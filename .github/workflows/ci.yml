@@ -45,6 +45,8 @@ jobs:
       # quietly resolves a different tree is not the build anyone reviewed.
       - name: install
         run: npm ci
+      - name: build stamp (public/build.json is generated, never committed)
+        run: node scripts/gen-build-json.mjs
 
       - name: types
         run: npx tsc --noEmit -p .
