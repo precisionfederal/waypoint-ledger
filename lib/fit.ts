@@ -467,7 +467,10 @@ export function totalLabels(ctx: Ctx): TotalLabels {
      this line, so the label names the basis and points at it. */
   if (!ctx.coverage) {
     return {
-      primary: `Medicare allowed amounts${where} — say who pays for your care and this changes`,
+      /* The sentence that used to ride on this label now sits BELOW the number,
+         as small type, on the page that prints it (app/sheet/page.tsx). A label
+         names the basis; it is not the place for an instruction. */
+      primary: `Medicare allowed amounts${where}`,
       secondary: null,
     };
   }

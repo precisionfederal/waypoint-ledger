@@ -28,13 +28,14 @@
     border-bottom: 1px solid #bbb !important; padding: .05in .06in .05in 0 !important }
   .sheet-table td[data-label]::before { content: none !important }
   .sheet-table td.num, .sheet-table th.num { text-align: right !important }
-  /* six columns, widest to the words a person typed */
-  .sheet-table th:nth-child(1), .sheet-table td:nth-child(1) { width: 26% }
-  .sheet-table th:nth-child(2), .sheet-table td:nth-child(2) { width: 23% }
+  /* five columns, widest to the words a person typed. The sixth column used to
+     print one repeated word down 14% of the page; its answer is now a line under
+     the figure, and the width it held went back to the person's own sentences. */
+  .sheet-table th:nth-child(1), .sheet-table td:nth-child(1) { width: 30% }
+  .sheet-table th:nth-child(2), .sheet-table td:nth-child(2) { width: 24% }
   .sheet-table th:nth-child(3), .sheet-table td:nth-child(3) { width: 6% }
-  .sheet-table th:nth-child(4), .sheet-table td:nth-child(4) { width: 19% }
+  .sheet-table th:nth-child(4), .sheet-table td:nth-child(4) { width: 26% }
   .sheet-table th:nth-child(5), .sheet-table td:nth-child(5) { width: 14% }
-  .sheet-table th:nth-child(6), .sheet-table td:nth-child(6) { width: 12% }
   .sheet-table th { font-size: 11pt; text-transform: none; letter-spacing: 0; color: #000; border-bottom: 1.5px solid #000 }
 
   /* the page furniture the screen needs and paper does not */
@@ -71,6 +72,7 @@
   .sheet-url { font-size: 11pt; word-break: break-all; color: #333 }
   /* the service code is the line a clinician checks: it prints at the floor, like everything else */
   .sheet-code { font-size: 11pt; color: #333 }
+  .sheet-verdict { font-size: 11pt; color: #000 }
   .sheet-foot { font-size: 11pt; color: #333; margin-top: .1in; padding-top: .05in; break-inside: avoid }
 
   /* a link a person cannot click is a link they must be able to read */

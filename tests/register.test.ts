@@ -12,6 +12,7 @@
    ========================================================================== */
 
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { CONTEXT, CONTEXT_KEYS, STATES, SMALL_CELL_MIN, suppressSmallCells, dictionary } from '../lib/survey';
 import { TABLE } from '../lib/table';
 import {
@@ -176,5 +177,60 @@ describe('a correction leaves here in a form the publisher can act on', () => {
     expect(csvCell('say "hi"')).toBe('"say ""hi"""');
     const csv = correctionsCsv([{ ...ROW, label: '=HYPERLINK("http://x")' }], '2026-09-09');
     expect(csv).toContain('"\'=HYPERLINK(""http://x"")"');
+  });
+});
+
+/* ==========================================================================
+   THE EMPTY STATES (UX-2, fixes 3 and 8).
+
+   A page whose whole claim is an honest public count cannot answer its first
+   supporter with a row of zeros, and cannot ask a phone to scan itself. Both
+   are checked against the source, the way /integrity's caps are, because both
+   are promises about what a stranger sees on the day the count is still 1.
+   ========================================================================== */
+const REG = readFileSync(new URL('../components/Register.tsx', import.meta.url), 'utf8');
+
+describe('a zero count invites, it never prints a 0', () => {
+  it('gives each of the four counts its own one-line invitation', () => {
+    for (const words of [
+      'No thumbs yet — be the first, on any priced line',
+      'No reports yet — be the first to count uncounted care',
+      'No rankings yet — be the first, in two minutes',
+      'No interviews yet — be the first, in your own time',
+    ]) expect(REG).toContain(words);
+    expect(REG.match(/invite=\{\{/g) ?? []).toHaveLength(4);
+  });
+
+  it('puts the invitation where the numeral was, and drops the "none yet" sub-line', () => {
+    const start = REG.indexOf('if (n === 0 && invite)');
+    expect(start).toBeGreaterThan(-1);
+    const branch = REG.slice(start, REG.indexOf('return (', REG.indexOf('}', REG.indexOf('  }', start))));
+    expect(branch).not.toContain('big-num');
+    expect(branch).not.toContain('reg-sub');
+    expect(branch).toContain('inviteLine');
+  });
+
+  it('draws no chart at all while nobody has ranked, and says why in the card', () => {
+    expect(REG).not.toContain('EmptyRankChart');
+    expect(REG).not.toContain('0 first · 0 last');
+    expect(REG).toContain('The bars fill from real answers only. Nothing here is ever seeded.');
+  });
+});
+
+describe('the share control fits the screen it is offered on', () => {
+  const CSS = readFileSync(new URL('../components/Register.module.css', import.meta.url), 'utf8');
+
+  it('hands a phone the link instead of a code for it to scan', () => {
+    expect(REG).toContain('Copy the link to send to someone');
+  });
+
+  it('swaps the QR for the link below 720px in CSS, never on a guessed width', () => {
+    expect(CSS).toMatch(/\.qrWide\s*\{\s*display:\s*block/);
+    expect(CSS).toMatch(/\.qrNarrow\s*\{\s*display:\s*none/);
+    const mq = CSS.slice(CSS.indexOf('@media (max-width: 720px)'));
+    expect(mq.length).toBeGreaterThan(0);
+    expect(mq).toMatch(/\.qrWide\s*\{\s*display:\s*none/);
+    expect(mq).toMatch(/\.qrNarrow\s*\{\s*display:\s*block/);
+    expect(REG).not.toMatch(/innerWidth|matchMedia/);
   });
 });

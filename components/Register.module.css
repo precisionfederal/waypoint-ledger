@@ -1,0 +1,41 @@
+/* ==========================================================================
+   THE REGISTER'S EMPTY STATES.
+
+   Two rules, both about one thing: a page nobody has answered yet must read as
+   young, never as broken.
+   1. A card whose count is zero prints an invitation where the numeral was.
+   2. The QR belongs on a projected screen; a phone is handed the link instead.
+   ========================================================================== */
+
+/* The invitation stands in for the big numeral, so the card keeps its rhythm
+   in the grid without printing a 0 anybody has to interpret. */
+.statInvite {
+  justify-content: flex-start;
+}
+
+.inviteLine {
+  margin: 0 0 .2rem;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  font-weight: 600;
+}
+
+.inviteLine a {
+  color: var(--brand-3);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.inviteLine a:hover {
+  color: var(--accent-ink);
+}
+
+/* One card, two share controls, and the viewport picks — no width is guessed
+   before hydration. 720px is the breakpoint the ledger table already uses. */
+.qrWide { display: block; }
+.qrNarrow { display: none; }
+
+@media (max-width: 720px) {
+  .qrWide { display: none; }
+  .qrNarrow { display: block; margin: 0; flex: 1 1 100%; }
+}

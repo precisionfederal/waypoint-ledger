@@ -2,7 +2,7 @@
    SELF-HOSTED TYPE — the identity, served from this origin only.
 
    The site used to load these three families from fonts.googleapis.com, which
-   was the only third-party request the app made and sat badly beside the
+   was a third-party request that sat badly beside the
    promise on /privacy that nothing leaves your device. The .woff2 files in
    /public/fonts were downloaded from Google Fonts on 2026-09-09 and are served
    from our own origin. Licence: SIL Open Font License 1.1 for all three

@@ -98,7 +98,7 @@ img,svg{max-width:100%;display:inline-block;vertical-align:middle}
 @media (forced-colors: active){:focus-visible,textarea:focus,input:focus,select:focus{outline:3px solid Highlight;outline-offset:2px}}
 ::selection{background:var(--brand-soft);color:var(--brand-ink)}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:0 clamp(1rem,4vw,2rem)}
-.skip{position:absolute;left:-999px;top:0;background:var(--surface);color:var(--ink);padding:.5rem 1rem;z-index:100;border-radius:0 0 var(--r-sm) 0;font-weight:700}
+.skip{position:absolute;min-height:44px;display:inline-flex;align-items:center;left:-999px;top:0;background:var(--surface);color:var(--ink);padding:.5rem 1rem;z-index:100;border-radius:0 0 var(--r-sm) 0;font-weight:700}
 .skip:focus{left:0}
 main:focus{outline:none}
 

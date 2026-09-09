@@ -235,9 +235,22 @@ export default function JourneyBuilder() {
             <LivePreviewChips preview={preview} onExample={(t) => setStory((s) => (s.trim() ? `${s.replace(/[\s,]+$/, '')}, ${t}` : t))} />
             <div className="row between wrap-sm">
               <button type="button" className="link-btn" onClick={() => setStory(EXAMPLE)}>Use an example</button>
-              <button className="btn primary" type="submit" disabled={!story.trim()}>
-                {preview.segments.length ? `Add these ${preview.segments.length}` : 'Add everything'} <Icon.Arrow />
-              </button>
+              {/* 🔴 THE PRIMARY IS NEVER A GREY PILL.
+                  On an empty box this was the disabled button, so the only
+                  live-looking control beside it was the ghost link — the person's
+                  own action looked switched off. It now carries the primary style
+                  at every moment; while the box is empty it puts the cursor in the
+                  box instead of submitting nothing. */}
+              {story.trim() ? (
+                <button className="btn primary" type="submit">
+                  {preview.segments.length ? `Add these ${preview.segments.length}` : 'Add everything'} <Icon.Arrow />
+                </button>
+              ) : (
+                <button className="btn primary" type="button"
+                        onClick={() => storyRef.current?.focus({ preventScroll: true })}>
+                  Add everything <Icon.Arrow />
+                </button>
+              )}
             </div>
             {/* The honest version of the promise, kept where the typing happens.
                 It used to be a paragraph above the box; the fact is unchanged. */}

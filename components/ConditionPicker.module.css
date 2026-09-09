@@ -34,3 +34,11 @@
 .alts{margin:0 0 var(--sp-2);padding-left:1.1rem;font-size:.9375rem;line-height:1.5;color:var(--ink-3)}
 .alts li{margin:0 0 .35rem}
 .alts b{color:var(--ink-2)}
+
+/* UX-2 — the fine print of the year-ahead card, one tap down */
+.fine{margin:0 0 var(--sp-3);border-top:1px solid var(--line-2);padding-top:var(--sp-2)}
+.fine>summary{cursor:pointer;font-size:.9375rem;color:var(--ink-2);list-style:none;display:flex;align-items:center;gap:.4rem}
+.fine>summary::-webkit-details-marker{display:none}
+.fine>summary::before{content:"";width:.45rem;height:.45rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.fine[open]>summary::before{transform:rotate(45deg)}
+.fine[open]>summary{margin-bottom:var(--sp-2)}

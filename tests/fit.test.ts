@@ -212,13 +212,19 @@ describe('the total says what it is', () => {
   /* 🔴 R4, results #1(c): the default visitor — the one who answered nothing —
      met the biggest number on the page labelled as a Medicare total, with no
      sign that a tap re-labels every row under it. */
-  it('tells a visitor who chose no coverage what the basis is and how to change it', () => {
+  /* UX-1 fix 5: the label names the basis and stops there. The instruction it
+     used to carry — say who pays and every line will say whether that figure
+     describes you — now sits BELOW the number, as small type, on /sheet. A label
+     on the largest figure of a page a person hands a clinician is not a prompt. */
+  it('tells a visitor who chose no coverage what the basis is', () => {
     const l = totalLabels({});
-    expect(l.primary).toBe('Medicare allowed amounts — say who pays for your care and this changes');
+    expect(l.primary).toBe('Medicare allowed amounts');
     expect(l.secondary).toBeNull();
+    // the label is a label: no instruction rides on it
+    expect(l.primary).not.toMatch(/ — /);
     // it still names the locality when one is set, and still names Medicare
     expect(totalLabels({ locality: 'IA-00' }).primary)
-      .toBe('Medicare allowed amounts in Iowa — say who pays for your care and this changes');
+      .toBe('Medicare allowed amounts in Iowa');
     expect(l.primary).toMatch(/medicare/i);
     // and it never claims the figure is theirs
     expect(l.primary).not.toMatch(/you paid|your bill|what you paid/i);

@@ -151,4 +151,29 @@ describe('the sheet prints', () => {
     expect(sizes.length).toBeGreaterThan(5);
     for (const s of sizes) expect(s).toBeGreaterThanOrEqual(11);
   });
+
+  /* ---------- UX-1 fix 5 — the number leads, and one cell carries the answer ----
+     The sheet used to print the largest figure on the page under a label that was
+     really an instruction, and a sixth column that said REFERENCE PRICE on every
+     row down 14% of the paper. */
+  it('puts the basis sentence under the total, as small type, not on top of it', () => {
+    expect(PAGE).toMatch(/Medicare reference/);
+    expect(PAGE).toMatch(/every line will say whether that figure describes you/);
+    /* it is below the total block and above the table */
+    const total = PAGE.indexOf('sheet-total-note');
+    const note = PAGE.indexOf('Medicare reference');
+    const table = PAGE.indexOf('<table className="sheet-table">');
+    expect(total).toBeLessThan(note);
+    expect(note).toBeLessThan(table);
+  });
+
+  it('carries no column of one repeated word: the verdict sits with its figure, and only when the lines differ', () => {
+    expect(PAGE).not.toMatch(/Does it describe me/);
+    expect(PAGE).toMatch(/className="sheet-verdict"/);
+    /* one answer for every line is said once, above the table, never down it */
+    expect(PAGE).toMatch(/fit && tally\.length > 1 \?/);
+    /* five columns on paper, not six, and the foot no longer points at a column */
+    expect(PRINT_CSS).not.toMatch(/nth-child\(6\)/);
+    expect(PAGE).not.toMatch(/The last column/);
+  });
 });

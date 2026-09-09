@@ -322,12 +322,15 @@ function ImpliedFigurePanel({ b, ask }: { b: Extract<Benchmark, { kind: 'figure'
       <p className={s.meta}>
         {b.year} {b.agencyDisplay ?? 'source'}{b.isGovernmentPublication ? '' : ' data'} &mdash; {b.geography}.
       </p>
-      <p className={s.meta}>
-        <strong>Who this describes:</strong> {b.population}.
-      </p>
       <p className={s.invite}>
         {ask} Say what you are looking into above and this card becomes yours.
       </p>
+      <details className={s.fine}>
+        <summary>Who is in this figure</summary>
+        <p className={s.meta}>
+          <strong>Who this describes:</strong> {b.population}.
+        </p>
+      </details>
       <p className={s.acts}>
         {b.sourceUrl && (
           <a className="btn ghost small" href={b.sourceUrl} target="_blank" rel="noopener noreferrer">
@@ -373,9 +376,6 @@ function PublishedSpanPanel({ ask }: { ask: string }) {
         {lead.figureKindLabel} &mdash; {lead.year} {lead.agencyDisplay ?? 'source'}
         {lead.isGovernmentPublication ? '' : ' data'}, {lead.geography}.
       </p>
-      <p className={s.meta}>
-        <strong>Who this describes:</strong> {lead.population}.
-      </p>
       {rows.length > 1 && (
         <ul className={s.alts}>
           {rows.filter((r) => r.rowId !== lead.rowId).map((r) => (
@@ -387,11 +387,17 @@ function PublishedSpanPanel({ ask }: { ask: string }) {
           ))}
         </ul>
       )}
-      <p className={s.meta}>
-        These are different measures of different populations, so they are listed and never
-        summed or averaged into one span.
-      </p>
       <p className={s.invite}>{ask} Pick a chip above and this card becomes one figure &mdash; yours.</p>
+      <details className={s.fine}>
+        <summary>Who is in this figure</summary>
+        <p className={s.meta}>
+          <strong>Who this describes:</strong> {lead.population}.
+        </p>
+        <p className={s.meta}>
+          These are different measures of different populations, so they are listed and never
+          summed or averaged into one span.
+        </p>
+      </details>
       <p className={s.acts}>
         {lead.sourceUrl && (
           <a className="btn ghost small" href={lead.sourceUrl} target="_blank" rel="noopener noreferrer">
@@ -434,31 +440,32 @@ function FigurePanel({ b }: { b: Extract<Benchmark, { kind: 'figure' }> }) {
             below says whose reading it is. */}
         {b.year} {b.agencyDisplay ?? 'source'}{b.isGovernmentPublication ? '' : ' data'} &mdash;{' '}
         {b.geography}.
-        {b.neverAddedToTotal
-          ? ' It already contains every visit, test and scan a year holds, which is why it is shown here and never summed with the lines above.'
-          : ''}
+        {b.neverAddedToTotal ? ' A whole year of care, so it is never added to the lines above.' : ''}
       </p>
 
-      {/* 🔴 WHO IS AND ISN'T IN THE DATA — Phillips's first test, and the reason
-          the survey population no longer sits on top of the money screen. It is
-          not deleted; it is here, one tap from the total, where a person who
-          wants it will look for it. */}
-      <p className={s.meta} id="year-ahead-who">
-        <strong>Who this describes:</strong> {b.population}.
-      </p>
-
-      {!b.isGovernmentPublication && (
-        <p className={s.meta}><strong>Who published it:</strong> {b.publisherNote}</p>
-      )}
-      {b.median !== null && (
-        <p className={s.meta}>
-          The median for the same population is {usd(b.median)}. The mean is more than seven times
-          it, so most people spend far less and a few spend enormously more.
+      {/* UX-2 (Bo, 2026-09-09: "wordy and hard to read"): the number, its meaning and its source stay in
+          view; who is in the data, who published it, the median and the definition caveat keep every word
+          but sit one tap down. Nothing was deleted. */}
+      <details className={s.fine}>
+        <summary>Who is in this figure, and what it is not</summary>
+        {/* 🔴 WHO IS AND ISN'T IN THE DATA — Phillips's first test. Not deleted;
+            one tap from the total, where a person who wants it will look for it. */}
+        <p className={s.meta} id="year-ahead-who">
+          <strong>Who this describes:</strong> {b.population}.
         </p>
-      )}
-      {b.condition.definitionCaveat && (
-        <p className={s.caveat}>{b.condition.definitionCaveat}</p>
-      )}
+        {!b.isGovernmentPublication && (
+          <p className={s.meta}><strong>Who published it:</strong> {b.publisherNote}</p>
+        )}
+        {b.median !== null && (
+          <p className={s.meta}>
+            The median for the same population is {usd(b.median)}. The mean is more than seven times
+            it, so most people spend far less and a few spend enormously more.
+          </p>
+        )}
+        {b.condition.definitionCaveat && (
+          <p className={s.caveat}>{b.condition.definitionCaveat}</p>
+        )}
+      </details>
 
       <p className={s.acts}>
         {b.sourceUrl && (

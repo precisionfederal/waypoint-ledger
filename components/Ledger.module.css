@@ -1,0 +1,30 @@
+/* ==========================================================================
+   UX-2 · STEP 3 IS A BAND, NOT ONE CARD IN A TRAY OF FOUR.
+
+   /ledger prints "Step 2 of 3" at its head and then kept the route to step 3 in
+   a four-card tray at the foot, so the promise the stepper makes was one the
+   page did not keep. The band below sits directly under the ledger table, full
+   width, and carries the sentence the card always carried, unchanged.
+
+   Nothing new: --brand-soft behind, the accent rule at the edge, the existing
+   pill button, no type under the floor.
+   ========================================================================== */
+.stepBand{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:var(--sp-4);margin:var(--sp-5) 0 0;padding:var(--sp-5);
+  background:var(--brand-soft);border:1px solid var(--line);
+  border-left:4px solid var(--accent);border-radius:var(--r-lg)}
+.stepBandBody{flex:1 1 24rem;min-width:0}
+.stepBandBody h2{margin:0 0 .35rem;font-family:var(--font-d);font-weight:800;
+  font-size:1.25rem;line-height:1.2;color:var(--brand-ink)}
+.stepBandBody p{margin:0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
+.stepBandWho{margin-top:.35rem !important;font-size:.875rem;color:var(--ink-3)}
+.stepBtn{flex:0 0 auto}
+@media (max-width:720px){
+  .stepBand{padding:var(--sp-4)}
+  .stepBtn{width:100%;justify-content:center}
+}
+
+/* The download glyph in the four export pills was being flex-shrunk to nothing
+   on a phone — 0px wide on the widest label, 9px on the next. The pills are
+   unchanged; the icon simply stops being the thing that gives way. */
+.exportBtn svg{flex:0 0 auto}

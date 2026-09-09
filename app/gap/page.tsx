@@ -12,7 +12,7 @@ export default function GapPage() {
     <section className="page">
       <div className="wrap">
         <p className="eyebrow">Uncounted care</p>
-        <h1 className="page-h1">The costs no dataset counted</h1>
+        <h1 className="page-h1">What the data never recorded about you</h1>
         <p className="page-h1-sub">Federal data records care that was delivered and billed; everything below that produces no row anywhere.</p>
         <GapClient />
         <Aside summary="Why counting it is the whole point">

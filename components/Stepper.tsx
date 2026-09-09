@@ -2,7 +2,7 @@ import Link from 'next/link';
 const STEPS = [
   { n: 1, label: 'Describe', href: '/journey' },
   { n: 2, label: 'Your ledger', href: '/ledger' },
-  { n: 3, label: 'Act on it', href: '/ledger#act' },
+  { n: 3, label: 'Act on it', href: '/ledger#step3' },
 ];
 export default function Stepper({ current }: { current: 1 | 2 | 3 }) {
   return (

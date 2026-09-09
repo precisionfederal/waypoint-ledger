@@ -64,6 +64,7 @@ function Fields({ e }: { e: PrivacyEndpoint }) {
 
 const TOC: TocItem[] = [
   { id: 'browser', text: 'Your journey stays in this browser' },
+  { id: 'reader', text: 'What the AI reader sees' },
   { id: 'save', text: 'If you press Save' },
   { id: 'about-you', text: 'What you tell the ledger about yourself' },
   { id: 'share', text: 'A share link carries no names' },
@@ -71,7 +72,7 @@ const TOC: TocItem[] = [
   { id: 'gap', text: 'What a gap report sends' },
   { id: 'survey', text: 'What the burden survey sends' },
   { id: 'interview', text: 'What a written interview sends' },
-  { id: 'third-party', text: 'No analytics, no advertising, no third party' },
+  { id: 'third-party', text: 'No analytics, no advertising, no tracking' },
   { id: 'fields', text: 'Every field this database has' },
   { id: 'who', text: 'Who runs it' },
 ];
@@ -82,11 +83,23 @@ export default function Privacy() {
       <div className={`wrap prose ${long.wide}`}>
         <p className="eyebrow">Privacy</p>
         <h1>What this tool keeps, and what it never sees</h1>
-        <p className="sub">Nothing you type leaves this browser unless you press Save or send something.</p>
+        <p className="sub">Nothing you type is kept anywhere but this browser unless you press Save, send something, or write a phrase our own rules cannot read &mdash; and each of those is described here, field by field.</p>
 
         <LongLayout items={TOC}>
           <LongSection id="browser" title="Your journey stays in this browser" first open>
             <p>What you type into the ledger is held in this browser&rsquo;s local storage. Clearing your browser data, or pressing &ldquo;Start over&rdquo;, removes it. An account is optional and changes none of that: your journey still lives in this browser. If you make one, we store a random account number, whichever way in you chose (the public half of a passkey, or an email address and a scrambled form of your password that cannot be turned back into it), a ten-word recovery code we keep only the scrambled form of, and the ledgers you press save on. No mail is ever sent to that address. Deleting your account from /account erases all of it; corrections you already sent stay in the public register with the link back to you removed.</p>
+          </LongSection>
+
+          {/* 🔴 THE ONE REQUEST THIS PRODUCT MAKES OF AN OUTSIDE COMPANY IS
+              DESCRIBED IN THE SAME PLAIN WORDS AS EVERY FIELD BELOW. Read
+              cf/functions/api/map.js and components/JourneyBuilder.tsx before
+              editing a word of this: the rules run in the browser AND again on
+              our server, the model sees only what those rules could not read,
+              the catalog it chooses from carries no prices, and the cache holds
+              the answer for one day. Nothing here is aspiration. */}
+          <LongSection id="reader" title="What the AI reader sees">
+            <p>While you type, the words in the box are sent to this site so that the same rules your browser just ran can be run again on our server. Any phrase those rules cannot read is passed on &mdash; that phrase, the list of unit names from the price table, and nothing else &mdash; over an encrypted connection to a model run by OpenAI, which may answer only with a unit name the table already holds. No price is ever sent to a model and no price ever comes back: the published federal table does every bit of the pricing on this side of the wire. The answer, which carries the phrases you typed, is held for one day under a one-way hash of what you typed, so the same sentence is never read twice; after that day it is gone.</p>
+            <p className="micro">If the OpenAI key is absent the same request goes to Anthropic, or to Cloudflare&rsquo;s own model on the network that served you this page. If no model answers, the rules&rsquo; answer stands and the line is simply left blank for you to fill in yourself. You can see exactly what is asked and what comes back at <a href="/api/map">POST /api/map</a>, and the rules themselves are in the open source.</p>
           </LongSection>
 
           <LongSection id="save" title="If you press Save">
@@ -118,8 +131,8 @@ export default function Privacy() {
             <p>The answers you wrote, the consent you chose (learn only, quote anonymously, quote by name), a name only if you chose to be quoted by name, and an email address only if you asked to hear about a new version. Interview answers are encrypted at rest and are never served by any endpoint or included in any export. Quotes appear only in the way you chose. To have an interview removed, write to bo@precisionfederal.com.</p>
           </LongSection>
 
-          <LongSection id="third-party" title="No analytics, no advertising, no third party at all">
-            <p>This site makes no third-party request of any kind. The three typefaces are served from this domain (they used to come from Google Fonts, and that was the last outside request left). There is no analytics script, no advertising, no tracking cookie. The only cookie this site can ever set is the session cookie you get if you sign in, and it holds one random value.</p>
+          <LongSection id="third-party" title="No analytics, no advertising, no tracking">
+            <p>Your browser makes no third-party request of any kind. The single outside request this product makes is the one above, to the AI reader, and our server makes it &mdash; never your browser, and never with a price in it. The three typefaces are served from this domain (they used to come from Google Fonts, and that was the last outside request left). There is no analytics script, no advertising, no tracking cookie. The only cookie this site can ever set is the session cookie you get if you sign in, and it holds one random value.</p>
           </LongSection>
 
           <LongSection id="fields" title="Every field this database has">

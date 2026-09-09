@@ -567,3 +567,48 @@ header.site .wrap.bar{max-width:82rem}
 /* the fit mark is a button: it opens the why-block under its line */
 button.fit-mark{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 button.fit-mark:hover,button.fit-mark[aria-expanded="true"]{text-decoration:underline;text-underline-offset:.2em}
+
+/* ================= UX-2 home ================= */
+/* Fixes 1, 2 and 4 from ../winloop/UX-1/ux.md, plus the R5 chip-scroll item.
+   Nothing here changes a type size: the hero's hierarchy changes, not its
+   scale. Anything outside this block belongs to another lane. */
+
+/* FIX 2 — the sample is not the person's card. Tinted inset, own label, own
+   total; the type inside it is exactly what it was. */
+.hl-sample{background:var(--ground-2);border-radius:var(--r-sm);padding:var(--sp-3);margin:.15rem 0 .3rem}
+.hl-sample .hl-eg-lbl{margin-top:0}
+.hl-sample .hl-eg{border-top-color:var(--line);margin-bottom:.35rem}
+.hl-sample .hl-total{margin-top:.15rem}
+
+/* FIX 1 — the person's own action is the loudest control, and it is first.
+   The example is a ghost. The hero band paints ghosts white-on-transparent for
+   the dark band; inside the white card it has to read as a real control. */
+/* Both labels are longer than half the card, so a row would wrap raggedly:
+   they stack full-width, primary first, which is also how they land on a
+   phone. No type size changes. */
+.hl-foot.is-empty{flex-direction:column;align-items:stretch;gap:.5rem;margin-top:.35rem}
+.hl-foot.is-empty .btn{width:100%}
+.hl-card .btn.ghost{background:var(--surface);color:var(--ink);border-color:var(--line)}
+.hl-card .btn.ghost:hover{border-color:var(--brand-3);color:var(--brand-3)}
+
+/* FIX 4 — the fact stays, the numeral stops being the headline. */
+.zero-say{margin:0;font-size:1.02rem;line-height:1.55;max-width:38ch;margin-inline:auto}
+
+/* R5 — the running total has to stay on screen. Measured at 1280x800: five
+   chips are 286 px, so the cap is set just above that (18rem = 288 px) and the
+   demo sentence never clips; a longer sentence scrolls inside the card instead
+   of pushing "So far" and the button past the fold. The thin scrollbar is the
+   affordance, and it only renders when there is something to scroll. */
+.hero-live .lp-chips{max-height:18rem;overflow-y:auto;overscroll-behavior:contain;
+  padding-right:.25rem;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+@media (max-height:760px){.hero-live .lp-chips{max-height:12rem}}
+/* ================= /UX-2 home ================= */
+
+
+/* ========================= UX-2 pages ======================================
+   UX-1 fixes 5 and 12 (runs/TOPX-HHS-PHASE2/winloop/UX-1/ux.md). Nothing here
+   introduces a colour, a typeface or a smaller size: the sheet's fit mark reuses
+   the ledger's own .fit-mark values so one answer has one look in both places.
+   ========================================================================== */
+.sheet-verdict{font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--ink-3)}

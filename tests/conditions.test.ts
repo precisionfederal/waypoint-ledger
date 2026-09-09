@@ -236,7 +236,7 @@ describe('the panel renders what the row says, and nothing else', () => {
     expect(html).toContain('not a federal publication');
     expect(html).toContain('AHRQ MEPS data');   // the survey is AHRQ's; the estimate is not
     // and it must never be summed with the itemized lines
-    expect(html).toContain('never summed with the lines above');
+    expect(html).toContain('never added to the lines above');
   });
 
   it('diabetes: the same panel swaps kind and figure with no code change', async () => {

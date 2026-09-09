@@ -67,7 +67,7 @@ export default function Home() {
               <Link className="btn ghost" href="/survey">Rank the five burdens</Link>
             </div>
           </div>
-          <div className="zero-card"><p className="zero-num">$0</p><p>rows you generate in federal health data for every visit you needed and could not get</p></div>
+          <div className="zero-card"><p className="zero-say">Every visit you needed and could not get produces no row in any federal file. Not $0 &mdash; no row at all.</p></div>
         </div>
       </section>
 
@@ -171,20 +171,34 @@ function HeroBuilder() {
           </>
         ) : (
           <>
-            <p className="hl-eg-lbl">A worked example, priced from the table as this page loads</p>
-            <ul className="hl-eg">
-              {rows.map((r) => (
-                <li key={r.id}>
-                  <span className="hl-said">{r.said}</span>
-                  <span className="hl-unit"><i className="hl-src">{agencyOf(r.it!)}</i>{r.it!.label}</span>
-                  <b>{usd((r.it!.valueUsd ?? 0) * r.n)}</b>
-                </li>
-              ))}
-            </ul>
-            <p className="hl-cited"><Icon.Cite /> Free · no account · every figure cited to a published federal file</p>
-            <div className="hl-foot">
+            {/* The sample is not the person's answer. It sits in its own tinted
+                inset, with its own label and its own total, so nobody reads our
+                three rows as theirs. Same type sizes as before. */}
+            <div className="hl-sample">
+              <p className="hl-eg-lbl">Not your numbers yet &mdash; an example, priced from the table as this page loads</p>
+              <ul className="hl-eg">
+                {rows.map((r) => (
+                  <li key={r.id}>
+                    <span className="hl-said">{r.said}</span>
+                    <span className="hl-unit"><i className="hl-src">{agencyOf(r.it!)}</i>{r.it!.label}</span>
+                    <b>{usd((r.it!.valueUsd ?? 0) * r.n)}</b>
+                  </li>
+                ))}
+              </ul>
               <p className="hl-total"><span className="lbl">These three published figures</span> <b>{usd(exampleTotal)}</b></p>
-              <button className="btn primary" type="button" onClick={() => { st.loadExample(); window.location.href = '/ledger'; }}>Open the full example <Icon.Arrow /></button>
+            </div>
+            <p className="hl-cited"><Icon.Cite /> Free · no account · every figure cited to a published federal file</p>
+            {/* The loudest control is the person's own next move. Empty, it is a
+                prompt that puts the cursor in the box; the moment there is text
+                it is the same add action the typed state uses. The example is a
+                ghost beside it, never the thing the eye lands on first. */}
+            <div className="hl-foot is-empty">
+              {story.trim() ? (
+                <button className="btn primary" type="button" onClick={add}>Add everything <Icon.Arrow /></button>
+              ) : (
+                <button className="btn primary" type="button" onClick={() => ref.current?.focus()}>Start with one sentence <Icon.Arrow /></button>
+              )}
+              <button className="btn ghost" type="button" onClick={() => { st.loadExample(); window.location.href = '/ledger'; }}>See it done with an example</button>
             </div>
           </>
         )}

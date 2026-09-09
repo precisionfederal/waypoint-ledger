@@ -180,6 +180,25 @@ export default function LineDrawer({ item, ctx = {}, onClose }: { item: PriceIte
             </p>
           )}
 
+          {/* 🔴 "SHOW ME THE SOURCE" IS ANSWERED IN ONE GLANCE.
+              This link used to sit six sections down, under a File/Row/SHA table
+              of raw CSV names, so the first screen of the drawer argued about
+              provenance and never offered it. It now stands directly under the
+              figure it opens and above every other measure. Nothing below was
+              removed — the file, the row and the hash are still there for anyone
+              who wants to check the check. */}
+          {openHref && (
+            <a className="btn ghost full" href={openHref} target="_blank" rel="noopener noreferrer">
+              Open the source and check this number <Icon.External />
+            </a>
+          )}
+          {showingCharge && cy2024 && (
+            <p className="micro">
+              That link opens {openTitle} — the file this charge is in, not the fee schedule the
+              row&rsquo;s own figure comes from.
+            </p>
+          )}
+
           {formula && loc && (
             <section className={cs.formula}>
               <h3>How the figure for {loc.displayName} is made</h3>
@@ -231,17 +250,6 @@ export default function LineDrawer({ item, ctx = {}, onClose }: { item: PriceIte
             <dt>Source</dt><dd>{item.sourceTitle}</dd>
             {item.loinc && (<><dt>LOINC</dt><dd>{item.loinc}{item.loincName ? ` — ${item.loincName}` : ''}</dd></>)}
           </dl>
-          {openHref && (
-            <a className="btn ghost full" href={openHref} target="_blank" rel="noopener noreferrer">
-              Open the source and check this number <Icon.External />
-            </a>
-          )}
-          {showingCharge && cy2024 && (
-            <p className="micro">
-              That link opens {openTitle} — the file this charge is in, not the fee schedule the
-              row&rsquo;s own figure comes from.
-            </p>
-          )}
           <section className="coverage">
             <h3>Who this number does and does not describe</h3>
             {cov.intro.map((t, i) => <p key={i}>{t}</p>)}

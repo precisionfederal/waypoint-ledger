@@ -136,10 +136,21 @@ export default function SheetPage() {
           </p>
         </div>
 
+        {/* 🔴 THE NUMBER LEADS; THE SENTENCE FOLLOWS IT.
+            This sentence used to be the total's own label, so the largest figure
+            on a sheet a person hands a clinician arrived wearing an instruction.
+            It is the same sentence, relocated under the number as small type. */}
+        {!ctx.coverage && (
+          <p className="sheet-fit">
+            Medicare reference &middot; {loc ? loc.displayName : 'national'}. Say who pays for your care and
+            every line will say whether that figure describes you.
+          </p>
+        )}
+
         {tally.length > 0 && (
           <p className="sheet-fit">
             <strong>Does the published figure describe you:</strong>{' '}
-            {tally.map(([v, n]) => `${n} ${n === 1 ? 'line' : 'lines'} ${v.toLowerCase()}`).join(' · ')}. The last column says which line is which.
+            {tally.map(([v, n]) => `${n} ${n === 1 ? 'line' : 'lines'} ${v.toLowerCase()}`).join(' · ')}.{tally.length > 1 ? ' Each line says which it is, under its own figure.' : ''}
           </p>
         )}
 
@@ -150,7 +161,6 @@ export default function SheetPage() {
               <th scope="col">Unit of care</th>
               <th scope="col" className="num">Times</th>
               <th scope="col" className="num">Published figure</th>
-              <th scope="col">Does it describe me</th>
               <th scope="col" className="num">Line total</th>
             </tr>
           </thead>
@@ -163,11 +173,18 @@ export default function SheetPage() {
                   <td>{l.entry.raw}</td>
                   <td data-label="Unit of care">{it ? <>{agencyOf(it)} · {it.label}{it.code ? <span className="sheet-code"> {it.code}</span> : null}</> : <em>no federal figure exists</em>}</td>
                   <td className="num" data-label="Times">{l.entry.times}</td>
+                  {/* 🔴 ONE CELL CARRIES THE FIGURE, ITS BASIS AND WHETHER IT
+                      DESCRIBES THIS PERSON. A sixth column spent 14% of the paper
+                      width printing one repeated word; the same answer now sits
+                      under the figure it is about, where a clinician reads it —
+                      and only when the lines differ. Where every line carries the
+                      same answer, the counted line above the table says it once
+                      and no word is repeated down the page. */}
                   <td className="num" data-label="Published figure">
                     {it && l.priced && fit ? `${usd(fit.figureUsd, true)} (${figureLabel(it, fit)})` : '—'}
                     {fit?.figureNote ? <><br /><span className="sheet-code">{fit.figureNote}</span></> : null}
+                    {fit && tally.length > 1 ? <><br /><span className="sheet-verdict">{fit.verdict}</span></> : null}
                   </td>
-                  <td data-label="Does it describe me">{fit ? fit.verdict : '—'}</td>
                   <td className="num" data-label="Line total">{l.priced ? usd(l.totalUsd) : '—'}</td>
                 </tr>
               );
@@ -251,7 +268,7 @@ export default function SheetPage() {
           {loc && localityLines > 0
             ? `${localityLines} of the ${lines.length} ${lines.length === 1 ? 'line' : 'lines'} here carry the CMS allowed amount CMS publishes for ${loc.displayName} under the CY2026 formula; the rest carry the figure named in their own row, and each says which.`
             : 'Each figure is labelled with what it is: a Medicare allowed amount, an average submitted charge, or a survey average across everyone in the source population. Nothing here is a bill.'}
-          {' '}The last column says, for each line, whether the published figure describes this person, is a reference price, is what an uninsured person is billed against, or describes someone else entirely.
+          {' '}{tally.length > 1 ? 'Under each published figure' : 'The counted line above the table'} says whether the published figure describes this person, is a reference price, is what an uninsured person is billed against, or describes someone else entirely.
           Not a diagnosis, not treatment advice, not medical records. waypoint · Precision Federal.
         </p>
       </div>

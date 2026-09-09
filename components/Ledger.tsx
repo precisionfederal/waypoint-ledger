@@ -29,6 +29,7 @@ import {
   type Fit, type FitVerdict, type MedicaidFeeSchedule, type NoFigureCopy,
 } from '@/lib/fit';
 import cs from './ContextBar.module.css';
+import ls from './Ledger.module.css';
 
 /* One typographic mark per row, not three filled pills. The glyph carries the
    verdict at a glance and the words carry it exactly; both are the verdict's own
@@ -200,18 +201,39 @@ export default function Ledger() {
     [gaps, appointments],
   );
   const sos = useMemo(() => siteOfServiceFinding(), []);
+  /* 🔴 ONE BUTTON PER ACTION. "Save my card" stood in the sticky phone bar and
+     again in the "Take it somewhere" card, both on screen at once. The bar's
+     copy stands down while the card it duplicates is in the viewport; scroll
+     away from the card and the bar takes the action back. A callback ref is used
+     rather than useRef so the observer attaches on the render the node appears. */
+  const [takeItEl, setTakeItEl] = useState<HTMLElement | null>(null);
+  const [shareInView, setShareInView] = useState(false);
+  useEffect(() => {
+    if (!takeItEl || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setShareInView(e.isIntersecting), { threshold: 0 });
+    io.observe(takeItEl);
+    return () => io.disconnect();
+  }, [takeItEl]);
   const burdensEntered = burdens.workdays > 0 || burdens.careHours > 0 || burdens.trips > 0 || burdens.dismissed > 0;
 
   /* Three stat cards beside the total, in the order that argues: time first. */
   const stats: { lbl: string; val: string; sub: ReactNode }[] = [];
   if (gaps.months > 0) stats.push({ lbl: 'Time spent searching', val: monthsPhrase(gaps.months), sub: 'counted, never priced' });
-  stats.push({ lbl: 'Steps in your journey', val: String(appointments), sub: `${st.entries.length} distinct` });
+  /* 🔴 ONE NOUN FOR ONE NUMBER. The stat said "Steps in your journey 7" while the
+     bar under it said "7 appointments" — the same count, two nouns, one screen.
+     The noun is appointments, in both places. */
+  stats.push({ lbl: 'Appointments', val: String(appointments), sub: `${st.entries.length} distinct` });
   const blankLines = sum.unpricedCount + st.unpricedHits.length;
-  stats.push({
-    lbl: 'Without a federal figure',
-    val: String(blankLines),
-    sub: blankLines === 0 ? 'every line carries one' : 'shown blank, never guessed',
-  });
+  /* 🔴 THE STRONGEST FACT ABOUT THIS PRODUCT WAS BEING DISPLAYED AS A ZERO.
+     "0 / Without a federal figure" is the good outcome — every line is cited —
+     and it read as an empty result. When there is nothing missing, the stat is a
+     statement instead of a numeral; the moment something IS missing, the count
+     comes back, because that count is the honest part. */
+  stats.push(
+    blankLines === 0
+      ? { lbl: 'carries a published federal figure', val: 'Every line', sub: null }
+      : { lbl: 'Without a federal figure', val: String(blankLines), sub: 'shown blank, never guessed' },
+  );
   if (wrong > 0) stats.push({ lbl: 'Corrections you sent', val: String(wrong), sub: <Link href="/register">see the running count</Link> });
 
   if (!st.hydrated) return <div className="wrap"><p className="micro">Loading your ledger…</p></div>;
@@ -484,11 +506,11 @@ export default function Ledger() {
             Eight choices in one card is not generosity, it is an unfinished
             decision handed to the reader. One primary action, and everything
             else one click away and named. Nothing was deleted. */}
-        <section className="card actions">
+        <section className="card actions" ref={setTakeItEl}>
           <p className="lbl">Take it somewhere</p>
           <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION, yearAhead: yearAheadFigure }} className="btn primary full" label="Save my card" />
           <p className="micro">An image drawn in this browser — the number, how long the search took, and where the cost sits. Nothing is uploaded to make it.</p>
-          <div className="row exports"><button className="btn ghost" onClick={csv}><Icon.Download /> CSV</button><button className="btn ghost" onClick={json}><Icon.Download /> JSON</button><button className="btn ghost" onClick={fhir}><Icon.Download /> FHIR</button><button className="btn ghost" onClick={brief}><Icon.Download /> Brief</button></div>
+          <div className="row exports"><button className={`btn ghost ${ls.exportBtn}`} onClick={csv}><Icon.Download /> CSV</button><button className={`btn ghost ${ls.exportBtn}`} onClick={json}><Icon.Download /> JSON</button><button className={`btn ghost ${ls.exportBtn}`} onClick={fhir} title="HL7 FHIR R4 Bundle — the format the rest of health IT reads"><Icon.Download /> FHIR R4</button><button className={`btn ghost ${ls.exportBtn}`} onClick={brief}><Icon.Download /> Brief</button></div>
           {/* 🔴 SAVE LIVES HERE NOW, NOT IN THE NAV.
               It was a header control on all thirteen pages and meant something
               on one of them. It belongs beside the ledger it saves. */}
@@ -648,6 +670,21 @@ export default function Ledger() {
         </div>
       </section>
 
+      {/* 🔴 THE PAGE KEEPS THE PROMISE THE STEPPER MAKES.
+          Step 3 was one card in a tray of four at the foot, below the year-ahead
+          block and the site-of-service fold. It is now a band of its own,
+          directly under the table it follows from, carrying the same sentence it
+          carried in the card. Nothing was deleted: the tray at the foot keeps
+          the other three ways to use this ledger. */}
+      <section className={ls.stepBand} aria-labelledby="step3">
+        <div className={ls.stepBandBody}>
+          <h2 id="step3">Step 3 — count what never happened</h2>
+          <p>The care you needed and did not get produces no row in any federal file. Tell us how often, and rank which cost hurt most.</p>
+          <p className={ls.stepBandWho}>You, in two minutes</p>
+        </div>
+        <Link className={`btn primary ${ls.stepBtn}`} href="/gap">Report the gap <Icon.Arrow /></Link>
+      </section>
+
       {st.unpricedHits.length > 0 && (
         <section className="card">
           <p className="lbl">Real costs with no defensible federal figure</p>
@@ -689,14 +726,13 @@ export default function Ledger() {
       ) : <SiteOfService />}
 
       <section id="act" className="acts-wrap">
-        <p className="eyebrow">Step 3 of 3</p>
+        <p className="eyebrow">After the number</p>
         <h2>A number nobody reads changes nothing</h2>
         <div className="acts">
           <article className="act-card"><span className="act-ic"><Icon.Sheet /></span><h3>Bring it to your next appointment</h3><p className="who">Your doctor · the next specialist</p><p>One printed page: every step so far, what each costs in the government&rsquo;s own figures, and three questions worth asking.</p><Link className="btn small primary" href="/sheet">Make the sheet</Link></article>
           <article className="act-card"><span className="act-ic"><Icon.Signal /></span><h3>Tell the government its figure is wrong</h3><p className="who">The agency that published the number</p><p>A correction is bound to the exact source row, so it can be routed to the agency that published it. <Link href="/register">See the running count.</Link></p></article>
           <article className="act-card"><span className="act-ic"><Icon.Cite /></span><h3>Give it to your employer</h3><p className="who">HR · a benefits administrator · a leave request</p><p>An itemized, cited account of what a search for a diagnosis has cost is evidence in a conversation about accommodation or leave.</p><button className="btn small ghost" onClick={brief}>Build the brief</button></article>
-          <article className="act-card"><span className="act-ic"><Icon.Shield /></span><h3>Count what no dataset counted</h3><p className="who">You, in two minutes</p><p>The care you needed and did not get produces no row in any federal file. Tell us how often, and rank which cost hurt most.</p><Link className="btn small ghost" href="/gap">Report the gap</Link></article>
-        </div>
+                  </div>
       </section>
 
       <LineDrawer item={detail} ctx={ctx} onClose={closeDetail} />
@@ -707,7 +743,9 @@ export default function Ledger() {
           <span className="mb-sub">{appointments} {appointments === 1 ? 'appointment' : 'appointments'}</span>
           <span className="mb-sub mb-distinct">{st.entries.length} distinct {st.entries.length === 1 ? 'line' : 'lines'}</span>
         </div>
-        <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION, yearAhead: yearAheadFigure }} className="btn primary" label="Save my card" />
+        {!shareInView && (
+          <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION, yearAhead: yearAheadFigure }} className="btn primary" label="Save my card" />
+        )}
       </div>
     </div>
   );

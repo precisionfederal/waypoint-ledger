@@ -28,6 +28,7 @@ import {
   publisherOf, documentOf, fitRate, citationText, correctionsCsv,
   PUBLISHER_FULL, PUBLISHER_ROUTE, type CiteRow, type Publisher,
 } from '@/lib/register-cite';
+import styles from './Register.module.css';
 
 interface CorrRow { priceId: string; confirmedRight: number; flaggedWrong: number; publicMedianBelievedUsd: number | null }
 interface GapRow { category: string; respondentsReporting: number; totalReported: number; meanPerRespondent: number }
@@ -212,15 +213,19 @@ export default function Register() {
         {totalSent === 0 ? <FirstAnswer /> : (
         <div className="reg-grid">
           <Stat n={loaded ? nCorr : null} label={nCorr === 1 ? 'thumb on a published federal figure' : 'thumbs on published federal figures'}
-            sub={loaded ? `on ${corr!.length} of ${PRICED_ROWS} priced rows · counted ${day(asOf)}` : undefined} />
+            sub={loaded ? `on ${corr!.length} of ${PRICED_ROWS} priced rows · counted ${day(asOf)}` : undefined}
+            invite={{ href: '/ledger', words: 'No thumbs yet — be the first, on any priced line' }} />
           {/* "no reports yet" is a claim about the register. When the register could
               not be read it is a claim we have no right to make, so it is not made. */}
           <Stat n={loaded ? gap!.respondents : null} label="people reporting uncounted care"
-            sub={!loaded ? (failed ? 'unread' : undefined) : gap!.respondents > 0 ? `first ${day(gap!.firstAt)} · latest ${day(gap!.lastAt)}` : 'no reports yet'} />
+            sub={!loaded ? (failed ? 'unread' : undefined) : gap!.respondents > 0 ? `first ${day(gap!.firstAt)} · latest ${day(gap!.lastAt)}` : 'no reports yet'}
+            invite={{ href: '/gap', words: 'No reports yet — be the first to count uncounted care' }} />
           <Stat n={loaded ? sv!.n : null} label="burden rankings"
-            sub={!loaded ? (failed ? 'unread' : undefined) : sv!.n > 0 ? `first ${day(sv!.firstAt)} · latest ${day(sv!.lastAt)}` : 'no rankings yet'} />
+            sub={!loaded ? (failed ? 'unread' : undefined) : sv!.n > 0 ? `first ${day(sv!.firstAt)} · latest ${day(sv!.lastAt)}` : 'no rankings yet'}
+            invite={{ href: '/survey', words: 'No rankings yet — be the first, in two minutes' }} />
           <Stat n={loaded ? iv!.n : null} label="written interviews"
-            sub={!loaded ? (failed ? 'unread' : undefined) : iv!.n > 0 ? `first ${day(iv!.firstAt)} · latest ${day(iv!.lastAt)}` : 'none yet'} />
+            sub={!loaded ? (failed ? 'unread' : undefined) : iv!.n > 0 ? `first ${day(iv!.firstAt)} · latest ${day(iv!.lastAt)}` : 'none yet'}
+            invite={{ href: '/interview', words: 'No interviews yet — be the first, in your own time' }} />
         </div>
         )}
         <p className="micro">
@@ -273,7 +278,15 @@ export default function Register() {
         <h2 className="sig-h">Which cost weighed most, ranked by the people who carried it <span className="sig-n">{sv ? sigN(`${sv.n} ${sv.n === 1 ? 'person' : 'people'} answered`) : sigN('')}</span></h2>
         <p className="sub">{QUESTIONS.rank} Five burdens, ranked by each person. Reported as how many put each first, how many put it last, and the mean position. No weighting scheme of ours underneath.</p>
         {failed && <Failed onRetry={load} busy={busy} />}
-        {sv && sv.n === 0 && <EmptyRankChart />}
+        {sv && sv.n === 0 && (
+          <InviteCard
+            headline="Nobody has ranked yet."
+            body="The bars fill from real answers only. Nothing here is ever seeded."
+            cta="Be the first, in two minutes"
+            href="/survey"
+            foot="Five burdens, ranked heaviest to lightest. No account, no name, no diagnosis."
+          />
+        )}
         {sv && sv.n > 0 && sv.ranking && (
           <>
             <RankChart rows={sv.ranking.map((r) => ({ label: B_LABEL[r.burden] ?? r.burden, first: r.rankedFirstBy, last: r.rankedLastBy, mean: r.meanRank }))} n={sv.n} />
@@ -404,24 +417,56 @@ export default function Register() {
    read off a screen in a waiting room or off a slide in a room. */
 function FirstAnswer() {
   return (
+    <InviteCard
+      headline="Nobody has answered yet."
+      body="The first answer appears here the moment it is sent."
+      cta="Answer the five questions"
+      href="/survey"
+    />
+  );
+}
+
+/* The one card this page shows wherever a count is still zero: the sentence that
+   tells the truth about the emptiness, and the single thing a reader can do
+   about it. Used at the top of the page and in place of the ranking chart, so an
+   empty register never draws a chart with nothing in it. */
+function InviteCard({ headline, body, cta, href, foot }: { headline: string; body: string; cta: string; href: string; foot?: string }) {
+  return (
     <div className="card" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-5)',
                                    alignItems: 'center', maxWidth: '46rem' }}>
       <div style={{ flex: '1 1 16rem', minWidth: 0 }}>
         <p style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--ink)', margin: '0 0 var(--sp-2)' }}>
-          Nobody has answered yet.
+          {headline}
         </p>
-        <p style={{ margin: '0 0 var(--sp-4)' }}>
-          The first answer appears here the moment it is sent.
-        </p>
+        <p style={{ margin: '0 0 var(--sp-4)' }}>{body}</p>
         <p className="step-actions" style={{ margin: 0 }}>
-          <Link className="btn primary" href="/survey">Answer the five questions</Link>
+          <Link className="btn primary" href={href}>{cta}</Link>
         </p>
+        {foot && <p className="micro" style={{ margin: 'var(--sp-3) 0 0' }}>{foot}</p>}
       </div>
-      <figure style={{ margin: 0, textAlign: 'center', flex: '0 0 auto' }}>
-        <Qr text={SURVEY_URL} px={168} />
+      <ShareOrQr text={SURVEY_URL} />
+    </div>
+  );
+}
+
+/* A QR is genuinely useful on a projected screen or a waiting-room monitor, and
+   useless on the phone that would have to scan it — so under 720px the same card
+   hands over the link instead. Both are rendered and the viewport picks, so
+   nothing here has to guess a screen width before hydration. */
+function ShareOrQr({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <>
+      <figure className={styles.qrWide} style={{ margin: 0, textAlign: 'center', flex: '0 0 auto' }}>
+        <Qr text={text} px={168} />
         <figcaption className="micro" style={{ marginTop: 'var(--sp-2)' }}>Or point a phone at this</figcaption>
       </figure>
-    </div>
+      <p className={styles.qrNarrow}>
+        <button type="button" className="btn ghost" onClick={async () => { setCopied(await copyText(text)); }}>
+          {copied ? 'Link copied' : 'Copy the link to send to someone'}
+        </button>
+      </p>
+    </>
   );
 }
 
@@ -441,7 +486,19 @@ function Qr({ text, px = 140 }: { text: string; px?: number }) {
   );
 }
 
-function Stat({ n, label, sub }: { n: number | null; label: string; sub?: string }) {
+/* A zero here is a young count, not a failure — but four of them in a row read
+   as a dashboard that broke. So a card with nothing in it yet prints no numeral
+   at all: it prints the one thing a reader can do about it. The sub-line is
+   dropped with the numeral, because it would only have said "none yet" twice. */
+function Stat({ n, label, sub, invite }: { n: number | null; label: string; sub?: string; invite?: { href: string; words: string } }) {
+  if (n === 0 && invite) {
+    return (
+      <div className={`reg-stat is-zero ${styles.statInvite}`}>
+        <p className={styles.inviteLine}><Link href={invite.href}>{invite.words}</Link></p>
+        <p className="big-lab">{label}</p>
+      </div>
+    );
+  }
   return (
     <div className={`reg-stat${n === 0 ? ' is-zero' : ''}`}>
       <p className="big-num">{n === null ? '…' : n}</p>
@@ -739,41 +796,3 @@ function RankChart({ rows, n }: { rows: { label: string; first: number; last: nu
   );
 }
 
-/**
- * The empty chart. Same geometry, the five real burdens on the axis, and every
- * bar at zero — because zero is the true value. It invites the first answer
- * instead of printing a sentence where a chart should be.
- */
-function EmptyRankChart() {
-  const { W, rowH, left, right, top, axis } = CHART_GEOM;
-  const labels = BURDENS.map((b) => b.label);
-  const H = top + labels.length * rowH + axis;
-  const span = W - left - right;
-  const baseY = top + labels.length * rowH;
-  return (
-    <figure className="chart is-empty">
-      <ChartKey />
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="The burden ranking, with no responses yet">
-        <line x1={left} y1={baseY} x2={left + span} y2={baseY} className="chart-base" />
-        <line x1={left} y1={top - 8} x2={left} y2={baseY} className="chart-grid" />
-        <text x={left} y={baseY + 18} className="chart-axis">0</text>
-        {labels.map((label, i) => {
-          const y = top + i * rowH;
-          return (
-            <g key={label}>
-              <text x={left} y={y + 12} className="chart-label">{label}</text>
-              <rect x={left} y={y + 20} width={span} height={13} rx={3} className="ghost-bar" />
-              <rect x={left} y={y + 36} width={span} height={13} rx={3} className="ghost-bar" />
-              <text x={left + span + 10} y={y + 42} className="chart-val">0 first · 0 last</text>
-            </g>
-          );
-        })}
-      </svg>
-      <figcaption>Nobody has ranked yet. The bars fill from real answers only — nothing here is ever seeded.</figcaption>
-      <div className="chart-invite">
-        <Link className="btn primary" href="/survey">Be the first, in two minutes</Link>
-        <p>Five burdens, ranked heaviest to lightest. No account, no name, no diagnosis.</p>
-      </div>
-    </figure>
-  );
-}

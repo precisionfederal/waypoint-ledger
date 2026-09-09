@@ -29,12 +29,23 @@
 .sec{border-top:1px solid var(--line)}
 .sec>summary{display:flex;align-items:baseline;gap:var(--sp-3);cursor:pointer;list-style:none;padding:var(--sp-4) 0}
 .sec>summary::-webkit-details-marker{display:none}
+/* THE WHOLE ROW IS THE TARGET, SO THE WHOLE ROW LIGHTS UP. The heading has been
+   the control since this file was written; the only thing that said so was one
+   word in the lightest ink on the page. The tint is drawn past the text on both
+   sides with a shadow rather than padding, so no heading moves. */
+.sec>summary:hover{background:var(--ground-2);box-shadow:-.6rem 0 0 var(--ground-2),.6rem 0 0 var(--ground-2)}
 .sec>summary:focus-visible{outline:none;box-shadow:var(--ring)}
 .sec>summary h2,.sec>summary p{margin:0}
-.sec>summary .mark{margin:0 0 0 auto;flex:none;align-self:center;font-family:var(--font-m);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.sec>summary .mark{margin:0 0 0 auto;flex:none;align-self:center;display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-m);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
 .sec>summary:hover .mark{color:var(--accent-ink)}
-.sec>summary .mark::after{content:'Open'}
-.sec[open]>summary .mark::after{content:'Close'}
+/* the word keeps its place; the chevron is the part that turns */
+.sec>summary .mark::before{content:'Open'}
+.sec[open]>summary .mark::before{content:'Close'}
+.sec>summary .mark::after{content:'';display:block;width:.4rem;height:.4rem;margin-top:-.15rem;
+  border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg);transition:transform .18s ease}
+.sec[open]>summary .mark::after{transform:rotate(-135deg);margin-top:.1rem}
+@media (prefers-reduced-motion:reduce){.sec>summary .mark::after{transition:none}}
 .secBody{padding:0 0 var(--sp-6)}
 .first{border-top:0}
 
