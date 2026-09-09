@@ -18,6 +18,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { TABLE } from '@/lib/table';
+import { qrPath } from '@/lib/qr';
+import { LongSection } from './LongSection';
 import { usd } from '@/lib/pricing';
 import gapData from '@/data/invisible-events.json';
 import spRaw from '@/data/state-prices.json';
@@ -153,6 +155,9 @@ export default function Register() {
      and the keys themselves never leave the server. */
   const senders = d?.corrections?.senders;
   const loaded = !!(d && corr && gap && sv && iv);
+  /* Null while the register is unread — which is not the same as zero, and is
+     never printed as an empty state. */
+  const totalSent = loaded ? nCorr + gap!.respondents + sv!.n + iv!.n : null;
   const firstAt = loaded ? d!.firstAt : undefined;
   const lastAt = loaded ? d!.lastAt : undefined;
 
@@ -191,11 +196,9 @@ export default function Register() {
     <section className="step register">
       <div className="wrap">
         <p className="eyebrow">The register</p>
-        <h1>What the public has told the government through this tool</h1>
+        <h1>What the public has told the government</h1>
         <p className="sub">
-          Every row below is a count of what people actually sent: a thumb on a published federal figure, an event no dataset recorded,
-          or a ranking of which cost weighed most. Published with its N, its denominator, its dates and where the people came from.
-          Nothing identifies anyone.
+          Every row is a count of what people sent through this tool, with its N and its dates.
         </p>
         {err && (
           <p className="match-note miss" role="alert">
@@ -206,6 +209,7 @@ export default function Register() {
           </p>
         )}
 
+        {totalSent === 0 ? <FirstAnswer /> : (
         <div className="reg-grid">
           <Stat n={loaded ? nCorr : null} label={nCorr === 1 ? 'thumb on a published federal figure' : 'thumbs on published federal figures'}
             sub={loaded ? `on ${corr!.length} of ${PRICED_ROWS} priced rows · counted ${day(asOf)}` : undefined} />
@@ -218,10 +222,11 @@ export default function Register() {
           <Stat n={loaded ? iv!.n : null} label="written interviews"
             sub={!loaded ? (failed ? 'unread' : undefined) : iv!.n > 0 ? `first ${day(iv!.firstAt)} · latest ${day(iv!.lastAt)}` : 'none yet'} />
         </div>
+        )}
         <p className="micro">
           {loaded && (nCorr + gap!.respondents + sv!.n + iv!.n) > 0
             ? <>First entry {day(firstAt)} · latest {day(lastAt)} · read as of {day(asOf)} · self-selected sample, read as one · counts, never estimates.</>
-            : loaded ? <>Nothing recorded yet. The first thumb, report or ranking will appear here the moment it is sent. Read as of {day(asOf)}.</>
+            : loaded ? <>Read as of {day(asOf)}.</>
             : failed ? <>These four counts could not be read. They are unread, not zero.</>
             : 'Loading…'}
         </p>
@@ -240,8 +245,13 @@ export default function Register() {
         )}
 
         {/* ---------------- who published what each section is about ---------------- */}
+        <LongSection id="publishers" title="Who published the figures each section is about" first>
         <div className="reg-routes">
-          <h2 className="rr-h">Who published the figures each section is about</h2>
+          <p className="sub">
+            A thumb on a published federal figure, an event no dataset recorded, or a ranking of which cost
+            weighed most &mdash; each published with its N, its denominator, its dates and where the people
+            came from. Nothing identifies anyone.
+          </p>
           <ul>
             <li><b>Corrections</b> — bound to one row of one published file. Of the {PRICED_ROWS} rows this tool prices,
               {' '}{ROWS_BY_PUBLISHER['CMS'] ?? 0} were published by CMS, {ROWS_BY_PUBLISHER['AHRQ'] ?? 0} by AHRQ (MEPS and HCUP),
@@ -257,6 +267,7 @@ export default function Register() {
             as a citation block — the row, the file, the figure and the count — that a person at the publishing body can act on directly.
           </p>
         </div>
+        </LongSection>
 
         {/* ---------------- the burden ranking ---------------- */}
         <h2 className="sig-h">Which cost weighed most, ranked by the people who carried it <span className="sig-n">{sv ? sigN(`${sv.n} ${sv.n === 1 ? 'person' : 'people'} answered`) : sigN('')}</span></h2>
@@ -384,6 +395,49 @@ export default function Register() {
         </p>
       </div>
     </section>
+  );
+}
+
+/* The register with nothing in it is not a failure and not a placeholder: it is
+   a page waiting on the first person. Four zeros read as one, so while every
+   count is zero the four cards give way to the ask, with the code a phone can
+   read off a screen in a waiting room or off a slide in a room. */
+function FirstAnswer() {
+  return (
+    <div className="card" style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-5)',
+                                   alignItems: 'center', maxWidth: '46rem' }}>
+      <div style={{ flex: '1 1 16rem', minWidth: 0 }}>
+        <p style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--ink)', margin: '0 0 var(--sp-2)' }}>
+          Nobody has answered yet.
+        </p>
+        <p style={{ margin: '0 0 var(--sp-4)' }}>
+          The first answer appears here the moment it is sent.
+        </p>
+        <p className="step-actions" style={{ margin: 0 }}>
+          <Link className="btn primary" href="/survey">Answer the five questions</Link>
+        </p>
+      </div>
+      <figure style={{ margin: 0, textAlign: 'center', flex: '0 0 auto' }}>
+        <Qr text={SURVEY_URL} px={168} />
+        <figcaption className="micro" style={{ marginTop: 'var(--sp-2)' }}>Or point a phone at this</figcaption>
+      </figure>
+    </div>
+  );
+}
+
+const SURVEY_URL = 'https://waypoint-ledger.pages.dev/survey?c=register';
+
+/* Drawn here, not fetched: no image request, no third party, nothing to load.
+   The two colours are the palette's own ground and brand, written literally
+   because a QR code has to stay dark-on-light in dark mode to be readable. */
+function Qr({ text, px = 140 }: { text: string; px?: number }) {
+  const { side, d } = qrPath(text);
+  return (
+    <svg width={px} height={px} viewBox={`0 0 ${side} ${side}`} shapeRendering="crispEdges"
+         role="img" aria-label={`QR code opening ${text}`}>
+      <rect width={side} height={side} fill="#ffffff" />
+      <path d={d} fill="#0e2a3a" />
+    </svg>
   );
 }
 

@@ -341,6 +341,10 @@ const TIME_FILLER = new Set([
   ...COUNT_UNITS.split('|').map(singular),
   'week', 'month', 'year', 'hour', 'minute', 'decade',
   'waiting', 'wait', 'waited', 'searching', 'search', 'searched',
+  // The verbs a wait is said with. Without these, "took six weeks" reads as
+  // care and "spent two years" reads as care — see waitSpan() below, which
+  // needs its own phrase to come back through gapSignalFor() unchanged.
+  'took', 'take', 'taking', 'spend', 'spending', 'sat', 'stuck', 'lost',
   'looking', 'looked', 'chasing', 'chased', 'circle', 'limbo', 'runaround',
   'run', 'around', 'back', 'forth', 'nothing', 'answer', 'nowhere', 'anywhere',
   'everywhere', 'thi', 'these', 'those',
@@ -350,6 +354,21 @@ const TIME_FILLER = new Set([
 function firstCue(hay: string, cues: readonly string[]): string | null {
   for (const c of cues) if (hay.includes(` ${c} `)) return c;
   return null;
+}
+
+/**
+ * A span of time in months, for the one stat card this product leads with.
+ *
+ * Weeks are converted at 4.33 weeks to the month and kept to one decimal:
+ * rounding a six-week wait to "1 month" throws away 40 percent of somebody's
+ * wait on a page whose headline is TIME SPENT SEARCHING. Months and years are
+ * exact, so nothing that already reads as a whole number stops doing so.
+ */
+function monthsOfSpan(n: number, unit: string): number {
+  if (unit === 'year') return n * 12;
+  if (unit === 'month') return n;
+  if (unit === 'week') return Math.round((n / 4.33) * 10) / 10;
+  return Math.round((n / SPAN_DAYS.month) * 10) / 10;
 }
 
 /**
@@ -373,7 +392,31 @@ function durationOnly(raw: string): { months: number; said: string } | null {
     .map(singular)
     .filter((w) => !TIME_FILLER.has(w));
   if (left.length) return null;
-  return { months: Math.round(dur.days / SPAN_DAYS.month), said: dur.said };
+  return { months: monthsOfSpan(dur.n, dur.unit), said: dur.said };
+}
+
+/**
+ * A wait said in the middle of a sentence: "waited eight months for a
+ * gastroenterologist appointment", "it took six weeks", "spent two years".
+ *
+ * A leading "for four years:" was already read as a span by durationOnly. The
+ * same fact said mid-clause was read as nothing at all — measured on the
+ * deployed preview 2026-09-09, an eight-month wait vanished from a sentence on
+ * a product whose own headline stat card is TIME SPENT SEARCHING. This finds it
+ * beside the care in the same clause, so the visit still prices and the wait is
+ * still counted. The phrase it hands back is the person's own words, and it is
+ * written so that gapSignalFor() reads it back as the same span — one
+ * definition of what a length of time is, or /gap and the chip disagree.
+ */
+const WAIT_VERBS = 'waited|waiting|wait|spent|spend|spending|took|takes|taking|sat|stuck|lost';
+
+function waitSpan(raw: string): { months: number; said: string } | null {
+  const q = ` ${normalize(raw)} `;
+  const hedge = '(?:about|almost|nearly|around|roughly|over|more than|another)\\s+';
+  const m = q.match(new RegExp(`\\s(${WAIT_VERBS})\\s+(?:${hedge})?(${NUM}|a|an)\\s+(week|month|year)s?\\b`, 'i'));
+  if (!m) return null;
+  const n = /^(a|an)$/i.test(m[2]) ? 1 : toNum(m[2]);
+  return { months: monthsOfSpan(n, m[3].toLowerCase()), said: m[0].trim() };
 }
 
 /**
@@ -489,6 +532,243 @@ export function gapPrefill(entries: readonly { raw: string; times?: number }[]):
     lines.push({ raw: e.raw, category: g.category, amount: n, unit: 'occasions', matchedOn: g.matchedOn });
   }
   return { counts, lines };
+}
+
+/* --------------------------------------------------------------------------
+   A CLINICIAN IS A UNIT OF CARE, AND SO IS THE TEST THEY ORDERED
+
+   "A rheumatologist ordered a nerve test" is two things that happened: a visit
+   and a test. Until this section existed that sentence came back as the test
+   alone, at $99.87, and the preview said "1 of 1 phrase recognised" — so the
+   person was told nothing had been lost while $177.36 of published figure was
+   removed from their own journey in silence. Measured on the deployed preview
+   on 2026-09-09; three more sentences did the same thing, including "my primary
+   care doctor sent me to a neurologist who did an MRI", which dropped the
+   neurologist.
+
+   Nothing here invents a figure. The visit is priced at the row the published
+   table already carries for it, found by asking the matcher for the words the
+   table itself uses, so a change to data/prices.json moves this with it and no
+   id is written down in this file.
+
+   The third rule at the top of this file — nothing typed disappears — is what
+   this enforces. Where a clinician is recognised and a second visit is NOT
+   priced, the phrase still comes back, named, with the reason on its face.
+   -------------------------------------------------------------------------- */
+
+export type ClinicianKind = 'specialist' | 'pcp';
+
+/** Specialty names people say. Every one of them is the same billed unit — a
+ *  first visit with a new specialist — which is exactly what data/synonyms.json
+ *  records under cms-99204: "the figure does not change by specialty". */
+const SPECIALIST_NOUNS = [
+  'specialist', 'rheumatologist', 'neurologist', 'cardiologist', 'gastroenterologist',
+  'endocrinologist', 'pulmonologist', 'dermatologist', 'nephrologist', 'hematologist',
+  'haematologist', 'oncologist', 'immunologist', 'allergist', 'urologist', 'psychiatrist',
+  'otolaryngologist', 'ophthalmologist', 'orthopedist', 'orthopaedist', 'gynecologist',
+  'rheumatology doctor', 'infectious disease doctor', 'sleep doctor', 'pain doctor',
+  'gi doctor', 'lung doctor', 'heart doctor', 'brain doctor', 'kidney doctor',
+  'skin doctor', 'gut doctor', 'hormone doctor', 'blood doctor', 'ent',
+];
+
+/** The doctor a person starts with. Their visit is the established-patient unit
+ *  the rules already land on — "saw my regular doctor" — not a new-patient one.
+ *  ALIASES has already turned "PCP" and "GP" into "regular doctor" by the time
+ *  these are looked for. */
+const PCP_NOUNS = [
+  'regular doctor', 'primary care doctor', 'primary care physician', 'primary care provider',
+  'family doctor', 'family physician', 'general practitioner', 'internist',
+  'nurse practitioner', 'physician assistant',
+];
+
+/** Longest first, so "primary care doctor" is never found as "care doctor" and
+ *  "infectious disease doctor" is never found as "doctor". */
+const CLINICIAN_NOUNS: { noun: string; kind: ClinicianKind }[] = [
+  ...SPECIALIST_NOUNS.map((noun) => ({ noun, kind: 'specialist' as ClinicianKind })),
+  ...PCP_NOUNS.map((noun) => ({ noun, kind: 'pcp' as ClinicianKind })),
+].sort((a, b) => b.noun.length - a.noun.length);
+
+/** Words a person puts between the number and the clinician. They are emphasis,
+ *  never a unit of care: "four DIFFERENT specialists" is still four visits. */
+const COUNT_ADJECTIVES = 'different|separate|other|another|various|new|more|additional|assorted|unrelated';
+
+/** Every way of saying more than one clinician, longest first. Generic words are
+ *  included because "three doctors" is a count of visits too. */
+const CLINICIAN_PLURALS = [
+  ...CLINICIAN_NOUNS.map((c) => c.noun),
+  'doctor', 'physician', 'provider', 'clinician', 'practitioner', 'surgeon', 'consultant',
+]
+  .map((n) => `${n}s`)
+  .sort((a, b) => b.length - a.length)
+  .join('|');
+
+export interface ClinicianMention {
+  /** The noun as the table and this file spell it, singular. */
+  noun: string;
+  kind: ClinicianKind;
+  /** Where it sits in the normalised phrase, so a chip can be shown in the
+   *  order the person said things. */
+  at: number;
+}
+
+/** Every clinician a phrase names, in the order they were said, each found once. */
+export function clinicianMentions(raw: string): ClinicianMention[] {
+  const q = ` ${normalize(raw)} `;
+  const claimed: boolean[] = new Array(q.length).fill(false);
+  const found: ClinicianMention[] = [];
+  for (const { noun, kind } of CLINICIAN_NOUNS) {
+    // Plural first: "specialists" must not be claimed as "specialist" + a stray "s".
+    for (const form of [`${noun}s`, noun]) {
+      const needle = ` ${form} `;
+      for (let i = q.indexOf(needle); i > -1; i = q.indexOf(needle, i + 1)) {
+        const end = i + needle.length - 1;
+        let free = true;
+        for (let k = i + 1; k < end; k++) if (claimed[k]) { free = false; break; }
+        if (!free) continue;
+        for (let k = i + 1; k < end; k++) claimed[k] = true;
+        found.push({ noun, kind, at: i });
+      }
+    }
+  }
+  return found.sort((a, b) => a.at - b.at);
+}
+
+/** How many of that clinician the person said: "four different specialists" is
+ *  four visits, "a neurologist" is one. Only a plural can carry a count. */
+function clinicianCount(q: string, noun: string): number {
+  const m = q.match(new RegExp(`\\s(${NUM})\\s+(?:(?:${COUNT_ADJECTIVES})\\s+)*${noun}s\\b`, 'i'));
+  if (!m) return 1;
+  return Math.max(1, Math.min(365, toNum(m[1])));
+}
+
+interface ClinicianUnits {
+  unit: Record<ClinicianKind, PriceItem | null>;
+  ids: Record<ClinicianKind, Set<string>>;
+}
+
+/** The table's own words for each kind of visit. Asked of the matcher rather
+ *  than written here as an id, so this file still holds no price and no code. */
+const KIND_PHRASES: Record<ClinicianKind, string[]> = {
+  specialist: ['saw a new specialist', 'first visit with a specialist', 'specialist appointment', 'specialist consult'],
+  pcp: ['saw my regular doctor', 'primary care visit', 'appointment with my doctor', 'saw my internist'],
+};
+
+const CLINICIAN_UNIT_CACHE = new WeakMap<object, ClinicianUnits>();
+
+function clinicianUnits(table: PriceItem[]): ClinicianUnits {
+  const cached = CLINICIAN_UNIT_CACHE.get(table as unknown as object);
+  if (cached) return cached;
+  const unit = {} as Record<ClinicianKind, PriceItem | null>;
+  const ids = {} as Record<ClinicianKind, Set<string>>;
+  for (const kind of ['specialist', 'pcp'] as ClinicianKind[]) {
+    const hits = KIND_PHRASES[kind]
+      .map((phrase) => mapUtterance(phrase, table).item)
+      .filter((i): i is PriceItem => Boolean(i));
+    unit[kind] = hits[0] ?? null;
+    ids[kind] = new Set(hits.map((i) => i.id));
+  }
+  const v: ClinicianUnits = { unit, ids };
+  CLINICIAN_UNIT_CACHE.set(table as unknown as object, v);
+  return v;
+}
+
+/** The row for a visit with THIS clinician: the specialty's own words first, so
+ *  a table that one day prices a neurologist differently is followed, and the
+ *  kind's ordinary row when it does not. */
+function visitUnitFor(m: ClinicianMention, table: PriceItem[]): PriceItem | null {
+  const units = clinicianUnits(table);
+  const said = mapUtterance(m.kind === 'pcp' ? `saw my ${m.noun}` : `saw a ${m.noun}`, table).item;
+  if (said && units.ids[m.kind].has(said.id)) return said;
+  return units.unit[m.kind];
+}
+
+/** True when the clinician was named before the words the rows matched on, so
+ *  the visit chip is shown where the person said it: you see the doctor, then
+ *  they order the test. */
+function namedFirst(q: string, at: number, rows: readonly ParsedSegment[]): boolean {
+  let first = Number.POSITIVE_INFINITY;
+  for (const r of rows) {
+    for (const w of tokens(r.result.matchedOn ?? '')) {
+      const i = q.indexOf(` ${w}`);
+      if (i > -1 && i < first) first = i;
+    }
+  }
+  return at < first;
+}
+
+export const NO_SECOND_VISIT_REASON = 'counted, no separate visit priced';
+
+/**
+ * The rows for one piece of a clause, with the clinician visits it named.
+ *
+ * Three outcomes per clinician, and none of them is silence:
+ *   · the rows already priced that very clinician → nothing to add;
+ *   · the kind of visit is not on this piece yet → the visit is priced, at the
+ *     table's own row, with the count the person stated;
+ *   · the kind is already priced here → a named, blank chip saying so, because
+ *     a person who typed a word must see that word come back.
+ */
+function withClinicianVisits(
+  piece: string,
+  rows: ParsedSegment[],
+  table: PriceItem[],
+  pricedKinds: Set<ClinicianKind>,
+): ParsedSegment[] {
+  const mentions = clinicianMentions(piece);
+  if (!mentions.length) return rows;
+  const q = ` ${normalize(piece)} `;
+  const units = clinicianUnits(table);
+
+  // Which clinician each priced row already IS, and which kinds are covered.
+  const alreadyNamed = new Set<string>();
+  for (const r of rows) {
+    const it = r.result.item;
+    if (!it) continue;
+    const on = ` ${normalize(r.result.matchedOn ?? '')} `;
+    for (const m of mentions) if (on.includes(` ${m.noun} `) || on.includes(` ${m.noun}s `)) alreadyNamed.add(m.noun);
+    for (const kind of ['specialist', 'pcp'] as ClinicianKind[]) if (units.ids[kind].has(it.id)) pricedKinds.add(kind);
+  }
+
+  const head: ParsedSegment[] = [];
+  const tail: ParsedSegment[] = [];
+  const done = new Set<string>();
+  for (const m of mentions) {
+    if (done.has(m.noun)) continue;
+    done.add(m.noun);
+    if (alreadyNamed.has(m.noun)) continue;
+
+    if (!pricedKinds.has(m.kind)) {
+      const item = visitUnitFor(m, table);
+      if (!item) continue;
+      pricedKinds.add(m.kind);
+      const result: MapResult = {
+        item,
+        score: 60,
+        matchedOn: m.noun,
+        // The person named the clinician; the level of the visit is the table's
+        // ordinary row for it, not something they said. Medium, never high.
+        confidence: 'medium',
+        reason: null,
+        gapCategory: null,
+        months: null,
+      };
+      const seg: ParsedSegment = { raw: m.noun, times: clinicianCount(q, m.noun), result, countNote: null };
+      (namedFirst(q, m.at, rows) ? head : tail).push(seg);
+      continue;
+    }
+
+    const result: MapResult = {
+      item: null,
+      score: 0,
+      matchedOn: null,
+      reason: `${m.noun} — ${NO_SECOND_VISIT_REASON}`,
+      confidence: 'none',
+      gapCategory: null,
+      months: null,
+    };
+    tail.push({ raw: m.noun, times: 1, result, countNote: null });
+  }
+  return [...head, ...rows, ...tail];
 }
 
 /* --------------------------------------------------------------------------
@@ -733,6 +1013,21 @@ export function extractCount(phrase: string): CountResult {
       if (standalone) { times = NUMBER_WORDS[w]; cut(m[0]); break; }
     }
   }
+  /* 4a. A NUMBER IN FRONT OF A PLURAL CLINICIAN — "four different specialists",
+         "three doctors", "12 specialists". Rule 4 below reads a number in front
+         of any plural, but only when the two words touch, so the adjective in
+         "four different specialists" hid the count and the line read x1 —
+         about $531 of published figure, measured on the deployed preview
+         2026-09-09. The clinician noun stays in the phrase so it still matches
+         a row; only the number and the adjective come out. */
+  if (!times) {
+    const clinicians = text.match(new RegExp(`\\s(${NUM})\\s+(?:(?:${COUNT_ADJECTIVES})\\s+)*(${CLINICIAN_PLURALS})\\b`, 'i'));
+    if (clinicians) {
+      times = toNum(clinicians[1]);
+      text = text.replace(clinicians[0], ` ${clinicians[2]} `);
+    }
+  }
+
   // 4. A NUMBER IN FRONT OF A PLURAL — "two rheumatologists", "three MRIs".
   //    The number is a count; the noun is what was counted, and it stays in the
   //    phrase so it can still be matched. Time words are excluded: "four years"
@@ -872,24 +1167,36 @@ export function parseJourney(story: string, table: PriceItem[]): ParsedSegment[]
     }
 
     const seen = new Set<string>();
+    const pricedKinds = new Set<ClinicianKind>();
     for (const p of parsed) {
-      out.push({ raw: p.raw, times: p.times, result: p.result, countNote: p.note });
-      if (!p.result.item) continue;
-      seen.add(p.result.item.id);
+      const rows: ParsedSegment[] = [{ raw: p.raw, times: p.times, result: p.result, countNote: p.note }];
+      if (p.result.item) {
+        seen.add(p.result.item.id);
 
-      // Whatever the match did not use, scanned again — up to three more units.
-      // A second line is only worth printing when it is a different unit of care,
-      // matched on more than one shared word, from a phrase with something left
-      // in it. Anything weaker is a guess, and a guess here prints a real
-      // federal figure for care that never happened.
-      let rest = residualAfter(p.text || p.raw, p.result.matchedOn);
-      for (let i = 0; i < 3 && rest && tokens(rest).length >= 2; i++) {
-        const more = extractCount(rest);
-        const m = mapUtterance(more.text || rest, table);
-        if (!m.item || m.confidence === 'low' || seen.has(m.item.id)) break;
-        seen.add(m.item.id);
-        out.push({ raw: rest, times: more.times, result: m, countNote: more.note });
-        rest = residualAfter(more.text || rest, m.matchedOn);
+        // Whatever the match did not use, scanned again — up to three more units.
+        // A second line is only worth printing when it is a different unit of care,
+        // matched on more than one shared word, from a phrase with something left
+        // in it. Anything weaker is a guess, and a guess here prints a real
+        // federal figure for care that never happened.
+        let rest = residualAfter(p.text || p.raw, p.result.matchedOn);
+        for (let i = 0; i < 3 && rest && tokens(rest).length >= 2; i++) {
+          const more = extractCount(rest);
+          const m = mapUtterance(more.text || rest, table);
+          if (!m.item || m.confidence === 'low' || seen.has(m.item.id)) break;
+          seen.add(m.item.id);
+          rows.push({ raw: rest, times: more.times, result: m, countNote: more.note });
+          rest = residualAfter(more.text || rest, m.matchedOn);
+        }
+      }
+
+      /* 🔴 The clinician the person named is a visit, and the test they ordered
+         is a test. Both, or the sentence comes back smaller than it was typed.
+         `pricedKinds` carries across the pieces of one clause, so "my primary
+         care doctor sent me to a neurologist who did an MRI" prices the PCP
+         visit once, the specialist visit once, and the MRI once. */
+      for (const row of withClinicianVisits(p.raw, rows, table, pricedKinds)) {
+        if (row.result.item) seen.add(row.result.item.id);
+        out.push(row);
       }
     }
 
@@ -902,6 +1209,25 @@ export function parseJourney(story: string, table: PriceItem[]): ParsedSegment[]
       if (!r.gapCategory) continue;
       if (held) out[i] = { ...out[i], result: { ...r, gapCategory: null, months: null } };
       held = true;
+    }
+
+    /* 🔴 A wait said in the middle of a clause that also names real care: the
+       care prices, and the wait is counted beside it. It is added AFTER the
+       rule above, which keeps one gap per sentence — a dismissal and a wait are
+       two different facts and the sentence holds both. */
+    const wait = waitSpan(seg);
+    const alreadySpanned = out.slice(startedAt).some((x) => x.result.gapCategory === 'time-searching');
+    if (wait && !alreadySpanned) {
+      const waited: ParsedSegment = {
+        raw: wait.said,
+        times: 1,
+        result: gapResult({ category: 'time-searching', matchedOn: wait.said, months: wait.months, suppressesPrice: true }),
+        countNote: null,
+      };
+      const q = ` ${normalize(seg)} `;
+      const at = q.indexOf(` ${normalize(wait.said)} `);
+      if (namedFirst(q, at < 0 ? 0 : at, out.slice(startedAt))) out.splice(startedAt, 0, waited);
+      else out.push(waited);
     }
   }
   return out;

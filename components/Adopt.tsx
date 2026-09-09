@@ -12,6 +12,7 @@
    ========================================================================== */
 
 import Link from 'next/link';
+import { LongLayout, LongSection, type TocItem } from './LongSection';
 import { TABLE, SELECTABLE, TABLE_VERSION } from '@/lib/table';
 import { LOCALITIES, LOCALITY_ROW_COUNT, STATES } from '@/lib/fit';
 import conditions from '@/data/conditions.json';
@@ -88,16 +89,21 @@ const FIELD_IT = `https://waypoint-ledger.pages.dev/survey?c=your-org-slug
 # column of /api/export/survey.csv, so your community's responses are
 # separable from everyone else's — by you, and by anyone reading the export.`;
 
+const TOC: TocItem[] = [
+  { id: 'take-it', text: 'Take it' },
+  { id: 'starting-from', text: 'What you are starting from' },
+  { id: 'commands', text: 'The two commands that keep it honest' },
+  { id: 'tell-us', text: 'What we would want to know' },
+];
+
 export default function Adopt() {
   return (
     <section className="page">
       <div className="wrap">
-        <p className="eyebrow">For an agency, a health department or another team</p>
-        <h1>What to edit to run this for your condition, your state, your people</h1>
+        <p className="eyebrow">For agencies and teams</p>
+        <h1>Run this for your condition, your state, your people</h1>
         <p className="sub">
-          The whole application is one download and it runs on your own machine in three commands. This page is
-          the procedure, not the pitch: the files you change, the command that refuses a figure that does not
-          reproduce, and what happens when no federal file describes the people you serve.
+          The whole application is one download and it runs on your own machine in three commands.
         </p>
         <div className="row" style={{ marginBottom: 'var(--sp-5)' }}>
           <a className="btn primary" href="/waypoint-ledger-source.tar.gz">Download the whole application</a>
@@ -114,8 +120,13 @@ export default function Adopt() {
           </p>
         </div>
 
+        <LongLayout items={TOC}>
+        <LongSection id="take-it" title="Take it" first open>
+        <p className="sub">
+          This page is the procedure, not the pitch: the files you change, the command that refuses a figure
+          that does not reproduce, and what happens when no federal file describes the people you serve.
+        </p>
         <div className="card">
-          <p className="lbl">0 &middot; Take it</p>
           <p>
             No account, no request, nothing to sign. The archive is the tree this site is built from, minus the
             build output and our own credentials: <strong>app/</strong>, <strong>components/</strong>,{' '}
@@ -131,7 +142,9 @@ export default function Adopt() {
           </p>
         </div>
 
-        <h2>What you are starting from</h2>
+        </LongSection>
+
+        <LongSection id="starting-from" title="What you are starting from">
         <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>File</th><th>What is in it</th><th>Take it</th></tr></thead>
@@ -247,7 +260,9 @@ export default function Adopt() {
           </p>
         </div>
 
-        <h2>The two commands that keep it honest</h2>
+        </LongSection>
+
+        <LongSection id="commands" title="The two commands that keep it honest">
         <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>Command</th><th>What it refuses</th></tr></thead>
@@ -268,7 +283,9 @@ export default function Adopt() {
           </table>
         </div>
 
-        <h2>What we would want to know</h2>
+        </LongSection>
+
+        <LongSection id="tell-us" title="What we would want to know">
         <p>
           If you stand this up, the thing worth sending back is not a thank-you. It is the corrections: which
           published figure your community says does not describe them, and what care never entered a claims
@@ -280,6 +297,8 @@ export default function Adopt() {
         <p className="micro">
           Questions, or a row you think is wrong: <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a>.
         </p>
+        </LongSection>
+        </LongLayout>
       </div>
     </section>
   );

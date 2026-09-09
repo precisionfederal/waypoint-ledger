@@ -6,6 +6,7 @@
    ========================================================================== */
 
 import Link from 'next/link';
+import { LongLayout, LongSection, type TocItem } from './LongSection';
 import { OPENAPI } from '@/lib/openapi';
 import { TABLE, SELECTABLE, TABLE_VERSION } from '@/lib/table';
 import { LOCALITIES, LOCALITY_ROW_COUNT } from '@/lib/fit';
@@ -337,6 +338,15 @@ const preOut: React.CSSProperties = { ...pre, maxHeight: '26rem', overflow: 'aut
 
 const METHODS = ['get', 'post', 'put', 'delete'] as const;
 
+const TOC: TocItem[] = [
+  { id: 'price-a-story', text: 'Price a story' },
+  { id: 'more-calls', text: 'Nine more worked calls' },
+  { id: 'take', text: 'What you can take without asking' },
+  { id: 'routes', text: 'Every route' },
+  { id: 'rules', text: 'The rules' },
+  { id: 'why', text: 'Why reuse this' },
+];
+
 export default function Developers() {
   const routes = Object.entries(OPENAPI.paths).flatMap(([path, item]) =>
     METHODS.filter((m) => item[m]).map((m) => ({ path, method: m.toUpperCase(), op: item[m]! })));
@@ -347,10 +357,7 @@ export default function Developers() {
         <p className="eyebrow">For developers, agencies and researchers</p>
         <h1>Price a diagnostic journey with one request</h1>
         <p className="sub">
-          Send a sentence a person actually wrote. Get back every unit of care it names, the published
-          federal figure that prices each one, and the year, basis, population and source URL behind that
-          figure &mdash; so whatever you build can show any number it prints. A deterministic matcher maps
-          words to a unit of care; a published table prices it. No model produces a dollar figure.
+          Send a sentence a person actually wrote. Get back every unit of care it names, priced and cited.
         </p>
         <div className="row" style={{ marginBottom: 'var(--sp-5)' }}>
           <a className="btn primary" href="/api/openapi.json">OpenAPI 3.1 description</a>
@@ -369,9 +376,17 @@ export default function Developers() {
           </p>
         </div>
 
+        <LongLayout items={TOC}>
+        <LongSection id="price-a-story" title="Price a story" first open>
+        <p className="sub">
+          Every response carries the published federal figure that prices each unit of care, and the year,
+          basis, population and source URL behind that figure &mdash; so whatever you build can show any
+          number it prints. A deterministic matcher maps words to a unit of care; a published table prices
+          it. No model produces a dollar figure.
+        </p>
         <div className="card">
-          <p className="lbl">1 &middot; Price a story</p>
-          <p>The same call the site itself makes. One request, one journey, every line traceable.</p>
+          <p className="lbl">1 &middot; The call the site itself makes</p>
+          <p>One request, one journey, every line traceable.</p>
           <pre style={pre} tabIndex={0}><code>{CURL_PRICE}</code></pre>
           <p className="micro">Real response. Long coverage statements and three further segments are elided, marked with an ellipsis key:</p>
           <pre style={preOut} tabIndex={0} aria-label="Response to the pricing request"><code>{OUT_PRICE}</code></pre>
@@ -385,6 +400,9 @@ export default function Developers() {
           </p>
         </div>
 
+        </LongSection>
+
+        <LongSection id="more-calls" title="Nine more worked calls">
         <div className="card">
           <p className="lbl">2 &middot; Read one unit of care, with its provenance</p>
           <p>Every row carries who it describes, who it does not, and the rules about adding it to anything else.</p>
@@ -540,7 +558,9 @@ export default function Developers() {
           </p>
         </div>
 
-        <h2>What you can take without asking</h2>
+        </LongSection>
+
+        <LongSection id="take" title="What you can take without asking">
         <p className="sub">
           The register is public: what people said a federal figure got wrong, what care never entered any
           claims file, and how the people who carried the burden ranked it. Counts and a de-identified CSV,
@@ -579,7 +599,9 @@ export default function Developers() {
           </table>
         </div>
 
-        <h2>Every route</h2>
+        </LongSection>
+
+        <LongSection id="routes" title="Every route">
         <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>Method</th><th>Path</th><th>What it does</th></tr></thead>
@@ -600,7 +622,9 @@ export default function Developers() {
           not published there.
         </p>
 
-        <h2>The rules</h2>
+        </LongSection>
+
+        <LongSection id="rules" title="The rules">
         <ul>
           <li><strong>No model, average or interpolation ever produces a dollar figure.</strong> A phrase that maps to nothing stays unpriced and is returned as unpriced, with the reason.</li>
           <li><strong>Figures that cannot be added are not added.</strong> Measures that answer different questions raise <code>basisWarning</code>; a whole-year figure is returned outside the total in <code>excludedFromTotal</code>.</li>
@@ -609,7 +633,9 @@ export default function Developers() {
           <li><strong>Errors are sentences.</strong> Every failure is <code>{'{ ok: false, error }'}</code> with the right status, written for a person reading a log.</li>
         </ul>
 
-        <h2>Why reuse this</h2>
+        </LongSection>
+
+        <LongSection id="why" title="Why reuse this">
         <p>
           The hard part of a cost-of-illness number is not arithmetic. It is knowing which published figure
           applies, what it measures, who it leaves out, and what it must not be added to. That work is in the
@@ -626,6 +652,8 @@ export default function Developers() {
           commands, so none of that is a promise you have to take on trust.
         </p>
         <p className="micro">Questions, or a row you think is wrong: <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a>.</p>
+        </LongSection>
+        </LongLayout>
       </div>
     </section>
   );

@@ -11,15 +11,20 @@
    person's diagnosis in particular never leaves the device, which is why the
    condition is read client-side and is not in any URL.
 
-   🔴 IT IS ASKED BEFORE THE NUMBER, NOT AFTER IT.
-   The bar used to live only on the ledger, under the total — so a first-time
-   visitor met "$1,275" labelled with Medicare figures that describe almost
-   nobody this tool is built for, and had to know to go looking. It now opens
-   the journey page, above the box you type in, and the ledger arrives already
-   fitted. Two shapes, one component:
-     · `ask`  — on /journey: the question, asked plainly, skippable.
-     · `bar`  — on /ledger: once answered, one line and a Change button, so the
-                first thing on a phone screen is the number, not a control.
+   🔴 IT IS ONE LINE UNTIL SOMEBODY WANTS IT.
+   Round after round the questionnaire opened first: three columns, six coverage
+   chips, a 54-option state select and ten condition chips stood between a person
+   and the box they came to type in, and a band reading "THIS LEDGER IS FITTED
+   FOR …" sat on top of the largest number on the site. Nothing here was wrong;
+   it was simply asked before anyone had a reason to care.
+
+   So every surface now opens as ONE quiet line that states the basis the
+   figures are on, with Change beside it. Clicking Change expands the same three
+   questions in place — every chip, every note, every stored answer, unchanged.
+   Nothing is hidden; it is a click instead of a screen.
+     · `ask`  — under the box on /journey: "Priced as … · Change".
+     · `line` — under the number on /ledger, in small type: "… · Change".
+     · `bar`  — the legacy card shape, kept for any surface still asking for it.
    ========================================================================== */
 
 import { useMemo, useState } from 'react';
@@ -30,8 +35,8 @@ import s from './ContextBar.module.css';
 import ConditionPicker from './ConditionPicker';
 
 export interface ContextBarProps {
-  /** `ask` opens the journey page; `bar` sits on the ledger. */
-  variant?: 'ask' | 'bar';
+  /** `ask` sits under the journey box; `line` under the ledger's number; `bar` is the card shape. */
+  variant?: 'ask' | 'bar' | 'line';
 }
 
 export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
@@ -41,20 +46,11 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
   const stateCode = loc?.state ?? '';
   const group = useMemo(() => STATES.find((g) => g.code === stateCode) ?? null, [stateCode]);
   const answered = !!(coverage || loc);
-  /* Skipping is a real answer: it is remembered for this visit only, and the
-     figures then say plainly, on every line, that they are national references. */
-  const [skipped, setSkipped] = useState(false);
+  /* Closed is the resting state on every surface. Skipping and pressing Done
+     are the same gesture as never opening it: the figures then say plainly, on
+     every line, that they are national references. */
   const [open, setOpen] = useState(false);
-  /* 🔴 ON THE LEDGER THE BAR IS ONE LINE, ANSWERED OR NOT.
-     The ask belongs on /journey, before the number. On the ledger the full
-     three-question panel — six coverage chips, a 54-option state select and ten
-     condition chips — pushed the total to y = 1004 px in an 860 px viewport, so
-     the count-up played where nobody could see it. One line above the number
-     carries the same answer and expands to the same panel on one click; nothing
-     is hidden, it is a click instead of a screen.
-     The ask never folds itself away mid-answer: answering "who pays" used to
-     collapse the panel before the second question could be reached. */
-  const collapsed = !open && (skipped || variant === 'bar');
+  const collapsed = !open;
 
   function pickState(code: string) {
     if (!code) { st.setLocality(undefined); return; }
@@ -63,27 +59,32 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
     st.setLocality((sole ?? g?.localities[0])?.key);
   }
 
-  /* 🔴 THE CHIP NAMES THE BASIS EVEN WHEN NOBODY HAS ANSWERED.
+  /* 🔴 THE LINE NAMES THE BASIS EVEN WHEN NOBODY HAS ANSWERED.
      "This ledger is not fitted yet · Not answered" told a first-time visitor
-     that something was missing without telling them what they were looking at.
-     The honest default is a sentence: no coverage chosen, so these are the
-     national Medicare reference figures — and the button beside it changes
-     that in one tap. */
+     that something was missing without telling them what they were looking at,
+     and "say who pays for your care and this changes" put a to-do item where a
+     meaning belongs. The honest default is the basis itself — these are the
+     national Medicare reference figures — and Change beside it. */
   const summary = answered
     ? `${coverage ? COVERAGE_LABEL[coverage] : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}`
-    : 'No coverage chosen — Medicare reference figures, national';
+    : variant === 'ask' ? 'Medicare reference figures, national' : 'Medicare reference · national';
 
   if (collapsed) {
+    const cls = variant === 'ask' ? s.fitLineAsk : variant === 'line' ? s.fitLineNum : s.fitLineBar;
     return (
-      <section className={`${s.bar} ${s.collapsed} ctx-shell`} aria-labelledby="ctx-h">
-        <p className={s.sumLine} id="ctx-h">
-          <span className={s.sumLbl}>This ledger is fitted for</span>
-          <b className={s.sumVal}>{summary}</b>
-        </p>
-        <button type="button" className={s.change} aria-expanded={false} onClick={() => setOpen(true)}>
-          {answered ? 'Change' : 'Answer three questions'}
+      <p className={`${s.fitLine} ${cls}`} id="ctx-h">
+        <span className={s.fitTxt}>{variant === 'ask' ? 'Priced as ' : ''}{summary}</span>
+        <button
+          type="button"
+          className={s.fitChange}
+          aria-expanded={false}
+          title="Your coverage, where you live, and what you are looking into"
+          aria-label="Change what these figures are priced for: your coverage, where you live, and what you are looking into"
+          onClick={() => setOpen(true)}
+        >
+          Change
         </button>
-      </section>
+      </p>
     );
   }
 
@@ -92,22 +93,13 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
   return (
     <section className={`${s.bar} ${ask ? s.ask : ''} ctx-shell`} aria-labelledby="ctx-h">
       <div className={s.head}>
-        {ask ? (
-          <>
-            <p className="eyebrow" id="ctx-h">Before the number</p>
-            <p className={s.note}>
-              Answer these three and every figure on your ledger arrives already labelled for you —
-              whether it describes you, is a reference price, or describes nobody in your situation.
-              All three stay on this device and are sent with nothing.
-            </p>
-          </>
-        ) : (
-          <>
-            <p className="eyebrow" id="ctx-h">Who this ledger is for</p>
-            <p className={s.note}>Change any answer and every row below re-labels. They stay on this device; none of them is sent with anything you send.</p>
-            <button type="button" className={s.change} aria-expanded onClick={() => setOpen(false)}>Done</button>
-          </>
-        )}
+        <p className="eyebrow" id="ctx-h">{ask ? 'Before the number' : 'Who this ledger is for'}</p>
+        <p className={s.note}>
+          {ask
+            ? 'Answer these three and every figure on your ledger arrives already labelled for you — whether it describes you, is a reference price, or describes nobody in your situation. All three stay on this device and are sent with nothing.'
+            : 'Change any answer and every row below re-labels. They stay on this device; none of them is sent with anything you send.'}
+        </p>
+        <button type="button" className={s.change} aria-expanded onClick={() => setOpen(false)}>Done</button>
       </div>
 
       <div className={s.groups}>
@@ -166,7 +158,7 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
 
       {ask && !answered && (
         <p className={s.skipRow}>
-          <button type="button" className={s.skip} onClick={() => setSkipped(true)}>Skip this</button>
+          <button type="button" className={s.skip} onClick={() => setOpen(false)}>Skip this</button>
           <span className={s.skipNote}>
             You will still get every figure. They will be national Medicare amounts, and each line
             will say so rather than pretend it is yours.

@@ -10,6 +10,8 @@ import { priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION } from '@/lib/table';
 import type { PriceItem, PricedLine } from '@/lib/types';
 import ShareCard, { type ShareCardData } from './ShareCard';
+import ContextBar from './ContextBar';
+import cs from './ContextBar.module.css';
 import { gapSummary, odysseyClauses } from '@/lib/sheet';
 import { siteOfServiceFinding } from '@/lib/site-of-service';
 import { Icon } from './Icons';
@@ -99,7 +101,7 @@ export function LivePreviewChips({ preview, onExample }: { preview: LivePreview;
   return (
     <div className="lp">
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {matched} of {segments.length} {segments.length === 1 ? 'phrase' : 'phrases'} recognised,
+        {segments.length} {segments.length === 1 ? 'phrase' : 'phrases'} read, {matched} carrying a published figure and the rest shown blank and named,
         {' '}{usd(previewTotal)} from published figures so far.
       </p>
       <ul className="lp-chips" aria-label="What this sentence maps to so far">
@@ -165,6 +167,12 @@ export default function JourneyBuilder() {
   const cats = CATEGORIES.filter((c) => byCat[c.key]?.length);
   const appointments = st.entries.reduce((a, e) => a + e.times, 0);
   const card = useMemo(() => shareCardData(lines, st.entries.length, st.unpricedHits.length), [lines, st.entries.length, st.unpricedHits.length]);
+  /* 🔴 A ZERO IS A CLAIM THAT THE CARE WAS FREE.
+     The panel and the phone bar opened on "$0 · 0 appointments · 0 distinct
+     lines" — three zeros where the product's promise belongs, and the same
+     mistake the ledger refuses to make for a Medicaid visitor. Nothing has been
+     counted yet, so the honest mark is a dash and the invitation to type. */
+  const nothingYet = st.entries.length === 0 && preview.previewTotal === 0;
 
   /* 🔴 focus({ preventScroll: true }).
      Focusing the textarea used to scroll the browser 723 px down the page, which
@@ -231,8 +239,18 @@ export default function JourneyBuilder() {
                 {preview.segments.length ? `Add these ${preview.segments.length}` : 'Add everything'} <Icon.Arrow />
               </button>
             </div>
+            {/* The honest version of the promise, kept where the typing happens.
+                It used to be a paragraph above the box; the fact is unchanged. */}
+            <p className="micro">What you type stays in this browser. It is sent to this site only if you press <strong>Save and share</strong>, and that save comes back with a code that deletes it.</p>
           </form>
         </section>
+
+        {/* 🔴 ASKED UNDER THE BOX, NOT IN FRONT OF IT.
+            The three questions that decide whether a federal figure describes
+            this person are still asked before the number — but as one line that
+            states the basis, with Change beside it. Every chip, every note and
+            every stored answer is behind that one click, unchanged. */}
+        <ContextBar variant="ask" />
 
         <section className="card">
           <p className="lbl">Or add one thing at a time</p>
@@ -354,7 +372,15 @@ export default function JourneyBuilder() {
 
       <section className="builder-side" aria-label="Running total">
         <div className="card sticky">
-          {sum.totalUsd === 0 && preview.previewTotal > 0 ? (
+          {nothingYet ? (
+            <>
+              <p className="lbl">Running total</p>
+              {/* No figure at the reveal's size before anything has been counted:
+                  a $0 is a claim and a 3.6rem dash reads as a redaction. The slot
+                  waits in words until there is a published figure to put in it. */}
+              <p className={cs.waitNote}>Nothing counted yet. Name a visit, a scan or a test in the box and the published figure lands here as you type.</p>
+            </>
+          ) : sum.totalUsd === 0 && preview.previewTotal > 0 ? (
             <>
               <p className="lbl">So far · from the sentence you are typing</p>
               <p className="big-num">{usd(preview.previewTotal)}</p>
@@ -382,11 +408,23 @@ export default function JourneyBuilder() {
       <div className="mobile-bar">
         {/* One journey count, then its sub-line. The bar and the ledger count the same
             way: appointments is the sum of times, distinct lines is how many rows. */}
-        <div>
-          <span className="mb-total">{usd(sum.totalUsd)}</span>
-          <span className="mb-sub">{appointments} {appointments === 1 ? 'appointment' : 'appointments'}</span>
-          <span className="mb-sub mb-distinct">{st.entries.length} distinct {st.entries.length === 1 ? 'line' : 'lines'}</span>
-        </div>
+        {nothingYet ? (
+          <div>
+            <span className={cs.barWait}>Type what happened and it counts here</span>
+          </div>
+        ) : sum.totalUsd === 0 && preview.previewTotal > 0 ? (
+          <div>
+            <span className="mb-total">{usd(preview.previewTotal)}</span>
+            <span className="mb-sub">so far, from the sentence you are typing</span>
+            <span className="mb-sub mb-distinct">press Add to keep it</span>
+          </div>
+        ) : (
+          <div>
+            <span className="mb-total">{usd(sum.totalUsd)}</span>
+            <span className="mb-sub">{appointments} {appointments === 1 ? 'appointment' : 'appointments'}</span>
+            <span className="mb-sub mb-distinct">{st.entries.length} distinct {st.entries.length === 1 ? 'line' : 'lines'}</span>
+          </div>
+        )}
         {st.entries.length
           ? <Link className="btn primary" href="/ledger" data-go="total">See what it cost</Link>
           : <button className="btn primary is-disabled" type="button" data-go="total" disabled>See what it cost</button>}

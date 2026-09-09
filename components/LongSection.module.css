@@ -1,0 +1,52 @@
+/* The reading pages — /method, /developers, /privacy, /adopt — in the product's
+   own tokens. Nothing here is a new colour or a new typeface: a section keeps
+   its own h2, it is simply folded until someone asks for it. */
+/* A reading page with a rail needs the room /method already takes; 46rem minus
+   a 13rem rail is a 55-character line. */
+.wide{max-width:52rem}
+.layout{display:grid;grid-template-columns:13rem minmax(0,1fr);gap:var(--sp-6);align-items:start}
+@media (max-width:960px){.layout{display:block}}
+
+.rail{position:sticky;top:5rem;font-size:.9375rem;line-height:1.35}
+@media (max-width:960px){.rail{display:none}}
+.railHead{margin:0 0 var(--sp-2);font-family:var(--font-m);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.railList{list-style:none;margin:0;padding:0;border-left:1px solid var(--line)}
+.railList li{margin:0}
+.railList button{display:block;width:100%;text-align:left;padding:.35rem .75rem;margin-left:-1px;border:0;border-left:2px solid transparent;background:none;color:var(--ink-2);font:inherit;cursor:pointer}
+.railList button:hover{color:var(--ink);border-left-color:var(--accent)}
+
+.mob{display:none;margin:0 0 var(--sp-4);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+@media (max-width:960px){.mob{display:block}}
+.mob>summary{display:flex;align-items:center;gap:.5rem;padding:.75rem var(--sp-4);min-height:44px;cursor:pointer;font-weight:600;list-style:none}
+.mob>summary::after{content:'+';margin-left:auto;font-family:var(--font-m);color:var(--ink-3)}
+.mob[open]>summary::after{content:'\2013'}
+.mob>summary::-webkit-details-marker{display:none}
+.mob .railList{border-left:0;padding:0 var(--sp-4) var(--sp-3)}
+.mob .railList button{padding:.45rem 0;min-height:44px}
+
+/* A folded section. The summary carries the real h2, so the type scale, the
+   table of contents and a screen reader all see exactly what they saw before. */
+.sec{border-top:1px solid var(--line)}
+.sec>summary{display:flex;align-items:baseline;gap:var(--sp-3);cursor:pointer;list-style:none;padding:var(--sp-4) 0}
+.sec>summary::-webkit-details-marker{display:none}
+.sec>summary:focus-visible{outline:none;box-shadow:var(--ring)}
+.sec>summary h2,.sec>summary p{margin:0}
+.sec>summary .mark{margin:0 0 0 auto;flex:none;align-self:center;font-family:var(--font-m);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.sec>summary:hover .mark{color:var(--accent-ink)}
+.sec>summary .mark::after{content:'Open'}
+.sec[open]>summary .mark::after{content:'Close'}
+.secBody{padding:0 0 var(--sp-6)}
+.first{border-top:0}
+
+/* A small fold for one paragraph that had been sitting in front of the thing
+   the page is for: the survey's reason for asking, the gap page's reason for
+   counting. Not a section — it carries no heading and takes no rail entry. */
+.aside{margin:var(--sp-5) 0 0;border-top:1px solid var(--line);padding-top:var(--sp-2)}
+.aside>summary{display:flex;align-items:center;gap:.45rem;min-height:44px;cursor:pointer;list-style:none;color:var(--ink-3);font-size:.9375rem}
+.aside>summary::-webkit-details-marker{display:none}
+.aside>summary::after{content:'+';font-family:var(--font-m)}
+.aside[open]>summary::after{content:'\2013'}
+.aside>summary:hover{color:var(--ink)}
+.aside>summary:focus-visible{outline:none;box-shadow:var(--ring)}
+.asideBody{color:var(--ink-2);font-size:.9375rem;max-width:60ch}
+.asideBody p{margin:0 0 var(--sp-3)}

@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest';
 import {
   parseJourney, splitJourney, extractCount, mapUtterance, suggestions, SYMPTOM_REASON,
   gapSignalFor, gapPrefill, NOT_RECEIVED_REASON, DENIED_REASON, DURATION_REASON, DISMISSAL_REASON,
+  protectionsFor, clinicianMentions, NO_SECOND_VISIT_REASON,
   type GapCategory,
 } from '../lib/mapper';
 import gapData from '../data/invisible-events.json';
@@ -610,5 +611,146 @@ describe('a cost is a reason, not always an absence', () => {
     const segs = parseJourney('I went to urgent care and they turned down the referral', SELECTABLE);
     expect(segs.map((x) => x.result.item?.id ?? null)).toEqual(['cms-99203', null]);
     expect(segs[1].result.gapCategory).toBe('care-denied');
+  });
+});
+
+
+/* --------------------------------------------------------------------------
+   NOTHING THE PERSON TYPED IS SILENTLY REMOVED
+
+   Four sentences, typed live on the deployed preview on 2026-09-09, each of
+   which came back smaller than it went in — and in every case the counter said
+   "N of N recognised", so the person was told nothing had been lost:
+
+     "a rheumatologist ordered a nerve test"          1 of 1, $100  (no visit)
+     "my primary care doctor sent me to a
+      neurologist who did an MRI"                     2 of 2, $331  (no neurologist)
+     "I saw four different specialists ..."           new specialist x1, not x4
+     "I waited eight months for a gastroenterologist
+      appointment and then had a colonoscopy"         the eight months not counted
+
+   Every expectation below was produced by running this code, and the dollar
+   figures are read from the published table in the test itself — never typed
+   in by hand, so a table change moves the test with it.
+   -------------------------------------------------------------------------- */
+describe('nothing the person typed is silently removed', () => {
+  const priceOf = (id: string) => SELECTABLE.find((i) => i.id === id)?.valueUsd ?? 0;
+  const totalOf = (story: string) =>
+    parseJourney(story, SELECTABLE).reduce((a, s) => a + (s.result.item?.valueUsd ?? 0) * s.times, 0);
+
+  it('(a) a clinician and a procedure in one clause are both rows, never the test alone', () => {
+    const story = 'a rheumatologist ordered a nerve test';
+    // BEFORE: ['cms-test-emg'] alone, $99.87. AFTER: the visit leads, as it did in life.
+    expect(ids(story)).toEqual(['cms-99204', 'cms-test-emg']);
+    expect(times(story)).toEqual([1, 1]);
+    expect(totalOf(story)).toBeCloseTo(priceOf('cms-99204') + priceOf('cms-test-emg'), 2);
+  });
+
+  it('(a) a referral chain is three rows: the PCP visit, the specialist visit and the scan', () => {
+    const story = 'my primary care doctor sent me to a neurologist who did an MRI';
+    // BEFORE: ['cms-99214', 'cms-img-mri-brain-nc'], $331.01 — the neurologist was dropped.
+    expect(ids(story)).toEqual(['cms-99214', 'cms-99204', 'cms-img-mri-brain-nc']);
+    expect(totalOf(story)).toBeCloseTo(
+      priceOf('cms-99214') + priceOf('cms-99204') + priceOf('cms-img-mri-brain-nc'), 2,
+    );
+  });
+
+  it('(a) the visit is never invented out of a bare procedure', () => {
+    // No clinician named, no visit added. The guard against the opposite failure.
+    expect(ids('an MRI of my brain')).toEqual(['cms-img-mri-brain-nc']);
+    expect(ids('blood work 6 times')).toEqual(['cms-lab-cbc']);
+  });
+
+  it('(b) a cardinal before a plural clinician noun is the line count', () => {
+    // BEFORE: x1 on every one of these.
+    expect(times('I saw four different specialists')).toEqual([4]);
+    expect(times('three doctors')).toEqual([3]);
+    expect(times('12 specialists')).toEqual([12]);
+    expect(times('two different neurologists')).toEqual([2]);
+    const story = 'I saw four different specialists and none of them found anything';
+    expect(ids(story)).toEqual(['cms-99204', null]);
+    expect(times(story)).toEqual([4, 1]);
+    expect(totalOf(story)).toBeCloseTo(priceOf('cms-99204') * 4, 2);
+  });
+
+  it('(b) a number in front of a time word is still a span, never a count of doctors', () => {
+    expect(seg1('Four years of appointments').result.months).toBe(48);
+    expect(seg1('Four years of appointments').times).toBe(1);
+  });
+
+  it('(c) a wait said mid-sentence is months of searching, exactly like a leading one', () => {
+    const story = 'I waited eight months for a gastroenterologist appointment and then had a colonoscopy';
+    const segs = parseJourney(story, SELECTABLE);
+    // BEFORE: two rows, both priced, and the eight-month wait counted nowhere.
+    expect(segs.map((x) => x.result.item?.id ?? null)).toEqual([null, 'cms-99204', 'cms-proc-colonoscopy']);
+    expect(segs[0].result.gapCategory).toBe('time-searching');
+    expect(segs[0].result.months).toBe(8);
+    expect(segs[0].result.reason).toBe(DURATION_REASON);
+    expect(segs[0].raw).toBe('waited eight months');
+    // The care in the same breath still prices, in full.
+    expect(totalOf(story)).toBeCloseTo(priceOf('cms-99204') + priceOf('cms-proc-colonoscopy'), 2);
+  });
+
+  it('(c) weeks become months at 4.33 to the month, to one decimal', () => {
+    const segs = parseJourney('I waited six weeks for an MRI', SELECTABLE);
+    const span = segs.find((x) => x.result.gapCategory === 'time-searching');
+    expect(span?.result.months).toBe(1.4);
+    expect(segs.some((x) => x.result.item?.id === 'cms-img-mri-brain-nc')).toBe(true);
+    expect(seg1('six weeks of waiting').result.months).toBe(1.4);
+  });
+
+  it('(c) the wait a person states rides into the /gap counts unchanged', () => {
+    // The chip's own words must read back as the same span, or the page and the
+    // chip disagree about how long somebody searched.
+    const segs = parseJourney('I spent two years and then took six weeks to get in', SELECTABLE);
+    const span = segs.find((x) => x.result.gapCategory === 'time-searching');
+    expect(span).toBeTruthy();
+    const { counts } = gapPrefill([{ raw: span!.raw }]);
+    expect(counts['time-searching']).toBe(span!.result.months);
+  });
+
+  it('(d) a clinician the reader will not price a second visit for is named, never dropped', () => {
+    const story = 'a rheumatologist sent me to a neurologist';
+    const segs = parseJourney(story, SELECTABLE);
+    expect(segs.map((x) => x.result.item?.id ?? null)).toEqual(['cms-99204', null]);
+    expect(segs[1].raw).toBe('rheumatologist');
+    expect(segs[1].result.reason).toBe(`rheumatologist — ${NO_SECOND_VISIT_REASON}`);
+    // Blank means blank: a named chip never carries a figure.
+    expect(segs[1].result.item).toBeNull();
+  });
+
+  it('(d) every clinician a phrase names is found, in the order they were said', () => {
+    expect(clinicianMentions('my primary care doctor sent me to a neurologist').map((m) => m.noun))
+      .toEqual(['primary care doctor', 'neurologist']);
+    // The long name is never found as the short one inside it.
+    expect(clinicianMentions('my primary care doctor').map((m) => m.noun)).toEqual(['primary care doctor']);
+    expect(clinicianMentions('I was exhausted for months')).toEqual([]);
+  });
+
+  it('(e) the counter can never read n of n while a clause was dropped', () => {
+    // The counter's denominator is parseJourney's own output, so the invariant
+    // that makes it honest is this one: every clause the splitter produced comes
+    // back as at least one segment. Checked across every sentence in this file.
+    const stories = [
+      ...SENTENCES.map(([story]) => story),
+      'a rheumatologist ordered a nerve test',
+      'my primary care doctor sent me to a neurologist who did an MRI',
+      'I saw four different specialists and none of them found anything',
+      'I waited eight months for a gastroenterologist appointment and then had a colonoscopy',
+    ];
+    for (const story of stories) {
+      const clauses = splitJourney(story, protectionsFor(SELECTABLE));
+      const segs = parseJourney(story, SELECTABLE);
+      expect([story, segs.length >= clauses.length]).toEqual([story, true]);
+    }
+  });
+
+  it('(e) a phrase that carries no figure is still one of the phrases read', () => {
+    const story = 'I waited eight months for a gastroenterologist appointment and then had a colonoscopy';
+    const segs = parseJourney(story, SELECTABLE);
+    const priced = segs.filter((x) => x.result.item).length;
+    // 3 phrases read, 2 carrying a published figure — never "2 of 2".
+    expect([segs.length, priced]).toEqual([3, 2]);
+    expect(segs.every((x) => x.raw.trim().length > 0)).toBe(true);
   });
 });

@@ -182,12 +182,8 @@ export default function GapPanel({ context, onDone, onBack }: {
   return (
     <section className="step">
       <div className="wrap">
-        <p className="eyebrow">The part the data cannot see</p>
-        <h2>Now the costs no dataset has ever counted</h2>
         <p className="sub">
-          Everything priced so far came from federal files that record care that was{' '}
-          <strong>delivered and billed</strong>. If you needed care and did not get it, you produce
-          no row in any of them. In the national data, that is indistinguishable from being well.
+          Care you needed and did not get produces no row in any federal file. Counting it here is the only way it exists.
         </p>
         <p className="sub">
           Nothing below is required, and nothing you enter identifies you.

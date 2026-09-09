@@ -1,13 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import Stepper from '@/components/Stepper';
 import GapPanel from '@/components/GapPanel';
 
 export default function GapClient() {
   const r = useRouter();
   return (
     <>
-      <Stepper current={3} />
+      <p className="eyebrow">Step 3 of 3</p>
       <GapPanel onDone={() => r.push('/ledger#act')} onBack={() => r.push('/ledger')} />
     </>
   );

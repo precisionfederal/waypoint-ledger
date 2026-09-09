@@ -7,6 +7,7 @@ import { promises as fs } from 'node:fs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
+import { LongLayout, LongSection, type TocItem } from '@/components/LongSection';
 import { CONTEXT, SMALL_CELL_MIN, SEX_POLICY, SEX_POLICY_URL, SEX_ASK_ORIGIN } from '@/lib/survey';
 
 export const dynamic = 'force-static';
@@ -184,6 +185,19 @@ export default async function MethodPage() {
   const localityCount = states?.localities.length ?? 0;
   const localityRows = states ? Object.keys(states.items).length : 0;
 
+  const TOC: TocItem[] = [
+    ...(audit ? [{ id: 'audit', text: 'The audit' },
+                 { id: 'classes', text: 'How each class of figure is made' },
+                 { id: 'sources', text: 'The files, and what they hash to' }] : []),
+    ...(states && iowa && iowa99213 ? [{ id: 'locality', text: 'Where you live' }] : []),
+    ...(conds ? [{ id: 'conditions', text: 'Which condition, and its code' },
+                 { id: 'ai', text: 'How the AI reads a story' },
+                 { id: 'sex', text: 'Sex differences' }] : []),
+    { id: 'take-the-data', text: 'Take the data' },
+    { id: 'method-doc', text: 'The method, written out in full' },
+    { id: 'could-not-price', text: 'What we could not price, and why' },
+  ];
+
   return (
     <section className="step">
       <div className="wrap method-page">
@@ -192,22 +206,26 @@ export default async function MethodPage() {
             every number had no top-level heading for a screen reader to land on.
             .page-h1 is the site's own class for a panel page (see /gap), and it
             renders at 35.2px against the 34.4px this line had, so nothing moves. */}
-        <h1 className="page-h1">Every figure in the ledger, and every one we would not print</h1>
+        <h1 className="page-h1">Every figure, and the file it was read from</h1>
         <p className="sub">
-          Nothing here is modelled, averaged or estimated. Each figure was read out of a published
-          federal file, or is the product of figures on that file with the formula printed. This page
-          shows the formulas, the audit that re-derives every figure from scratch, and the files
-          themselves.
+          Nothing here is modelled, averaged or estimated. Every figure was read out of a published
+          federal file.
         </p>
-        {audit?.version_line && (
-          <p className="sub" style={{ fontFamily: 'var(--font-m)', fontSize: '.9375rem' }}>
-            {audit.version_line}
-          </p>
-        )}
 
+        <LongLayout items={TOC}>
         {audit && (
           <>
-            <h2 id="audit">The audit</h2>
+            <LongSection id="audit" title="The audit" first open>
+            <p className="sub">
+              A figure is either a row of a federal file or the product of figures on that file with the
+              formula printed. Below: the formulas, the audit that re-derives every figure from scratch,
+              and the files themselves.
+            </p>
+            {audit.version_line && (
+              <p className="sub" style={{ fontFamily: 'var(--font-m)', fontSize: '.9375rem' }}>
+                {audit.version_line}
+              </p>
+            )}
             <div className="card">
               <p>
                 <strong>
@@ -256,7 +274,9 @@ export default async function MethodPage() {
               )}
             </div>
 
-            <h2 id="classes">How each class of figure is made</h2>
+            </LongSection>
+
+            <LongSection id="classes" title="How each class of figure is made">
             <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <thead>
@@ -287,7 +307,9 @@ export default async function MethodPage() {
               redo it. The laboratory rows need no arithmetic at all: the rate is a column on the file.
             </p>
 
-            <h2 id="sources">The files, and what they hash to</h2>
+            </LongSection>
+
+            <LongSection id="sources" title="The files, and what they hash to">
             <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <thead>
@@ -316,12 +338,13 @@ export default async function MethodPage() {
                 </tbody>
               </table>
             </div>
+            </LongSection>
           </>
         )}
 
         {states && iowa && iowa99213 && (
           <>
-            <h2 id="locality">Where you live</h2>
+            <LongSection id="locality" title="Where you live">
             <div className="card">
               <p>
                 Medicare does not pay one national price. It multiplies each half of the payment by a
@@ -347,12 +370,13 @@ export default async function MethodPage() {
                 ; the per-row build log is <code>data/STATE-PRICES-AUDIT.txt</code>.
               </p>
             </div>
+            </LongSection>
           </>
         )}
 
         {conds && (
           <>
-            <h2 id="conditions">Which condition, and its code</h2>
+            <LongSection id="conditions" title="Which condition, and its code">
             <div className="card">
               <p>
                 The year-ahead figure is not one number written into the page. You choose the
@@ -424,12 +448,13 @@ export default async function MethodPage() {
                    target="_blank" rel="noopener noreferrer">CDC ICD-10-CM browser</a>
               </p>
             </div>
+            </LongSection>
           </>
         )}
 
         {conds && (
           <>
-            <h2 id="ai">How the AI reads a story</h2>
+            <LongSection id="ai" title="How the AI reads a story">
             <p>
               A person types what happened in her own words. The deterministic rules in this codebase read the story first and map
               every phrase they recognise to a unit of care. Each phrase the rules leave blank is then shown to a language model
@@ -448,7 +473,9 @@ export default async function MethodPage() {
               deleting the key: the product is the same, minus the filled blanks.
             </p>
 
-            <h2 id="sex">Sex differences</h2>
+            </LongSection>
+
+            <LongSection id="sex" title="Sex differences">
             <div className="card">
               <p>
                 {SEX_ASK_ORIGIN} This is the answer, and it is held to the same standard as every
@@ -540,10 +567,11 @@ export default async function MethodPage() {
                 </p>
               )}
             </div>
+            </LongSection>
           </>
         )}
 
-        <h2 id="take-the-data">Take the data</h2>
+        <LongSection id="take-the-data" title="Take the data">
         <div className="card">
           <p>
             The whole table is published as open data, versioned, with every field described and the
@@ -569,15 +597,22 @@ export default async function MethodPage() {
           )}
         </div>
 
-        <nav className="toc" aria-label="Contents">
-          <p className="toc-h">Method</p>
-          <ul>{m.toc.map((t) => <li key={t.id}><a href={`#m-${t.id}`}>{t.text}</a></li>)}</ul>
-          <p className="toc-h">What we could not price</p>
-          <ul>{g.toc.map((t) => <li key={t.id}><a href={`#g-${t.id}`}>{t.text}</a></li>)}</ul>
-        </nav>
-        <article className="prose" dangerouslySetInnerHTML={{ __html: m.html.replace(/id="/g, 'id="m-') }} />
-        <h2 className="prose-h2">What we could not price, and why</h2>
-        <article className="prose" dangerouslySetInnerHTML={{ __html: g.html.replace(/id="/g, 'id="g-') }} />
+        </LongSection>
+
+        <LongSection id="method-doc" title="The method, written out in full">
+          <nav className="toc" aria-label="Contents of the method document">
+            <ul>{m.toc.map((t) => <li key={t.id}><a href={`#m-${t.id}`}>{t.text}</a></li>)}</ul>
+          </nav>
+          <article className="prose" dangerouslySetInnerHTML={{ __html: m.html.replace(/id="/g, 'id="m-') }} />
+        </LongSection>
+
+        <LongSection id="could-not-price" title="What we could not price, and why">
+          <nav className="toc" aria-label="Contents of what we could not price">
+            <ul>{g.toc.map((t) => <li key={t.id}><a href={`#g-${t.id}`}>{t.text}</a></li>)}</ul>
+          </nav>
+          <article className="prose" dangerouslySetInnerHTML={{ __html: g.html.replace(/id="/g, 'id="g-') }} />
+        </LongSection>
+        </LongLayout>
         <div className="step-actions"><Link className="btn ghost" href="/">Back to the ledger</Link></div>
       </div>
     </section>

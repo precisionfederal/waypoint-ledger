@@ -2,15 +2,19 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useStore, ITEMS } from '@/lib/store';
+import { TABLE } from '@/lib/table';
 import { usd } from '@/lib/pricing';
 import { LivePreviewChips, useLivePreview } from '@/components/JourneyBuilder';
 import { Icon } from '@/components/Icons';
 import { agencyOf, agencyTally } from '@/lib/fit';
 
 /* Who published the rows this tool prices from, counted off the table itself.
-   Four bodies, not four badges — and the number beside each is the real count
-   of rows in data/prices.json, so the strip cannot drift from the data. */
-const PUBLISHERS = agencyTally(ITEMS);
+   Bodies, not badges — and the number beside each is the real count of rows in
+   data/prices.json, so the strip cannot drift from the data. It counts the whole
+   table, not the selectable subset: the MEPS, HCUP, BLS and GSA rows carry the
+   context figures the ledger shows beside the money, and they are published
+   figures too. */
+const PUBLISHERS = agencyTally(TABLE);
 const PUBLISHER_FULL: Record<string, string> = {
   CMS: 'Centers for Medicare & Medicaid Services',
   'AHRQ MEPS': 'AHRQ · Medical Expenditure Panel Survey',
@@ -22,94 +26,92 @@ const PUBLISHER_FULL: Record<string, string> = {
 const EXAMPLE = 'saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER once when my heart was racing';
 
 /* The worked example, drawn from the price table at render time. Every figure on
-   this page is a row of data/prices.json — none of it is typed into the page. */
+   this page is a row of data/prices.json — none of it is typed into the page.
+   Three rows, not nine: the three that read fastest. The button opens the full
+   example on the ledger, and the total below says it totals these three, so the
+   longer ledger is an expansion of a promise and never a contradiction of it. */
 const PREVIEW = [
   { said: 'my regular doctor, six times', id: 'cms-99214', n: 6 },
   { said: 'a cardiologist', id: 'cms-99204', n: 1 },
-  { said: 'an echo', id: 'cms-img-echo', n: 1 },
   { said: 'the ER, twice', id: 'cms-ed-99284-complete', n: 2 },
-  { said: 'MRI of my brain', id: 'cms-img-mri-brain-nc', n: 1 },
 ];
 
 export default function Home() {
-  const st = useStore();
   return (
     <>
+      {/* THE FIRST FIVE SECONDS: a label, a question, one sentence, and the box.
+          Everything else about this tool — who made it, what it refuses to do,
+          what it costs — sits under the box or behind one click below. */}
       <section className="hero">
         <div className="wrap hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">For anyone who spent years getting a diagnosis</p>
+            <p className="eyebrow">Years to a diagnosis</p>
             <h1>What did your diagnostic search actually cost?</h1>
-            <p className="hero-line">The care you needed and never got produces $0 in federal data.</p>
-            <p className="hero-who">I built this so a person who spent years getting a diagnosis can add up what it cost from the government&rsquo;s own published figures, line by line, and send back the ones that are wrong. It will never invent a number. <span>Bo Peng · Precision Federal · Ames, Iowa</span></p>
-            <p className="lede">Type the visits, tests and scans the way you remember them. Waypoint Ledger prices each one from a published federal figure, cites the source on every line, and never invents a number.</p>
-            <div className="cta-row">
-              <Link className="btn primary lg" href={st.entries.length ? '/ledger' : '/journey'}>{st.entries.length ? 'Open my ledger' : 'Price my journey'} <Icon.Arrow /></Link>
-              <Link className="btn ghost lg" href="/register">See the register</Link>
-            </div>
-            <p className="micro">Free · no account · what you type stays in this browser unless you save it · add it to your home screen and it prices with no signal</p>
+            <p className="hero-line">Type it the way you remember it. Every figure comes from a published federal file.</p>
           </div>
           <HeroBuilder />
+        </div>
+        <div className="wrap hero-foot">
+          <p className="hero-who">I built this so a person who spent years getting a diagnosis can add up what it cost from the government&rsquo;s own published figures. It will never invent a number.<span>Bo Peng · Precision Federal · Ames, Iowa</span></p>
         </div>
       </section>
 
       <section className="gap-pitch">
         <div className="wrap gap-grid">
           <div>
-            <p className="eyebrow">The part no dataset can see</p>
-            <h2>The care you needed and never got produces $0 in federal data.</h2>
+            <p className="eyebrow">The part no dataset sees</p>
+            <h2>The costs no dataset counted</h2>
             <p>Every federal cost file records care that was delivered and billed. A visit you could not get, a test you were denied, months lost waiting: none of it leaves a row. Waypoint Ledger counts it, and asks the people who carried it which cost hurt most.</p>
             <div className="row wrap-sm">
-              <Link className="btn primary" href="/survey">Rank the five burdens, two minutes <Icon.Arrow /></Link>
-              <Link className="btn ghost" href="/gap">Count what never happened</Link>
+              <Link className="btn primary" href="/gap">Count what never happened <Icon.Arrow /></Link>
+              <Link className="btn ghost" href="/survey">Rank the five burdens</Link>
             </div>
           </div>
           <div className="zero-card"><p className="zero-num">$0</p><p>rows you generate in federal health data for every visit you needed and could not get</p></div>
         </div>
       </section>
 
-      <section className="trust">
-        <div className="wrap trust-row">
-          <span className="lbl">Every figure published by</span>
-          {PUBLISHERS.map((a) => (
-            <span key={a.agency} className="trust-pub">
-              {PUBLISHER_FULL[a.agency] ?? a.agency}
-              <em>{a.lines} {a.lines === 1 ? 'row' : 'rows'}</em>
-            </span>
-          ))}
-        </div>
-      </section>
-
       <section className="how">
         <div className="wrap">
           <p className="eyebrow">How it works</p>
-          <h2>Three steps. No codes, no bills, no dates.</h2>
+          <h2>Every figure opens</h2>
           <div className="how-grid">
-            <article><span className="how-n">1</span><h3>Describe it</h3><p>“Saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER.” One sentence is enough. We split it into steps.</p></article>
-            <article><span className="how-n">2</span><h3>See what it cost</h3><p>Each step maps to a standard unit of care and is priced at one published federal figure, with its year, basis and population beside it. Anything with no figure stays blank and named.</p></article>
-            <article><span className="how-n">3</span><h3>Act on it</h3><p>Print the appointment sheet for your next visit. Flag a figure that is not you, and it goes back to the agency that published it.</p></article>
+            <article><span className="how-n">1</span><h3>Describe it</h3><p>One sentence in your own words. No codes, no bills, no dates.</p></article>
+            <article><span className="how-n">2</span><h3>See what it cost</h3><p>Each step is priced at one published federal figure, with its year and basis beside it.</p></article>
+            <article><span className="how-n">3</span><h3>Act on it</h3><p>Print the appointment sheet. Flag a figure that is not you.</p></article>
           </div>
-        </div>
-      </section>
 
-      <section className="features">
-        <div className="wrap">
-          <div className="feat-grid">
-            <article><span className="feat-ic"><Icon.Cite /></span><h3>Cited on every line</h3><p>A figure without a source is a rumor. Each line shows who the number describes, and who it does not, and links to the federal file.</p></article>
-            <article><span className="feat-ic"><Icon.Signal /></span><h3>Your correction counts</h3><p>Mark a figure wrong and say what you paid. Corrections are bound to the exact published row, so an agency can see where its data misses.</p></article>
-            <article><span className="feat-ic"><Icon.Sheet /></span><h3>Built for the next appointment</h3><p>One printed page with every step, every cost and three questions worth asking. A clinician who sees the whole search orders differently.</p></article>
-            <article><span className="feat-ic"><Icon.Shield /></span><h3>Nothing leaves your device unless you send it</h3><p>No account. Your journey is built and priced in this browser. It reaches us only if you press Save and share — and that save hands you a code that deletes it. A share link carries units and counts, never names. Install it to your home screen and the whole price table comes with it, so a waiting room with no bars still works.</p></article>
+          {/* The four publishers, counted off the table, kept as one quiet row
+              rather than a band of its own. */}
+          <div className="trust-row how-pub">
+            <span className="lbl">Every figure published by</span>
+            {PUBLISHERS.map((a) => (
+              <span key={a.agency} className="trust-pub">
+                {PUBLISHER_FULL[a.agency] ?? a.agency}
+                <em>{a.lines} {a.lines === 1 ? 'row' : 'rows'}</em>
+              </span>
+            ))}
           </div>
-        </div>
-      </section>
 
-      <section className="faq">
-        <div className="wrap">
-          <h2>Questions people ask</h2>
-          <details><summary>Is this what I will be billed?</summary><p>No. Most figures are Medicare allowed amounts: the price the federal program pays plus the patient share. For a working-age adult on private coverage they are usually a floor. An uninsured person may be billed the charge, which is higher. The ledger says which basis each line uses.</p></details>
-          <details><summary>Where do the numbers come from?</summary><p>The 2026 Medicare physician and hospital fee schedules, the Clinical Laboratory Fee Schedule, the Medical Expenditure Panel Survey, HCUP and the Bureau of Labor Statistics. Every row links to its file, and <Link href="/method">How it is made</Link> shows the arithmetic.</p></details>
-          <details><summary>Does an AI price anything?</summary><p>No. A deterministic matcher maps your words to a unit of care. A published table prices the unit. No model, average or estimate produces a dollar figure anywhere in this tool.</p></details>
-          <details><summary>What happens to what I type?</summary><p>It stays in your browser. If you choose to flag a figure, we record only which figure, your verdict, and optionally what you paid. See <Link href="/privacy">Privacy</Link>.</p></details>
+          {/* Every sentence this page used to open with is still here, word for
+              word, one click down: the four questions, the four things the tool
+              does, and the long form of the three steps above. */}
+          <div className="faq">
+            <details>
+              <summary>Questions people ask</summary>
+              <div className="qa-in">
+                <details><summary>Is this what I will be billed?</summary><p>No. Most figures are Medicare allowed amounts: the price the federal program pays plus the patient share. For a working-age adult on private coverage they are usually a floor. An uninsured person may be billed the charge, which is higher. The ledger says which basis each line uses.</p></details>
+                <details><summary>Where do the numbers come from?</summary><p>The 2026 Medicare physician and hospital fee schedules, the Clinical Laboratory Fee Schedule, the Medical Expenditure Panel Survey, HCUP and the Bureau of Labor Statistics. Every row links to its file, and <Link href="/method">How it is made</Link> shows the arithmetic.</p></details>
+                <details><summary>Does an AI price anything?</summary><p>No. A deterministic matcher maps your words to a unit of care. A published table prices the unit. No model, average or estimate produces a dollar figure anywhere in this tool.</p></details>
+                <details><summary>What happens to what I type?</summary><p>It stays in your browser. If you choose to flag a figure, we record only which figure, your verdict, and optionally what you paid. See <Link href="/privacy">Privacy</Link>.</p></details>
+                <details><summary>What the three steps do, in full</summary><p><b>Describe it.</b> “Saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER.” One sentence is enough. We split it into steps.</p><p><b>See what it cost.</b> Each step maps to a standard unit of care and is priced at one published federal figure, with its year, basis and population beside it. Anything with no figure stays blank and named.</p><p><b>Act on it.</b> Print the appointment sheet for your next visit. Flag a figure that is not you, and it goes back to the agency that published it.</p></details>
+                <details><summary>Cited on every line</summary><p>A figure without a source is a rumor. Each line shows who the number describes, and who it does not, and links to the federal file.</p></details>
+                <details><summary>Your correction counts</summary><p>Mark a figure wrong and say what you paid. Corrections are bound to the exact published row, so an agency can see where its data misses.</p></details>
+                <details><summary>Built for the next appointment</summary><p>One printed page with every step, every cost and three questions worth asking. A clinician who sees the whole search orders differently.</p></details>
+                <details><summary>Nothing leaves your device unless you send it</summary><p>No account. Your journey is built and priced in this browser. It reaches us only if you press Save and share — and that save hands you a code that deletes it. A share link carries units and counts, never names. Install it to your home screen and the whole price table comes with it, so a waiting room with no bars still works.</p></details>
+              </div>
+            </details>
+          </div>
         </div>
       </section>
 
@@ -161,7 +163,7 @@ function HeroBuilder() {
         {preview.segments.length > 0 ? (
           <>
             <LivePreviewChips preview={preview} onExample={(t) => setStory((s) => (s.trim() ? `${s.replace(/[\s,]+$/, '')}, ${t}` : t))} />
-            <p className="hl-cited"><Icon.Cite /> Every figure cited to a published federal file</p>
+            <p className="hl-cited"><Icon.Cite /> Free · no account · every figure cited to a published federal file</p>
             <div className="hl-foot">
               <p className="hl-total"><span className="lbl">So far</span> <b>{usd(preview.previewTotal)}</b></p>
               <button className="btn primary" type="button" onClick={add}>Add these {preview.segments.length} <Icon.Arrow /></button>
@@ -179,10 +181,10 @@ function HeroBuilder() {
                 </li>
               ))}
             </ul>
-            <p className="hl-cited"><Icon.Cite /> Every figure cited to a published federal file</p>
+            <p className="hl-cited"><Icon.Cite /> Free · no account · every figure cited to a published federal file</p>
             <div className="hl-foot">
-              <p className="hl-total"><span className="lbl">What the published prices add up to</span> <b>{usd(exampleTotal)}</b></p>
-              <button className="btn primary" type="button" onClick={() => { st.loadExample(); window.location.href = '/ledger'; }}>Open this example <Icon.Arrow /></button>
+              <p className="hl-total"><span className="lbl">These three published figures</span> <b>{usd(exampleTotal)}</b></p>
+              <button className="btn primary" type="button" onClick={() => { st.loadExample(); window.location.href = '/ledger'; }}>Open the full example <Icon.Arrow /></button>
             </div>
           </>
         )}

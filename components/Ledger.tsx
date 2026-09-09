@@ -206,14 +206,19 @@ export default function Ledger() {
   const stats: { lbl: string; val: string; sub: ReactNode }[] = [];
   if (gaps.months > 0) stats.push({ lbl: 'Time spent searching', val: monthsPhrase(gaps.months), sub: 'counted, never priced' });
   stats.push({ lbl: 'Steps in your journey', val: String(appointments), sub: `${st.entries.length} distinct` });
-  stats.push({ lbl: 'Without a federal figure', val: String(sum.unpricedCount + st.unpricedHits.length), sub: 'shown blank, never guessed' });
-  if (wrong > 0) stats.push({ lbl: 'Corrections you sent', val: String(wrong), sub: <Link href="/signal">see the running count</Link> });
+  const blankLines = sum.unpricedCount + st.unpricedHits.length;
+  stats.push({
+    lbl: 'Without a federal figure',
+    val: String(blankLines),
+    sub: blankLines === 0 ? 'every line carries one' : 'shown blank, never guessed',
+  });
+  if (wrong > 0) stats.push({ lbl: 'Corrections you sent', val: String(wrong), sub: <Link href="/register">see the running count</Link> });
 
   if (!st.hydrated) return <div className="wrap"><p className="micro">Loading your ledger…</p></div>;
   if (!st.entries.length) {
     return (
       <section className="empty card">
-        <h2>Your ledger is empty</h2>
+        <h2>Start with one sentence</h2>
         <p>Describe your diagnostic journey in your own words and every step becomes a priced, cited line.</p>
         <div className="row"><Link className="btn primary" href="/journey">Price a journey <Icon.Arrow /></Link><button className="btn ghost" onClick={st.loadExample}>See a worked example</button></div>
       </section>
@@ -367,9 +372,14 @@ export default function Ledger() {
 
   return (
     <div className="ledger">
-      <ContextBar />
-
-      <div className="sum-grid">
+      {/* 🔴 THE NUMBER, THEN WHO IT IS FOR.
+          A band reading "THIS LEDGER IS FITTED FOR No coverage chosen … Answer
+          three questions" used to sit on top of the largest figure on the site,
+          and the figure itself was labelled with an instruction. The card now
+          carries the meaning, the line under it carries the basis and the way to
+          change it, and the three counts sit below as a quiet row instead of as
+          three cards competing with the total. */}
+      <div className={cs.numberWrap}>
         {suppressed && noFig ? (
           <NoFigureTotal
             copy={noFig}
@@ -388,11 +398,19 @@ export default function Ledger() {
             totalUsd={sum.totalUsd}
             pricedCount={sum.pricedCount}
             tableVersion={TABLE_VERSION}
-            label={labels.primary}
+            label="Published figures for this pattern of care"
           />
         )}
+        <ContextBar variant="line" />
+      </div>
+
+      <div className={cs.figRow}>
         {stats.slice(0, 3).map((c) => (
-          <div className="sum-card" key={c.lbl}><p className="lbl">{c.lbl}</p><p className="mid-num">{c.val}</p><p className="micro">{c.sub}</p></div>
+          <div className={cs.fig} key={c.lbl}>
+            <span className={cs.figV}>{c.val}</span>
+            <span className={cs.figL}>{c.lbl}</span>
+            <span className={cs.figS}>{c.sub}</span>
+          </div>
         ))}
       </div>
 
@@ -410,6 +428,9 @@ export default function Ledger() {
       />
 
       <div className={`ledger-strip ${cs.strip}`}>
+        {/* The full basis label, moved off the top of the number and kept here in
+            full — it is the same string the CSV, the JSON and the brief carry. */}
+        {!suppressed && ctx.coverage && <p className="micro">{labels.primary}.</p>}
         {loc && !twoTotals && (
           <p className="micro">Figures on this page are the CMS allowed amounts for {loc.displayName} under the CY2026 formula, wherever CMS publishes one for the code.</p>
         )}
@@ -422,18 +443,14 @@ export default function Ledger() {
         {suppressed && (
           <p className="micro">No total is shown because no published federal figure describes any line on this page. The figures beside each line are references, and each says which.</p>
         )}
-        {agencies.length > 0 && (
-          <p className="micro">Sources in this ledger: {agencies.map((a) => `${a.agency} (${a.lines} ${a.lines === 1 ? 'line' : 'lines'})`).join(' · ')}</p>
-        )}
-        <p className="micro">Every line carries a thumb. What the public sends back is counted in the open — <Link href="/register">see the running count</Link>.</p>
       </div>
 
-      <div className="apart-rule"><span>Beside the money · never added to it</span></div>
-
       {/* Four published rate tables before anyone has entered a count is a wall,
-          not information. It opens by itself the moment there is a count in it. */}
+          not information. It opens by itself the moment there is a count in it.
+          The rule that used to run above it ("Beside the money · never added to
+          it") is the block's own first line, inside BurdenLedger. */}
       <details className="more-block" open={burdensEntered}>
-        <summary>The burden no claims file records — missed workdays, unpaid care hours, trips, times you were dismissed</summary>
+        <summary>The burden no claims file records</summary>
         <BurdenLedger />
       </details>
 
@@ -472,12 +489,10 @@ export default function Ledger() {
           <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION, yearAhead: yearAheadFigure }} className="btn primary full" label="Save my card" />
           <p className="micro">An image drawn in this browser — the number, how long the search took, and where the cost sits. Nothing is uploaded to make it.</p>
           <div className="row exports"><button className="btn ghost" onClick={csv}><Icon.Download /> CSV</button><button className="btn ghost" onClick={json}><Icon.Download /> JSON</button><button className="btn ghost" onClick={fhir}><Icon.Download /> FHIR</button><button className="btn ghost" onClick={brief}><Icon.Download /> Brief</button></div>
-          <details className="more-ways">
-            <summary>More ways to use this</summary>
-            <div className="mw-body">
-          <Link className="btn ghost full" href="/sheet"><Icon.Sheet /> Make the appointment sheet</Link>
-          <button className="btn ghost full" onClick={share}>{copied ? <Icon.Check /> : <Icon.Link />} {copied ? 'Copied' : 'Copy a share link'}</button>
-          <button className="btn ghost full" onClick={saveAndShare} disabled={st.saving}>{st.saving ? 'Saving…' : <><Icon.Shield /> Save and share across devices</>}</button>
+          {/* 🔴 SAVE LIVES HERE NOW, NOT IN THE NAV.
+              It was a header control on all thirteen pages and meant something
+              on one of them. It belongs beside the ledger it saves. */}
+          <button className="btn ghost full" onClick={saveAndShare} disabled={st.saving}>{st.saving ? 'Saving…' : <><Icon.Shield /> Save across devices</>}</button>
           {savedUrl && (
             <div className="saved-link">
               <label htmlFor="saved-url">Your saved ledger</label>
@@ -502,6 +517,11 @@ export default function Ledger() {
               <button className="link-btn" type="button" onClick={forgetSaved}>Delete this saved copy now</button>
             </div>
           )}
+          <details className="more-ways">
+            <summary>More ways to use this</summary>
+            <div className="mw-body">
+          <Link className="btn ghost full" href="/sheet"><Icon.Sheet /> Make the appointment sheet</Link>
+          <button className="btn ghost full" onClick={share}>{copied ? <Icon.Check /> : <Icon.Link />} {copied ? 'Copied' : 'Copy a share link'}</button>
           <Link className="link-btn" href="/journey">Edit my journey</Link>
             </div>
           </details>
@@ -509,6 +529,9 @@ export default function Ledger() {
       </div>
 
       <section className="card table-card">
+        {/* The instruction that used to run under the page heading, moved to the
+            thing it is about. It is the whole argument of the product. */}
+        <p className="micro">Open any line to see exactly who its figure does and does not describe.</p>
         <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <caption className="sr-only">Every step of your journey, the unit of care it maps to, the published federal figure, the line total, and a control to say whether that figure describes you.</caption>
@@ -617,6 +640,12 @@ export default function Ledger() {
             ))}
           </table>
         </div>
+        <div className={cs.listFoot}>
+          {agencies.length > 0 && (
+            <p className="micro">Sources in this ledger: {agencies.map((a) => `${a.agency} (${a.lines} ${a.lines === 1 ? 'line' : 'lines'})`).join(' · ')}</p>
+          )}
+          <p className="micro">Every line carries a thumb. What the public sends back is counted in the open — <Link href="/register">see the running count</Link>.</p>
+        </div>
       </section>
 
       {st.unpricedHits.length > 0 && (
@@ -634,7 +663,21 @@ export default function Ledger() {
           handed the person's own phrases so it can offer the published figure
           their words already name — conditionally worded, never assigned to
           them, and never written back as their choice. */}
-      <YearAheadCard impliedFrom={typedWords} />
+      {/* 🔴 THE MENU FOLDS; THE ANSWER DOES NOT.
+          With no condition chosen this card is a chooser — every published
+          year-ahead figure we hold, 562 px of it, between the ledger and the
+          things a person can do with it. Folded, its summary still says what is
+          inside and one click opens the whole cited card. The moment a condition
+          IS chosen it is that person's answer, not a menu, so it stays open —
+          which is also what keeps the "Who this describes" anchor reachable. */}
+      {yearAhead ? (
+        <YearAheadCard impliedFrom={typedWords} />
+      ) : (
+        <details className="more-block">
+          <summary>The year ahead, shown apart and never added</summary>
+          <YearAheadCard impliedFrom={typedWords} />
+        </details>
+      )}
 
       {sos ? (
         <details className="more-block sos-fold">
@@ -650,7 +693,7 @@ export default function Ledger() {
         <h2>A number nobody reads changes nothing</h2>
         <div className="acts">
           <article className="act-card"><span className="act-ic"><Icon.Sheet /></span><h3>Bring it to your next appointment</h3><p className="who">Your doctor · the next specialist</p><p>One printed page: every step so far, what each costs in the government&rsquo;s own figures, and three questions worth asking.</p><Link className="btn small primary" href="/sheet">Make the sheet</Link></article>
-          <article className="act-card"><span className="act-ic"><Icon.Signal /></span><h3>Tell the government its figure is wrong</h3><p className="who">The agency that published the number</p><p>A correction is bound to the exact source row, so it can be routed to the agency that published it. <Link href="/signal">See the running count.</Link></p></article>
+          <article className="act-card"><span className="act-ic"><Icon.Signal /></span><h3>Tell the government its figure is wrong</h3><p className="who">The agency that published the number</p><p>A correction is bound to the exact source row, so it can be routed to the agency that published it. <Link href="/register">See the running count.</Link></p></article>
           <article className="act-card"><span className="act-ic"><Icon.Cite /></span><h3>Give it to your employer</h3><p className="who">HR · a benefits administrator · a leave request</p><p>An itemized, cited account of what a search for a diagnosis has cost is evidence in a conversation about accommodation or leave.</p><button className="btn small ghost" onClick={brief}>Build the brief</button></article>
           <article className="act-card"><span className="act-ic"><Icon.Shield /></span><h3>Count what no dataset counted</h3><p className="who">You, in two minutes</p><p>The care you needed and did not get produces no row in any federal file. Tell us how often, and rank which cost hurt most.</p><Link className="btn small ghost" href="/gap">Report the gap</Link></article>
         </div>

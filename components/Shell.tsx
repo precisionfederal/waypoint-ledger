@@ -5,22 +5,88 @@ import { useCallback, useEffect, useState } from 'react';
 import { StoreProvider, useStore } from '@/lib/store';
 import { Icon } from './Icons';
 import Toasts from './Toasts';
-import { AccountLink } from './Account';
+
+/* ==========================================================================
+   The frame.
+
+   The header used to carry eight destinations plus a pill. Nobody holds eight,
+   and a person who arrived with one question ("what did this cost me?") had to
+   read a menu before they could ask it. The bar is now FOUR links and one
+   button; everything else moved into the footer under three headings that say
+   who each group is for, and the phone menu shows those same three headings
+   under the four links. Nothing was deleted — every destination that was in
+   the header is still one tap away, and every one of them is in the footer of
+   every page.
+   ========================================================================== */
 
 const NAV = [
-  { href: '/journey', label: 'Price a journey' },
+  { href: '/journey', label: 'Price my journey' },
   { href: '/ledger', label: 'My ledger' },
-  { href: '/sheet', label: 'Appointment sheet' },
-  { href: '/survey', label: 'Rank the burdens' },
   { href: '/register', label: 'The register' },
   { href: '/method', label: 'How it is made' },
 ];
+
+type MoreLink = { href: string; label: string; external?: boolean };
+type MoreGroup = { head: string; links: MoreLink[] };
+
+/* One list, rendered twice: the footer columns and the phone menu. Two copies
+   of this list is how a footer and a menu start disagreeing about what exists. */
+const MORE: MoreGroup[] = [
+  {
+    head: 'For you',
+    links: [
+      { href: '/sheet', label: 'Appointment sheet' },
+      { href: '/survey', label: 'Rank the burdens' },
+      { href: '/interview', label: 'Written interview' },
+      { href: '/account', label: 'Save across devices' },
+    ],
+  },
+  {
+    head: 'For agencies and developers',
+    links: [
+      { href: '/developers', label: 'Developers: the API' },
+      { href: '/adopt', label: 'Run this yourself' },
+      { href: '/api/corrections', label: 'Open data: corrections', external: true },
+      { href: '/api/gap', label: 'Open data: the gap', external: true },
+      { href: '/api/survey', label: 'Open data: burden rankings', external: true },
+      { href: '/data/dictionary.csv', label: 'Data dictionary', external: true },
+    ],
+  },
+  {
+    head: 'About',
+    links: [
+      { href: '/privacy', label: 'Privacy' },
+      { href: '/integrity', label: 'The integrity record' },
+      { href: '/accessibility', label: 'Accessibility' },
+    ],
+  },
+];
+
+function MoreLinks({ links }: { links: MoreLink[] }) {
+  return (
+    <>
+      {links.map((l) => (l.external
+        ? <a key={l.href} href={l.href} target={l.href.startsWith('/api') ? '_blank' : undefined} rel="noopener noreferrer">{l.label}</a>
+        : <Link key={l.href} href={l.href}>{l.label}</Link>
+      ))}
+    </>
+  );
+}
+
+/* A button that points at the page you are standing on is a dead control, and
+   the header used to offer "Open my ledger" while you were on /ledger. So the
+   one CTA always points somewhere you are not. */
+function ctaFor(path: string, count: number): { href: string; label: string } | null {
+  if (count > 0) return path === '/ledger' ? { href: '/journey', label: 'Add more care' } : { href: '/ledger', label: 'Open my ledger' };
+  return path === '/journey' ? null : { href: '/journey', label: 'Price my journey' };
+}
 
 function Header() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   const { entries } = useStore();
   useEffect(() => { setOpen(false); }, [path]);
+  const cta = ctaFor(path, entries.length);
   return (
     <header className="site">
       <div className="wrap bar">
@@ -34,13 +100,19 @@ function Header() {
               {n.label}{n.href === '/ledger' && entries.length > 0 && <span className="pill-n">{entries.length}</span>}
             </Link>
           ))}
-          <AccountLink />
+          {/* the same three headings as the footer, so the menu and the footer
+              can never drift apart; hidden at desktop widths by CSS */}
+          <div className="nav-more">
+            {MORE.map((g) => (
+              <div key={g.head} className="nav-group">
+                <p className="foot-h">{g.head}</p>
+                <MoreLinks links={g.links} />
+              </div>
+            ))}
+          </div>
         </nav>
         <div className="bar-right">
-          {/* "Start" alone is on the list of link texts that tell a screen reader and a
-              crawler nothing. "Start a ledger" is the same 14 characters as the other
-              state of this button, so the bar does not move. */}
-          <Link href={entries.length ? '/ledger' : '/journey'} className="btn primary small hide-sm">{entries.length ? 'Open my ledger' : 'Start a ledger'}</Link>
+          {cta && <Link href={cta.href} className="btn primary small nav-cta">{cta.label}</Link>}
           <button className="menu-btn" type="button" aria-expanded={open} aria-controls="topnav" aria-label={open ? 'Close the menu' : 'Open the menu'} onClick={() => setOpen((o) => !o)}><Icon.Menu /></button>
         </div>
       </div>
@@ -51,41 +123,21 @@ function Header() {
 function Footer() {
   return (
     <footer className="site-foot">
+      <div className="wrap foot-top">
+        <div className="brand"><Icon.Logo size={24} /><span className="name">Waypoint Ledger</span></div>
+        <p className="micro">Prices one person&rsquo;s diagnostic journey from published U.S. federal figures and cites every one. Never invents a number.</p>
+      </div>
       <div className="wrap foot-grid">
-        <div>
-          <div className="brand"><Icon.Logo size={24} /><span className="name">Waypoint Ledger</span></div>
-          <p className="micro">Prices one person&rsquo;s diagnostic journey from published U.S. federal figures and cites every one. Never invents a number.</p>
-        </div>
-        <nav aria-label="Product">
-          <p className="foot-h">Product</p>
-          <Link href="/journey">Price a journey</Link>
-          <Link href="/ledger">My ledger</Link>
-          <Link href="/sheet">Appointment sheet</Link>
-          <Link href="/survey">Rank the burdens</Link>
-          <Link href="/interview">Written interview</Link>
-          <Link href="/register">The register</Link>
-          <Link href="/account">Save across devices</Link>
-        </nav>
-        <nav aria-label="Trust and open data">
-          <p className="foot-h">Trust</p>
-          <Link href="/method">How it is made</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/developers">Developers: the API</Link>
-          <Link href="/adopt">Run this yourself</Link>
-          <Link href="/integrity">The integrity record</Link>
-          <a href="/api/corrections" target="_blank" rel="noopener noreferrer">Open data: corrections</a>
-          <a href="/api/gap" target="_blank" rel="noopener noreferrer">Open data: the gap</a>
-          <a href="/api/survey" target="_blank" rel="noopener noreferrer">Open data: burden rankings</a>
-          <a href="/data/dictionary.csv">Data dictionary</a>
-        </nav>
-        <div>
-          <p className="foot-h">Precision Federal</p>
-          <p className="micro">Ames, Iowa · <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a></p>
-          <p className="micro">Built in the TOPx HHS Tech Sprint for AI and Invisible Illness, Cost of Illness track.</p>
-          <p className="micro">Open source, Apache 2.0: <a href="https://github.com/precisionfederal/waypoint-ledger" rel="noopener">github.com/precisionfederal/waypoint-ledger</a></p>
-        </div>
+        {MORE.map((g) => (
+          <nav key={g.head} aria-label={g.head}>
+            <p className="foot-h">{g.head}</p>
+            <MoreLinks links={g.links} />
+          </nav>
+        ))}
       </div>
       <div className="wrap foot-legal">
+        <p className="micro">Built by Bo Peng at Precision Federal, Ames, Iowa &middot; <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a> &middot; open source, Apache 2.0: <a href="https://github.com/precisionfederal/waypoint-ledger" rel="noopener">github.com/precisionfederal/waypoint-ledger</a></p>
+        <p className="micro">Built in the TOPx HHS Tech Sprint for AI and Invisible Illness, Cost of Illness track.</p>
         <p className="micro">Not a diagnostic device. Not medical, legal or financial advice. Your journey stays in your browser. A correction you choose to send contains no personal information.</p>
       </div>
     </footer>

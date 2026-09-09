@@ -762,3 +762,71 @@ td > .li-sub{display:block;margin-top:.2rem}
   body:has(.outbox-chip) .ledger{padding-bottom:11rem}
 }
 /* === END ENG3 LANE (BUILD-7) === */
+
+/* === SHELL LANE (DESIGN-2) — the frame: four links, one button, three footer columns ===
+   Appended, never edited in place, because three other lanes are in this tree in
+   the same round. Selectors here are one level more specific than the header
+   rules in app/product.css (`header.site .topnav` vs `.topnav`) because
+   product.css is imported AFTER globals.css in app/layout.tsx, so an equally
+   specific rule here would lose. */
+
+/* The bar's height is one number, and the dropdown hangs from it. Two literals
+   is how a menu ends up floating 8 px below the header on a phone. */
+header.site{--hdr-h:4rem}
+header.site .bar{height:var(--hdr-h)}
+header.site .topnav{top:var(--hdr-h)}
+/* an open menu is never taller than the screen it opened on */
+header.site .topnav.open{max-height:calc(100dvh - var(--hdr-h));overflow-y:auto;overscroll-behavior:contain}
+
+/* The three groups inside the phone menu: same headings as the footer, from the
+   same list in components/Shell.tsx. Desktop never shows them. */
+.nav-more{display:none}
+.topnav.open .nav-more{display:block;margin-top:.4rem;padding-top:.5rem;border-top:1px solid var(--line-2)}
+.nav-group{margin:0 0 .35rem}
+.topnav .nav-group .foot-h{margin:.55rem .8rem .1rem}
+.topnav .nav-more a{display:block;padding:.55rem .8rem;border-radius:var(--r-sm);color:var(--ink-2);font-weight:600;font-size:.95rem}
+.topnav .nav-more a:hover{background:var(--ground-2);color:var(--ink);text-decoration:none}
+
+/* Four labels and a button fit on an iPad in landscape; product.css collapses
+   the bar at 1040 because it was sized for eight. Above 900 the row is back. */
+@media (min-width:901px){
+  header.site .topnav{position:static;display:flex;flex-direction:row;background:none;border-bottom:0;padding:0;box-shadow:none;max-height:none;overflow:visible}
+  header.site .menu-btn{display:none}
+  header.site .nav-more{display:none}
+}
+
+/* The one CTA stays on the phone: brand, button, menu, nothing else. */
+@media (max-width:720px){
+  header.site{--hdr-h:3.5rem}          /* 56 px */
+  header.site .bar{gap:.5rem}
+  .topnav .nav-more a{min-height:44px;display:flex;align-items:center}
+}
+/* At 390 px the wordmark, the button and the menu are 369 px of content in a
+   359 px bar, so flex shrank the brand and "Waypoint Ledger" broke across two
+   lines inside a 56 px header. The wordmark never wraps; the three things get
+   smaller instead, and the bar keeps its own tighter gutter. */
+@media (max-width:560px){
+  header.site .wrap.bar{padding:0 .75rem}
+  header.site .brand{flex:0 0 auto}
+  header.site .brand .name{font-size:.92rem;white-space:nowrap}
+  header.site .nav-cta{padding:.3rem .7rem;font-size:.8rem}
+}
+
+/* ---- footer: the identity line, then three columns that say who each is for ---- */
+.foot-top{margin-bottom:var(--sp-6)}
+.foot-top .brand{margin-bottom:.4rem}
+.foot-top .micro{max-width:56ch;margin:0}
+.site-foot .foot-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-6)}
+@media (max-width:900px){.site-foot .foot-grid{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.site-foot .foot-grid{grid-template-columns:1fr}}
+.foot-legal .micro{margin:0 0 .35rem}
+.foot-legal .micro:last-child{margin:0}
+
+/* ---- the Save control, moved out of the header and onto the ledger ----
+   It wraps <AccountLink/>, which is a link whose text is "Save" until this
+   device has signed in and the person's name afterwards, so it cannot be a
+   plain <button>. This styles that link as the ghost button it now is. */
+.save-cta{display:inline-flex}
+.save-cta a{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.85rem;padding:.6rem 1.25rem;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--surface);color:var(--ink);font-family:var(--font-d);font-weight:700;font-size:.97rem;text-decoration:none;transition:border-color .18s ease,color .18s ease}
+.save-cta a:hover{border-color:var(--brand-3);color:var(--brand-3);text-decoration:none}
+/* === END SHELL LANE (DESIGN-2) === */

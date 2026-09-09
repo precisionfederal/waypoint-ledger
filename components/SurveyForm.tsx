@@ -8,6 +8,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { Aside } from './LongSection';
 import { BURDENS, BURDEN_IDS, DECIDERS, QUESTIONS, CONTEXT, CONTEXT_KEYS, SURVEY_VERSION, SMALL_CELL_MIN, SEX_POLICY, SEX_POLICY_URL, type BurdenId, type DeciderId, type ContextKey } from '@/lib/survey';
 
 export default function SurveyForm() {
@@ -73,11 +74,10 @@ export default function SurveyForm() {
   return (
     <section className="step survey">
       <div className="wrap narrow">
-        <p className="eyebrow">Two minutes · six questions · nothing identifies you</p>
+        <p className="eyebrow">Two minutes, six questions</p>
         <h1>Which cost of looking for a diagnosis weighed most?</h1>
         <p className="sub">
-          Federal cost studies decide how to weigh money, time and lost work by analyst judgment. We are asking the people who carried it.
-          Everything you answer is published only as a count, alongside how many people answered and where they came from.
+          Rank the five burdens. Nothing here identifies you.
         </p>
 
         <fieldset className="q">
@@ -188,6 +188,13 @@ export default function SurveyForm() {
           </button>
           {!complete && <p className="micro">{ranking.length < 5 ? `Rank all five (${ranking.length} of 5 so far).` : 'Answer questions 2 to 4.'}</p>}
         </div>
+        <Aside summary="Why we ask">
+          <p>
+            Federal cost studies decide how to weigh money, time and lost work by analyst judgment. We are
+            asking the people who carried it. Everything you answer is published only as a count, alongside
+            how many people answered and where they came from.
+          </p>
+        </Aside>
         <p className="micro">
           Read <Link href="/privacy">what is recorded</Link>. See <Link href="/register">the register</Link> for what everyone has said so far.
           Instrument version {SURVEY_VERSION}. Burden ids: {BURDEN_IDS.join(', ')}.

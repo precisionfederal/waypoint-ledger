@@ -72,3 +72,61 @@
 /* the two published figures that bracket a blank line in the table */
 .refFig{display:block;margin-top:.3rem;font-size:.85rem;font-weight:400;line-height:1.4;color:var(--ink-3);white-space:normal}
 .refFig b{font-family:var(--font-m);color:var(--ink-2)}
+
+/* ==========================================================================
+   DESIGN-2 · flow lane — the fit line, the number block, the quiet figures.
+
+   Everything below replaces furniture, not facts. The three-question panel is
+   unchanged; what changed is that it rests as one line, and that the ledger's
+   summary is a number with a line under it instead of a four-card grid under a
+   band. No new colour, no new font, nothing under the type floor.
+   ========================================================================== */
+
+/* ONE LINE, EVERYWHERE. Text, then a dot drawn in CSS, then Change. The dot is
+   decorative so a screen reader hears "Medicare reference, national. Change". */
+.fitLine{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem;margin:0}
+.fitTxt{color:var(--ink-3);min-width:0}
+.fitChange{position:relative;padding:0 0 0 .85rem;border:0;background:none;color:var(--accent-ink);
+  font:inherit;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:.2em}
+.fitChange::before{content:"·";position:absolute;left:.15rem;color:var(--ink-4);text-decoration:none;font-weight:400}
+.fitChange:hover{color:var(--ink)}
+.fitChange:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
+
+/* Under the box on /journey — the same size as the rest of the page's small print. */
+.fitLineAsk{margin:var(--sp-3) 0 var(--sp-4);font-size:.9375rem}
+/* Under the number on /ledger — small type, tucked against the card above it. */
+.fitLineNum{margin:.55rem 0 0;font-size:.875rem}
+.fitLineBar{margin:0 0 var(--sp-3);font-size:.9375rem}
+
+/* 🔴 THE NUMBER IS THE FIRST THING, AND IT IS ALONE.
+   The reveal used to be the first column of a four-column grid, so the largest
+   figure on the site shared its row with three counts and was topped by a band.
+   The card is now full width with the fit line under it, and the counts sit
+   below as a quiet row. Nothing was removed; the order changed. */
+.numberWrap{margin:0 0 var(--sp-4)}
+
+.figRow{display:flex;flex-wrap:wrap;gap:clamp(1.5rem,5vw,3.5rem);
+  margin:0 0 var(--sp-4);padding:var(--sp-3) 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.fig{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.figV{font-family:var(--font-d);font-weight:800;font-size:1.35rem;line-height:1.15;color:var(--ink)}
+.figL{font-size:.875rem;font-weight:600;color:var(--ink-2)}
+.figS{font-size:.8125rem;color:var(--ink-3)}
+@media (max-width:560px){
+  .figRow{flex-direction:column;gap:var(--sp-3)}
+  .fig{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:.4rem}
+  .figV{font-size:1.15rem}
+  .figS{flex-basis:100%}
+}
+
+/* The two standing sentences about the ledger's own sources, at the foot of the
+   list they describe rather than above the number. */
+.listFoot{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2)}
+.listFoot p{margin:0 0 .25rem}
+.listFoot p:last-child{margin-bottom:0}
+
+/* Nothing has been counted yet. A dash, not a zero — the same rule the ledger
+   applies when no published figure describes a person: never print a number
+   that would read as a claim. */
+.numNone{color:var(--ink-4)}
+.barWait{display:block;font-size:.95rem;line-height:1.3;color:var(--ink-3);max-width:20ch}
+.waitNote{margin:.35rem 0 var(--sp-3);font-size:1rem;line-height:1.45;color:var(--ink-3)}

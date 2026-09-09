@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { LongLayout, LongSection, type TocItem } from '@/components/LongSection';
+import long from '@/components/LongSection.module.css';
 import {
   PRIVACY_ENDPOINTS, PRIVACY_GENERATED_ON, PRIVACY_MIGRATIONS, PRIVACY_SCHEMA_FINGERPRINT,
   PRIVACY_COLUMN_COUNT, PRIVACY_TABLE_COUNT, type PrivacyEndpoint,
@@ -60,51 +62,78 @@ function Fields({ e }: { e: PrivacyEndpoint }) {
   );
 }
 
+const TOC: TocItem[] = [
+  { id: 'browser', text: 'Your journey stays in this browser' },
+  { id: 'save', text: 'If you press Save' },
+  { id: 'about-you', text: 'What you tell the ledger about yourself' },
+  { id: 'share', text: 'A share link carries no names' },
+  { id: 'correction', text: 'What a correction sends' },
+  { id: 'gap', text: 'What a gap report sends' },
+  { id: 'survey', text: 'What the burden survey sends' },
+  { id: 'interview', text: 'What a written interview sends' },
+  { id: 'third-party', text: 'No analytics, no advertising, no third party' },
+  { id: 'fields', text: 'Every field this database has' },
+  { id: 'who', text: 'Who runs it' },
+];
+
 export default function Privacy() {
   return (
     <section className="page narrow">
-      <div className="wrap prose">
+      <div className={`wrap prose ${long.wide}`}>
         <p className="eyebrow">Privacy</p>
         <h1>What this tool keeps, and what it never sees</h1>
-        <p className="sub">Nothing you type leaves this browser unless you press Save or send something. When you do send something, every field that lands in our database is listed further down this page &mdash; and that list is generated from the database itself, so it cannot fall behind.</p>
+        <p className="sub">Nothing you type leaves this browser unless you press Save or send something.</p>
 
-        <h2>Your journey stays in this browser</h2>
-        <p>What you type into the ledger is held in this browser&rsquo;s local storage. Clearing your browser data, or pressing &ldquo;Start over&rdquo;, removes it. An account is optional and changes none of that: your journey still lives in this browser. If you make one, we store a random account number, whichever way in you chose (the public half of a passkey, or an email address and a scrambled form of your password that cannot be turned back into it), a ten-word recovery code we keep only the scrambled form of, and the ledgers you press save on. No mail is ever sent to that address. Deleting your account from /account erases all of it; corrections you already sent stay in the public register with the link back to you removed.</p>
+        <LongLayout items={TOC}>
+          <LongSection id="browser" title="Your journey stays in this browser" first open>
+            <p>What you type into the ledger is held in this browser&rsquo;s local storage. Clearing your browser data, or pressing &ldquo;Start over&rdquo;, removes it. An account is optional and changes none of that: your journey still lives in this browser. If you make one, we store a random account number, whichever way in you chose (the public half of a passkey, or an email address and a scrambled form of your password that cannot be turned back into it), a ten-word recovery code we keep only the scrambled form of, and the ledgers you press save on. No mail is ever sent to that address. Deleting your account from /account erases all of it; corrections you already sent stay in the public register with the link back to you removed.</p>
+          </LongSection>
 
-        <h2>If you press Save</h2>
-        <p>Saving is the one thing that puts your own words on our server: the units of care, their counts and the short phrase you typed for each line, so the link you get back opens the ledger again. Two things come back with that link. A delete code, shown once, which is the only way to remove the save and needs no account &mdash; we keep only a one-way hash of it, so we cannot use it and cannot recover it for you. And a date: an anonymous save stops opening after 180 days, while a save on an account has no expiry. Anyone holding the link can open that ledger, so treat the link as the ledger itself and keep names out of what you type.</p>
+          <LongSection id="save" title="If you press Save">
+            <p>Saving is the one thing that puts your own words on our server: the units of care, their counts and the short phrase you typed for each line, so the link you get back opens the ledger again. Two things come back with that link. A delete code, shown once, which is the only way to remove the save and needs no account &mdash; we keep only a one-way hash of it, so we cannot use it and cannot recover it for you. And a date: an anonymous save stops opening after 180 days, while a save on an account has no expiry. Anyone holding the link can open that ledger, so treat the link as the ledger itself and keep names out of what you type.</p>
+          </LongSection>
 
-        <h2>What you tell the ledger about yourself</h2>
-        <p>Choosing your coverage and where you live changes which published figure each line shows you. Both answers are held in this browser under <code>waypoint-ledger.ctx.v1</code>, and the fit of a figure to a person is worked out on your own device: neither answer is attached to a correction, a gap report, a share link or a saved ledger.</p>
+          <LongSection id="about-you" title="What you tell the ledger about yourself">
+            <p>Choosing your coverage and where you live changes which published figure each line shows you. Both answers are held in this browser under <code>waypoint-ledger.ctx.v1</code>, and the fit of a figure to a person is worked out on your own device: neither answer is attached to a correction, a gap report, a share link or a saved ledger.</p>
+          </LongSection>
 
-        <h2>A share link carries no names</h2>
-        <p>The link the ledger copies for you carries the units of care, their counts and your short phrases inside the link itself, after the <code>#</code>. A browser never sends that part to any server, so a shared journey of this kind is never stored by us and never arrives here. A link from Save is the other kind: that one is a row in our database, and it is described field by field below.</p>
+          <LongSection id="share" title="A share link carries no names">
+            <p>The link the ledger copies for you carries the units of care, their counts and your short phrases inside the link itself, after the <code>#</code>. A browser never sends that part to any server, so a shared journey of this kind is never stored by us and never arrives here. A link from Save is the other kind: that one is a row in our database, and it is described field by field below.</p>
+          </LongSection>
 
-        <h2>What a correction sends</h2>
-        <p>If you mark a published figure right or wrong, we record the identifier of the figure, your verdict, optionally the amount you say you paid, the version of the price table, and an optional note that is never published and never exported. No name, no diagnosis and no IP address, ever. If you happen to be signed in, the row also records which account sent it, so the site can show you what you have told the government; deleting your account removes that link and leaves the correction counted. If you are not signed in &mdash; the default, and how nearly everyone uses this &mdash; there is no account and nothing about you on the row. The aggregate is public at <a href="/api/corrections">/api/corrections</a>.</p>
-        <p>So that one person cannot answer the same figure a hundred times, your browser makes a random identifier for itself the first time you send anything, and keeps it under <code>waypoint-ledger.submitter.v1</code>. It is sent with a correction and the server stores only a truncated hash of it combined with that one price row &mdash; a hash that cannot be joined to your answer on any other row, and that we could not turn back into the identifier if we wanted to. It is used for nothing else and sent nowhere else.</p>
+          <LongSection id="correction" title="What a correction sends">
+            <p>If you mark a published figure right or wrong, we record the identifier of the figure, your verdict, optionally the amount you say you paid, the version of the price table, and an optional note that is never published and never exported. No name, no diagnosis and no IP address, ever. If you happen to be signed in, the row also records which account sent it, so the site can show you what you have told the government; deleting your account removes that link and leaves the correction counted. If you are not signed in &mdash; the default, and how nearly everyone uses this &mdash; there is no account and nothing about you on the row. The aggregate is public at <a href="/api/corrections">/api/corrections</a>.</p>
+            <p>So that one person cannot answer the same figure a hundred times, your browser makes a random identifier for itself the first time you send anything, and keeps it under <code>waypoint-ledger.submitter.v1</code>. It is sent with a correction and the server stores only a truncated hash of it combined with that one price row &mdash; a hash that cannot be joined to your answer on any other row, and that we could not turn back into the identifier if we wanted to. It is used for nothing else and sent nowhere else.</p>
+          </LongSection>
 
-        <h2>What a gap report sends</h2>
-        <p>If you report care you needed and did not get, we record the counts and ranking you entered, an optional note, and any optional context you chose to give (an age band, insurance type, region). Nothing identifies you. The aggregate is public at <a href="/api/gap">/api/gap</a>.</p>
+          <LongSection id="gap" title="What a gap report sends">
+            <p>If you report care you needed and did not get, we record the counts and ranking you entered, an optional note, and any optional context you chose to give (an age band, insurance type, region). Nothing identifies you. The aggregate is public at <a href="/api/gap">/api/gap</a>.</p>
+          </LongSection>
 
-        <h2>What the burden survey sends</h2>
-        <p>Your ranking of five burdens, three multiple-choice answers, an optional clinician count, any optional self-description you chose (age band, coverage, region, state, stage), the channel slug on the link you used, and the time it was received. An optional one-sentence note is encrypted at rest and never published word for word. The aggregate and a de-identified CSV are public, and a cell holding too few people to be safe is withheld from both.</p>
+          <LongSection id="survey" title="What the burden survey sends">
+            <p>Your ranking of five burdens, three multiple-choice answers, an optional clinician count, any optional self-description you chose (age band, coverage, region, state, stage), the channel slug on the link you used, and the time it was received. An optional one-sentence note is encrypted at rest and never published word for word. The aggregate and a de-identified CSV are public, and a cell holding too few people to be safe is withheld from both.</p>
+          </LongSection>
 
-        <h2>What a written interview sends</h2>
-        <p>The answers you wrote, the consent you chose (learn only, quote anonymously, quote by name), a name only if you chose to be quoted by name, and an email address only if you asked to hear about a new version. Interview answers are encrypted at rest and are never served by any endpoint or included in any export. Quotes appear only in the way you chose. To have an interview removed, write to bo@precisionfederal.com.</p>
+          <LongSection id="interview" title="What a written interview sends">
+            <p>The answers you wrote, the consent you chose (learn only, quote anonymously, quote by name), a name only if you chose to be quoted by name, and an email address only if you asked to hear about a new version. Interview answers are encrypted at rest and are never served by any endpoint or included in any export. Quotes appear only in the way you chose. To have an interview removed, write to bo@precisionfederal.com.</p>
+          </LongSection>
 
-        <h2>No analytics, no advertising, no third party at all</h2>
-        <p>This site makes no third-party request of any kind. The three typefaces are served from this domain (they used to come from Google Fonts, and that was the last outside request left). There is no analytics script, no advertising, no tracking cookie. The only cookie this site can ever set is the session cookie you get if you sign in, and it holds one random value.</p>
+          <LongSection id="third-party" title="No analytics, no advertising, no third party at all">
+            <p>This site makes no third-party request of any kind. The three typefaces are served from this domain (they used to come from Google Fonts, and that was the last outside request left). There is no analytics script, no advertising, no tracking cookie. The only cookie this site can ever set is the session cookie you get if you sign in, and it holds one random value.</p>
+          </LongSection>
 
-        <h2 id="fields">Every field this database has</h2>
-        <p>A privacy page written as prose drifts from the database the first time an engineer adds a column. So this part is not written. It is generated from the schema itself &mdash; {PRIVACY_COLUMN_COUNT} columns across {PRIVACY_TABLE_COUNT} tables, read from {PRIVACY_MIGRATIONS.join(', ')} &mdash; together with the validators as they actually run, the field list inside the tamper-evidence chain, and the header of each published CSV. <strong>A column added without a plain-English description here fails our build</strong>, so a field cannot ship without appearing on this page.</p>
-        <p className="micro">Generated {PRIVACY_GENERATED_ON} · schema fingerprint {PRIVACY_SCHEMA_FINGERPRINT} · <em>Kept</em> says whether the value is always there or only when it applies · <em>Public</em> means the value is served to anyone and, where the register is chained, is inside the hash chain · <em>In the CSV</em> means it is in the open download at /api/export.</p>
-        {PRIVACY_ENDPOINTS.map((e) => (
-          <Fields e={e} key={e.id} />
-        ))}
+          <LongSection id="fields" title="Every field this database has">
+            <p>When you do send something, every field that lands in our database is listed here &mdash; and this list is generated from the database itself, so it cannot fall behind. A privacy page written as prose drifts from the database the first time an engineer adds a column. So this part is not written. It is generated from the schema itself &mdash; {PRIVACY_COLUMN_COUNT} columns across {PRIVACY_TABLE_COUNT} tables, read from {PRIVACY_MIGRATIONS.join(', ')} &mdash; together with the validators as they actually run, the field list inside the tamper-evidence chain, and the header of each published CSV. <strong>A column added without a plain-English description here fails our build</strong>, so a field cannot ship without appearing on this page.</p>
+            <p className="micro">Generated {PRIVACY_GENERATED_ON} &middot; schema fingerprint {PRIVACY_SCHEMA_FINGERPRINT} &middot; <em>Kept</em> says whether the value is always there or only when it applies &middot; <em>Public</em> means the value is served to anyone and, where the register is chained, is inside the hash chain &middot; <em>In the CSV</em> means it is in the open download at /api/export.</p>
+            {PRIVACY_ENDPOINTS.map((e) => (
+              <Fields e={e} key={e.id} />
+            ))}
+          </LongSection>
 
-        <h2>Who runs it</h2>
-        <p>Precision Federal, Ames, Iowa. Questions: <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a>.</p>
+          <LongSection id="who" title="Who runs it">
+            <p>Precision Federal, Ames, Iowa. Questions: <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a>.</p>
+          </LongSection>
+        </LongLayout>
       </div>
     </section>
   );

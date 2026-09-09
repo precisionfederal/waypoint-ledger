@@ -1,24 +1,22 @@
 import type { Metadata } from 'next';
-import Stepper from '@/components/Stepper';
-import ContextBar from '@/components/ContextBar';
 import JourneyBuilder from '@/components/JourneyBuilder';
-export const metadata: Metadata = { title: 'Price a journey' };
+export const metadata: Metadata = { title: 'Price my journey' };
+
+/* 🔴 THE BOX IS THE PAGE.
+   This opening used to be a step-pill row, a heading, a two-line promise, a
+   privacy paragraph and a three-column questionnaire — about seventy words and
+   two full screens on a phone before the thing you came to do. Nothing here was
+   untrue and nothing has been deleted: the privacy sentence is under the box in
+   the builder's own foot and on /privacy, and the three fit questions are one
+   line under the box with Change beside them. What is left above the box is the
+   step, the instruction, and one sentence. */
 export default function JourneyPage() {
   return (
     <section className="page">
       <div className="wrap">
-        <Stepper current={1} />
-        <h1>Describe your journey the way you remember it</h1>
-        <p className="sub">Plain language. No codes, no bills, no dates. We split it into steps and price each from a published federal figure, or say plainly that no figure exists.</p>
-        {/* The honest version of the promise. What you type stays in this browser
-            until you press Save; Save sends it here so its link opens elsewhere,
-            and it hands back a code that deletes it. Anything stronger than this
-            would be a sentence the Save button contradicts. */}
-        <p className="micro">What you type stays in this browser. It is sent to this site only if you press <strong>Save and share</strong>, and that save comes back with a code that deletes it.</p>
-        {/* 🔴 Asked BEFORE the number, never after it. Two answers here and the
-            ledger arrives already labelled for this person; skipped, and every
-            line says plainly that it is a national reference. */}
-        <ContextBar variant="ask" />
+        <p className="eyebrow">Step 1 of 3</p>
+        <h1>Describe it the way you remember it</h1>
+        <p className="sub">Plain language, no codes and no dates. Every phrase becomes a priced, cited line.</p>
         <JourneyBuilder />
       </div>
     </section>
