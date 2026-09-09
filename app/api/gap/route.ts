@@ -38,7 +38,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { validateGap, aggregateGap } from '../../../cf/functions/api/gap.js';
-import { readRows } from '../survey/route';
+import { readRows } from '../_rows';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

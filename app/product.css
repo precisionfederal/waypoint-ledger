@@ -61,7 +61,11 @@
 .hl-total{margin:0;display:flex;flex-direction:column;line-height:1.15}
 .hl-total .lbl{margin:0 0 .15rem}
 .hl-total b{font-family:var(--font-d);font-weight:800;font-size:1.6rem;font-variant-numeric:tabular-nums}
-@media (max-width:900px){.hero-live{padding-bottom:clamp(2rem,8vw,3rem)}.hero-copy{padding-bottom:var(--sp-5)}}
+@media (max-width:900px){.hero-live{padding-bottom:clamp(2rem,8vw,3rem)}.hero-copy{padding-bottom:var(--sp-5)}
+  /* On a phone the box comes before the paragraph: the product is on the first screen. */
+  .hero-grid{display:flex;flex-direction:column}.hero-copy{display:contents}
+  .hero-copy .eyebrow{order:1}.hero-copy h1{order:2}.hero-copy .hero-line{order:3}.hero-live{order:4}.hero-copy .hero-who{order:5}.hero-copy .lede{order:6}.hero-copy .cta-row{order:7}.hero-copy .micro{order:8}}
+.hero-who{font-size:.95rem;line-height:1.5;max-width:34rem;margin:.35rem 0 .9rem;color:var(--ink-2,inherit)}.hero-who span{display:block;margin-top:.25rem;font-weight:600;letter-spacing:.01em}
 
 /* ---------- the return trip on /gap: their row, then the count it joined ---------- */
 .gap-back{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);

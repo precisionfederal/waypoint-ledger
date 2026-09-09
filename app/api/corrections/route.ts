@@ -31,7 +31,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { validateCorrection, aggregateCorrections } from '../../../cf/functions/api/corrections.js';
-import { readRows } from '../survey/route';
+import { readRows } from '../_rows';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

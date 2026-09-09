@@ -442,9 +442,10 @@ export default async function MethodPage() {
               mark <span className="lp-chip" style={{ padding: '.1rem .5rem' }}><span className="lp-ai">AI read</span></span> and the person can change it like any other line.
             </p>
             <p>
-              The reader is <a href="/api/map">POST /api/map</a>. It answers with the model that read the story, or with the rules alone
-              when no model was reachable, so the tool never waits on one. Run without it by deleting the AI binding: the product is
-              the same, minus the filled blanks.
+              The reader is <a href="/api/map">POST /api/map</a>. The model in production is OpenAI gpt-5.4-nano, which answers in
+              about a second; gpt-5-mini stands behind it, and Cloudflare Workers AI behind that. The reply names the model that read
+              the story, or reports the rules alone when none was reachable, so the tool never waits on one. Run without it by
+              deleting the key: the product is the same, minus the filled blanks.
             </p>
 
             <h2 id="sex">Sex differences</h2>

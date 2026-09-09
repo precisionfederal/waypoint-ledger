@@ -10,8 +10,8 @@
 
    Everything here is pure so it can be tested without a model: build the
    request, validate the answer, merge it. `cf/functions/api/map.js` supplies
-   the model (Anthropic when a key is configured, Cloudflare Workers AI
-   otherwise) and the cache. */
+   the model (OpenAI gpt-5.4-nano first; Anthropic or Cloudflare Workers AI
+   when that key is absent) and the cache. */
 import type { PriceItem } from './types';
 import type { ParsedSegment, MapResult } from './mapper';
 
@@ -99,7 +99,10 @@ export function applyModel(
     // machine"). If a neighbouring phrase the rules already read names the same unit, this is the same event,
     // not a second one — leave it blank rather than count the unit twice.
     const neighbours = [out[idx - 1], out[idx + 1]].filter(Boolean);
-    if (neighbours.some((n) => n && n.result.item && n.result.item.id === item.id)) continue;
+    if (neighbours.some((n) => n && n.result.item && n.result.item.id === item.id)) {
+      out[idx] = { ...out[idx], absorbed: true, source: 'model', modelWhy: a.why ?? null };
+      continue;
+    }
     const result: MapResult = {
       item,
       score: 0.5,
@@ -128,6 +131,7 @@ export interface WireSegment {
   months: number | null;
   source: SegmentSource;
   why: string | null;
+  absorbed?: boolean;
 }
 
 export function toWire(segments: readonly ParsedSegment[]): WireSegment[] {
@@ -143,6 +147,7 @@ export function toWire(segments: readonly ParsedSegment[]): WireSegment[] {
     months: s.result.months,
     source: s.source ?? 'rules',
     why: s.modelWhy ?? null,
+    ...(s.absorbed ? { absorbed: true } : {}),
   }));
 }
 
@@ -155,6 +160,7 @@ export function fromWire(wire: readonly WireSegment[], table: readonly PriceItem
     countNote: w.countNote,
     source: w.source,
     modelWhy: w.why,
+    ...(w.absorbed ? { absorbed: true } : {}),
     result: {
       item: w.itemId ? byId.get(w.itemId) ?? null : null,
       score: w.source === 'model' ? 0.5 : w.itemId ? 1 : 0,

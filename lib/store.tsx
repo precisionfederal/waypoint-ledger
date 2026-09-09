@@ -5,6 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { JourneyEntry, PriceItem } from './types';
 import { TABLE, SELECTABLE } from './table';
 import { extractCount, mapUtterance, parseJourney } from './mapper';
+import type { ParsedSegment } from './mapper';
 import { unpriceableFor } from './price-api';
 import { post as outboxPost, startOutbox, queuedCorrections, queuedVerdicts, onOutboxChange } from './outbox';
 import type { Coverage, Ctx, GapHint } from './fit';
@@ -65,6 +66,7 @@ interface Store {
   toasts: Toast[];
   toast: (text: string, kind?: Toast['kind']) => void;
   addStory: (story: string) => { added: number; matched: number; unpriced: number };
+  addSegments: (segs: ParsedSegment[]) => { added: number; matched: number; unpriced: number };
   addOne: (text: string) => void;
   addItem: (it: PriceItem, raw?: string) => void;
   setTimes: (key: string, times: number) => void;
@@ -255,6 +257,21 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     return { added: add.length, matched, unpriced };
   }, []);
 
+  /** Add what the live preview already read — the AI reader's fills included — so the chip
+   *  a person saw is the line she gets. Absorbed fragments never become lines. */
+  const addSegments = useCallback((segs: ParsedSegment[]) => {
+    const add: JourneyEntry[] = []; let matched = 0, unpriced = 0;
+    for (const s of segs) {
+      if (s.absorbed) continue;
+      const un = unpriceableHit(s.raw);
+      if (un) { setUnpriced((p) => (p.includes(un.id) ? p : [...p, un.id])); unpriced++; continue; }
+      add.push({ key: uid(), raw: s.raw, item: s.result.item, times: s.times, gapCategory: s.result.gapCategory, months: s.result.months });
+      if (s.result.item) matched++;
+    }
+    setEntries((p) => [...p, ...add]);
+    return { added: add.length, matched, unpriced };
+  }, []);
+
   const addOne = useCallback((text: string) => {
     const t = text.trim(); if (!t) return;
     const un = unpriceableHit(t);
@@ -373,8 +390,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     } finally { setSaving(false); }
   }, [entries, toast]);
 
-  const value = useMemo<Store>(() => ({ entries, ctx, setCoverage, setLocality, unpricedHits, gapHints, flags, sentOk, tallies, queued, hydrated, toasts, toast, addStory, addOne, addItem, setTimes, remove, remap, reset, loadExample, correct, clearFlag, shareUrl, saveJourney, saving }),
-    [entries, ctx, setCoverage, setLocality, unpricedHits, gapHints, flags, sentOk, tallies, queued, hydrated, toasts, toast, addStory, addOne, addItem, setTimes, remove, remap, reset, loadExample, correct, clearFlag, shareUrl, saveJourney, saving]);
+  const value = useMemo<Store>(() => ({ entries, ctx, setCoverage, setLocality, unpricedHits, gapHints, flags, sentOk, tallies, queued, hydrated, toasts, toast, addStory, addSegments, addOne, addItem, setTimes, remove, remap, reset, loadExample, correct, clearFlag, shareUrl, saveJourney, saving }),
+    [entries, ctx, setCoverage, setLocality, unpricedHits, gapHints, flags, sentOk, tallies, queued, hydrated, toasts, toast, addStory, addSegments, addOne, addItem, setTimes, remove, remap, reset, loadExample, correct, clearFlag, shareUrl, saveJourney, saving]);
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
 

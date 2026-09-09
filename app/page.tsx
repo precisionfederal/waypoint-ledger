@@ -41,6 +41,7 @@ export default function Home() {
             <p className="eyebrow">For anyone who spent years getting a diagnosis</p>
             <h1>What did your diagnostic search actually cost?</h1>
             <p className="hero-line">The care you needed and never got produces $0 in federal data.</p>
+            <p className="hero-who">I built this so a person who spent years getting a diagnosis can add up what it cost from the government&rsquo;s own published figures, line by line, and send back the ones that are wrong. It will never invent a number. <span>Bo Peng · Precision Federal · Ames, Iowa</span></p>
             <p className="lede">Type the visits, tests and scans the way you remember them. Waypoint Ledger prices each one from a published federal figure, cites the source on every line, and never invents a number.</p>
             <div className="cta-row">
               <Link className="btn primary lg" href={st.entries.length ? '/ledger' : '/journey'}>{st.entries.length ? 'Open my ledger' : 'Price my journey'} <Icon.Arrow /></Link>
@@ -146,7 +147,8 @@ function HeroBuilder() {
 
   function add() {
     if (!story.trim()) return;
-    st.addStory(story);
+    // The chips she saw are the lines she gets: the AI reader's fills ride along when the read is for this exact sentence.
+    if (!preview.pending && preview.segments.length) st.addSegments(preview.segments); else st.addStory(story);
     window.location.href = '/ledger';
   }
 

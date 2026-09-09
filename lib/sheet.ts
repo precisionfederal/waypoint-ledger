@@ -146,5 +146,7 @@ export function odysseyLine(i: OdysseyInput): string | null {
   const cl = odysseyClauses(i);
   if (!cl.length) return null;
   const counted = i.months > 0 || i.cats.some(([, c]) => c.times > 0);
+  // A lone appointment count restates the card above it. No band beats a repeated one.
+  if (!counted && cl.length <= 1) return null;
   return `${cl.join(' · ')}${counted ? ' · none of that produces a row in federal data' : ''}`;
 }

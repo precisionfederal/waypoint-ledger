@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { validateInterview, summarizeInterviews } from '../../../cf/functions/api/interview.js';
-import { readRows } from '../survey/route';
+import { readRows } from '../_rows';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const STORE = path.join(process.cwd(), 'data', 'interviews.jsonl');

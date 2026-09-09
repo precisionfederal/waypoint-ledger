@@ -599,6 +599,10 @@ export interface ParsedSegment {
   /** The arithmetic behind a count, in words, when the count was not simply stated.
    *  e.g. "twice a week × 26 weeks = 52". Shown on the line; never hidden. */
   countNote?: string | null;
+  /** True when this fragment is the tail of the phrase beside it and names the same unit the
+   *  AI reader already filled there ("they put electrodes on my legs" … "and shocked the nerves").
+   *  One clause, one line: it is neither shown nor counted, and never priced twice. */
+  absorbed?: boolean;
 }
 
 export interface CountResult {

@@ -601,8 +601,10 @@ export default function Ledger() {
                         {st.sentOk[it.id] && !st.queued[it.id] && f && <p className="sent-ok"><Icon.Check /> Sent to the count</p>}
                         {st.tallies[it.id] && (
                           <p className="nth-back">
-                            <span>You are the <b>{ordinal(st.tallies[it.id].n)}</b> person to answer on this figure.</span>
-                            <span>{st.tallies[it.id].flaggedWrong} of {st.tallies[it.id].n} say it is wrong.</span>
+                            {st.tallies[it.id].n <= 1
+                              ? <span>You are the <b>first</b> person to answer on this figure. It is on the register now.</span>
+                              : <><span>You are the <b>{ordinal(st.tallies[it.id].n)}</b> person to answer on this figure.</span>
+                                <span>{st.tallies[it.id].flaggedWrong} of {st.tallies[it.id].n} say it is wrong.</span></>}
                             <Link href="/register">See it on the register →</Link>
                           </p>
                         )}

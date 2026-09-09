@@ -87,3 +87,22 @@ describe('the wire', () => {
     expect(back.map((b) => b.times)).toEqual(segs.map((s) => s.times));
   });
 });
+
+describe('one clause, one line', () => {
+  it('absorbs the tail fragment when the model names the unit its neighbour already carries', () => {
+    const segs = parseJourney('they put electrodes on my legs and shocked the nerves', SELECTABLE);
+    const cands = candidatesOf(segs);
+    expect(cands.length).toBeGreaterThanOrEqual(2);
+    const emg = SELECTABLE.find((i) => /EMG/i.test(i.label))!;
+    const r = applyModel(segs, cands, [{ i: 0, id: emg.id, why: 'electrodes' }, { i: 1, id: emg.id, why: 'same test' }], SELECTABLE);
+    expect(r.filled).toEqual([cands[0]]);
+    expect(r.segments[cands[0]].result.item?.id).toBe(emg.id);
+    expect(r.segments[cands[1]].absorbed).toBe(true);
+    expect(r.segments[cands[1]].result.item).toBeNull();
+    const wire = toWire(r.segments);
+    expect(wire[cands[1]].absorbed).toBe(true);
+    expect(fromWire(wire, SELECTABLE)[cands[1]].absorbed).toBe(true);
+    // Priced once: the absorbed fragment carries no unit.
+    expect(r.segments.filter((s) => s.result.item?.id === emg.id).length).toBe(1);
+  });
+});

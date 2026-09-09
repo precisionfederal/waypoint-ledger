@@ -14,7 +14,7 @@ bash "$HERE/scripts/export-public-repo.sh" >/dev/null
 rsync -a --delete --exclude .git --exclude node_modules "$EXPORT/" "$MIRROR/"
 cd "$MIRROR"
 # A secret VALUE, not a variable name: 16+ token characters after the "=", a PEM header, or Bo's number.
-if grep -rIlE -e "(ADMIN_TOKEN|INTERVIEW_KEY|ANTHROPIC_API_KEY)=[\"']?[A-Za-z0-9_-]{16,}" -e "BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY" -e "650-966-4334" -e "sk-ant-[A-Za-z0-9_-]{8,}" . --exclude-dir=.git --exclude-dir=node_modules --exclude=publish-public-repo.sh ; then echo "REFUSED: a secret-shaped string is in the export"; exit 2; fi
+if grep -rIlE -e "(ADMIN_TOKEN|INTERVIEW_KEY|ANTHROPIC_API_KEY|OPENAI_API_KEY)=[\"']?[A-Za-z0-9_-]{16,}" -e "BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY" -e "650-966-4334" -e "sk-ant-[A-Za-z0-9_-]{8,}" -e "sk-proj-[A-Za-z0-9_-]{8,}" . --exclude-dir=.git --exclude-dir=node_modules --exclude=publish-public-repo.sh ; then echo "REFUSED: a secret-shaped string is in the export"; exit 2; fi
 # The lockfile must let `npm ci` run in CI.
 npm install --package-lock-only --ignore-scripts >/dev/null 2>&1
 git add -A

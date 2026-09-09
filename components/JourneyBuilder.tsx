@@ -56,7 +56,8 @@ export function useLivePreview(story: string): LivePreview {
 
   return useMemo(() => {
     const rules = debounced.trim() ? parseJourney(debounced, ITEMS) : [];
-    const segments = modelRead && modelRead.story === debounced ? modelRead.segments : rules;
+    const read = modelRead && modelRead.story === debounced ? modelRead.segments : rules;
+    const segments = read.filter((s) => !s.absorbed);
     return { segments, ...previewTotals(segments), pending: debounced !== story };
   }, [debounced, story, modelRead]);
 }
@@ -181,7 +182,9 @@ export default function JourneyBuilder() {
   function submitStory(e: React.FormEvent) {
     e.preventDefault();
     if (!story.trim()) return;
-    const r = st.addStory(story);
+    // The chips she saw are the lines she gets: the preview's read (AI fills included) when it is
+    // for this exact sentence, else the rules alone.
+    const r = !preview.pending && preview.segments.length ? st.addSegments(preview.segments) : st.addStory(story);
     // "step" is the ledger's word for the SUM OF TIMES (11 steps, 6 distinct). What was
     // added here is lines, so the toast, the bar and the ledger card all count the same.
     st.toast(`${r.added} ${r.added === 1 ? 'line' : 'lines'} added · ${r.matched} priced from a published figure${r.added - r.matched ? ` · ${r.added - r.matched} kept unpriced` : ''}${r.unpriced ? ` · ${r.unpriced} named as a cost we will not price` : ''}`, r.matched === r.added && !r.unpriced ? 'ok' : 'info');
@@ -351,11 +354,21 @@ export default function JourneyBuilder() {
 
       <section className="builder-side" aria-label="Running total">
         <div className="card sticky">
-          <p className="lbl">Running total</p>
-          <p className="big-num">{usd(sum.totalUsd)}</p>
-          <p className="micro">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? ` · ${sum.unpricedCount} unpriced` : ''} · what the published figures add up to, all payers combined</p>
-          {preview.previewTotal > 0 && (
-            <p className="lp-ghost">+ {usd(preview.previewTotal)} from the sentence you are typing — not added yet</p>
+          {sum.totalUsd === 0 && preview.previewTotal > 0 ? (
+            <>
+              <p className="lbl">So far · from the sentence you are typing</p>
+              <p className="big-num">{usd(preview.previewTotal)}</p>
+              <p className="micro">{preview.matched} {preview.matched === 1 ? 'phrase' : 'phrases'} priced from published figures, all payers combined · press Add to keep them</p>
+            </>
+          ) : (
+            <>
+              <p className="lbl">Running total</p>
+              <p className="big-num">{usd(sum.totalUsd)}</p>
+              <p className="micro">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? ` · ${sum.unpricedCount} unpriced` : ''} · what the published figures add up to, all payers combined</p>
+              {preview.previewTotal > 0 && (
+                <p className="lp-ghost">+ {usd(preview.previewTotal)} from the sentence you are typing — not added yet</p>
+              )}
+            </>
           )}
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Running total {usd(sum.totalUsd)} from {sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? `, ${sum.unpricedCount} unpriced` : ''}.</p>
           {st.entries.length

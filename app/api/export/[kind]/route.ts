@@ -2,7 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'node:path';
 import { exportRows } from '../../../../cf/functions/api/export/[kind].js';
-import { readRows } from '../../survey/route';
+import { readRows } from '../../_rows';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 const FILES: Record<string, string> = { corrections: 'corrections.jsonl', gap: 'gap-reports.jsonl', survey: 'survey-responses.jsonl' };

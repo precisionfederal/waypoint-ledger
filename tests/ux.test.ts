@@ -36,11 +36,15 @@ describe('the odyssey — the line a person actually repeats', () => {
     expect(line).toContain('7 appointments');
   });
 
+  it('prints no band when the only clause would restate the appointment card above it', () => {
+    // A lone "3 appointments" under a card reading STEPS IN YOUR JOURNEY · 3 is the page repeating itself.
+    expect(odysseyLine({ months: 0, appointments: 3, cats: [] })).toBeNull();
+  });
+
   it('drops every clause whose count is zero rather than printing a zero', () => {
-    const line = odysseyLine({ months: 0, appointments: 3, cats: [] });
-    expect(line).toBe('3 appointments');
-    expect(line).not.toMatch(/0 /);
-    expect(line).not.toContain('federal data');   // nothing was counted-not-priced
+    const line = odysseyLine({ months: 18, appointments: 3, cats: [] });
+    expect(line).toContain('3 appointments');
+    expect(line).not.toMatch(/\b0 /);
   });
 
   it('says nothing at all when there is nothing real to say', () => {

@@ -198,7 +198,7 @@ export const OPENAPI: OpenApiDoc = {
           'Send `story`. The deterministic rules (the same lib/mapper the browser runs) read it first. Every phrase '
           + 'they leave blank goes to a model with the catalog\'s ids and labels only; the model may answer with a '
           + 'catalog id or null, never a figure. Care that was not received and spans of time are decided by the rules '
-          + 'and are never sent to the model. The reply carries ids and labels; price them with POST /api/price or '
+          + 'and are never sent to the model (OpenAI gpt-5.4-nano in production, gpt-5-mini and Cloudflare Workers AI behind it). The reply carries ids and labels; price them with POST /api/price or '
           + 'the public table. `model` names the model that answered, or null when none was reachable and the rules\' '
           + 'answer stands. Cached by the story\'s SHA-256 for 24 hours.',
         requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['story'], properties: { story: { type: 'string', maxLength: 2000 } } } } } },
