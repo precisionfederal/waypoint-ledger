@@ -4,13 +4,51 @@ export const json = (obj, status = 200, extra = {}) => new Response(JSON.stringi
 export const bad = (error, status = 400) => json({ ok: false, error }, status);
 export const MAX_BODY = 16 * 1024;
 
-/** Parse a JSON body with a size cap. Returns { body } or { error }. */
+/* --------------------------------------------------------------------------
+   READING A BODY THAT LIED ABOUT ITS SIZE.
+
+   This used to be `await request.text()` with the length checked afterwards.
+   Two holes in one line. The cap ran on `text.length`, which counts UTF-16 code
+   units, so 16,384 three-byte characters passed a 16 KB cap at 48 KB. And the
+   check ran AFTER the whole body was in memory, so a chunked request with no
+   content-length header — the middleware's cap reads content-length, and a
+   client is not obliged to send one — was buffered in full first and refused
+   second. Refusing a body you have already paid to hold is not a cap.
+
+   So the bytes are counted off the stream as they arrive and the stream is
+   cancelled the moment it goes over. MAX_BODY is now a byte count, which is
+   what it always said it was.
+   -------------------------------------------------------------------------- */
+const OVERFLOW = Symbol('body too large');
+
+async function readCapped(request, max) {
+  const stream = request.body;
+  if (!stream) return request.text();          // no stream to meter (GET, or a mock)
+  const reader = stream.getReader();
+  const chunks = [];
+  let total = 0;
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.byteLength;
+      if (total > max) { try { await reader.cancel(); } catch { /* already gone */ } throw OVERFLOW; }
+      chunks.push(value);
+    }
+  } finally { try { reader.releaseLock(); } catch { /* already released */ } }
+  const buf = new Uint8Array(total);
+  let at = 0;
+  for (const c of chunks) { buf.set(c, at); at += c.byteLength; }
+  return new TextDecoder().decode(buf);
+}
+
+/** Parse a JSON body with a size cap in BYTES. Returns { body } or { error }. */
 export async function readJson(request) {
   const len = Number(request.headers.get('content-length') || 0);
   if (len > MAX_BODY) return { error: 'Body too large.' };
   let text;
-  try { text = await request.text(); } catch { return { error: 'Body must be JSON.' }; }
-  if (text.length > MAX_BODY) return { error: 'Body too large.' };
+  try { text = await readCapped(request, MAX_BODY); }
+  catch (e) { return { error: e === OVERFLOW ? 'Body too large.' : 'Body must be JSON.' }; }
   try { const body = JSON.parse(text); return body && typeof body === 'object' ? { body } : { error: 'Body must be a JSON object.' }; }
   catch { return { error: 'Body must be JSON.' }; }
 }

@@ -22,8 +22,13 @@
 # waypoint-backups/ — never inside the repo, because the dump carries every
 # encrypted interview blob and the repo is exported publicly.
 #
-#   bash scripts/backup-d1.sh              the daily backup
+#   bash scripts/backup-d1.sh              the daily backup, from live D1
 #   npm run backup                         the same thing
+#   bash scripts/backup-d1.sh --local --state ops3 --origin http://127.0.0.1:8841
+#                                          the same code path against a local
+#                                          database, which is how the row-count
+#                                          arithmetic gets exercised on rows
+#                                          without writing a row to production
 #
 # Exit 0 only when every check above passed. On a failure the file is KEPT
 # (a suspect dump is evidence) and the exit code is 1.
@@ -35,6 +40,20 @@ PROJECT="waypoint-ledger"
 ORIGIN="${BACKUP_ORIGIN:-https://waypoint-ledger.pages.dev}"
 DIR="${WAYPOINT_BACKUP_DIR:-$HOME/Library/Application Support/precision-federal/waypoint-backups}"
 RETAIN_DAYS="${BACKUP_RETAIN_DAYS:-30}"
+MODE=remote
+STATE_NAME=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --local)  MODE=local; shift ;;
+    --state)  STATE_NAME="$2"; shift 2 ;;
+    --origin) ORIGIN="${2%/}"; shift 2 ;;
+    --dir)    DIR="$2"; shift 2 ;;
+    --retain) RETAIN_DAYS="$2"; shift 2 ;;
+    *) printf 'backup-d1: unknown argument %s\n' "$1" >&2; exit 2 ;;
+  esac
+done
+[ "$MODE" = "local" ] && [ -z "$STATE_NAME" ] && { printf 'backup-d1: --local needs --state NAME\n' >&2; exit 2; }
 
 # The six tables a person's typing lands in, health key -> SQL table name.
 # health.tables uses short keys; the dump uses the real table names.
@@ -55,7 +74,7 @@ chmod 700 "$DIR" 2>/dev/null
 FILE="$DIR/$TS.sql"
 META="$DIR/$TS.json"
 
-say "backup-d1: $PROJECT -> $FILE"
+say "backup-d1: $PROJECT ($MODE) -> $FILE"
 
 # --------------------------------------------------------------------------
 # 1  the counts before
@@ -71,7 +90,11 @@ LIVE_COMMIT="$(printf '%s' "$BEFORE" | jq -r '.build.fullCommit // "unknown"' 2>
 
 # --------------------------------------------------------------------------
 # 2  the export. READ-ONLY: `d1 export` runs a SELECT and writes a file.
-( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --remote --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+if [ "$MODE" = "local" ]; then
+  ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --local --persist-to "$ROOT/cf/.wrangler/state-$STATE_NAME" --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+else
+  ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --remote --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+fi
 RC=$?
 if [ "$RC" -ne 0 ] || [ ! -s "$FILE" ]; then
   fail "wrangler d1 export failed (exit $RC)"
@@ -132,7 +155,8 @@ jq -n --arg file "$(basename "$FILE")" --arg at "$TS" --arg sha "$SHA" \
       --argjson bytes "$BYTES" --argjson tables "$TABLES_IN_FILE" \
       --argjson counts "$COUNTS_JSON" --arg commit "$LIVE_COMMIT" \
       --arg beforeAt "$BEFORE_AT" --arg afterAt "$AFTER_AT" --argjson failures "$FAIL" \
-  '{file:$file, takenAt:$at, sha256:$sha, bytes:$bytes, createTableCount:$tables,
+      --arg mode "$MODE" --arg origin "$ORIGIN" \
+  '{file:$file, takenAt:$at, source:$mode, origin:$origin, sha256:$sha, bytes:$bytes, createTableCount:$tables,
     rowCounts:$counts, liveCommit:$commit, healthReadAt:{before:$beforeAt, after:$afterAt},
     failures:$failures}' > "$META"
 chmod 600 "$META"

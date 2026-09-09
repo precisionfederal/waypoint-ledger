@@ -23,9 +23,10 @@
 // transforms it with esbuild's classic runtime, which emits React.createElement.
 // The import costs nothing at build time and lets the tests render the panel.
 import React from 'react';
+import { useCallback, useEffect, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import {
-  BLANK_CODE_NOTE, CONDITIONS, ICD10CM_BROWSER, ICD10CM_YEARS,
+  BLANK_CODE_NOTE, CONDITIONS, ICD10CM_BROWSER, ICD10CM_YEARS, PRICED_CONDITIONS,
   benchmarkFor, useCondition, type Benchmark, type Condition,
 } from '@/lib/conditions';
 import s from './ConditionPicker.module.css';

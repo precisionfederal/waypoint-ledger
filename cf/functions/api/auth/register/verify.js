@@ -28,7 +28,7 @@ export async function onRequestPost({ request, env }) {
       expectedRPID: rpID,
       requireUserVerification: false,
     });
-  } catch (e) { return bad(e instanceof Error ? e.message : 'The passkey could not be verified.', 400); }
+  } catch { return bad('The passkey could not be verified. Try again, or use a password instead.', 400); }   // the library's own message names the relying party and the expected origin; that is our configuration, not theirs
   if (!v.verified || !v.registrationInfo) return bad('The passkey could not be verified.', 400);
 
   const cred = v.registrationInfo.credential;

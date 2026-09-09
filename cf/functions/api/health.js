@@ -36,6 +36,32 @@ export const BUILD = {
 
 const WRITE_OK_KEY = 'health:lastWriteOkAt';
 
+/* THE WRITE PROOF A STRANGER CAN CHECK.
+   Round 4's gate was red for every honest outsider: /adopt invites an agency to
+   run cf/verify-live.sh, and the one check that proves an INSERT reaches D1
+   needed ADMIN_TOKEN — a secret we can never hand them. So the gate failed
+   structurally on every run they made, on the page that asks them to trust us.
+   The canary already stamps KV on every successful write. This turns that stamp
+   into something readable: WHEN the write happened, how long AFTER the artifact
+   that is answering was published, and how old it is now. No secret, no
+   identifier, no row.
+
+   `provenForThisBuild` is deliberately strict. A stamp that predates `builtAt`
+   proves the write path of some earlier artifact, not the one answering this
+   request, and 24 h is the widest gap we will call the same deployment. It is a
+   claim about THIS build or it is not made at all. */
+export function writeProof(lastWriteOkAt, builtAt, nowMs = Date.now()) {
+  const wrote = lastWriteOkAt ? Date.parse(lastWriteOkAt) : NaN;
+  const built = builtAt ? Date.parse(builtAt) : NaN;
+  const secondsAfterBuild = Number.isFinite(wrote) && Number.isFinite(built) ? Math.round((wrote - built) / 1000) : null;
+  return {
+    lastWriteOkAt: Number.isFinite(wrote) ? lastWriteOkAt : null,
+    ageSeconds: Number.isFinite(wrote) ? Math.max(0, Math.round((nowMs - wrote) / 1000)) : null,
+    secondsAfterBuild,
+    provenForThisBuild: secondsAfterBuild !== null && secondsAfterBuild >= 0 && secondsAfterBuild <= 86400,
+  };
+}
+
 export async function onRequestGet({ env }) {
   const tables = {};
   let db = 'ok';
@@ -54,6 +80,7 @@ export async function onRequestGet({ env }) {
     build: BUILD,
     tables,
     lastWriteOkAt,
+    canary: writeProof(lastWriteOkAt, BUILD.builtAt),
     generatedAt: new Date().toISOString(),
   }, db === 'ok' ? 200 : 503);
 }

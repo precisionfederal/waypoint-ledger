@@ -53,6 +53,7 @@ SOURCES = {
                  title='CMS Clinical Laboratory Fee Schedule, CY2026 Q3 public use file'),
     'oppsb': dict(url='https://www.cms.gov/files/zip/january-2026-opps-addendum-b.zip',
                   member='Addendum B', member_ext='.csv', kind='csv',
+                  file='2026 January Web Addendum B.12.29.25.csv',
                   title='CMS January 2026 Hospital Outpatient PPS Addendum B'),
     'oews': dict(url='https://www.bls.gov/oes/special-requests/oesm25nat.zip',
                  member='national_M2025_dl.xlsx', kind='xlsx',
@@ -103,6 +104,16 @@ def sha256(path):
     return h.hexdigest()
 
 
+def file_name(key):
+    """The federal file we actually read, by the name its publisher gave it.
+
+    A correction routed back to CMS or AHRQ has to name a file a person there can
+    pull up. `member` is the file inside the zip; `file` overrides it where the
+    archive's real member name differs from the pattern we match on."""
+    s = SOURCES[key]
+    return s.get('file') or s.get('member') or os.path.basename(s['url'].split('?')[0])
+
+
 def _find_local(member):
     for d in LOCAL_DIRS:
         for root, _dirs, files in os.walk(d):
@@ -127,7 +138,8 @@ def fetch(key):
         if local:
             shutil.copyfile(local, out)
             STATE[key] = dict(path=out, sha256=sha256(out), bytes=os.path.getsize(out),
-                              retrieved='local copy: %s' % local, url=s['url'], title=s['title'])
+                              retrieved='local copy: %s' % local, url=s['url'], title=s['title'],
+                              file=file_name(key))
             return out
         if OFFLINE:
             STATE[key] = dict(path=None, error='not in cache and --offline', url=s['url'], title=s['title'])
@@ -160,7 +172,8 @@ def fetch(key):
             open(out, 'wb').write(body)
 
     STATE[key] = dict(path=out, sha256=sha256(out), bytes=os.path.getsize(out),
-                      retrieved=time.strftime('%Y-%m-%d'), url=s['url'], title=s['title'])
+                      retrieved=time.strftime('%Y-%m-%d'), url=s['url'], title=s['title'],
+                      file=file_name(key))
     return out
 
 

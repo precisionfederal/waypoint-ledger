@@ -79,6 +79,7 @@ function Footer() {
           <p className="foot-h">Precision Federal</p>
           <p className="micro">Ames, Iowa · <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a></p>
           <p className="micro">Built in the TOPx HHS Tech Sprint for AI and Invisible Illness, Cost of Illness track.</p>
+          <p className="micro">Open source, Apache 2.0: <a href="https://github.com/precisionfederal/waypoint-ledger" rel="noopener">github.com/precisionfederal/waypoint-ledger</a></p>
         </div>
       </div>
       <div className="wrap foot-legal">

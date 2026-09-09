@@ -1,5 +1,6 @@
 // D1 access + encryption at rest for the private fields. One definition.
 import { id, now } from './_http.js';
+import { constantTimeEquals } from './auth/password/_kdf.js';
 
 export const all = async (env, sql, ...args) => (await env.DB.prepare(sql).bind(...args).all()).results || [];
 export const one = async (env, sql, ...args) => env.DB.prepare(sql).bind(...args).first();
@@ -51,7 +52,19 @@ export function sessionCookie(sid, request) {
   return `wl_session=${sid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_DAYS * 86400}${secure}`;
 }
 export const clearCookie = () => 'wl_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0';
+/* The one door with no public purpose, so the one door worth timing.
+
+   This used to be `a === `Bearer ${env.ADMIN_TOKEN}``. JavaScript's === on
+   strings compares length first and then bytes left to right, and returns the
+   moment they differ, so the time it takes to say no is a function of how much
+   of the token was right. Over enough samples that is the token. The lockout in
+   _middleware.js caps a network at five wrong tokens an hour, which makes the
+   attack slow rather than impossible, and "slow" is not the standard for the
+   route that reads the interviews.
+
+   constantTimeEquals runs a fixed number of iterations whatever was sent. */
 export function isAdmin(env, request) {
   const a = request.headers.get('authorization') || '';
-  return Boolean(env.ADMIN_TOKEN) && a === `Bearer ${env.ADMIN_TOKEN}`;
+  if (!env.ADMIN_TOKEN) return false;
+  return constantTimeEquals(a, `Bearer ${env.ADMIN_TOKEN}`);
 }

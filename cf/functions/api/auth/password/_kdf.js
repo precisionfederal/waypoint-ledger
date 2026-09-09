@@ -69,6 +69,32 @@ const MAX_PASSES = 50;
 export const b64 = (u8) => btoa(String.fromCharCode(...u8));
 export const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
 
+/* The window a secret of unknown length is compared over. Wider than any token
+   this site issues, so the loop count never depends on what was sent. */
+const COMPARE_WINDOW = 512;
+
+/** Same string, no early exit, and no early exit on LENGTH either.
+
+    timingSafeEqual below is for two base64 digests, which are the same length
+    by construction, so returning false on a length mismatch costs nothing
+    there. A bearer token is different: the attacker chooses the length, and a
+    compare that returns immediately when it is wrong hands back "how long is
+    the real one" for free. This one always runs COMPARE_WINDOW iterations and
+    folds the length difference into the same accumulator, so neither the length
+    nor the position of the first wrong character can be read off the clock.
+
+    charCodeAt past the end is NaN, and NaN | 0 is 0, so both strings read as
+    zero beyond their end and the length XOR is what separates "equal" from
+    "equal prefix, different length". */
+export function constantTimeEquals(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < COMPARE_WINDOW; i += 1) {
+    diff |= (a.charCodeAt(i) | 0) ^ (b.charCodeAt(i) | 0);
+  }
+  return diff === 0;
+}
+
 /** Same string, no early exit. Both sides are base64 of a fixed-length digest. */
 export function timingSafeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string' || a.length !== b.length) return false;

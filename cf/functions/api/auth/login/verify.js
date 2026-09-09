@@ -38,7 +38,7 @@ export async function onRequestPost({ request, env }) {
       credential: { id: row.id, publicKey: isoBase64URL.toBuffer(row.public_key), counter: Number(row.counter) || 0, transports },
       requireUserVerification: false,
     });
-  } catch (e) { return bad(e instanceof Error ? e.message : 'That passkey could not be verified.', 400); }
+  } catch { return bad('That passkey could not be verified. Try again, or sign in with your password.', 400); }   // never hand the library's internals to the caller
   if (!v.verified) return bad('That passkey could not be verified.', 400);
 
   try { await run(env, 'UPDATE credentials SET counter=?1 WHERE id=?2', v.authenticationInfo.newCounter, row.id); } catch { /* counter is advisory for platform passkeys */ }

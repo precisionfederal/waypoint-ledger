@@ -109,13 +109,32 @@ function OutboxChip() {
   );
 }
 
+/* THE SENTENCE THE CHIP ALREADY SAYS.
+   Pressing a thumb with no signal queues the correction, and lib/store.tsx
+   answers with "Saved on this device. It will be sent the moment you are back
+   online." — the chip's own fact, in the chip's own words, in a second box
+   directly above the chip. Round 3 filtered `ok` toasts and stopped there;
+   that toast is a `warn` (the request did not reach us), so it survived the
+   filter and Round 4 photographed TWO boxes stating one fact, 227px tall, over
+   the ledger, on an iPhone 14.
+
+   Matched on meaning rather than on an exact string so a reworded sentence in
+   another lane's file cannot quietly bring the second box back. The store is
+   not edited from here: it is right to tell someone their correction is held,
+   and it is right that the chip is the one that says it. */
+const SAYS_THE_OUTBOX_FACT = /\bon this device\b/i;
+
 export default function Toasts() {
   const { toasts } = useStore();
   const waiting = useOutboxCount();
   /* One voice. While the chip is up it is the standing statement about whether
      anything reached us; a cheerful "Saved" beside it is the contradiction Round 3
-     photographed. Warnings still come through: they carry different facts. */
-  const shown = waiting > 0 ? toasts.filter((t) => t.kind !== 'ok') : toasts;
+     photographed, and a "held on this device" beside it is the one Round 4 did.
+     Warnings that carry a DIFFERENT fact still come through — and at most one of
+     them, because two boxes over a phone ledger is the failure, whatever they say. */
+  const shown = waiting > 0
+    ? toasts.filter((t) => t.kind !== 'ok' && !SAYS_THE_OUTBOX_FACT.test(t.text)).slice(-1)
+    : toasts;
   const urgent = shown.some((t) => t.kind === 'warn');
   return (
     <div

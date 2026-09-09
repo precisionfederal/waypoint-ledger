@@ -15,6 +15,11 @@
 #   3. With ADMIN_TOKEN in the environment, POST /api/health writes and deletes
 #      a row in `canary` inside one D1 batch: the INSERT itself, proven, in a
 #      table outside every chain, every export and every aggregate.
+#   4. WITHOUT any token — the run an outside agency actually makes — the same
+#      write path is proven from production's own published record of it:
+#      GET /api/health carries the canary stamp and how long after THIS build
+#      it was written. Round 4 found the token-gated check red on every run an
+#      outsider could make, on the page that asks them to adopt us.
 # ==========================================================================
 
 say "the write path (nothing is written to the register)"
@@ -48,6 +53,9 @@ else
   [ "$WV_CODE" = "400" ] && ok "a dry run still refuses a figure that is not published" || fail "a dry run accepted an unpublished figure (HTTP $WV_CODE)"
 fi
 
+# 3a. THE REAL CANARY — only the deploying shell can run it, and there it is a
+#     hard failure. Run FIRST so that the public proof below reads the stamp
+#     this run just made rather than the previous deploy's.
 if [ -n "${ADMIN_TOKEN:-}" ]; then
   WV_BODY="$(curl -sS -m 25 -X POST "$ORIGIN/api/health" -H "authorization: Bearer $ADMIN_TOKEN" -w $'\n%{http_code}')"
   WV_CODE="$(printf '%s' "$WV_BODY" | tail -n1)"
@@ -61,18 +69,45 @@ if [ -n "${ADMIN_TOKEN:-}" ]; then
 elif [ "${VERIFY_NO_WRITE:-0}" = "1" ]; then
   say "  skip  write canary (VERIFY_NO_WRITE=1, asked for deliberately). Not counted as a pass."
 else
-  # A SKIP MUST NEVER PRINT ok. Round 3's read: production `lastWriteOkAt` was
-  # null, every register table was 0, and this line printed `ok write canary
-  # skipped` on every run — so the one check that proves an INSERT reaches D1
-  # had never run, and the gate said green. A local origin is exempt (its D1 is
-  # a file on this laptop and the canary proves nothing about production); a
-  # real origin with no ADMIN_TOKEN in the shell is now a failure, and
-  # VERIFY_NO_WRITE=1 is the deliberate way to say "not this run".
+  say "  note  the write canary needs ADMIN_TOKEN and is for the deploying shell; the check below proves the same write path without it."
+fi
+
+# 3b. THE WRITE PROOF AN OUTSIDER CAN CHECK — no secret, no row, no trust.
+#
+# ROUND 4 FOUND THE HONEST GATE PERMANENTLY RED FOR EVERY HONEST READER.
+# /adopt invites an agency to run this script. R3's rule was right and landed —
+# a skip must never print `ok` — and its consequence was that the one check
+# proving an INSERT reaches D1 failed on every run anyone outside this laptop
+# could make: `28 ok, 1 failed`, and the failure was structural, because they
+# can never hold ADMIN_TOKEN. A gate that cannot be green for its own audience
+# is not a gate, it is a warning label.
+#
+# What changed: production stamps KV every time the canary writes, and
+# GET /api/health now publishes that stamp beside the build it belongs to.
+# So the stranger checks production's own record of a successful write instead
+# of being asked for our secret. It is still a real check — it goes red if the
+# write path has never run, or ran against a different artifact than the one
+# answering (see `provenForThisBuild` in cf/functions/api/health.js).
+WV_H="$(curl -sS -m 20 "$ORIGIN/api/health")"
+WV_PROVEN="$(printf '%s' "$WV_H" | grep -o '"provenForThisBuild":[a-z]*' | head -n1 | sed 's/.*://')"
+WV_AT="$(printf '%s' "$WV_H" | grep -o '"lastWriteOkAt":"[^"]*"' | head -n1 | sed 's/.*:"//;s/"//')"
+WV_AFTER="$(printf '%s' "$WV_H" | grep -o '"secondsAfterBuild":-\{0,1\}[0-9]*' | head -n1 | sed 's/.*://')"
+if [ "$WV_PROVEN" = "true" ]; then
+  ok "the write path was exercised on this origin ${WV_AFTER}s after the build now answering was published (canary stamp $WV_AT, read from /api/health with no token)"
+elif [ -z "$WV_PROVEN" ]; then
+  fail "/api/health carries no write proof (no canary field): this origin cannot say whether a write has ever reached its database"
+else
+  # Named separately so the red line says which of the two things is wrong.
+  if [ -z "$WV_AT" ]; then
+    WV_WHY="no successful write has ever been stamped"
+  else
+    WV_WHY="the last successful write ($WV_AT) is ${WV_AFTER}s from this build, so it belongs to a different artifact than the one answering"
+  fi
   case "$ORIGIN" in
     http://127.0.0.1*|http://localhost*|http://0.0.0.0*)
-      say "  skip  write canary (local origin; the canary is about production D1). Not counted as a pass." ;;
+      say "  skip  the write proof on a local origin: $WV_WHY. Not counted as a pass." ;;
     *)
-      fail "the write canary did not run: ADMIN_TOKEN is not in this shell, so no INSERT has been proven on $ORIGIN. Export it, or pass VERIFY_NO_WRITE=1 to say so on purpose." ;;
+      fail "the write path is not proven on $ORIGIN: $WV_WHY" ;;
   esac
 fi
 

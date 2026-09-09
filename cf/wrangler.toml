@@ -1,5 +1,5 @@
 name = "YOUR-PAGES-PROJECT"        # wrangler pages project create YOUR-PAGES-PROJECT
-compatibility_date = "2026-01-01"
+compatibility_date = "2026-09-09"
 compatibility_flags = ["nodejs_compat"]
 pages_build_output_dir = "out"
 

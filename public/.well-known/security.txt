@@ -5,7 +5,9 @@
 # publish what changed on /register.
 
 Contact: mailto:bo@precisionfederal.com
-Expires: 2027-09-09T00:00:00.000Z
+# RFC 9116 asks for an Expires less than a year out. The old value was one
+# year to the day, which is not less than a year; this one is unambiguous.
+Expires: 2027-06-30T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://waypoint-ledger.pages.dev/.well-known/security.txt
 Policy: https://waypoint-ledger.pages.dev/integrity
