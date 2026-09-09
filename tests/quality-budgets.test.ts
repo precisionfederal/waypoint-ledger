@@ -84,11 +84,11 @@ const firstLoadCss = refs(/\/_next\/static\/css\/[^"]*\.css/g);
 const BUDGET = {
   firstLoadJsRaw: 1_253_000,   // measured 1,138,963
   firstLoadJsGzip: 305_000,    // measured   276,950
-  firstLoadCssRaw: 84_000,     // measured    76,326
-  firstLoadCssGzip: 16_500,    // measured    15,002
+  firstLoadCssRaw: 100_000,    // measured    76,326; 94,414 after DESIGN-2 (footer columns, section lists, context bar) 2026-09-09
+  firstLoadCssGzip: 19_500,    // measured    15,002; raised with the raw figure 2026-09-09
   largestChunkRaw: 418_000,    // measured   379,707  (the price table ships with the client, by design)
   allJsRaw: 1_815_000,         // measured 1,649,774  (every route's chunk, not just first load)
-  allCssRaw: 98_000,           // measured    88,912
+  allCssRaw: 110_000,          // measured    88,912; 101,027 after DESIGN-2 2026-09-09
   servedBytes: 4_379_000,      // measured 3,980,893  (the whole export minus data/ and the source tarball)
 };
 
@@ -107,6 +107,7 @@ const ROUTE_BUDGET: Record<string, number> = {
   '/gap': 9_900,         // measured  8,968
   '/integrity': 3_350,   // measured  3,036
   '/journey': 1_820,     // measured  1,646
+  '/account': 10_500,    // measured  9,673 — the passkey + email flow is the page's own chunk since DESIGN-2 (2026-09-09)
 };
 
 function routeChunks(): { route: string; file: string; size: number }[] {
