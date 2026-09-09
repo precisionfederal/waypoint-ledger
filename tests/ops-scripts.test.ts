@@ -191,7 +191,9 @@ describe('the rollback', () => {
   });
 });
 
-describe('the two scheduled jobs', () => {
+// The launchd wrappers live in the private repo above this app; the public mirror has no such folder.
+const MACHINE = join(ROOT, '../../../scripts/machine/');
+describe.skipIf(!existsSync(MACHINE))('the two scheduled jobs', () => {
   const machine = '../../../../scripts/machine/';  // tests/ -> waypoint-app -> TOPX-HHS-PHASE2 -> runs -> repo root
   const plist = (n: string) => readFileSync(new URL(machine + n, import.meta.url), 'utf8');
 

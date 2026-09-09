@@ -51,14 +51,16 @@ jobs:
       - name: types
         run: npx tsc --noEmit -p .
 
-      - name: tests
-        run: npm test
 
       # The privacy page is generated from the D1 migrations, the write-path
       # validators and the CSV header. If a column has no plain-English line,
       # this fails — which is the whole reason the page can be trusted.
       - name: the static export (privacy page included)
         run: npm run build:static
+
+      # tests after the export: the size-budget gate measures cf/out and refuses to pass on nothing.
+      - name: tests
+        run: npm test
 
       - name: the export carries what the live gate asks for
         run: |
