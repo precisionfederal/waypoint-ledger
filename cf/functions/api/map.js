@@ -25,6 +25,24 @@ const TIMEOUT_MS = 9000;
 const MAX_STORY = 2000;
 const CACHE_TTL = 24 * 3600;
 const PROMPT_VERSION = 'map-4';
+// The paid path has a ceiling and a kill switch: a global KV counter per hour (READER_HOURLY_CEILING,
+// default 2000 model calls), and the counter is read fail-CLOSED — if KV cannot answer, the model is
+// skipped, never the request. READER_OFF=1 pauses the model entirely. The rules' answer always ships.
+const DEFAULT_CEILING = 2000;
+
+async function readerAllowed(env) {
+  if (String(env.READER_OFF || '') === '1') return { ok: false, why: 'the reader is paused' };
+  if (!env.LEDGER) return { ok: false, why: 'the reader needs KV to meter itself' };
+  const hour = new Date().toISOString().slice(0, 13);
+  const key = `map:spend:${hour}`;
+  try {
+    const n = Number((await env.LEDGER.get(key)) || 0);
+    const cap = Number(env.READER_HOURLY_CEILING || DEFAULT_CEILING);
+    if (n >= cap) return { ok: false, why: 'the reader is paused for this hour' };
+    await env.LEDGER.put(key, String(n + 1), { expirationTtl: 2 * 3600 });
+    return { ok: true, why: null };
+  } catch { return { ok: false, why: 'the reader could not meter itself' }; }
+}
 
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error('model timeout')), ms))]);
 
@@ -100,6 +118,8 @@ export async function readWithModel(env, story, debug = false) {
   if (!candidates.length) return { ...base, segments: toWire(segments), note: 'the rules read every phrase' };
   const provider = env.OPENAI_API_KEY ? askOpenAI : env.ANTHROPIC_API_KEY ? askAnthropic : env.AI ? askWorkersAi : null;
   if (!provider) return { ...base, segments: toWire(segments), note: 'no model configured' };
+  const gate = await readerAllowed(env);
+  if (!gate.ok) return { ...base, segments: toWire(segments), note: gate.why };
   const user = buildUserPrompt(catalogFor(SELECTABLE), candidates.map((i) => segments[i].raw), story);
   try {
     const { text, model } = await provider(env, SYSTEM_PROMPT, user);

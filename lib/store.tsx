@@ -265,7 +265,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       if (s.absorbed) continue;
       const un = unpriceableHit(s.raw);
       if (un) { setUnpriced((p) => (p.includes(un.id) ? p : [...p, un.id])); unpriced++; continue; }
-      add.push({ key: uid(), raw: s.raw, item: s.result.item, times: s.times, gapCategory: s.result.gapCategory, months: s.result.months });
+      add.push({ key: uid(), raw: s.raw, item: s.result.item, times: s.times, gapCategory: s.result.gapCategory, months: s.result.months, source: s.source ?? 'rules', modelWhy: s.modelWhy ?? null });
       if (s.result.item) matched++;
     }
     setEntries((p) => [...p, ...add]);

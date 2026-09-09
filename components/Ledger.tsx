@@ -158,15 +158,9 @@ export default function Ledger() {
   }, [lines]);
   /* The same sentence under nine identical lines is noise, not information.
      A fit sentence is printed the first time it appears in the table and not again. */
-  const showWhy = useMemo(() => {
-    const seen = new Set<string>(); const keys = new Set<string>();
-    for (const g of groups) for (const l of g.lines) {
-      const w = fits.get(l.entry.key)?.why;
-      if (!w || seen.has(w)) continue;
-      seen.add(w); keys.add(l.entry.key);
-    }
-    return keys;
-  }, [groups, fits]);
+  // Provenance and the fit paragraph live behind the mark: a line is six things, everything else is a click.
+  const [openWhy, setOpenWhy] = useState<Set<string>>(new Set());
+  const toggleWhy = (k: string) => setOpenWhy((p) => { const n = new Set(p); if (n.has(k)) n.delete(k); else n.add(k); return n; });
   const chart = useMemo(() => groups.filter((g) => g.cat.key !== 'unmatched').map((g) => ({ label: g.cat.label, total: g.lines.reduce((a, l) => a + (l.totalUsd ?? 0), 0), n: g.lines.reduce((a, l) => a + l.entry.times, 0) })).filter((r) => r.total > 0).sort((a, b) => b.total - a.total), [groups]);
   const max = Math.max(1, ...chart.map((c) => c.total));
   const wrong = Object.values(st.flags).filter((v) => v === 'wrong').length;
@@ -477,6 +471,7 @@ export default function Ledger() {
           <p className="lbl">Take it somewhere</p>
           <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION, yearAhead: yearAheadFigure }} className="btn primary full" label="Save my card" />
           <p className="micro">An image drawn in this browser — the number, how long the search took, and where the cost sits. Nothing is uploaded to make it.</p>
+          <div className="row exports"><button className="btn ghost" onClick={csv}><Icon.Download /> CSV</button><button className="btn ghost" onClick={json}><Icon.Download /> JSON</button><button className="btn ghost" onClick={fhir}><Icon.Download /> FHIR</button><button className="btn ghost" onClick={brief}><Icon.Download /> Brief</button></div>
           <details className="more-ways">
             <summary>More ways to use this</summary>
             <div className="mw-body">
@@ -507,7 +502,6 @@ export default function Ledger() {
               <button className="link-btn" type="button" onClick={forgetSaved}>Delete this saved copy now</button>
             </div>
           )}
-          <div className="row"><button className="btn ghost" onClick={csv}><Icon.Download /> CSV</button><button className="btn ghost" onClick={json}><Icon.Download /> JSON</button><button className="btn ghost" onClick={fhir}><Icon.Download /> FHIR</button><button className="btn ghost" onClick={brief}><Icon.Download /> Brief</button></div>
           <Link className="link-btn" href="/journey">Edit my journey</Link>
             </div>
           </details>
@@ -558,13 +552,30 @@ export default function Ledger() {
                     <tr key={l.entry.key}>
                       <td>
                         <button className="li-name" data-li-key={l.entry.key} onClick={() => openDetail(it, l.entry.key)}>{it.label}</button>
+                        {l.entry.source === 'model' && <span className="lp-ai" title={`AI read this as ${it.label}${l.entry.modelWhy ? `: ${l.entry.modelWhy}` : ''}. The price came from the table, never from the model.`}>AI read</span>}
                         {fit && (
-                          <span className={`fit-mark ${FIT_MARK[fit.verdict].cls}`}>
+                          <button type="button" className={`fit-mark ${FIT_MARK[fit.verdict].cls}`} aria-expanded={openWhy.has(l.entry.key)}
+                            title="Why this figure, and what it does not describe" onClick={() => toggleWhy(l.entry.key)}>
                             <span className="fm-g" aria-hidden="true">{FIT_MARK[fit.verdict].glyph}</span>{fit.verdict}
-                          </span>
+                          </button>
                         )}
-                        <p className="li-sub"><span className={cs.agency}>{agencyOf(it)}</span>{' · '}<span className={`basis b-${it.basis}`}>{BASIS_NAME[it.basis]}</span>{' · '}you said “{l.entry.raw}” · {it.year}{it.code ? ` · ${it.code}` : ''} · {it.confidence === 'VERIFIED' ? 'read in the source' : 'derived from the source'}</p>
-                        {fit && showWhy.has(l.entry.key) && <p className={cs.why}>{fit.why}</p>}
+                        <p className="li-sub">you said “{l.entry.raw}”</p>
+                        {fit && openWhy.has(l.entry.key) && (
+                          <div className={cs.why}>
+                            <p><span className={cs.agency}>{agencyOf(it)}</span>{' · '}<span className={`basis b-${it.basis}`}>{BASIS_NAME[it.basis]}</span> · {it.year}{it.code ? ` · ${it.code}` : ''}</p>
+                            <p>{fit.why}</p>
+                            {fit.figureNote ? <p className={cs.subFig}>{fit.figureNote}</p> : null}
+                            {fit.reference && fit.reference.floorUsd !== null && (
+                              <p className={cs.refFig}>
+                                <b>{usd(fit.reference.floorUsd, true)}</b> — {fit.reference.floorLabel}
+                                {fit.reference.ceilingUsd !== null && fit.reference.ceilingLabel && (
+                                  <><br /><b>{usd(fit.reference.ceilingUsd, true)}</b> — {fit.reference.ceilingLabel}</>
+                                )}
+                              </p>
+                            )}
+                            <LocalityRange itemId={it.id} loc={loc} shown={fit ? fit.figureUsd : it.valueUsd} which={fit?.which ?? 'schedule'} />
+                          </div>
+                        )}
                         {fit?.offerGap && (
                           <button className={cs.gapBtn} type="button" onClick={() => { void st.correct(it, 'wrong', null, 'not-described'); }}>
                             Count this gap
@@ -574,16 +585,6 @@ export default function Ledger() {
                       <td className="r" data-label="Times">{l.entry.times}</td>
                       <td className="r" data-label="Figure">
                         {fit && fit.figureUsd === null ? <em>No published federal figure describes you here</em> : usd(fit ? fit.figureUsd : it.valueUsd, true)}
-                        {fit?.figureNote ? <span className={cs.subFig}>{fit.figureNote}</span> : null}
-                        {fit?.reference && fit.reference.floorUsd !== null && (
-                          <span className={cs.refFig}>
-                            <b>{usd(fit.reference.floorUsd, true)}</b> — {fit.reference.floorLabel}
-                            {fit.reference.ceilingUsd !== null && fit.reference.ceilingLabel && (
-                              <><br /><b>{usd(fit.reference.ceilingUsd, true)}</b> — {fit.reference.ceilingLabel}</>
-                            )}
-                          </span>
-                        )}
-                        <LocalityRange itemId={it.id} loc={loc} shown={fit ? fit.figureUsd : it.valueUsd} which={fit?.which ?? 'schedule'} />
                       </td>
                       <td className="r total" data-label="Line total"><strong>{l.priced ? usd(l.totalUsd) : '—'}</strong></td>
                       <td className="verdict">

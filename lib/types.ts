@@ -80,6 +80,10 @@ export interface JourneyEntry {
   gapCategory?: string | null;
   /** Whole months, when the phrase named a length of time rather than care. */
   months?: number | null;
+  /** Who read the phrase into this unit: the deterministic rules, or the AI reader. Shown on every screen. */
+  source?: 'rules' | 'model';
+  /** The AI reader's one-line reason, when it read the phrase. Never a price. */
+  modelWhy?: string | null;
 }
 
 export interface PricedLine {

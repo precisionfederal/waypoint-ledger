@@ -73,6 +73,32 @@ for i in $(seq 1 "$ATTEMPTS"); do
   [ "$i" -lt "$ATTEMPTS" ] && sleep "$GAP"
 done
 
+# ---- RESPONSES WATCH (Bo, 2026-09-09: "did you set up to track the answers?") ----
+# Every run reads the public aggregates and keeps a one-line tally in pf-state.
+# When any count rises, Bo gets a macOS notification and a dated line in the tally,
+# so an answer never lands unseen. Public GETs only; nothing is written to the register.
+RESP="$STATE_DIR/WAYPOINT-RESPONSES.md"
+sv="$(curl -sS -m 20 "$ORIGIN/api/survey" 2>/dev/null)"
+rg="$(curl -sS -m 20 "$ORIGIN/api/register" 2>/dev/null)"
+n_survey="$(printf '%s' "$sv" | jq -r '.n // 0' 2>/dev/null)"; n_survey="${n_survey:-0}"
+chan="$(printf '%s' "$sv" | jq -c '.channels // {}' 2>/dev/null)"
+n_corr="$(printf '%s' "$rg" | jq -r '.corrections.n // .corrections // 0 | if type=="object" then (.n // 0) else . end' 2>/dev/null)"; n_corr="${n_corr:-0}"
+n_gap="$(printf '%s' "$rg" | jq -r '.gap.n // .gap // 0 | if type=="object" then (.n // 0) else . end' 2>/dev/null)"; n_gap="${n_gap:-0}"
+n_int="$(printf '%s' "$rg" | jq -r '.interviews.n // .interviews // 0 | if type=="object" then (.n // 0) else . end' 2>/dev/null)"; n_int="${n_int:-0}"
+prev="$(grep -m1 '^TOTAL ' "$RESP" 2>/dev/null | awk '{print $2}')"; prev="${prev:-0}"
+total=$(( ${n_survey:-0} + ${n_corr:-0} + ${n_gap:-0} + ${n_int:-0} ))
+if [ "$total" -gt "$prev" ] 2>/dev/null; then
+  osascript -e "display notification \"survey $n_survey · corrections $n_corr · gap $n_gap · interviews $n_int\" with title \"Waypoint Ledger: new answer\"" >/dev/null 2>&1 || true
+  printf '%s  +%s  survey=%s corrections=%s gap=%s interviews=%s channels=%s\n' "$(NOW)" "$((total - prev))" "$n_survey" "$n_corr" "$n_gap" "$n_int" "$chan" >> "$RESP.log"
+fi
+{
+  printf 'TOTAL %s\n' "$total"
+  printf '# Waypoint Ledger — answers on the public register (read %s, every 15 min by com.precisionfederal.waypoint-uptime)\n\n' "$(NOW)"
+  printf 'survey answers: %s   by channel: %s\ncorrections (thumbs): %s\ngap reports: %s\nwritten interviews: %s\n\n' "$n_survey" "$chan" "$n_corr" "$n_gap" "$n_int"
+  printf 'Every rise is logged in WAYPOINT-RESPONSES.md.log and shown as a Mac notification. Live: %s/register\n' "$ORIGIN"
+} > "$RESP"
+# ---- end RESPONSES WATCH ----
+
 STAMP="$(NOW)"
 if [ -z "$WHY" ]; then
   printf '%s  up    build=%s chains=%s/%s  %s\n' "$STAMP" "${COMMIT:-?}" "${NGOOD:-?}" "${NCHAINS:-?}" "$ORIGIN" >> "$LOG"

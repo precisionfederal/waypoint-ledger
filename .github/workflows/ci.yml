@@ -67,7 +67,8 @@ jobs:
           set -e
           for f in index.html build.json robots.txt integrity/index.html \
                    register/index.html method/index.html data/dictionary.csv; do
-            test -e "cf/out/$f" || { echo "MISSING cf/out/$f"; exit 1; }
+            # a route may be exported as <p>/index.html or <p>.html (Next's trailingSlash setting decides)
+            test -e "cf/out/$f" || test -e "cf/out/${f%/index.html}.html" || { echo "MISSING cf/out/$f"; exit 1; }
           done
           echo "every published path is in the export"
 
