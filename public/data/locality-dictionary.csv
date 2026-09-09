@@ -1,0 +1,30 @@
+file,field,type,note
+locality-prices.csv,price_id,text,The row of the Waypoint Ledger price table this figure belongs to. Join on this to public/data/price-table.csv.
+locality-prices.csv,code,text,The CPT/HCPCS code CMS prices.
+locality-prices.csv,label,text,What the unit of care is called in plain words.
+locality-prices.csv,state,text,Two-letter postal abbreviation of the state or territory.
+locality-prices.csv,locality,text,The two-digit CMS payment locality number inside that state.
+locality-prices.csv,locality_key,text,"state and locality joined, ""IA-00"". This is the key POST /api/price accepts as ""locality""."
+locality-prices.csv,locality_name,text,The locality name exactly as CMS writes it in Addendum E.
+locality-prices.csv,mac,text,The Medicare Administrative Contractor number that prices this locality.
+locality-prices.csv,work_rvu,number,"Work relative value units for this code, from the PFS Relative Value File."
+locality-prices.csv,pe_nonfacility_rvu,number,Non-facility practice expense relative value units.
+locality-prices.csv,mp_rvu,number,Malpractice relative value units.
+locality-prices.csv,pw_gpci,number,Work geographic practice cost index for this locality (the 1.0 statutory floor is already applied by CMS).
+locality-prices.csv,pe_gpci,number,Practice expense geographic practice cost index for this locality.
+locality-prices.csv,mp_gpci,number,Malpractice geographic practice cost index for this locality.
+locality-prices.csv,conversion_factor,number,"The CY2026 non-qualifying-APM conversion factor, in dollars per RVU."
+locality-prices.csv,allowed_usd,number,"The Medicare allowed amount for this code in this locality. DERIVED by the formula in the formula column, never estimated."
+locality-prices.csv,national_usd,number,The same code with every index set to 1.000 — the national figure on the price table.
+locality-prices.csv,pct_of_national,number,"allowed_usd as a percentage of national_usd, to one decimal. Arithmetic on the two columns beside it."
+locality-prices.csv,formula,text,"CMS's own formula, written out, so the row can be recomputed without this file."
+locality-prices.csv,basis,text,"allowed — a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays."
+locality-prices.csv,year,text,The calendar year of the fee schedule.
+locality-prices.csv,population,text,Who the figure describes: Medicare Part B fee-for-service beneficiaries. For anyone else it is a reference price.
+locality-prices.csv,locality_audit_status,text,"REPRODUCED means two independent runs recomputed this exact figure from the RVUs and GPCIs in the columns to the left: this generator, and data/verify_price_table.py reading the CMS files itself."
+locality-prices.csv,national_audit_status,text,"PASS, FAIL or NOT AUDITED for the national figure, from data/verify_price_table.py."
+locality-prices.csv,rvu_file,text,The CMS file the RVU columns were read from.
+locality-prices.csv,rvu_file_sha256,text,"SHA256 of that file, so you can prove the copy you hold is the one these RVUs were read from."
+locality-prices.csv,gpci_file,text,The CMS file the GPCI columns were read from.
+locality-prices.csv,gpci_file_sha256,text,"SHA256 of that file, so you can prove the copy you hold is the one these indices were read from."
+locality-prices.csv,table_version,text,"The version of the locality table this row came from, so two downloads can be told apart."

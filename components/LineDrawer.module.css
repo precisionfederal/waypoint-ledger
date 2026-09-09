@@ -1,0 +1,12 @@
+/* The standards line — the codes a clinician or a health-data analyst reads first.
+   Mono for the codes because they are identifiers, not prose; the long common name
+   sits beside them in the body face so a person who does not know LOINC still
+   learns what the test is. Same tokens as the rest of the drawer; nothing new. */
+.standards{
+  display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .5rem;
+  margin:.5rem 0 0;padding:.55rem .7rem;
+  background:var(--surface-2);border-radius:var(--r-md);
+  font-size:.9rem;line-height:1.45;color:var(--ink-2);
+}
+.standards b{font-family:var(--font-m);font-weight:700;letter-spacing:.01em;color:var(--ink-1)}
+.standards .micro{flex:1 1 100%;margin:.15rem 0 0}

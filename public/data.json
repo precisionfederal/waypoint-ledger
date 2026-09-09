@@ -1,0 +1,414 @@
+{
+  "@context": "https://project-open-data.cio.gov/v1.1/schema/catalog.jsonld",
+  "@id": "https://waypoint-ledger.pages.dev/data.json",
+  "@type": "dcat:Catalog",
+  "conformsTo": "https://project-open-data.cio.gov/v1.1/schema",
+  "describedBy": "https://project-open-data.cio.gov/v1.1/schema/catalog.json",
+  "dataset": [
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/adopt",
+      "identifier": "https://waypoint-ledger.pages.dev/data/price-table.csv",
+      "title": "Waypoint Ledger price table: published U.S. federal figures for units of care",
+      "description": "117 rows. Each row is one unit of care — an office visit, a lab, an imaging study — carrying a single published federal dollar figure and, beside it, the file that figure was read from, the year, the basis (allowed amount, payment, charge, out-of-pocket, facility cost), the population the figure describes and the rules that say whether it may be added to another row. Nothing is estimated, modelled, inflated or interpolated: data/verify_price_table.py re-derives every row from the file it cites and exits non-zero if one does not reproduce (117 of 117 reproduced on 2026-09-09). Published by 5 bodies, chiefly CMS and AHRQ. Table version 2026-09-09.1.",
+      "keyword": [
+        "health care costs",
+        "price transparency",
+        "medicare",
+        "physician fee schedule",
+        "clinical laboratory fee schedule",
+        "cost of illness",
+        "diagnostic odyssey",
+        "CPT",
+        "HCPCS",
+        "open data",
+        "provenance"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "describedBy": "https://waypoint-ledger.pages.dev/data/price-dictionary.csv",
+      "describedByType": "text/csv",
+      "references": [
+        "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+        "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient-pps/quarterly-addenda-updates/january-2026-addendum-b",
+        "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+        "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/",
+        "https://meps.ahrq.gov/data_files/publications/st532/stat532.pdf",
+        "https://meps.ahrq.gov/data_stats/summ_tables/hc/mean_expend/2014/table1.pdf",
+        "https://meps.ahrq.gov/data_files/publications/st484/stat484.pdf",
+        "https://hcup-us.ahrq.gov/reports/statbriefs/sb311-ED-visit-costs-2021.pdf",
+        "https://hcup-us.ahrq.gov/db/ccr/ed-ccr/SummaryStats_edcc2021neds.PDF",
+        "https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf",
+        "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf",
+        "https://meps.ahrq.gov/data_files/publications/st560/stat560.pdf",
+        "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles",
+        "https://www.cms.gov/files/document/final-cy-2026-part-d-redesign-program-instruction.pdf",
+        "https://www.bls.gov/news.release/wkyeng.nr0.htm",
+        "https://www.bls.gov/oes/current/oes_nat.htm",
+        "https://www.gsa.gov/travel/plan-a-trip/transportation-airfare-rates-pov-rates/pov-mileage-reimbursement"
+      ],
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/price-table.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "price-table.csv",
+          "description": "One row per unit of care, with its figure, basis, year, population and source URL."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/price-table.json",
+          "mediaType": "application/json",
+          "format": "JSON",
+          "title": "price-table.json",
+          "description": "The same rows with the confidence and basis legends, the combination rules and the verification audit."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://waypoint-ledger.pages.dev/api/table",
+          "mediaType": "application/json",
+          "format": "JSON API",
+          "title": "GET /api/table",
+          "description": "The whole table with provenance, cacheable for an hour. Add ?locality=IA-00 or ?state=IA and every row comes back as the Medicare allowed amount for that CMS payment locality, with the three geographic indices and the formula that produced it.",
+          "conformsTo": "https://waypoint-ledger.pages.dev/api/openapi.json"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/adopt",
+      "identifier": "https://waypoint-ledger.pages.dev/data/locality-prices.csv",
+      "title": "Medicare allowed amounts for 52 services in all 109 CMS payment localities",
+      "description": "5668 figures: 52 CPT/HCPCS codes priced for each of the 109 Medicare payment localities across 53 states and territories. Every figure is CMS's own formula — (work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009 — applied to CMS's own published relative value units and geographic practice cost indices, which are printed on the same row together with the SHA-256 of each source file. The generator is also the audit: it recomputed all 5668 figures on 2026-09-09 and found 0 mismatches, and exits non-zero on one cent of drift. For a person who is not on Medicare this is a published reference price, not a bill; for a person on Medicaid it does not describe what their state pays at all.",
+      "keyword": [
+        "medicare",
+        "physician fee schedule",
+        "geographic practice cost index",
+        "GPCI",
+        "RVU",
+        "payment locality",
+        "health care prices",
+        "geography",
+        "open data",
+        "reproducible"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "describedBy": "https://waypoint-ledger.pages.dev/data/locality-dictionary.csv",
+      "describedByType": "text/csv",
+      "isPartOf": "https://waypoint-ledger.pages.dev/data/price-table.csv",
+      "references": [
+        "https://www.cms.gov/files/zip/rvu26c-updated-06-30-2026.zip",
+        "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c"
+      ],
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/locality-prices.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "locality-prices.csv",
+          "description": "One row per code per locality, with the RVUs, the GPCIs, the formula string and the audit status."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/locality-prices.json",
+          "mediaType": "application/json",
+          "format": "JSON",
+          "title": "locality-prices.json",
+          "description": "The same figures with the source file hashes and the audit block."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://waypoint-ledger.pages.dev/api/localities",
+          "mediaType": "application/json",
+          "format": "JSON API",
+          "title": "GET /api/localities",
+          "description": "The index of all 109 localities with their Medicare Administrative Contractor and their three geographic indices; GET /api/localities/IA-00 for one.",
+          "conformsTo": "https://waypoint-ledger.pages.dev/api/openapi.json"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/register",
+      "identifier": "https://waypoint-ledger.pages.dev/api/export/corrections.csv",
+      "title": "Waypoint Ledger register: corrections to published federal figures",
+      "description": "Where a member of the public says a published federal figure does not describe them. One row per correction, bound to the price row it disputes and to the table version that was on screen, with the coverage and state context the person chose. Each row carries a hash chained to the row before it, so a reader can prove nothing was quietly changed or removed. Free text is never published. Counts under 11 in a named place are withheld, and the withholding is itself counted rather than hidden. This file is the demand signal a publishing agency can act on: /api/citation/{id} renders any one row as a paste-ready correction report naming the body that published the number.",
+      "keyword": [
+        "data quality",
+        "public feedback",
+        "price transparency",
+        "corrections",
+        "crowdsourced",
+        "health care costs",
+        "open data"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
+      "describedByType": "text/csv",
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/api/export/corrections.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "corrections.csv",
+          "description": "Every published correction, with its row hash."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://waypoint-ledger.pages.dev/api/corrections",
+          "mediaType": "application/json",
+          "format": "JSON API",
+          "title": "GET /api/corrections",
+          "description": "The same records as counts per price row.",
+          "conformsTo": "https://waypoint-ledger.pages.dev/api/openapi.json"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/register",
+      "identifier": "https://waypoint-ledger.pages.dev/api/export/gap.csv",
+      "title": "Waypoint Ledger register: care that happened and no federal file prices",
+      "description": "Counted absences. Where a person names care they received, or a condition they live with, for which no published federal figure exists, the absence is recorded as a count in a named category rather than filled with the nearest available number. An absence you count is data; an absence you fill is a fabrication. Free text is never published and small cells are suppressed.",
+      "keyword": [
+        "data gaps",
+        "cost of illness",
+        "unpriced care",
+        "invisible illness",
+        "public feedback",
+        "open data"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
+      "describedByType": "text/csv",
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/api/export/gap.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "gap.csv",
+          "description": "Every published care-gap report."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://waypoint-ledger.pages.dev/api/gap",
+          "mediaType": "application/json",
+          "format": "JSON API",
+          "title": "GET /api/gap",
+          "description": "The same records as counts per category.",
+          "conformsTo": "https://waypoint-ledger.pages.dev/api/openapi.json"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/register",
+      "identifier": "https://waypoint-ledger.pages.dev/api/export/survey.csv",
+      "title": "Waypoint Ledger register: which burden weighed most, ranked by the people carrying it",
+      "description": "Responses to a published instrument that asks a person living with a long-undiagnosed illness to rank the kinds of burden — money spent, work lost, care never received, time — against each other. The point is the weighting: any total that combines kinds of burden needs a stated basis, and this is ours, published as a count with its N rather than asserted. Each response carries the channel it came through, so one community’s answers are separable from another’s by anyone reading the file. The exact wording of every question and every response option is in the dictionary. Free text is never published and small cells are suppressed.",
+      "keyword": [
+        "patient reported",
+        "burden of illness",
+        "survey",
+        "weighting",
+        "community engagement",
+        "invisible illness",
+        "open data"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
+      "describedByType": "text/csv",
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/api/export/survey.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "survey.csv",
+          "description": "Every published response."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "accessURL": "https://waypoint-ledger.pages.dev/api/survey",
+          "mediaType": "application/json",
+          "format": "JSON API",
+          "title": "GET /api/survey",
+          "description": "The rankings as counts, with the N.",
+          "conformsTo": "https://waypoint-ledger.pages.dev/api/openapi.json"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "accessLevel": "public",
+      "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "publisher": {
+        "@type": "org:Organization",
+        "name": "Precision Delivery Federal LLC"
+      },
+      "contactPoint": {
+        "@type": "vcard:Contact",
+        "fn": "Bo Peng",
+        "hasEmail": "mailto:bo@precisionfederal.com"
+      },
+      "language": [
+        "en-US"
+      ],
+      "spatial": "United States",
+      "theme": [
+        "health"
+      ],
+      "accrualPeriodicity": "irregular",
+      "landingPage": "https://waypoint-ledger.pages.dev/privacy",
+      "identifier": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
+      "title": "Waypoint Ledger data dictionary: every published column, and the instrument itself",
+      "description": "What each column in each published file means, in plain words, and the full text of the burden instrument — every question, every response option, every skip — so a reviewer can read the questions without running the site or trusting our description of them. Generated from the database schema and the write-path validators, not written by hand: a column with no plain-English line fails the build.",
+      "keyword": [
+        "data dictionary",
+        "codebook",
+        "metadata",
+        "survey instrument",
+        "open data"
+      ],
+      "modified": "2026-09-09",
+      "issued": "2026-09-09",
+      "distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "dictionary.csv",
+          "description": "The instrument and the register columns."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/dictionary.json",
+          "mediaType": "application/json",
+          "format": "JSON",
+          "title": "dictionary.json",
+          "description": "The same, as JSON."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/price-dictionary.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "price-dictionary.csv",
+          "description": "Column meanings for price-table.csv."
+        },
+        {
+          "@type": "dcat:Distribution",
+          "downloadURL": "https://waypoint-ledger.pages.dev/data/locality-dictionary.csv",
+          "mediaType": "text/csv",
+          "format": "CSV",
+          "title": "locality-dictionary.csv",
+          "description": "Column meanings for locality-prices.csv, including the formula and the audit status."
+        }
+      ]
+    }
+  ]
+}

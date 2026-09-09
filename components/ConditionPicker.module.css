@@ -1,0 +1,30 @@
+/* The condition selector and the year-ahead panel it drives, in the product's
+   own tokens. Nothing here restyles the identity: the chips are the context
+   bar's chips, the card is .card.year. */
+
+.group{min-width:0}
+.lbl{margin:0 0 var(--sp-2);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.note{margin:0 0 var(--sp-3);font-size:.9rem;color:var(--ink-3)}
+.chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.chip{min-height:44px;padding:.55rem 1rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2);font-size:1rem;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.chip:hover{border-color:var(--accent);color:var(--ink)}
+.chip.on{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-brand)}
+.chip.quiet{font-weight:500;color:var(--ink-3)}
+
+/* the standard code, under the chips — a mono line a coder recognises */
+.code{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+.codeMark{font-family:var(--font-m);font-weight:700;letter-spacing:.03em;color:var(--brand-ink);margin-right:.4rem;white-space:nowrap}
+.codeSrc{display:block;margin-top:.2rem;font-size:.85rem;color:var(--ink-3)}
+.blank{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
+
+/* the year-ahead panel */
+.kind{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .6rem;border-radius:var(--r-pill);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.kindExcess{background:var(--brand-soft);color:var(--brand-ink)}
+.kindAttr{background:var(--sun-soft);color:var(--warn-ink)}
+.kindNone{background:var(--flag-soft);color:var(--flag-ink)}
+.figure{display:block;font-family:var(--font-d);font-weight:700;line-height:1.1;font-size:clamp(1.9rem,5vw,2.6rem);letter-spacing:-.01em;margin:var(--sp-2) 0 .2rem}
+.point{display:block;font-size:.9rem;font-weight:400;color:var(--ink-3);margin-top:.3rem}
+.means{margin:.35rem 0 var(--sp-3);font-size:1rem;line-height:1.45;color:var(--ink-2)}
+.meta{margin:0 0 var(--sp-2);font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
+.caveat{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9rem;line-height:1.45;color:var(--ink-3)}
+.acts{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:var(--sp-3)}

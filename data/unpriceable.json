@@ -1,0 +1,41 @@
+{
+  "_README": "🔴 THIS FILE IS A FEATURE, NOT A BACKLOG. Dr. John Phillips (Senior Advisor on Health Economic Research, Office of the NIH Director) told this cohort that lost productivity and caregiver time are 'really important... but they're also ones that are difficult to capture and difficult to measure,' and then asked teams to name the source. Naming honestly that no defensible federal figure exists is a better answer than producing one. The app renders these on the page, in the ledger, beside the priced lines.",
+
+  "items": [
+    {
+      "id": "lost-work",
+      "label": "Days of work you missed",
+      "synonyms": ["missed work", "days off work", "couldn't work", "lost workdays", "took sick leave", "unpaid leave"],
+      "whyUnpriced": "Valuing a lost workday requires your actual earnings, not a national median. The Bureau of Labor Statistics publishes median usual weekly earnings for full-time wage and salary workers, but applying that median to a specific person is a guess about that person's pay, and it silently excludes part-time workers, the self-employed, and anyone who had already stopped working because of the illness — which is a large share of the people this tool exists for.",
+      "whatWouldFixIt": "Ask the person for their own hourly or weekly pay and multiply. That is arithmetic on a figure they supplied, not an estimate we invented, and it is the honest way to price this line."
+    },
+    {
+      "id": "caregiver-time",
+      "label": "Time someone spent caring for you",
+      "synonyms": ["caregiver", "my husband took time off", "my wife cared for me", "family took care of me", "someone drove me", "my mom helped"],
+      "whyUnpriced": "There is no federal price for unpaid family caregiving. The standard workarounds — a replacement-wage approach using the home health aide occupational wage, or an opportunity-cost approach using the caregiver's own foregone earnings — give materially different answers and neither is a published federal figure for this purpose. Choosing one silently would be choosing the answer.",
+      "whatWouldFixIt": "State the method and let the reader pick it, showing both numbers side by side rather than one. Until the tool does that, this line stays blank."
+    },
+    {
+      "id": "travel",
+      "label": "Travel to appointments",
+      "synonyms": ["drove to appointments", "gas", "mileage", "parking", "travel", "had to drive"],
+      "whyUnpriced": "Mileage rates exist — the IRS publishes a medical mileage rate — but the distance travelled is specific to a person and their geography, and rural patients routinely travel an order of magnitude further than urban ones. A national average here would be wrong for exactly the people it matters most to.",
+      "whatWouldFixIt": "Ask for the round-trip distance and apply the published IRS medical mileage rate. Real input, published rate, honest arithmetic."
+    },
+    {
+      "id": "out-of-pocket-share",
+      "label": "What YOU paid, as opposed to what your insurer paid",
+      "synonyms": ["what I paid", "out of pocket", "my copay", "deductible", "my share"],
+      "whyUnpriced": "MEPS Statistical Brief #549 reports total expenditures — every payer combined — and does not publish the out-of-pocket share for COVID-19-related events. Splitting a total into 'yours' and 'theirs' without a published split would be inventing the most personally meaningful number on the page.",
+      "whatWouldFixIt": "A MEPS data-file analysis of the out-of-pocket component, or a different published source that reports the split directly. Until one is in hand this tool says 'not reported' rather than guessing."
+    },
+    {
+      "id": "delay-harm",
+      "label": "What the delay itself cost you",
+      "synonyms": ["got worse waiting", "damage from the delay", "deteriorated", "waiting made it worse"],
+      "whyUnpriced": "This is a causal claim — that being diagnosed later produced worse outcomes and higher costs than being diagnosed sooner — and it needs an identification strategy, not a price. Without a design that separates the effect of the delay from the effect of being sicker in the first place, any number here is a correlation dressed as a cost.",
+      "whatWouldFixIt": "A study design. Until there is one, this line is named on the page and left blank, because the cost is real even though the figure is not available."
+    }
+  ]
+}

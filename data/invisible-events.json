@@ -1,0 +1,62 @@
+{
+  "_README": "🔴 THE CORE OF THE PRODUCT. Every event listed here produces ZERO ROWS in MEPS, HCUP and CMS claims, because those files record care that was DELIVERED AND BILLED. A person who wanted care and did not get it is invisible in all of them, by construction. Dr. John Phillips named this exact gap at the 2026-08-20 office hours: 'a lot of the things that will be showing up on patient need come from individuals who have actually received service of some way, shape or form. And a neat thing about this is the potential to identify folks who want service, but don't get it. And so that I think is going to be the... data challenge.' This file turns that data challenge into the thing the tool measures.",
+  "_version": "2026-08-21.1",
+
+  "categories": [
+    {
+      "id": "care-not-sought",
+      "label": "Care you needed and did not seek",
+      "prompt": "Was there care you knew you needed but did not go and get?",
+      "examples": ["couldn't afford the copay", "no specialist within driving distance", "no childcare", "couldn't take the time off", "gave up trying"],
+      "whyInvisible": "A visit that never happened generates no claim, no encounter record and no survey event. In every federal expenditure file this looks identical to being well.",
+      "unit": "occasions"
+    },
+    {
+      "id": "care-denied",
+      "label": "Care you asked for and were refused",
+      "prompt": "Did a clinician or insurer refuse something you asked for?",
+      "examples": ["doctor wouldn't order the test", "insurer denied it", "told I didn't meet criteria", "referral refused", "waitlist too long"],
+      "whyInvisible": "A denial is recorded by the payer, not in expenditure data, and a clinician declining to order a test leaves no trace at all. The need existed and is uncounted.",
+      "unit": "occasions"
+    },
+    {
+      "id": "dismissed",
+      "label": "Times you were told it was nothing",
+      "prompt": "How many times were you told your symptoms were anxiety, stress, or nothing at all?",
+      "examples": ["told it was anxiety", "told to lose weight", "told it was stress", "told it was in my head", "told to come back if it got worse"],
+      "whyInvisible": "The visit is billed, so it appears in the data as care delivered. What the data cannot show is that it produced no answer. A dismissal and a diagnosis cost the same and look the same in an expenditure file.",
+      "unit": "times"
+    },
+    {
+      "id": "wrong-track",
+      "label": "Care aimed at the wrong thing",
+      "prompt": "Were you treated for something you did not have?",
+      "examples": ["treated for depression instead", "wrong diagnosis for two years", "medication for the wrong condition", "surgery that didn't help"],
+      "whyInvisible": "This care is fully recorded and fully paid, and it is counted as successful utilization. Nothing in the data marks it as care that was aimed at the wrong target.",
+      "unit": "months"
+    },
+    {
+      "id": "time-searching",
+      "label": "Time spent searching rather than being treated",
+      "prompt": "Roughly how long from your first symptom to an answer?",
+      "examples": ["three years", "eighteen months", "still waiting"],
+      "whyInvisible": "Federal expenditure files have no field for duration of an undiagnosed period. The clock only starts when a code is assigned — so the longest and most expensive part of an odyssey begins after the data starts counting.",
+      "unit": "months"
+    },
+    {
+      "id": "life-lost",
+      "label": "What the search cost you outside of medicine",
+      "prompt": "What did this take from you that no bill records?",
+      "examples": ["lost my job", "left school", "lost my marriage", "moved back in with family", "stopped seeing friends", "gave up my career"],
+      "whyInvisible": "No health dataset has a field for this. It is the largest cost most people in a diagnostic odyssey report, and it is the one no federal file has ever counted.",
+      "unit": "occurrences"
+    }
+  ],
+
+  "weighting": {
+    "_note": "🔴 PHILLIPS'S SIGNATURE PROBE, asked as the FIRST question of the 2026-08-20 session and returned to three more times: 'whether it be doing something to kind of get a sense from the affected communities about the things that matter most, finding ways of waiting [weighting] would be... really fantastic and a great contribution.' This is that. Weights are ELICITED from the affected community, never assigned by us, never modelled. We report what people said and how many said it.",
+    "question": "Of everything this search cost you, which hurt the most?",
+    "instruction": "Rank as many as you want. There is no right answer and nothing here is scored.",
+    "reportedAs": "A frequency distribution across respondents, with the count. Never a weighted index we invented."
+  }
+}

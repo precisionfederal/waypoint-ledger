@@ -1,0 +1,44 @@
+{
+  "name": "waypoint-ledger",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Prices one person's diagnostic journey and cites every figure to public U.S. federal data.",
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "next lint",
+    "test": "vitest run",
+    "e2e": "node shots2/e2e.mjs",
+    "db:migrate:local": "cd cf && npx wrangler d1 migrations apply waypoint-ledger --local",
+    "db:migrate:remote": "cd cf && npx wrangler d1 migrations apply waypoint-ledger --remote",
+    "dev:full": "npm run build:static && cd cf && npx wrangler pages dev out --port 8788",
+    "build:info": "node scripts/gen-build-json.mjs",
+    "build:static": "npm run build:info && bash cf/build-static.sh",
+    "verify:live": "bash cf/verify-live.sh",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:dry": "PF_DEPLOY_DRY=1 bash scripts/deploy.sh",
+    "typecheck": "tsc --noEmit -p .",
+    "dictionary": "node scripts/gen-dictionary.mjs"
+  },
+  "dependencies": {
+    "@simplewebauthn/browser": "13.3.0",
+    "@simplewebauthn/server": "13.3.3",
+    "next": "15.5.25",
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.5",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "ajv": "^8.20.0",
+    "typescript": "5.7.3",
+    "vitest": "3.2.7",
+    "wrangler": "4.130.0"
+  },
+  "overrides": {
+    "postcss": "8.5.28",
+    "sharp": "0.35.4"
+  }
+}

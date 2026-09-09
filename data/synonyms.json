@@ -1,0 +1,488 @@
+{
+  "_README": "Extra plain-language synonyms for rows that ALREADY EXIST in data/prices.json. Merged into the table by lib/table.ts. This file never carries a price, a source or a new row: it changes only which published row a person's own words land on. Every key is checked against data/prices.json by tests/mapper.test.ts, and no phrase may belong to two rows.",
+  "_version": "2026-09-09",
+  "_rules": [
+    "A phrase goes here only if the row it points at is the unit of care a person means by it.",
+    "No phrase may appear under two ids: an ambiguous word (a bare 'scan', a bare 'test') is left out rather than guessed.",
+    "Where a lay phrase maps to a row for a reason a reader would question, the reason is written in `notes`."
+  ],
+  "notes": {
+    "cms-99203": "Urgent care, walk-in and retail clinics bill the office-visit codes; a first visit at one is a new-patient visit, so those phrases land on 99203. Medicare pays the same physician fee schedule amount wherever the visit happens; a freestanding urgent-care centre bills a commercial payer at its own rate, which this row does not describe.",
+    "cms-99213": "Medicare pays a telehealth office visit at the same physician fee schedule amount as the in-person visit, so 'video visit' and 'telehealth' land on the established-patient row rather than a separate figure.",
+    "cms-99204": "Every specialty name a person says ('endocrinologist', 'GI doctor', 'second opinion') is the same billed unit: a first visit with a new specialist. The figure does not change by specialty.",
+    "cms-pt-exercise-15": "'PT' and 'physio' are read as a physical therapy exercise session, which is billed in 15-minute units.",
+    "cms-proc-egd-biopsy": "A bare 'endoscopy' is read as an upper endoscopy, the common lay meaning; a colonoscopy has its own row and its own phrases."
+  },
+  "synonyms": {
+    "cms-99213": [
+      "saw my doctor again",
+      "went back to my doctor",
+      "another visit with my doctor",
+      "recheck with my doctor",
+      "med check",
+      "telehealth visit",
+      "video visit",
+      "virtual visit",
+      "video appointment with my doctor",
+      "telemedicine visit",
+      "phone visit with my doctor",
+      "nurse practitioner follow up",
+      "brief follow up appointment"
+    ],
+    "cms-99214": [
+      "doctor's appointment",
+      "appointment with my doctor",
+      "saw my internist",
+      "saw my family physician",
+      "saw my provider",
+      "saw my nurse practitioner",
+      "saw my physician assistant",
+      "primary care visit",
+      "clinic visit with my doctor",
+      "went in to see my doctor",
+      "office visit with my primary",
+      "medical appointment"
+    ],
+    "cms-99215": [
+      "long appointment with my doctor",
+      "extended office visit",
+      "complicated visit with my doctor",
+      "forty minute visit"
+    ],
+    "cms-99203": [
+      "urgent care",
+      "urgent care visit",
+      "went to urgent care",
+      "walk-in clinic",
+      "walk in clinic",
+      "after hours clinic",
+      "retail clinic",
+      "minute clinic",
+      "first appointment with a new doctor",
+      "established care with a new doctor",
+      "intake appointment with a new doctor"
+    ],
+    "cms-99204": [
+      "referral visit",
+      "referred to a new specialist",
+      "second opinion",
+      "second opinion with a specialist",
+      "saw a new specialist",
+      "specialist consult",
+      "consultation with a specialist",
+      "specialist appointment",
+      "specialist",
+      "saw an endocrinologist",
+      "saw a gastroenterologist",
+      "saw a GI doctor",
+      "saw an ENT",
+      "saw a hematologist",
+      "saw an allergist",
+      "saw a nephrologist",
+      "saw a dermatologist",
+      "saw an immunologist",
+      "saw a neurologist for the first time",
+      "saw a rheumatology specialist",
+      "gut doctor",
+      "kidney doctor",
+      "skin doctor",
+      "hormone doctor",
+      "blood doctor",
+      "sent to a specialist"
+    ],
+    "cms-99205": [
+      "long covid clinic visit",
+      "post covid clinic appointment",
+      "two hour first appointment",
+      "long first appointment with a specialist"
+    ],
+    "cms-99212": [
+      "quick appointment",
+      "five minute appointment",
+      "very short visit"
+    ],
+    "cms-g0463-hospital-clinic-fee": [
+      "hospital outpatient facility fee",
+      "separate hospital bill for the visit",
+      "facility charge on my bill",
+      "the hospital's own charge"
+    ],
+    "cms-ed-99284-complete": [
+      "ER trip",
+      "trip to the ER",
+      "emergency visit",
+      "emergency room trip",
+      "rushed to the emergency room",
+      "spent the night in the ER",
+      "urgent trip to the emergency room"
+    ],
+    "cms-lab-cbc": [
+      "lab work",
+      "blood draw",
+      "they drew my blood",
+      "drew my blood",
+      "blood panel",
+      "more blood tests",
+      "so much bloodwork",
+      "blood work again",
+      "full blood count"
+    ],
+    "cms-lab-cmp": [
+      "comprehensive panel",
+      "full chemistry panel",
+      "liver and kidney panel"
+    ],
+    "cms-lab-tsh": [
+      "thyroid level",
+      "TSH level",
+      "checked my thyroid levels"
+    ],
+    "cms-lab-ana": [
+      "ANA panel",
+      "screened me for lupus",
+      "autoimmune screen"
+    ],
+    "cms-lab-esr": [
+      "sed rate test",
+      "ESR test"
+    ],
+    "cms-lab-crp": [
+      "CRP test",
+      "inflammation blood test"
+    ],
+    "cms-lab-ddimer": [
+      "d dimer test",
+      "clotting blood test"
+    ],
+    "cms-lab-ferritin": [
+      "ferritin level",
+      "iron stores test"
+    ],
+    "cms-img-cxr": [
+      "chest xray",
+      "x ray of my chest",
+      "chest radiograph",
+      "xray of my lungs"
+    ],
+    "cms-img-ct-chest-nc": [
+      "CT of my chest",
+      "cat scan of my lungs",
+      "chest cat scan",
+      "lung CT"
+    ],
+    "cms-img-ct-chest-c": [
+      "CT of my chest with contrast",
+      "CT angiogram of my chest",
+      "CTA of my chest"
+    ],
+    "cms-img-echo": [
+      "heart echo",
+      "echo test",
+      "cardiac ultrasound",
+      "ultrasound of the heart",
+      "2D echo",
+      "echocardiography"
+    ],
+    "cms-img-mri-brain-nc": [
+      "MRI of my brain",
+      "brain scan",
+      "MRI of the brain",
+      "head MRI"
+    ],
+    "cms-img-mri-brain-both": [
+      "MRI with and without contrast",
+      "brain MRI with and without contrast",
+      "MRI of my brain with contrast"
+    ],
+    "cms-test-spirometry": [
+      "breathing tests",
+      "lung function testing",
+      "blowing test",
+      "spirometry test"
+    ],
+    "cms-test-dlco": [
+      "diffusing capacity test",
+      "gas exchange test"
+    ],
+    "cms-test-lung-volumes": [
+      "lung volume testing",
+      "body plethysmography"
+    ],
+    "cms-test-tilt-table": [
+      "tilt table study",
+      "table test for dizziness",
+      "tilt study"
+    ],
+    "cms-test-cpet": [
+      "cardiopulmonary exercise testing",
+      "exercise test with a mask",
+      "invasive exercise test"
+    ],
+    "cms-test-holter": [
+      "two day heart monitor",
+      "wore a monitor for 48 hours"
+    ],
+    "cms-mh-psych-eval": [
+      "psych eval",
+      "psychiatry intake",
+      "mental health intake",
+      "psychiatric assessment",
+      "told me it was stress",
+      "told me it was all in my head",
+      "sent me to mental health"
+    ],
+    "cms-mh-therapy-45": [
+      "counselling session",
+      "saw a counselor",
+      "saw a psychologist",
+      "psychologist visit",
+      "therapy appointment",
+      "CBT session",
+      "talk therapy session"
+    ],
+    "cms-mh-therapy-60": [
+      "long therapy session",
+      "full hour of therapy"
+    ],
+    "cms-test-ecg": [
+      "EKG test",
+      "ECG test",
+      "heart trace",
+      "12 lead ECG",
+      "stickers on my chest"
+    ],
+    "cms-test-stress-test": [
+      "stress test on a treadmill",
+      "exercise stress test",
+      "cardiac stress test on a treadmill"
+    ],
+    "cms-test-event-monitor": [
+      "30 day monitor",
+      "heart patch",
+      "month long heart monitor",
+      "long term heart monitor"
+    ],
+    "cms-test-sleep-study": [
+      "overnight sleep study",
+      "night in the sleep lab",
+      "polysomnography",
+      "sleep study in a lab"
+    ],
+    "cms-test-eeg": [
+      "EEG test",
+      "brain waves test",
+      "electrodes on my head"
+    ],
+    "cms-test-emg": [
+      "EMG test",
+      "nerve conduction study",
+      "nerve testing",
+      "needles in my muscles"
+    ],
+    "cms-img-ct-head-nc": [
+      "CT scan of my head",
+      "head cat scan",
+      "CT of the head"
+    ],
+    "cms-img-mri-lumbar-nc": [
+      "MRI of my back",
+      "lower back MRI",
+      "lumbar spine MRI",
+      "MRI of my spine"
+    ],
+    "cms-img-mri-joint-nc": [
+      "MRI of my hip",
+      "MRI of my ankle",
+      "knee scan"
+    ],
+    "cms-img-us-abdomen": [
+      "ultrasound of my abdomen",
+      "liver ultrasound",
+      "gallbladder ultrasound",
+      "abdominal scan"
+    ],
+    "cms-img-us-pelvic": [
+      "ultrasound of my pelvis area",
+      "pelvic scan",
+      "gynecological ultrasound"
+    ],
+    "cms-img-carotid-duplex": [
+      "ultrasound of my neck",
+      "carotid doppler",
+      "neck artery scan"
+    ],
+    "cms-img-ct-abd-pelvis-c": [
+      "CT of my abdomen and pelvis",
+      "belly CT with contrast",
+      "cat scan of my abdomen and pelvis"
+    ],
+    "cms-proc-colonoscopy": [
+      "camera in my bowel",
+      "colon scope",
+      "lower endoscopy",
+      "bowel camera",
+      "had a colonoscopy"
+    ],
+    "cms-proc-egd-biopsy": [
+      "stomach camera",
+      "camera down my throat",
+      "upper scope",
+      "gastroscopy",
+      "endoscopy",
+      "swallowed a camera"
+    ],
+    "cms-pt-eval-low": [
+      "first PT appointment",
+      "physio evaluation",
+      "physical therapy assessment"
+    ],
+    "cms-pt-exercise-15": [
+      "PT",
+      "physio",
+      "physiotherapy",
+      "rehab session",
+      "PT visit",
+      "physical therapy appointment",
+      "exercise therapy session"
+    ],
+    "cms-eye-exam-new": [
+      "went to the eye doctor",
+      "saw an ophthalmologist",
+      "eye appointment",
+      "vision test"
+    ],
+    "cms-test-neurobehavioral-1h": [
+      "cognitive test",
+      "memory test",
+      "tested my thinking",
+      "testing for brain fog"
+    ],
+    "cms-test-neuropsych-1h": [
+      "neuropsych evaluation",
+      "full neuropsychological testing"
+    ],
+    "cms-test-allergy-skin-per-test": [
+      "allergy scratch testing",
+      "skin testing for allergies"
+    ],
+    "cms-test-hearing": [
+      "audiology appointment",
+      "hearing check"
+    ],
+    "cms-proc-joint-injection": [
+      "steroid injection",
+      "cortisone injection",
+      "shot in my joint"
+    ],
+    "cms-lab-vitamin-d": [
+      "vitamin D",
+      "vitamin D level check"
+    ],
+    "cms-lab-b12": [
+      "B12 level",
+      "vitamin B12 test"
+    ],
+    "cms-lab-a1c": [
+      "hemoglobin A1c",
+      "A1c test"
+    ],
+    "cms-lab-lipid-panel": [
+      "cholesterol check",
+      "lipid profile"
+    ],
+    "cms-lab-free-t4": [
+      "T4 test",
+      "free T4 level"
+    ],
+    "cms-lab-glucose": [
+      "fasting glucose",
+      "fasting blood sugar"
+    ],
+    "cms-lab-urinalysis": [
+      "urine analysis",
+      "peed in a cup",
+      "urine dipstick"
+    ],
+    "cms-lab-urine-culture": [
+      "culture of my urine",
+      "urine culture test"
+    ],
+    "cms-lab-covid-pcr": [
+      "covid swab",
+      "PCR covid test",
+      "nose swab for covid"
+    ],
+    "cms-lab-magnesium": [
+      "magnesium blood test"
+    ],
+    "cms-lab-ck": [
+      "CPK test",
+      "creatine kinase test"
+    ],
+    "cms-lab-bnp": [
+      "BNP test",
+      "NT-proBNP"
+    ],
+    "cms-lab-troponin": [
+      "troponin test",
+      "troponins"
+    ],
+    "cms-lab-pt-inr": [
+      "INR check",
+      "INR test"
+    ],
+    "cms-lab-ptt": [
+      "PTT test",
+      "aPTT test"
+    ],
+    "cms-lab-ena": [
+      "ENA antibodies",
+      "ENA autoantibody test"
+    ],
+    "cms-lab-dsdna": [
+      "anti dsDNA",
+      "double stranded DNA test"
+    ],
+    "cms-lab-ige-per-allergen": [
+      "food allergy panel",
+      "IgE blood test"
+    ],
+    "cms-lab-free-testosterone": [
+      "testosterone level"
+    ],
+    "cms-lab-fsh": [
+      "FSH level"
+    ],
+    "cms-lab-estradiol": [
+      "estrogen",
+      "estradiol test"
+    ],
+    "cms-lab-prolactin": [
+      "prolactin blood test"
+    ],
+    "cms-lab-iron-binding": [
+      "TIBC test",
+      "iron panel",
+      "iron studies test"
+    ],
+    "cms-lab-folate": [
+      "folate level"
+    ],
+    "cms-lab-syphilis": [
+      "RPR test",
+      "syphilis screen"
+    ],
+    "cms-lab-hep-b-surface-ag": [
+      "hepatitis B surface antigen test",
+      "HBsAg test"
+    ],
+    "cms-lab-hep-c-ab": [
+      "hepatitis C antibody test",
+      "HCV test"
+    ],
+    "cms-lab-hiv": [
+      "HIV screen",
+      "HIV antibody test"
+    ]
+  }
+}

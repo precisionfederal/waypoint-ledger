@@ -1,0 +1,274 @@
+{
+ "generated": "2026-09-09T18:00:22Z",
+ "conditions_version": "2026-09-09.2",
+ "table_version": "2026-09-08.1-verified",
+ "conditions": 9,
+ "coded": 6,
+ "priced": 3,
+ "checks": 33,
+ "pass": 33,
+ "fail": 0,
+ "unverified": 0,
+ "icd10cm_years_checked": [
+  2026,
+  2027
+ ],
+ "sources": {
+  "icd10cm/fy2021": {
+   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2021.zip",
+   "sha256": "dffa100f5bc7e588cca63257c0da0668094b31ba9812283eba893d082d2e909f",
+   "bytes": 2372334,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2021/icd10cm-codes-order-Jan-2021.zip"
+  },
+  "icd10cm/fy2022": {
+   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2022.zip",
+   "sha256": "bab2b3b041cf4b999f8380f3198c1dd6ca404ba7d5513ec60efc813a97f7c214",
+   "bytes": 2245367,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2022/Code%20Descriptions%20zip.zip"
+  },
+  "icd10cm/fy2023": {
+   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2023.zip",
+   "sha256": "a7bfd4511dc154bff96fe0ced5fcd633bd26f997ccd6ae386f5c24595e1789b5",
+   "bytes": 2404202,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2023/icd10-Order-CodeFiles2023.zip"
+  },
+  "icd10cm/fy2026": {
+   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2026.zip",
+   "sha256": "a852eb91b3344ae38476e63816976ee1eeb94dcced7151118324f060e8499f88",
+   "bytes": 2198159,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2026/icd10cm-Code%20Descriptions-2026.zip"
+  },
+  "icd10cm/fy2027": {
+   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2027.zip",
+   "sha256": "93e3ad6004badf470c55bfe679b748ae88fd9b2b421851e409eec382c7713b9a",
+   "bytes": 2192779,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2027/icd10cm-code-descriptions-2027.zip"
+  },
+  "sources/pmc": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/pmc.html",
+   "sha256": "3bc6a22cc2522257691b939ee0a671bfb615e597272c080a2617f0301fb93830",
+   "bytes": 230662,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/"
+  },
+  "sources/st562": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/st562.pdf",
+   "sha256": "48a3f6e69893647bc5a7cc2121894a11d387ac973fba0bf4e517b610f12a42c1",
+   "bytes": 486305,
+   "retrieved": "cache",
+   "url": "https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf"
+  },
+  "sources/st568": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/st568.pdf",
+   "sha256": "78f76227dd8e0884b1bcecb5e18f2324f1dd23a6720f6b24b5b63278f7716f05",
+   "bytes": 447121,
+   "retrieved": "cache",
+   "url": "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf"
+  }
+ },
+ "results": [
+  {
+   "check": "long-covid U09.9 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "U09.9 Post COVID-19 condition, unspecified | billable=True"
+  },
+  {
+   "check": "long-covid U09.9 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "U09.9 Post COVID-19 condition, unspecified | billable=True"
+  },
+  {
+   "check": "long-covid U09.9 first effective",
+   "status": "PASS",
+   "detail": "absent from FY2021, present in FY2022 \u2014 first effective 2021-10-01",
+   "evidence": "absent from the FY2021 file, present in the FY2022 file"
+  },
+  {
+   "check": "heart-disease icd10cm blank",
+   "status": "PASS",
+   "detail": "no code, and the blank is explained",
+   "evidence": "AHRQ MEPS Statistical Brief #562 prices adults TREATED FOR HEART DISEASE, a clinical category that spans the whole I00-I99 circulatory chapter. No single ICD-10"
+  },
+  {
+   "check": "diabetes icd10cm blank",
+   "status": "PASS",
+   "detail": "no code, and the blank is explained",
+   "evidence": "AHRQ MEPS Statistical Brief #568 prices adults TREATED FOR DIABETES, which spans E08 through E13. E11 alone is type 2 only, so no single code names the populati"
+  },
+  {
+   "check": "me-cfs G93.32 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G93.32 Myalgic encephalomyelitis/chronic fatigue syndrome | billable=True"
+  },
+  {
+   "check": "me-cfs G93.32 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G93.32 Myalgic encephalomyelitis/chronic fatigue syndrome | billable=True"
+  },
+  {
+   "check": "me-cfs G93.32 first effective",
+   "status": "PASS",
+   "detail": "absent from FY2022, present in FY2023 \u2014 first effective 2022-10-01",
+   "evidence": "absent from the FY2022 file, present in the FY2023 file"
+  },
+  {
+   "check": "pots-dysautonomia G90.A FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G90.A Postural orthostatic tachycardia syndrome [POTS] | billable=True"
+  },
+  {
+   "check": "pots-dysautonomia G90.A FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G90.A Postural orthostatic tachycardia syndrome [POTS] | billable=True"
+  },
+  {
+   "check": "pots-dysautonomia G90.A first effective",
+   "status": "PASS",
+   "detail": "absent from FY2022, present in FY2023 \u2014 first effective 2022-10-01",
+   "evidence": "absent from the FY2022 file, present in the FY2023 file"
+  },
+  {
+   "check": "fibromyalgia M79.7 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M79.7 Fibromyalgia | billable=True"
+  },
+  {
+   "check": "fibromyalgia M79.7 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M79.7 Fibromyalgia | billable=True"
+  },
+  {
+   "check": "fibromyalgia M79.7 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "endometriosis N80 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N80 Endometriosis | billable=False"
+  },
+  {
+   "check": "endometriosis N80 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N80 Endometriosis | billable=False"
+  },
+  {
+   "check": "endometriosis N80 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "sickle-cell D57 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D57 Sickle-cell disorders | billable=False"
+  },
+  {
+   "check": "sickle-cell D57 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D57 Sickle-cell disorders | billable=False"
+  },
+  {
+   "check": "sickle-cell D57 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "undiagnosed icd10cm blank",
+   "status": "PASS",
+   "detail": "no code, and the blank is explained",
+   "evidence": "There is no ICD-10-CM code for not yet having a diagnosis. R69, \"Illness, unspecified\", is a code for an unspecified illness, not for a search; using it here wo"
+  },
+  {
+   "check": "long-covid publisher",
+   "status": "PASS",
+   "detail": "government publication = False, and the price row says the same",
+   "evidence": "Neba R, Pedaprolu LS, Neba B, Sambamoorthi U. Long COVID Is Associated with Excess Direct Healthcare Expenditures Among "
+  },
+  {
+   "check": "long-covid figure",
+   "status": "PASS",
+   "detail": "read in Neba et al., Healthcare (Basel) 2025;13(21):2704 \u2014 secondary analysis of MEPS 2022: the point estimate 4098 and the 95% CI 1619-6578, in one sentence; the same figures in the results table row",
+   "evidence": "row meps2022-longcovid-excess-total = $4098 (1619-6578), 2022"
+  },
+  {
+   "check": "heart-disease publisher",
+   "status": "PASS",
+   "detail": "government publication = True, and the price row says the same",
+   "evidence": "AHRQ, MEPS Statistical Brief #562: Healthcare Expenditures for Heart Disease among Adults Aged 18 and Older, 2022 (July "
+  },
+  {
+   "check": "heart-disease figure",
+   "status": "PASS",
+   "detail": "read in AHRQ MEPS Statistical Brief #562: the mean, $4,900 per adult; the median, $660, which the row also carries",
+   "evidence": "row meps2022-benchmark-heart-disease = $4900, 2022"
+  },
+  {
+   "check": "diabetes publisher",
+   "status": "PASS",
+   "detail": "government publication = True, and the price row says the same",
+   "evidence": "AHRQ, MEPS Statistical Brief #568: Healthcare Expenditures for Diabetes Among Adults Aged 18 and Older, 2021-2022 (Decem"
+  },
+  {
+   "check": "diabetes figure",
+   "status": "PASS",
+   "detail": "read in AHRQ MEPS Statistical Brief #568: the mean, $5,810 per adult with treated diabetes",
+   "evidence": "row meps2022-benchmark-diabetes = $5810, 2021-2022"
+  },
+  {
+   "check": "me-cfs asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "pots-dysautonomia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "fibromyalgia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "endometriosis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "sickle-cell asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "undiagnosed asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  }
+ ]
+}

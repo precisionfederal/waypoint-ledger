@@ -1,0 +1,505 @@
+/* ==========================================================================
+   PRODUCT SURFACES — the live parse, the reveal, the hero, the return trip.
+
+   A separate sheet, imported after globals.css, so the design system stays one
+   file and these components can be read in one place. Same tokens, same type,
+   same pill shapes; nothing here shrinks a font or restyles the identity.
+   ========================================================================== */
+
+/* ---------- live parse: chips that appear while a person types ---------- */
+.lp{margin:.25rem 0 0}
+.lp-chips{list-style:none;display:flex;flex-wrap:wrap;gap:.45rem;padding:0;margin:0}
+.lp-chip{display:inline-flex;align-items:center;gap:.5rem;background:var(--accent-soft);
+  border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);border-radius:var(--r-pill);
+  padding:.35rem .8rem;font-size:.95rem;color:var(--ink);animation:lp-in .18s ease-out}
+.lp-chip b{font-family:var(--font-d);font-weight:700}
+.lp-chip .lp-x{font-family:var(--font-m);font-size:.82rem;color:var(--accent-ink)}
+.lp-chip .lp-amt{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;
+  background:var(--surface);border-radius:var(--r-pill);padding:.1rem .55rem;font-size:.88rem;color:var(--ink-2)}
+.lp-chip.is-low{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+.lp-chip .lp-low{font-size:.8rem;font-weight:700;color:var(--warn-ink);text-transform:uppercase;letter-spacing:.04em}
+.lp-chip.is-blank{background:var(--ground-2);border-color:var(--line);border-style:dashed;color:var(--ink-2)}
+.lp-chip.is-blank b{font-family:var(--font-b);font-weight:600}
+.lp-chip.is-blank .lp-amt{background:transparent;color:var(--ink-3);font-family:var(--font-b);font-weight:500;padding-left:0}
+/* care that did not happen: counted, never priced — read as a finding, not a miss */
+.lp-chip.is-blank.is-gap{background:var(--flag-soft);border-color:var(--flag);border-style:solid;color:var(--flag-ink)}
+.lp-chip.is-blank.is-gap b{color:var(--flag-ink)}
+.lp-chip.is-blank.is-gap .lp-amt{color:var(--flag-ink)}
+.lp-coach{font-size:.95rem;color:var(--ink-2);margin:.6rem 0 0}
+.lp-ghost{font-family:var(--font-d);font-weight:700;font-size:.95rem;color:var(--accent-ink);
+  background:var(--accent-soft);border-radius:var(--r-md);padding:.5rem .75rem;margin:0 0 var(--sp-3);
+  font-variant-numeric:tabular-nums}
+@keyframes lp-in{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:none}}
+
+/* ---------- the reveal ---------- */
+.sum-card.main.reveal .big-num{font-variant-numeric:tabular-nums}
+.reveal-sub{font-size:.95rem;color:var(--ink-2);margin:-.2rem 0 .35rem}
+.ver-link{color:var(--ink-3);text-decoration:underline;text-underline-offset:2px}
+.ver-link:hover{color:var(--brand-3)}
+.reveal-compare{margin:.75rem 0 0;padding:.8rem .95rem;border-radius:var(--r-md);
+  background:var(--surface-2);border:1px solid var(--line);color:var(--ink-2);font-size:1rem;line-height:1.5}
+.reveal-compare b{font-family:var(--font-d);font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.reveal-compare .rc-note{display:block;margin-top:.35rem;font-size:.88rem;color:var(--ink-3)}
+.warn-txt{color:var(--warn-ink)}
+
+/* ---------- the hero: the product itself, not a picture of it ---------- */
+.hero-line{font-family:var(--font-d);font-weight:700;font-size:clamp(1.15rem,2vw,1.45rem);
+  line-height:1.3;color:var(--accent-2);margin:0 0 var(--sp-4);max-width:26ch}
+.hero-live{align-self:end;padding-bottom:clamp(2rem,6vw,5rem);position:relative;z-index:1}
+.hl-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);
+  padding:clamp(1.1rem,2.4vw,1.5rem);box-shadow:var(--sh-3);color:var(--ink)}
+.hl-card textarea{width:100%;min-height:5.5rem;font-size:1.02rem;margin-bottom:.6rem}
+.hl-card .lbl{margin-bottom:.4rem}
+.hl-eg-lbl{font-size:.88rem;color:var(--ink-3);margin:.2rem 0 .5rem}
+.hl-eg{list-style:none;padding:0;margin:0 0 .75rem;border-top:1px solid var(--line-2)}
+.hl-eg li{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"said amt" "unit amt";
+  gap:0 .75rem;padding:.5rem 0;border-bottom:1px solid var(--line-2);align-items:center}
+.hl-said{grid-area:said;font-size:.98rem;color:var(--ink)}
+.hl-unit{grid-area:unit;font-size:.82rem;color:var(--ink-3)}
+.hl-eg b{grid-area:amt;font-family:var(--font-d);font-weight:800;font-variant-numeric:tabular-nums;font-size:1.05rem}
+.hl-foot{display:flex;align-items:center;justify-content:space-between;gap:.75rem;flex-wrap:wrap;margin-top:.5rem}
+.hl-total{margin:0;display:flex;flex-direction:column;line-height:1.15}
+.hl-total .lbl{margin:0 0 .15rem}
+.hl-total b{font-family:var(--font-d);font-weight:800;font-size:1.6rem;font-variant-numeric:tabular-nums}
+@media (max-width:900px){.hero-live{padding-bottom:clamp(2rem,8vw,3rem)}.hero-copy{padding-bottom:var(--sp-5)}}
+
+/* ---------- the return trip on /gap: their row, then the count it joined ---------- */
+.gap-back{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:clamp(1rem,2.4vw,1.5rem);margin:var(--sp-5) 0}
+.gap-back h3{font-size:1rem;margin:var(--sp-4) 0 .5rem}
+.gap-back-n{font-size:1.15rem;color:var(--ink);margin:0}
+.gap-back-n b{font-family:var(--font-d);font-weight:800;color:var(--accent-ink)}
+.gap-bars{list-style:none;padding:0;margin:0}
+.gap-bars li{display:grid;grid-template-columns:minmax(7rem,1fr) minmax(4rem,2fr) auto;gap:.75rem;
+  align-items:center;padding:.35rem 0;font-size:.95rem}
+.gb-track{background:var(--ground-2);border-radius:var(--r-pill);height:.65rem;overflow:hidden}
+.gb-fill{display:block;height:100%;background:var(--brand-fill);border-radius:var(--r-pill)}
+.gb-v{font-family:var(--font-d);font-weight:700;font-size:.88rem;color:var(--ink-2);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.gap-counts{list-style:none;padding:0;margin:0}
+.gap-counts li{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem;padding:.4rem 0;
+  border-top:1px solid var(--line-2);font-size:.95rem}
+.gap-counts b{font-family:var(--font-d);font-weight:800;font-variant-numeric:tabular-nums}
+.gap-counts i{font-style:normal;color:var(--ink-3);font-size:.88rem}
+@media (max-width:560px){.gap-bars li{grid-template-columns:1fr auto;grid-template-areas:"l v" "t t"}
+  .gb-l{grid-area:l}.gb-v{grid-area:v}.gb-track{grid-area:t}}
+
+/* ---------- the $0 band now sits directly under the hero ---------- */
+/* Two deep bands in a row read as one long section, so this one carries its own
+   edge and a slightly deeper ground. Same tokens, same identity. */
+.hero + .gap-pitch{
+  background:linear-gradient(180deg,color-mix(in srgb,var(--band) 86%,#000) 0%,var(--band) 55%);
+  border-top:1px solid color-mix(in srgb,var(--accent-2) 30%,transparent)}
+.hero + .gap-pitch .zero-card{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.22)}
+
+/* ==========================================================================
+   BUILD-3 · THE DESIGN PASS — one owner, the whole surface.
+
+   Appended last in the cascade (layout.tsx loads fonts → globals → product), so
+   every rule here refines what is above it and replaces nothing. The identity is
+   unchanged: Bricolage Grotesque display, Figtree body, JetBrains Mono figures,
+   ground #f5f3ee, brand #0e2a3a, accent #0a8f86/#22c1b6, sun #f2b544, pill
+   buttons, both themes. What changes is the reading order, the type floor, and
+   which one thing on each screen is loud.
+   ========================================================================== */
+
+/* ---------- 1. THE TYPE FLOOR ----------------------------------------------
+   Measured before this pass: 69 painted elements on /ledger sat under 13 px,
+   the smallest at 10.9 px (.eyebrow on a phone). Nothing on any screen, in any
+   theme, is under 13 px now. Type is never shrunk to make something fit. */
+.eyebrow,.lbl,.foot-h,.toc-h,.basis,.blank,.conf,.sig-n,.dist-n,.pub-n,
+.ch-date,.act-card .who,.hit-r small,.st-n,.q-n,.rank-n,.sheet-code,
+.sheet-url,.chip b,.bar-l small,.mb-sub{font-size:.8125rem}
+.ledger-table thead th,.sheet-table th,.sheet-meta{font-size:.8125rem}
+.basis{padding:.2rem .55rem;letter-spacing:.01em}
+@media (max-width:720px){
+  .lbl,.eyebrow{font-size:.8125rem;letter-spacing:.08em}
+  .ledger-table thead th{font-size:.8125rem}
+}
+@media (max-width:560px){.eyebrow{font-size:.8125rem}}
+/* Any figure that sits in a column lines up with the figure above it. */
+.ledger-table td,.ledger-table th,.sheet-table td,.sheet-table th,
+.dist-list b,.gap-counts b,.reg-stat p,.kv dd,.formula td,.formula th,
+.hl-eg b,.mb-total,.lp-amt{font-variant-numeric:tabular-nums}
+
+/* ---------- 2. THE HEADER --------------------------------------------------
+   Six nav items in a 1184 px container wrapped every label onto two lines at
+   every desktop width (measured: item height 63 px, one line is 40). The bar
+   gets its own wider container, labels never break, and the menu takes over
+   earlier rather than cramming. */
+header.site .wrap.bar{max-width:82rem}
+.topnav a{white-space:nowrap;padding:.5rem .62rem}
+.topnav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--accent-ink)}
+@media (max-width:1040px){
+  .topnav{position:absolute;left:0;right:0;top:4rem;flex-direction:column;background:var(--surface);
+    border-bottom:1px solid var(--line);padding:.5rem;box-shadow:var(--sh-3);display:none}
+  .topnav.open{display:flex}
+  .topnav a{padding:.7rem .8rem;font-size:1rem}
+  .menu-btn{display:grid}
+  .hide-sm{display:none}
+}
+
+/* ---------- 3. THE REVEAL --------------------------------------------------
+   The most personal number in the product used to carry a light comparison card
+   nested inside the dark one: grey text on a gradient, and a first column four
+   times the height of its neighbours. The number is now alone on its card, and
+   the comparison is a full-width band under the grid, which is where a sentence
+   that long can actually be read. */
+.sum-grid{grid-template-columns:1.7fr 1fr 1fr 1fr;align-items:stretch}
+.sum-card{display:flex;flex-direction:column;justify-content:flex-start}
+.sum-card.main{padding:1.4rem 1.6rem;position:relative;overflow:hidden}
+.sum-card.main::after{content:"";position:absolute;inset:auto -20% -60% 40%;height:120%;
+  background:radial-gradient(50% 50% at 50% 50%,rgba(34,193,182,.25),transparent 70%);pointer-events:none}
+.sum-card.main>*{position:relative;z-index:1}
+.sum-card.main .big-num{font-size:clamp(2.6rem,4.6vw,3.6rem);letter-spacing:-.035em;margin:.1rem 0 .35rem}
+.sum-card.main .lbl{opacity:.92;color:#fff;max-width:24ch}
+.sum-card.main .micro{opacity:.9}
+.sum-card.main .ver-link{color:rgba(255,255,255,.8)}
+.sum-card.main .ver-link:hover{color:#fff}
+.sum-card:not(.main) .lbl{color:var(--ink-3)}
+.sum-card:not(.main) .mid-num{color:var(--ink);font-size:2rem}
+
+/* the one comparison line, full width, under the grid */
+.reveal-band{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:start;
+  background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sun);
+  border-radius:var(--r-lg);padding:1.05rem 1.25rem;margin:0 0 var(--sp-4);box-shadow:var(--sh-1)}
+.reveal-band .rb-mark{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--warn-ink);background:var(--sun-soft);border-radius:var(--r-pill);
+  padding:.3rem .7rem;white-space:nowrap}
+.reveal-band p{margin:0;color:var(--ink-2);font-size:1.05rem;line-height:1.5}
+.reveal-band b{font-family:var(--font-d);font-weight:800;color:var(--ink);
+  font-variant-numeric:tabular-nums;white-space:nowrap}
+.reveal-band .rc-note{display:block;margin-top:.4rem;font-size:.9375rem;color:var(--ink-3)}
+@media (max-width:640px){.reveal-band{grid-template-columns:1fr;gap:.6rem}.reveal-band .rb-mark{justify-self:start}}
+
+/* ---------- 4. THE CONTEXT BAR IS A CONTROL, NOT A CARD -------------------- */
+.ctx-shell{position:relative}
+.ctx-shell::before{content:"";position:absolute;left:0;top:1.15rem;bottom:1.15rem;width:4px;
+  border-radius:var(--r-pill);background:var(--accent);z-index:1}
+.ctx-relabel{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-d);font-weight:700;
+  font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);
+  background:var(--accent-soft);border-radius:var(--r-pill);padding:.25rem .7rem;
+  animation:lp-in .2s ease-out}
+
+/* ---------- 5. THE LEDGER TABLE: ONE MARK PER ROW, NOT A BADGE ZOO ---------
+   A row used to carry a filled basis pill, a filled fit pill and a mono agency
+   tag before the name had finished. The verdict is now a typographic mark — a
+   glyph and small caps in the verdict's own colour, no fill — and the basis and
+   the agency read as text in the sub-line where the provenance belongs. */
+.fit-mark{display:inline-flex;align-items:baseline;gap:.3rem;margin-left:.55rem;
+  font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase;white-space:nowrap;vertical-align:baseline}
+.fit-mark .fm-g{font-size:1em;line-height:1}
+.fm-you{color:var(--good-ink)}
+.fm-ref{color:var(--brand-3)}
+.fm-billed{color:var(--warn-ink)}
+.fm-none{color:var(--flag-ink)}
+.basis{background:transparent;border:1px solid var(--line);color:var(--ink-3);font-weight:700}
+.basis.b-allowed{background:transparent;border-color:color-mix(in srgb,var(--brand-3) 40%,transparent);color:var(--brand-3)}
+.basis.b-payment,.basis.b-total_expenditure{background:transparent;border-color:color-mix(in srgb,var(--accent) 45%,transparent);color:var(--accent-ink)}
+.basis.b-out_of_pocket{background:transparent;border-color:color-mix(in srgb,var(--good) 45%,transparent);color:var(--good-ink)}
+.basis.b-charge{background:transparent;border-color:color-mix(in srgb,var(--flag) 45%,transparent);color:var(--flag-ink)}
+.basis.b-wage{background:transparent;border-color:color-mix(in srgb,var(--warn) 50%,transparent);color:var(--warn-ink)}
+.ledger-table tbody tr:not(.grp):hover{background:var(--surface-2)}
+.ledger-table td.total strong{font-size:1.05rem;font-family:var(--font-d);font-weight:800}
+.li-name{font-size:1.02rem}
+
+/* the locality range, on the row it belongs to */
+.loc-range{display:block;margin-top:.25rem;font-family:var(--font-m);font-size:.8125rem;
+  color:var(--ink-3);white-space:normal;font-weight:400}
+.loc-range b{font-weight:700;color:var(--ink-2)}
+
+/* the return trip: the count that comes back after a thumb */
+.nth-back{display:flex;flex-wrap:wrap;align-items:baseline;gap:.4rem;margin:.5rem 0 0;
+  padding:.45rem .7rem;border-radius:var(--r-md);background:var(--accent-soft);
+  border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);font-size:.9375rem;color:var(--ink-2)}
+.nth-back b{font-family:var(--font-d);font-weight:800;color:var(--accent-ink)}
+.nth-back a{font-weight:600}
+
+/* ---------- 6. A DRAWN RULE BETWEEN THE MONEY AND THE BURDENS -------------- */
+.apart-rule{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:1rem;
+  margin:var(--sp-7) 0 var(--sp-5)}
+.apart-rule span{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.apart-rule::after{content:"";height:0;border-top:2px dashed var(--line)}
+.burden-block{border-top:0;padding-top:0}
+
+/* ---------- 7. THE LEDGER'S BOTTOM BAR (phones) --------------------------- */
+.mobile-bar .mb-sub{color:var(--ink-3)}
+.mobile-bar .mb-acts{flex-direction:row;gap:.5rem;align-items:center}
+@media (max-width:980px){.ledger{padding-bottom:5.5rem}}
+
+/* ---------- 8. THE DRAWER: A REAL MODAL WITH A REAL CLOSE ----------------- */
+.drawer-head .icon-btn{width:2.75rem;height:2.75rem;border:1px solid var(--line);background:var(--surface-2)}
+.drawer-head .icon-btn:hover{background:var(--ground-2);color:var(--ink)}
+.drawer-foot{margin-top:auto;padding:.9rem 1.25rem calc(.9rem + env(safe-area-inset-bottom));
+  border-top:1px solid var(--line-2);background:var(--surface)}
+.drawer-verdict{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.75rem;align-items:start;
+  padding:.85rem 1rem;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--line)}
+.drawer-verdict .dv-g{font-size:1.35rem;line-height:1}
+.drawer-verdict p{margin:0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
+.drawer-verdict strong{color:var(--ink)}
+.cov-blocks{display:flex;flex-direction:column;gap:.75rem}
+.cov-b{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.7rem;padding:.75rem .9rem;
+  border-radius:var(--r-md);border:1px solid var(--line-2);background:var(--surface-2)}
+.cov-b .cb-g{font-family:var(--font-d);font-weight:800;font-size:1rem;line-height:1.4}
+.cov-b h4{margin:0 0 .2rem;font-family:var(--font-d);font-size:.8125rem;font-weight:800;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.cov-b p{margin:0;font-size:.9875rem;line-height:1.55;color:var(--ink-2)}
+.cov-yes{border-color:color-mix(in srgb,var(--good) 35%,transparent)}
+.cov-yes .cb-g,.cov-yes h4{color:var(--good-ink)}
+.cov-no{border-color:color-mix(in srgb,var(--flag) 32%,transparent)}
+.cov-no .cb-g,.cov-no h4{color:var(--flag-ink)}
+.cov-how summary{cursor:pointer;font-family:var(--font-d);font-weight:700;font-size:.9375rem;color:var(--brand-3)}
+.cov-how[open] summary{margin-bottom:.4rem}
+.cov-how p{margin:0 0 .4rem}
+
+/* ---------- 9. THE REGISTER: an open-data product, not a report ----------- */
+.reg-grid{grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}
+.reg-stat{border-left:4px solid var(--accent);display:flex;flex-direction:column;gap:.15rem}
+.reg-stat .big-num{font-size:2.6rem;letter-spacing:-.03em}
+.reg-stat.is-zero{border-left-color:var(--line)}
+.reg-stat.is-zero .big-num{color:var(--ink-4)}
+.reg-stat .big-lab{font-size:.9375rem;color:var(--ink-2);font-weight:600}
+
+.chart{margin:var(--sp-4) 0;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-lg);padding:1.1rem 1.25rem;box-shadow:var(--sh-1)}
+.chart svg{display:block;width:100%;height:auto}
+.chart figcaption{margin-top:.6rem;font-size:.9375rem;color:var(--ink-3);line-height:1.5}
+.chart-key{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin:0 0 .75rem;font-size:.8125rem;
+  font-family:var(--font-d);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.chart-key span{display:inline-flex;align-items:center;gap:.45rem}
+.chart-key i{width:.85rem;height:.85rem;border-radius:3px;display:inline-block}
+.k-first{background:var(--brand)}
+.k-last{background:var(--brand-3);opacity:.45}
+.chart-label{font-size:14px;font-weight:600;fill:var(--ink)}
+.chart-val{font-size:13px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.chart-axis{font-size:13px;fill:var(--ink-4);font-variant-numeric:tabular-nums}
+.chart-grid{stroke:var(--line);stroke-width:1}
+.chart-base{stroke:var(--ink-4);stroke-width:1}
+/* the empty chart is an invitation, drawn to the same geometry as the full one */
+.chart.is-empty{border-style:dashed;background:var(--surface-2)}
+.chart.is-empty .chart-label{fill:var(--ink-3)}
+.ghost-bar{fill:var(--line);opacity:.9}
+.chart-invite{display:flex;flex-wrap:wrap;align-items:center;gap:.75rem;margin-top:.75rem}
+.chart-invite p{margin:0;color:var(--ink-2);font-size:1rem}
+
+/* take-the-data: a row of pills was a footer; this is the product */
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15.5rem,1fr));gap:var(--sp-3);margin:var(--sp-4) 0}
+.dl-card{display:flex;flex-direction:column;gap:.3rem;padding:1rem 1.1rem;border:1px solid var(--line);
+  border-radius:var(--r-lg);background:var(--surface);color:var(--ink);text-decoration:none;
+  box-shadow:var(--sh-1);transition:transform .15s,box-shadow .2s,border-color .15s;min-height:44px;
+  font:inherit;text-align:left;cursor:pointer}
+.dl-card:hover{transform:translateY(-2px);box-shadow:var(--sh-2);border-color:var(--brand-3);text-decoration:none}
+.dl-fmt{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--font-m);font-size:.8125rem;
+  font-weight:700;letter-spacing:.06em;color:var(--accent-ink)}
+.dl-card h3{margin:0;font-size:1.05rem}
+.dl-card p{margin:0;font-size:.9375rem;color:var(--ink-3);line-height:1.45}
+
+/* ---------- 10. FORMS: one column, calm, generous ------------------------- */
+.q legend,.q .field>span:first-child{max-width:52ch}
+.choice{min-height:52px}
+.choice.on{box-shadow:inset 0 0 0 1px var(--brand)}
+.rank-chip{min-height:48px}
+.q-num input{min-height:48px;font-size:1.05rem}
+.field select,.field input,.field textarea{min-height:48px}
+.form-err{display:flex;gap:.55rem;align-items:flex-start;margin:.5rem 0 0;padding:.6rem .8rem;
+  border-radius:var(--r-md);background:var(--flag-soft);
+  border:1px solid color-mix(in srgb,var(--flag) 35%,transparent);color:var(--flag-ink);font-size:.9375rem}
+.q-optional summary{min-height:44px;display:flex;align-items:center}
+
+/* ---------- 11. PHONES ---------------------------------------------------- */
+/* /sheet's table is a printable document on a desktop and a stack on a phone.
+   Measured before this pass: 605 px of table in a 390 px viewport. */
+@media (max-width:720px){
+  .sheet-table{display:block}
+  .sheet-table thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%)}
+  .sheet-table tbody,.sheet-table tr,.sheet-table td{display:block;width:100%}
+  .sheet-table tr{border-bottom:1px solid var(--line);padding:.7rem 0}
+  .sheet-table td{border:0;padding:.1rem 0}
+  .sheet-table td[data-label]::before{content:attr(data-label) " ";font-family:var(--font-d);
+    font-size:.8125rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-4);
+    margin-right:.4rem}
+  .sheet-table td.num{text-align:left}
+  .sheet-tools .btn{flex:1 1 auto}
+  /* the smallest controls on the page, at a thumb's size */
+  .btn.small,.btn.sm{min-height:44px;padding:.55rem 1.1rem}
+  .chip{min-height:44px;padding:.5rem .6rem .5rem .95rem}
+  .link-btn{min-height:44px;display:inline-flex;align-items:center}
+  .tabs button{min-height:44px}
+  .stepper-n button{width:2.75rem;height:2.75rem}
+  .stepper-n input{height:2.75rem;width:3.25rem}
+  .icon-btn{width:2.75rem;height:2.75rem}
+  .sum-card.main .big-num{font-size:2.5rem}
+  .apart-rule{margin:var(--sp-6) 0 var(--sp-4)}
+}
+
+/* ---------- 12. MOTION ----------------------------------------------------
+   Purposeful, under 400 ms except the 900 ms count-up, and every one of them is
+   switched off by the reduce block in globals.css. */
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.reveal-band{animation:rise .3s ease-out}
+.nth-back{animation:rise .25s ease-out}
+.dl-card:active{transform:translateY(0)}
+
+/* The comparison paragraph carries its own card styling for the in-card path;
+   inside the band the band is the card, so the paragraph is plain text. */
+.reveal-band .reveal-compare{background:none;border:0;padding:0;margin:0;
+  font-size:1.05rem;line-height:1.5;color:var(--ink-2);border-radius:0}
+
+/* A <details> is not a two-column grid: the how-it-was-made block stacks. */
+.cov-b.cov-how{display:block}
+.drawer{display:flex;flex-direction:column}
+.drawer-body{flex:1 1 auto}
+
+/* ---------- 13. THE FIRST FIVE SECONDS ------------------------------------
+   A sentence, a priced ledger, and the reason to believe it — in the hero, on
+   the first screen, with no instruction. The citation is not a footnote here;
+   it is the third thing the eye lands on. */
+.hl-cited{display:flex;align-items:center;gap:.45rem;margin:.35rem 0 .75rem;padding-top:.6rem;
+  border-top:1px solid var(--line-2);font-family:var(--font-d);font-weight:700;font-size:.9375rem;
+  letter-spacing:.01em;color:var(--accent-ink)}
+.hl-cited svg{flex:none}
+.hl-src{font-family:var(--font-m);font-style:normal;font-size:.8125rem;font-weight:700;letter-spacing:.05em;
+  color:var(--accent-ink);background:var(--accent-soft);border-radius:var(--r-pill);padding:.05rem .45rem;
+  margin-right:.45rem}
+.hl-unit{display:flex;align-items:baseline;flex-wrap:wrap}
+
+/* the trust strip names the bodies, and counts what each of them published */
+.trust-row{gap:.75rem 2rem;justify-content:space-between}
+.trust-pub{display:flex;flex-direction:column;line-height:1.25;font-family:var(--font-d);font-weight:700;
+  font-size:.9375rem;color:var(--ink-2)}
+.trust-pub em{font-style:normal;font-family:var(--font-m);font-size:.8125rem;font-weight:500;
+  color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:.15rem}
+@media (max-width:860px){.trust-row{justify-content:flex-start;gap:.9rem 1.5rem}}
+
+/* The label on the reveal is a human sentence, so it is set as one: sentence
+   case at reading size, not a 13 px accounting header in three shouted lines. */
+.sum-card.main .lbl{text-transform:none;letter-spacing:0;font-size:1rem;font-weight:700;
+  max-width:none;line-height:1.35;margin-bottom:.15rem}
+
+/* The bottom bar carries the total and the one thing worth taking away. Two
+   buttons did not fit at 390 px and clipped the first one. */
+.mobile-bar{gap:.75rem}
+.mobile-bar>div:first-child{min-width:0;flex:1 1 auto}
+.mobile-bar .btn{flex:0 0 auto;max-width:60vw}
+.mobile-bar .mb-total{line-height:1.15}
+/* the toast has to clear a two-line bar, not a one-line one */
+@media (max-width:980px){.toasts{bottom:6.75rem}}
+
+/* ---------- 14. ONE FAMILY: every form page reads the same way -------------
+   Four pages raised an error in three different shapes — a bare orange line on
+   two of them, a warn notice on a third. An error now looks the same wherever
+   it happens, is announced, and says what to do next. */
+.match-note.miss,.notice.warn[role="alert"]{
+  display:flex;gap:.55rem;align-items:flex-start;margin:.75rem 0 0;padding:.7rem .9rem;
+  border-radius:var(--r-md);background:var(--flag-soft);
+  border:1px solid color-mix(in srgb,var(--flag) 35%,transparent);
+  color:var(--flag-ink);font-size:1rem;line-height:1.5}
+.match-note.miss::before,.notice.warn[role="alert"]::before{
+  content:"!";flex:none;display:grid;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;
+  background:var(--flag);color:#fff;font-family:var(--font-d);font-weight:800;font-size:.9rem}
+.notice.warn[role="alert"] p{margin:0}
+.match-note{font-size:1rem}
+
+/* One column, one measure. A form is read down a single line of sight. */
+.step .wrap>.card,.step .wrap>form,.q,.gap-prompt,.gap-why,.gap-eg{max-width:52rem}
+.survey .sub,.register .sub,.page-h1-sub{max-width:60ch}
+.gap-note,.q-optional{max-width:52rem}
+
+/* Every page in the family carries one visible h1 and one lede, at one size. */
+.page-h1{font-family:var(--font-d)}
+.prose>p:first-of-type{font-size:1.1rem;color:var(--ink-2)}
+
+/* Cards and panels share one radius, one border and one shadow across pages. */
+.dist,.reg-stat,.reg-routes,.pub-block,.sos-card,.toc,.gap-back{box-shadow:var(--sh-1)}
+
+/* ---------- 15. CORRECTIONS FOUND BY MEASURING ----------------------------
+   Every rule below closes something a measurement caught, not something that
+   looked wrong in a screenshot. */
+
+/* The four-column summary grid is a DESKTOP rule. Written unscoped it landed
+   after globals' @media (max-width:900px) 2-column rule and won on source
+   order, which put a 422 px grid in a 390 px phone. */
+@media (min-width:901px){.sum-grid{grid-template-columns:1.7fr 1fr 1fr 1fr;align-items:stretch}}
+@media (max-width:900px){.sum-grid{grid-template-columns:1fr 1fr}.sum-card.main{grid-column:1/-1}}
+
+/* Type floor, the last two under it: the context bar's own labels and the
+   tables inside long-form prose. */
+.prose table{font-size:1rem}
+.prose td,.prose th{font-size:.9375rem}
+.prose code,.prose .mono,.prose td code{font-size:.9em}
+
+/* Targets a thumb can hit. Inline links inside running prose keep their line
+   box (WCAG 2.5.8 exempts them); everything that is a control does not. */
+@media (max-width:720px){
+  .foot-grid a{min-height:44px;display:flex;align-items:center;padding:.35rem 0}
+  .faq summary{min-height:44px}
+  .brand{min-height:44px}
+  .menu-btn{width:2.75rem;height:2.75rem}
+  .ledger-table .li-name{min-height:44px;display:flex;align-items:center}
+  .cite-btn,.dl-card{min-height:44px}
+  .stepper li a{min-height:44px}
+  .q-optional summary,.faq summary{padding-top:.35rem;padding-bottom:.35rem}
+}
+
+/* ---- §16 THE LAST TWO MEASUREMENTS (read off the demo frames) ---- */
+/* the locality range kept the money and the place together, never orphaned */
+.loc-range .lr-c{white-space:nowrap}
+@media (min-width:981px){
+  .ledger-table td[data-label="Figure"]{min-width:14rem}
+  .ledger-table td[data-label="Times"]{width:4.5rem}
+}
+
+/* ---------- 17. THE FIRST SCREEN, AND A PAGE WITH AN END (BUILD-6) ---------
+   Every rule here closes something that was measured on the running product,
+   not something that looked wrong in a screenshot. Nothing above this line
+   changed; no type was shrunk anywhere in this block. */
+
+/* THE LINE THAT TRAVELS. It sits directly under the number because it is the
+   sentence a person repeats out loud — four years, twenty-seven appointments —
+   and the number is the evidence for it, not the other way round. */
+.odyssey{font-family:var(--font-d);font-weight:700;font-size:1.2rem;line-height:1.45;
+  color:var(--ink);margin:calc(var(--sp-4) * -1 + .25rem) 0 var(--sp-4);max-width:62ch;
+  padding-left:.9rem;border-left:3px solid var(--accent)}
+@media (max-width:720px){.odyssey{font-size:1.0625rem;margin-top:.35rem}}
+
+/* ONE PRIMARY ACTION. The rest are named, not deleted: a disclosure that reads
+   like a sentence, at a thumb's height, and it opens in place. */
+.more-ways,.more-block{margin:0}
+.more-ways>summary,.more-block>summary{cursor:pointer;list-style:none;
+  font-family:var(--font-d);font-weight:700;color:var(--brand-ink);
+  display:flex;gap:.5rem;align-items:baseline;min-height:44px;padding:.5rem 0}
+.more-ways>summary::-webkit-details-marker,.more-block>summary::-webkit-details-marker{display:none}
+.more-ways>summary::before,.more-block>summary::before{content:"›";font-size:1.25em;line-height:1;
+  transition:transform .18s ease-out;flex:none}
+.more-ways[open]>summary::before,.more-block[open]>summary::before{transform:rotate(90deg)}
+.more-ways>summary{font-size:1rem}
+.mw-body{display:flex;flex-direction:column;gap:.6rem;padding-top:.35rem}
+.mw-body .row{gap:.5rem}
+
+/* The folded blocks below the table carry their own finding in the summary, so
+   a reader who never opens them still leaves with the sentence. */
+.more-block{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  margin:var(--sp-4) 0;padding:.2rem 0}
+.more-block>summary{font-size:1.0625rem;line-height:1.45;color:var(--ink);padding:.75rem 0}
+.more-block>summary b{font-weight:800}
+.sos-fold>summary b{display:block;color:var(--brand-ink)}
+.sos-fold>summary{flex-direction:row}
+@media (max-width:720px){.more-block>summary{font-size:1rem}}
+
+/* THE KEYBOARD SHORTCUT OUT OF THE CATALOGUE. Invisible until it has focus,
+   then a real control at a real size — the pattern the skip link already uses. */
+.skip-inline{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.skip-inline:focus,.skip-inline:focus-visible{position:static;width:auto;height:auto;overflow:visible;
+  clip-path:none;display:inline-flex;align-items:center;min-height:44px;margin:.4rem 0;
+  padding:.35rem .9rem;border-radius:var(--r-pill);background:var(--accent-soft);
+  color:var(--accent-ink);font-family:var(--font-d);font-weight:700;text-decoration:none}
+
+/* THE NUMBER IS ON THE FIRST SCREEN, AT EVERY WIDTH.
+   Measured before: the total's top sat at y = 1004 px in an 860 px viewport,
+   under a full-height three-question panel, so the count-up played where nobody
+   could see it. The panel is now one line (components/ContextBar.tsx) and the
+   page furniture above it is tightened — no type was made smaller. */
+.ledger .ctx-shell{margin-bottom:var(--sp-3)}
+.page>.wrap>h1+.sub{margin-bottom:var(--sp-3)}

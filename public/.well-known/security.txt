@@ -1,0 +1,11 @@
+# Waypoint Ledger — Precision Federal LLC, Ames, Iowa.
+# If you find a way to forge the register's count, read something private, or
+# make this site serve a number that is not on a published federal row, please
+# tell us. We will answer, we will credit you if you want that, and we will
+# publish what changed on /register.
+
+Contact: mailto:bo@precisionfederal.com
+Expires: 2027-09-09T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://waypoint-ledger.pages.dev/.well-known/security.txt
+Policy: https://waypoint-ledger.pages.dev/integrity

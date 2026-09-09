@@ -1,0 +1,27 @@
+{
+  "name": "Waypoint Ledger",
+  "short_name": "Waypoint",
+  "description": "Prices one person's diagnostic journey from published U.S. federal figures and cites every one. Never invents a number.",
+  "id": "/",
+  "start_url": "/journey",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#f5f3ee",
+  "theme_color": "#0e2a3a",
+  "categories": ["health", "medical", "finance", "utilities"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ],
+  "shortcuts": [
+    { "name": "Price a journey", "short_name": "New journey", "url": "/journey", "description": "Describe the visits and tests you had and see what they cost." },
+    { "name": "My ledger", "short_name": "Ledger", "url": "/ledger", "description": "The itemized, cited total of the journey in this browser." },
+    { "name": "Appointment sheet", "short_name": "Sheet", "url": "/sheet", "description": "One printed page to bring to the next appointment." }
+  ]
+}

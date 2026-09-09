@@ -1,0 +1,68 @@
+# ==========================================================================
+# CI — the three gates a stranger can watch go green.
+#
+# /adopt tells an agency they can run this themselves. This is the file that
+# makes that sentence checkable on the day the repository is public: every push
+# and every pull request runs the same three commands a person runs on their
+# own laptop, on a clean machine, from a lockfile.
+#
+# It is deliberately the LOCAL half of scripts/deploy.sh (types, tests, build)
+# and nothing more. The deploy gate also stands up wrangler with local D1 and
+# runs verify-live.sh and the Playwright end-to-end against it; that needs a
+# browser and Cloudflare credentials, so it stays with the human who deploys.
+# A green badge here means: this commit compiles, its 600-plus tests pass, and
+# it produces the static export the site is served from.
+# ==========================================================================
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: types · tests · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # npm ci, not npm install: the lockfile is the claim, and a build that
+      # quietly resolves a different tree is not the build anyone reviewed.
+      - name: install
+        run: npm ci
+
+      - name: types
+        run: npx tsc --noEmit -p .
+
+      - name: tests
+        run: npm test
+
+      # The privacy page is generated from the D1 migrations, the write-path
+      # validators and the CSV header. If a column has no plain-English line,
+      # this fails — which is the whole reason the page can be trusted.
+      - name: the static export (privacy page included)
+        run: npm run build:static
+
+      - name: the export carries what the live gate asks for
+        run: |
+          set -e
+          for f in index.html build.json robots.txt integrity/index.html \
+                   register/index.html method/index.html data/dictionary.csv; do
+            test -e "cf/out/$f" || { echo "MISSING cf/out/$f"; exit 1; }
+          done
+          echo "every published path is in the export"

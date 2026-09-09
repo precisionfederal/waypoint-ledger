@@ -1,0 +1,12 @@
+{
+  "what": "One verbatim ExplanationOfBenefit search Bundle from the Blue Button 2.0 API's own published OpenAPI specification. Synthetic beneficiary data, published by CMS; no real person is in it.",
+  "example_key": "components.examples.V2FhirExplanationOfBenefitExample.value",
+  "spec_url": "https://s3.amazonaws.com/bb-impl-content-cms-gov/static/openapi.yaml",
+  "spec_served_by": "https://sandbox.bluebutton.cms.gov/docs/openapi",
+  "spec_sha256": "4dc935575de737aafe30b6732791d5a64cf209be82e17a138a664a26fa9b3a57",
+  "fixture_sha256": "ef1491e9fc503ad93b70c3793a801994ea670d115f02dbbe560bb0648d07b686",
+  "downloaded_utc": "2026-09-09T18:37:22Z",
+  "fhir_version": "4.0.1 (R4), per https://sandbox.bluebutton.cms.gov/v2/fhir/metadata",
+  "eob_count": 10,
+  "note": "Not edited. Any change to this file breaks tests/bluebutton.test.ts, which re-checks the sha256."
+}

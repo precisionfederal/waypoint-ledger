@@ -1,0 +1,22 @@
+file,field,type,values,note
+survey.csv,received_at,ISO 8601 UTC timestamp,when the response was recorded,no other timing information is kept
+survey.csv,channel,string,"recruitment channel slug, or ""direct""",the ?c= parameter on the link the respondent used; published so the sample can be read as the sample it is
+survey.csv,rank_1 … rank_5,enum,oop | time | work | unpaid | forgone,"Thinking about the whole time you were looking for a diagnosis, rank these from heaviest to lightest."
+survey.csv,unasked,enum,oop | time | work | unpaid | forgone | all-asked,Which one of the five did no one ever ask you about?
+survey.csv,lead,enum,oop | time | work | unpaid | forgone,"If a tool could show you one number about that time, which of the five should it lead with?"
+survey.csv,decide,enum,patients | clinicians | researchers | reader,Who should decide how these are weighed when a total is reported?
+survey.csv,clinicians,integer 0–99 or blank,count,"How many different clinicians did you see before a diagnosis, or so far?"
+survey.csv,ctx_age,enum or blank,18–29 | 30–44 | 45–64 | 65 or older,optional self-description: Age
+survey.csv,ctx_insurance,enum or blank,Employer plan | Marketplace or individual plan | Medicaid | Medicare | Uninsured | Other or mixed,optional self-description: Coverage during the search
+survey.csv,ctx_region,enum or blank,Northeast | Midwest | South | West | Outside the U.S.,optional self-description: Region
+survey.csv,ctx_stage,enum or blank,Still searching | Diagnosed | Stopped looking,optional self-description: Where you are now
+corrections.csv,received_at,ISO 8601 UTC timestamp,,
+corrections.csv,price_id,string,row identifier in the published price table,joins to the table on /method
+corrections.csv,verdict,enum,right | wrong,the thumb on that ledger line
+corrections.csv,believed_usd,number or blank,dollars,"what the person says they actually paid; a demand signal about the published figure, never used to price a ledger"
+corrections.csv,table_version,string,,the price-table version the thumb was given against
+gap.csv,received_at,ISO 8601 UTC timestamp,,
+gap.csv,care-not-sought … life-lost,integer or blank,"occasions, times or months as labelled on /gap","events that produce zero rows in MEPS, HCUP and CMS claims"
+gap.csv,rank_1 … rank_6,enum or blank,gap category ids,"the order the person put them in, most costly first"
+"survey.csv, gap.csv",ctx_state,enum or blank,"56 options: the 50 states, the District of Columbia and the five U.S. territories","Optional. On the published register any state cell holding fewer than 11 responses is withheld, because a count of one or two people in a named place can identify a person; the number of withheld cells and the responses they hold are published instead. The raw export carries the value as entered."
+all files,(absent),,,"no name, no date of birth, no diagnosis, no IP address, no cookie, no free text. Free-text notes are held but never exported."

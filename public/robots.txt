@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Nothing here is behind a login and nothing here is a person. The register,
+# the price table and the method pages are meant to be read, cited and crawled.
+Disallow: /admin
+Disallow: /api/admin/
+
+# The open data, described the way data.gov harvests it. Everything below is a
+# whole published file with its provenance; nothing in it is a person.
+# Catalog: https://waypoint-ledger.pages.dev/data.json  (DCAT-US v1.1)
+# Source:  https://waypoint-ledger.pages.dev/waypoint-ledger-source.tar.gz
+# Licence: https://waypoint-ledger.pages.dev/LICENSE (code) and /NOTICE (data, CC0 1.0)

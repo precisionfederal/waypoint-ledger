@@ -1,0 +1,46 @@
+Waypoint Ledger
+Copyright 2026 Precision Delivery Federal LLC (d/b/a Precision Federal), Ames, Iowa
+Contact: bo@precisionfederal.com
+
+TWO LICENCES, AND WHICH ONE COVERS WHAT
+---------------------------------------
+
+1. THE SOFTWARE — Apache License, Version 2.0.
+   Everything that is code: app/, components/, lib/, cf/, scripts/, tests/, the
+   build and the migrations. The full text is in LICENSE, and at
+   https://www.apache.org/licenses/LICENSE-2.0
+   You may run it, change it, and run your own version of it. Keep this notice.
+
+2. THE DATA — CC0 1.0 Universal (public domain dedication).
+   Everything that is a figure or a description of one: data/prices.json,
+   data/state-prices.json, data/conditions.json, data/synonyms.json,
+   data/unpriceable.json, everything published under /data/, every CSV and JSON
+   the API exports, and the register's own aggregate counts.
+   https://creativecommons.org/publicdomain/zero/1.0/
+
+   The federal figures themselves are U.S. Government works and are already in
+   the public domain. Our part — the plain-language labels, the synonyms, the
+   coverage statements, the combination rules, the locality derivation and the
+   arrangement of all of it — is dedicated to the public domain as well.
+   Attribution is welcome and is not required.
+
+   How to cite, if you want to: each published file carries its own how_to_cite
+   line. /data.json is the DCAT-US v1.1 catalog that describes all of them.
+
+THIRD-PARTY SOURCES
+-------------------
+
+The dollar figures are read from published U.S. federal files (CMS, AHRQ and
+others named row by row). Every row in data/prices.json carries the file it came
+from, its year, its basis and the population it describes, and
+data/verify_price_table.py re-derives each one from that file and exits non-zero
+if it does not reproduce. Cite the federal source for the figure; cite this
+project for the arrangement.
+
+Third-party npm dependencies keep their own licences; see package.json and the
+licence files under node_modules/ after an install.
+
+NO ENDORSEMENT
+--------------
+
+Nothing here is published by, endorsed by, or on behalf of any federal agency.

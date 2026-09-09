@@ -1,0 +1,152 @@
+{
+ "generated": "2026-09-09",
+ "rows": [
+  {
+   "file": "survey.csv",
+   "field": "received_at",
+   "type": "ISO 8601 UTC timestamp",
+   "values": "when the response was recorded",
+   "note": "no other timing information is kept"
+  },
+  {
+   "file": "survey.csv",
+   "field": "channel",
+   "type": "string",
+   "values": "recruitment channel slug, or \"direct\"",
+   "note": "the ?c= parameter on the link the respondent used; published so the sample can be read as the sample it is"
+  },
+  {
+   "file": "survey.csv",
+   "field": "rank_1 … rank_5",
+   "type": "enum",
+   "values": "oop | time | work | unpaid | forgone",
+   "note": "Thinking about the whole time you were looking for a diagnosis, rank these from heaviest to lightest."
+  },
+  {
+   "file": "survey.csv",
+   "field": "unasked",
+   "type": "enum",
+   "values": "oop | time | work | unpaid | forgone | all-asked",
+   "note": "Which one of the five did no one ever ask you about?"
+  },
+  {
+   "file": "survey.csv",
+   "field": "lead",
+   "type": "enum",
+   "values": "oop | time | work | unpaid | forgone",
+   "note": "If a tool could show you one number about that time, which of the five should it lead with?"
+  },
+  {
+   "file": "survey.csv",
+   "field": "decide",
+   "type": "enum",
+   "values": "patients | clinicians | researchers | reader",
+   "note": "Who should decide how these are weighed when a total is reported?"
+  },
+  {
+   "file": "survey.csv",
+   "field": "clinicians",
+   "type": "integer 0–99 or blank",
+   "values": "count",
+   "note": "How many different clinicians did you see before a diagnosis, or so far?"
+  },
+  {
+   "file": "survey.csv",
+   "field": "ctx_age",
+   "type": "enum or blank",
+   "values": "18–29 | 30–44 | 45–64 | 65 or older",
+   "note": "optional self-description: Age"
+  },
+  {
+   "file": "survey.csv",
+   "field": "ctx_insurance",
+   "type": "enum or blank",
+   "values": "Employer plan | Marketplace or individual plan | Medicaid | Medicare | Uninsured | Other or mixed",
+   "note": "optional self-description: Coverage during the search"
+  },
+  {
+   "file": "survey.csv",
+   "field": "ctx_region",
+   "type": "enum or blank",
+   "values": "Northeast | Midwest | South | West | Outside the U.S.",
+   "note": "optional self-description: Region"
+  },
+  {
+   "file": "survey.csv",
+   "field": "ctx_stage",
+   "type": "enum or blank",
+   "values": "Still searching | Diagnosed | Stopped looking",
+   "note": "optional self-description: Where you are now"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "received_at",
+   "type": "ISO 8601 UTC timestamp",
+   "values": "",
+   "note": ""
+  },
+  {
+   "file": "corrections.csv",
+   "field": "price_id",
+   "type": "string",
+   "values": "row identifier in the published price table",
+   "note": "joins to the table on /method"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "verdict",
+   "type": "enum",
+   "values": "right | wrong",
+   "note": "the thumb on that ledger line"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "believed_usd",
+   "type": "number or blank",
+   "values": "dollars",
+   "note": "what the person says they actually paid; a demand signal about the published figure, never used to price a ledger"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "table_version",
+   "type": "string",
+   "values": "",
+   "note": "the price-table version the thumb was given against"
+  },
+  {
+   "file": "gap.csv",
+   "field": "received_at",
+   "type": "ISO 8601 UTC timestamp",
+   "values": "",
+   "note": ""
+  },
+  {
+   "file": "gap.csv",
+   "field": "care-not-sought … life-lost",
+   "type": "integer or blank",
+   "values": "occasions, times or months as labelled on /gap",
+   "note": "events that produce zero rows in MEPS, HCUP and CMS claims"
+  },
+  {
+   "file": "gap.csv",
+   "field": "rank_1 … rank_6",
+   "type": "enum or blank",
+   "values": "gap category ids",
+   "note": "the order the person put them in, most costly first"
+  },
+  {
+   "file": "survey.csv, gap.csv",
+   "field": "ctx_state",
+   "type": "enum or blank",
+   "values": "56 options: the 50 states, the District of Columbia and the five U.S. territories",
+   "note": "Optional. On the published register any state cell holding fewer than 11 responses is withheld, because a count of one or two people in a named place can identify a person; the number of withheld cells and the responses they hold are published instead. The raw export carries the value as entered."
+  },
+  {
+   "file": "all files",
+   "field": "(absent)",
+   "type": "",
+   "values": "",
+   "note": "no name, no date of birth, no diagnosis, no IP address, no cookie, no free text. Free-text notes are held but never exported."
+  }
+ ]
+}

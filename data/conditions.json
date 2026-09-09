@@ -1,0 +1,209 @@
+{
+ "_README": "The year-ahead panel, as data instead of code. One object per condition. price_row_id points at a row that is already in prices.json, so no figure lives here and nothing new is asserted; the panel renders whatever that row says, with that row's year, population and coverage statement. A condition with price_row_id null renders the absence and sends the person to /gap so the gap is COUNTED rather than filled. Adding a condition is one object — but only after its figure exists as a verified row in prices.json.",
+ "_version": "2026-09-09.2",
+ "_the_distinction_that_must_stay_on_the_face": "These figures are not the same KIND of number and must never be ranked against each other as if they were. An EXCESS figure is what a person spends OVER a comparable person who does not have the condition — the care the condition added. A CONDITION-ATTRIBUTED figure is what was spent on treating that condition, and it excludes everything else the person spent. figure_kind carries which one it is, and the panel prints it.",
+ "_baseline_row_id": "meps2022-population-baseline",
+ "conditions": [
+  {
+   "id": "long-covid",
+   "label": "Long COVID",
+   "also_called": [
+    "post-COVID condition",
+    "PASC",
+    "long haul COVID"
+   ],
+   "icd10cm": "U09.9",
+   "icd10cm_title": "Post COVID-19 condition, unspecified",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": "meps2022-longcovid-excess-total",
+   "figure_kind": "excess",
+   "figure_kind_label": "the EXTRA a person spends in a year, over a comparable adult who never had COVID",
+   "note": "The published figure is an interval, and the interval is the answer. It is not what long COVID costs — it is what a year of it added, after adjusting for age, income, insurance and other conditions.",
+   "definition_caveat": "Long COVID here is self-reported — the person said yes to having had COVID and yes to symptoms lasting three months or more. It is not a U09.9 diagnosis, so it includes people who never got one.",
+   "icd10cm_billable": true,
+   "icd10cm_billable_note": "A code that may be submitted on a claim.",
+   "icd10cm_first_effective": "2021-10-01",
+   "icd10cm_first_effective_evidence": "absent from the FY2021 file, present in the FY2022 file",
+   "figure_is_government_publication": false,
+   "figure_publisher_note": "A peer-reviewed secondary analysis of the federal survey, not a federal publication. The data underneath is AHRQ MEPS 2022; the estimate is the authors’, and we say so wherever we print it."
+  },
+  {
+   "id": "heart-disease",
+   "label": "Heart disease",
+   "also_called": [
+    "treated heart disease",
+    "cardiac disease"
+   ],
+   "icd10cm": null,
+   "price_row_id": "meps2022-benchmark-heart-disease",
+   "figure_kind": "condition_attributed",
+   "figure_kind_label": "what was spent TREATING this condition in a year, per adult being treated for it",
+   "note": "Here as a yardstick. A named, visible, well-funded chronic condition costs about the same per year as the excess attributable to long COVID.",
+   "definition_caveat": "The mean is more than seven times the median for the same population ($660). Most people treated for heart disease spend far less than the mean; a few spend enormously more.",
+   "icd10cm_title": null,
+   "icd10cm_billable": null,
+   "icd10cm_blank_reason": "AHRQ MEPS Statistical Brief #562 prices adults TREATED FOR HEART DISEASE, a clinical category that spans the whole I00-I99 circulatory chapter. No single ICD-10-CM code names that population, so this row carries none.",
+   "figure_is_government_publication": true,
+   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey."
+  },
+  {
+   "id": "diabetes",
+   "label": "Diabetes",
+   "also_called": [
+    "treated diabetes",
+    "type 2 diabetes"
+   ],
+   "icd10cm": null,
+   "price_row_id": "meps2022-benchmark-diabetes",
+   "figure_kind": "condition_attributed",
+   "figure_kind_label": "what was spent TREATING this condition in a year, per adult being treated for it",
+   "note": "A second yardstick. Four fifths of it is prescription drugs — which is exactly why a condition with no approved drug therapy can devastate someone and still measure smaller.",
+   "definition_caveat": "AHRQ states these estimates exclude lost productivity and exclude complication care such as related emergency and hospital use, so they are not comparable to broader cost-of-illness estimates.",
+   "icd10cm_title": null,
+   "icd10cm_billable": null,
+   "icd10cm_blank_reason": "AHRQ MEPS Statistical Brief #568 prices adults TREATED FOR DIABETES, which spans E08 through E13. E11 alone is type 2 only, so no single code names the population the $5,810 came from.",
+   "figure_is_government_publication": true,
+   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey."
+  },
+  {
+   "id": "me-cfs",
+   "label": "ME/CFS (chronic fatigue syndrome)",
+   "also_called": [
+    "myalgic encephalomyelitis",
+    "chronic fatigue syndrome"
+   ],
+   "icd10cm": "G93.32",
+   "icd10cm_title": "Myalgic encephalomyelitis/chronic fatigue syndrome",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "This table carries no published federal figure for a year with ME/CFS. The diagnosis code exists; the price does not.",
+   "definition_caveat": null,
+   "icd10cm_billable": true,
+   "icd10cm_billable_note": "A code that may be submitted on a claim.",
+   "icd10cm_first_effective": "2022-10-01",
+   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file"
+  },
+  {
+   "id": "pots-dysautonomia",
+   "label": "POTS and dysautonomia",
+   "also_called": [
+    "postural orthostatic tachycardia syndrome",
+    "autonomic dysfunction"
+   ],
+   "icd10cm": "G90.A",
+   "icd10cm_title": "Postural orthostatic tachycardia syndrome [POTS]",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "This table carries no published federal figure for a year with POTS. Every test on the way to that diagnosis is priced here; the year is not.",
+   "definition_caveat": null,
+   "icd10cm_billable": true,
+   "icd10cm_billable_note": "A code that may be submitted on a claim.",
+   "icd10cm_first_effective": "2022-10-01",
+   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file"
+  },
+  {
+   "id": "fibromyalgia",
+   "label": "Fibromyalgia",
+   "also_called": [
+    "fibro",
+    "chronic widespread pain"
+   ],
+   "icd10cm": "M79.7",
+   "icd10cm_title": "Fibromyalgia",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "This table carries no published federal figure for a year with fibromyalgia.",
+   "definition_caveat": null,
+   "icd10cm_billable": true,
+   "icd10cm_billable_note": "A code that may be submitted on a claim.",
+   "icd10cm_first_effective": null,
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+  },
+  {
+   "id": "endometriosis",
+   "label": "Endometriosis",
+   "also_called": [
+    "endo"
+   ],
+   "icd10cm": "N80",
+   "icd10cm_title": "Endometriosis",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "This table carries no published federal figure for a year with endometriosis.",
+   "definition_caveat": null,
+   "icd10cm_billable": false,
+   "icd10cm_billable_note": "A CATEGORY heading, not a code that may be submitted on a claim. The billable codes sit under it.",
+   "icd10cm_first_effective": null,
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+  },
+  {
+   "id": "sickle-cell",
+   "label": "Sickle cell disease",
+   "also_called": [
+    "SCD"
+   ],
+   "icd10cm": "D57",
+   "icd10cm_title": "Sickle-cell disorders",
+   "icd10cm_source": "CDC/NCHS, ICD-10-CM code descriptions, FY2026 and FY2027",
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "This table carries no published federal figure for a year with sickle cell disease.",
+   "definition_caveat": null,
+   "icd10cm_billable": false,
+   "icd10cm_billable_note": "A CATEGORY heading, not a code that may be submitted on a claim. The billable codes sit under it.",
+   "icd10cm_first_effective": null,
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+  },
+  {
+   "id": "undiagnosed",
+   "label": "Still looking for a diagnosis",
+   "also_called": [
+    "undiagnosed",
+    "diagnostic odyssey"
+   ],
+   "icd10cm": null,
+   "price_row_id": null,
+   "figure_kind": null,
+   "note": "There is no federal figure for a year spent looking. That is the gap this tool exists to count — the visits and tests below are priced, the search itself is not.",
+   "definition_caveat": null,
+   "icd10cm_title": null,
+   "icd10cm_billable": null,
+   "icd10cm_blank_reason": "There is no ICD-10-CM code for not yet having a diagnosis. R69, \"Illness, unspecified\", is a code for an unspecified illness, not for a search; using it here would put a diagnosis on someone who does not have one."
+  }
+ ],
+ "_when_there_is_no_figure": "We have not found a published federal annual figure for this condition. That is a statement about what we could find, not a claim that none exists anywhere — if you know of one, say so and we will price it and cite it.",
+ "_gap_link": "/gap",
+ "_icd10cm_source": {
+  "what": "Every ICD-10-CM code below was re-read in the code-description file CDC/NCHS publishes for the fiscal year, not typed from memory. The browser a clinician would use is the same data: https://icd10cmtool.cdc.gov/ (NCHS ICD-10-CM Web Application, multi-year edition).",
+  "browser_url": "https://icd10cmtool.cdc.gov/",
+  "files_index_url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/",
+  "field_read": "icd10cm-order-<FY>.txt, columns: order number, code, 1 if the code may be submitted on a claim / 0 if it is a category heading, short description, long description. The long description is what we print.",
+  "checked_against": [
+   {
+    "fiscal_year": 2026,
+    "in_effect": "2025-10-01 through 2026-09-30",
+    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2026/icd10cm-Code%20Descriptions-2026.zip",
+    "member": "icd10cm-order-2026.txt",
+    "sha256": "a852eb91b3344ae38476e63816976ee1eeb94dcced7151118324f060e8499f88",
+    "bytes": 2198159
+   },
+   {
+    "fiscal_year": 2027,
+    "in_effect": "from 2026-10-01",
+    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2027/icd10cm-code-descriptions-2027.zip",
+    "member": "icd10cm-code-descriptions-2027/icd10cm-order-2027.txt",
+    "sha256": "93e3ad6004badf470c55bfe679b748ae88fd9b2b421851e409eec382c7713b9a",
+    "bytes": 2192779
+   }
+  ],
+  "why_two_years": "The FY2027 code set takes effect on 1 October 2026. Every code here is present, billable-or-heading identical, and titled identically in both files, so nothing on this page changes when the code set turns over.",
+  "first_effective_method": "A first-effective date is asserted only where the code is ABSENT from an earlier year file and PRESENT in the year claimed. The earlier files read are FY2021 (icd10cm-codes-order-Jan-2021.zip, sha256 dffa100f5bc7e588cca63257c0da0668094b31ba9812283eba893d082d2e909f), FY2022 (2022/Code Descriptions zip.zip, sha256 bab2b3b041cf4b999f8380f3198c1dd6ca404ba7d5513ec60efc813a97f7c214) and FY2023 (icd10-Order-CodeFiles2023.zip, sha256 a7bfd4511dc154bff96fe0ced5fcd633bd26f997ccd6ae386f5c24595e1789b5). Where a code predates every file we read, we say that instead of inventing a date.",
+  "verified_on": "2026-09-09",
+  "rerun": "python3 data/verify_conditions.py"
+ },
+ "_no_code_is_not_an_oversight": "Some rows here carry no ICD-10-CM code on purpose, and the count is printed from the data rather than written into the prose. AHRQ MEPS prices a CLINICAL CATEGORY (\"adults treated for heart disease\", \"adults treated for diabetes\"), which spans dozens of codes; picking one code to stand for it would misdescribe the population the figure came from. And there is no code for not yet having a diagnosis. A blank we can explain beats a code we cannot defend."
+}

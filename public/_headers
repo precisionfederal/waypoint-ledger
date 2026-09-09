@@ -1,0 +1,13 @@
+# The licence has to READ as a licence. Without an extension Cloudflare Pages
+# serves it as application/octet-stream, which makes a browser download the file
+# instead of showing it, so counsel gets a mystery blob. /LICENSE.txt and
+# /NOTICE.txt exist for the same reason and need no rule.
+/LICENSE
+  Content-Type: text/plain; charset=utf-8
+/NOTICE
+  Content-Type: text/plain; charset=utf-8
+
+# The open-data catalog, so a harvester that checks the type is satisfied.
+/data.json
+  Content-Type: application/json; charset=utf-8
+  Access-Control-Allow-Origin: *

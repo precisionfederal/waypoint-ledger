@@ -1,0 +1,79 @@
+/* ==========================================================================
+   THE APPOINTMENT SHEET, ON PAPER
+
+   The sheet is the artifact the whole flow ends in: the page a person hands a
+   clinician, attaches to a leave request, or files with a disability review.
+   It has to come out of a phone's share sheet as cleanly as out of a desktop
+   print dialog, on Letter, in one or two pages.
+
+   Two rules govern every declaration here:
+   1. NEVER SHRINK TYPE TO FIT. Body copy stays at 11pt. When the sheet is long,
+      what gives is spacing and repetition, never the size of the words.
+   2. NOTHING IS SUMMED ACROSS BASES. The four burden counts print beside the
+      medical total, in their own block, each with its own source line — the
+      same separation the screen keeps.
+   ========================================================================== */
+
+@page { size: Letter; margin: 0.5in; }
+
+@media print {
+  /* Paper is 8.5in wide: the phone's one-card-per-line stack goes back to a
+     table, whatever the CSS pixel width the print context reports. */
+  .sheet-table { display: table !important; width: 100% !important; table-layout: fixed; font-size: 11pt }
+  .sheet-table thead { display: table-header-group !important; position: static !important;
+    width: auto !important; height: auto !important; clip: auto !important; clip-path: none !important; overflow: visible !important }
+  .sheet-table tbody { display: table-row-group !important }
+  .sheet-table tr { display: table-row !important; break-inside: avoid; page-break-inside: avoid; padding: 0 !important; border-bottom: 0 !important }
+  .sheet-table td { display: table-cell !important; width: auto !important; border: 0 !important;
+    border-bottom: 1px solid #bbb !important; padding: .05in .06in .05in 0 !important }
+  .sheet-table td[data-label]::before { content: none !important }
+  .sheet-table td.num, .sheet-table th.num { text-align: right !important }
+  /* six columns, widest to the words a person typed */
+  .sheet-table th:nth-child(1), .sheet-table td:nth-child(1) { width: 26% }
+  .sheet-table th:nth-child(2), .sheet-table td:nth-child(2) { width: 23% }
+  .sheet-table th:nth-child(3), .sheet-table td:nth-child(3) { width: 6% }
+  .sheet-table th:nth-child(4), .sheet-table td:nth-child(4) { width: 19% }
+  .sheet-table th:nth-child(5), .sheet-table td:nth-child(5) { width: 14% }
+  .sheet-table th:nth-child(6), .sheet-table td:nth-child(6) { width: 12% }
+  .sheet-table th { font-size: 11pt; text-transform: none; letter-spacing: 0; color: #000; border-bottom: 1.5px solid #000 }
+
+  /* the page furniture the screen needs and paper does not */
+  .sheet-tools, .sheet .btn, .install-card, .skip { display: none !important }
+  /* Everything that gives here is SPACE. No rule in this file drops below 11pt. */
+  body { line-height: 1.3 }
+  .sheet-head h1 { font-size: 16pt; margin: 0 0 .05in }
+  .sheet-meta { font-size: 11pt; color: #333; margin: 0 }
+  .sheet-total { margin: .1in 0; padding: .09in .13in; break-inside: avoid; page-break-inside: avoid }
+  .sheet-total .total-num { font-size: 20pt; margin: 0 }
+  .sheet-fit { margin: 0 0 .08in; font-size: 11pt }
+  .sheet-total .total-label { font-size: 11pt; margin: 0 0 .04in }
+  .sheet-total-note { font-size: 11pt; max-width: 44ch }
+
+  /* the burdens beside the money: two across, each card whole on one page */
+  /* The block may flow across the fold; a single CARD may not be split. Holding the
+     whole block together pushed it to its own page and left the first page short. */
+  .sheet-burdens { margin: .12in 0 0; padding-top: .08in }
+  .sheet-burdens .sb-grid { display: grid !important; grid-template-columns: 1fr 1fr; gap: .07in .2in; margin-top: .06in }
+  .sb-note { margin-top: .08in }
+  .sheet-burdens article { break-inside: avoid; page-break-inside: avoid; border: 0; border-top: 1px solid #bbb; padding: .07in 0 0 }
+  .sheet-burdens h3, .sheet-gaps h3, .sheet-cols h2 { font-size: 12pt; margin: 0 0 .04in }
+  .sheet-burdens p, .sheet-gaps p, .sheet-gaps li { font-size: 11pt; margin: 0 }
+  /* every one of these titles is printed in full under "Where every figure comes
+     from" at the foot of the sheet; twice on one page is a line a reader pays for */
+  .sheet-burdens .sb-src { display: none }
+  .sb-count { font-size: 13pt; font-weight: 700 }
+  .sheet-gaps { break-inside: avoid; page-break-inside: avoid; margin: .1in 0 0 }
+  .sheet-gaps ul { margin: .04in 0 0; padding-left: .18in }
+
+  .sheet-cols { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: .2in; margin-top: .12in }
+  .sheet-q, .sheet-src { font-size: 11pt; color: #000; padding-left: .16in }
+  .sheet-q li, .sheet-src li { margin-bottom: .05in; break-inside: avoid }
+  .sheet-url { font-size: 11pt; word-break: break-all; color: #333 }
+  /* the service code is the line a clinician checks: it prints at the floor, like everything else */
+  .sheet-code { font-size: 11pt; color: #333 }
+  .sheet-foot { font-size: 11pt; color: #333; margin-top: .1in; padding-top: .05in; break-inside: avoid }
+
+  /* a link a person cannot click is a link they must be able to read */
+  .sheet a { text-decoration: none }
+  h1, h2, h3 { break-after: avoid; page-break-after: avoid }
+}

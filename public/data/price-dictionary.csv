@@ -1,0 +1,37 @@
+file,field,type,note
+price-table.csv,id,text,Stable identifier. Cite a correction against this.
+price-table.csv,label,text,What the unit of care is called in plain words.
+price-table.csv,agency,text,"The federal body that published the figure: CMS, AHRQ, BLS or GSA."
+price-table.csv,agency_program,text,"The program within it, where it matters: AHRQ MEPS, AHRQ HCUP."
+price-table.csv,value_usd,number,The figure. Blank where the row publishes an interval or a ratio instead.
+price-table.csv,out_of_pocket_usd,number,"The person's own share, only where the source publishes one."
+price-table.csv,value_range_low_usd,number,"Low bound of the published interval, where there is one."
+price-table.csv,value_range_high_usd,number,High bound of the published interval.
+price-table.csv,basis,text,What kind of number it is. See basis_legend in the JSON. Never mix bases in a total.
+price-table.csv,attribution,text,gross (all spending on this) or excess (the amount over a comparable person).
+price-table.csv,summable,boolean,FALSE means this figure may never enter an itemized total.
+price-table.csv,mutually_exclusive_with,text,Semicolon-separated ids that must not appear in the same total. __ALL_PER_EVENT_LINES__ means the row already contains every event.
+price-table.csv,bundles_ancillaries,boolean,TRUE means the figure already contains the labs and imaging ordered during the visit.
+price-table.csv,year,text,"The year of the figure, as the source states it."
+price-table.csv,geography,text,The geography the figure describes.
+price-table.csv,population,text,Who is counted in it. This is the field that decides whether it describes you.
+price-table.csv,confidence,text,"VERIFIED read straight off the file; DERIVED the product of figures on the file, formula printed; REPORTED quoted from a published report."
+price-table.csv,code,text,"The billing code, where the figure is code-specific."
+price-table.csv,loinc,text,"The NLM order code for a lab, confirmed against the NLM Clinical Table Search Service. Blank where no single code names the same test."
+price-table.csv,loinc_long_common_name,text,"Exactly what that LOINC code means, as NLM states it."
+price-table.csv,audit_status,text,"PASS, FAIL or UNVERIFIED from data/verify_price_table.py on the date in the header."
+price-table.csv,audit_check,text,How that row was checked.
+price-table.csv,audit_evidence,text,"What the check found, quoted."
+price-table.csv,source_title,text,The exact file or report.
+price-table.csv,source_url,url,Where to open it.
+price-table.csv,plain_language_synonyms,text,Semicolon-separated phrases people actually use for this.
+price-table.csv,coverage_statement,text,"Who the figure describes, who it does not, and how it was made. The long one. Read it."
+price-table.csv,pfs_status_indicator,text,Set only where CMS publishes relative value units for the code and pays nothing for it. N = non-covered service; the row carries no figure on purpose.
+price-table.csv,cy2024_submitted_charge_usd,number,"What providers billed on average for this service in CY2024. CHARGE basis — an alternative measure, never an addition to the allowed amount."
+price-table.csv,cy2024_allowed_usd,number,"What Medicare allowed on average for this service in CY2024, from the same claims row."
+price-table.csv,cy2024_source_file,text,The CMS file both CY2024 figures were read in.
+price-table.csv,cy2024_source_file_sha256,text,SHA-256 of that file as retrieved. The audit re-reads it and fails on a mismatch.
+price-table.csv,cy2024_source_row,text,"The exact row inside that file: geography level, HCPCS code and place of service."
+price-table.csv,cy2024_source_url,url,The dataset page for that file.
+price-table.csv,cy2024_audit_status,text,"PASS, FAIL or UNVERIFIED for the CY2024 figures on this row, from the same audit run as audit_status."
+price-table.csv,alternates_json,json,"Every companion figure carried on this row, as JSON. Each CY2024 figure carries its own file, row, field and SHA-256 in the same object; the rest name the source in their note."
