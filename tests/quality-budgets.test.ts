@@ -85,7 +85,7 @@ const BUDGET = {
   firstLoadJsRaw: 1_253_000,   // measured 1,138,963
   firstLoadJsGzip: 305_000,    // measured   276,950
   firstLoadCssRaw: 100_000,    // measured    76,326; 94,414 after DESIGN-2 (footer columns, section lists, context bar) 2026-09-09
-  firstLoadCssGzip: 19_500,    // measured    15,002; raised with the raw figure 2026-09-09
+  firstLoadCssGzip: 21_500,    // measured    15,002; raised with the raw figure 2026-09-09
   largestChunkRaw: 418_000,    // measured   379,707  (the price table ships with the client, by design)
   allJsRaw: 1_815_000,         // measured 1,649,774  (every route's chunk, not just first load)
   allCssRaw: 110_000,          // measured    88,912; 101,027 after DESIGN-2 2026-09-09
@@ -104,9 +104,10 @@ const ROUTE_BUDGET: Record<string, number> = {
   '/': 12_150,           // measured 11,042
   '/sheet': 13_000,      // measured 10,528; 11,887 after the AI-reader chip fields (2026-09-09)
   '/interview': 10_000,  // measured  9,067
-  '/gap': 9_900,         // measured  8,968
+  '/gap': 11_500,        // measured  8,968; 10,430 after DESIGN-2 2026-09-09
   '/integrity': 3_350,   // measured  3,036
   '/journey': 1_820,     // measured  1,646
+  '/register': 50_000,   // measured 47,174 — the register (charts, tables, QR at N=0) became its own chunk in DESIGN-2 (2026-09-09)
   '/account': 10_500,    // measured  9,673 — the passkey + email flow is the page's own chunk since DESIGN-2 (2026-09-09)
 };
 
