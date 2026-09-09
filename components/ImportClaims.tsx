@@ -180,7 +180,7 @@ export default function ImportClaims() {
           {meta?.note && <p className="micro">{meta.note}</p>}
 
           {result.matched.length > 0 && (
-            <div className="table-scroll">
+            <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <caption className="sr-only">Medicare claim lines this table has a published figure for</caption>
                 <thead>

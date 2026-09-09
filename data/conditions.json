@@ -1,6 +1,6 @@
 {
  "_README": "The year-ahead panel, as data instead of code. One object per condition. price_row_id points at a row that is already in prices.json, so no figure lives here and nothing new is asserted; the panel renders whatever that row says, with that row's year, population and coverage statement. A condition with price_row_id null renders the absence and sends the person to /gap so the gap is COUNTED rather than filled. Adding a condition is one object — but only after its figure exists as a verified row in prices.json.",
- "_version": "2026-09-09.2",
+ "_version": "2026-09-09.3",
  "_the_distinction_that_must_stay_on_the_face": "These figures are not the same KIND of number and must never be ranked against each other as if they were. An EXCESS figure is what a person spends OVER a comparable person who does not have the condition — the care the condition added. A CONDITION-ATTRIBUTED figure is what was spent on treating that condition, and it excludes everything else the person spent. figure_kind carries which one it is, and the panel prints it.",
  "_baseline_row_id": "meps2022-population-baseline",
  "conditions": [
@@ -25,7 +25,10 @@
    "icd10cm_first_effective": "2021-10-01",
    "icd10cm_first_effective_evidence": "absent from the FY2021 file, present in the FY2022 file",
    "figure_is_government_publication": false,
-   "figure_publisher_note": "A peer-reviewed secondary analysis of the federal survey, not a federal publication. The data underneath is AHRQ MEPS 2022; the estimate is the authors’, and we say so wherever we print it."
+   "figure_publisher_note": "A peer-reviewed secondary analysis of the federal survey, not a federal publication. The data underneath is AHRQ MEPS 2022; the estimate is the authors’, and we say so wherever we print it.",
+   "sex_note": "CDC/NCHS Household Pulse Survey, 20 August to 16 September 2024: 6.8 percent of women (95% CI 6.2-7.4) and 3.7 percent of men (3.3-4.3) said they were currently experiencing long COVID. Prevalence, not cost — the figure this panel prints is not published by sex.",
+   "sex_note_source": "CDC/NCHS, Household Pulse Survey — Post-COVID Conditions, national estimates by sex, survey period 72 (20 Aug – 16 Sep 2024)",
+   "sex_note_source_url": "https://data.cdc.gov/National-Center-for-Health-Statistics/Post-COVID-Conditions/gsea-w83j"
   },
   {
    "id": "heart-disease",
@@ -44,7 +47,11 @@
    "icd10cm_billable": null,
    "icd10cm_blank_reason": "AHRQ MEPS Statistical Brief #562 prices adults TREATED FOR HEART DISEASE, a clinical category that spans the whole I00-I99 circulatory chapter. No single ICD-10-CM code names that population, so this row carries none.",
    "figure_is_government_publication": true,
-   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey."
+   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey.",
+   "sex_note": null,
+   "sex_note_source": null,
+   "sex_note_source_url": null,
+   "sex_note_blank_reason": "CDC's Heart Disease Facts publishes the share of all deaths caused by heart disease by race and ethnicity, not by sex, and says only that heart disease is the leading cause of death for men and women. Read 9 September 2026 at https://www.cdc.gov/heart-disease/data-research/facts-stats/index.html. No federal split by sex, so none is claimed."
   },
   {
    "id": "diabetes",
@@ -63,7 +70,11 @@
    "icd10cm_billable": null,
    "icd10cm_blank_reason": "AHRQ MEPS Statistical Brief #568 prices adults TREATED FOR DIABETES, which spans E08 through E13. E11 alone is type 2 only, so no single code names the population the $5,810 came from.",
    "figure_is_government_publication": true,
-   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey."
+   "figure_publisher_note": "Published by AHRQ, the federal agency that runs the survey.",
+   "sex_note": null,
+   "sex_note_source": null,
+   "sex_note_source_url": null,
+   "sex_note_blank_reason": "CDC's National Diabetes Statistics Report page publishes national totals and no split by sex. Read 9 September 2026 at https://www.cdc.gov/diabetes/php/data-research/index.html. No federal split by sex was read, so none is claimed."
   },
   {
    "id": "me-cfs",
@@ -82,7 +93,10 @@
    "icd10cm_billable": true,
    "icd10cm_billable_note": "A code that may be submitted on a claim.",
    "icd10cm_first_effective": "2022-10-01",
-   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file"
+   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file",
+   "sex_note": "CDC/NCHS, National Health Interview Survey 2021-2022: 1.7 percent of women and 0.9 percent of men had ME/CFS at the time of interview, against 1.3 percent of all adults. Prevalence, not cost.",
+   "sex_note_source": "NCHS Data Brief No. 488, Myalgic Encephalomyelitis/Chronic Fatigue Syndrome in Adults: United States, 2021–2022, December 2023",
+   "sex_note_source_url": "https://www.cdc.gov/nchs/data/databriefs/db488.pdf"
   },
   {
    "id": "pots-dysautonomia",
@@ -101,7 +115,11 @@
    "icd10cm_billable": true,
    "icd10cm_billable_note": "A code that may be submitted on a claim.",
    "icd10cm_first_effective": "2022-10-01",
-   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file"
+   "icd10cm_first_effective_evidence": "absent from the FY2022 file, present in the FY2023 file",
+   "sex_note": null,
+   "sex_note_source": null,
+   "sex_note_source_url": null,
+   "sex_note_blank_reason": "We have found no federal publication giving POTS prevalence by sex. That is a statement about what we could find, not a claim that none exists — if you know of one, say so and we will read it and cite it."
   },
   {
    "id": "fibromyalgia",
@@ -120,7 +138,10 @@
    "icd10cm_billable": true,
    "icd10cm_billable_note": "A code that may be submitted on a claim.",
    "icd10cm_first_effective": null,
-   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed",
+   "sex_note": "NIH NIAMS says plainly: “Anyone can get fibromyalgia, but more women get it than men.” It publishes a direction and no figure, so this row carries a direction and no figure.",
+   "sex_note_source": "NIH National Institute of Arthritis and Musculoskeletal and Skin Diseases, Fibromyalgia, read 9 September 2026",
+   "sex_note_source_url": "https://www.niams.nih.gov/health-topics/fibromyalgia"
   },
   {
    "id": "endometriosis",
@@ -138,7 +159,10 @@
    "icd10cm_billable": false,
    "icd10cm_billable_note": "A CATEGORY heading, not a code that may be submitted on a claim. The billable codes sit under it.",
    "icd10cm_first_effective": null,
-   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed",
+   "sex_note": "HHS Office on Women's Health: “Researchers think that at least 11% of women, or more than 6 ½ million women in the United States, have endometriosis.” Prevalence, not cost: we have found no published federal annual figure for endometriosis, by sex or otherwise.",
+   "sex_note_source": "HHS Office on Women's Health, Endometriosis, read 9 September 2026",
+   "sex_note_source_url": "https://womenshealth.gov/a-z-topics/endometriosis"
   },
   {
    "id": "sickle-cell",
@@ -156,7 +180,11 @@
    "icd10cm_billable": false,
    "icd10cm_billable_note": "A CATEGORY heading, not a code that may be submitted on a claim. The billable codes sit under it.",
    "icd10cm_first_effective": null,
-   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed"
+   "icd10cm_first_effective_evidence": "present in every year file we read, back to FY2021; older than our earliest file, so no first-effective date is claimed",
+   "sex_note": null,
+   "sex_note_source": null,
+   "sex_note_source_url": null,
+   "sex_note_blank_reason": "CDC's Data and Statistics on Sickle Cell Disease publishes counts and birth prevalence by race and ethnicity, and no split by sex. Read 9 September 2026 at https://www.cdc.gov/sickle-cell/data/index.html."
   },
   {
    "id": "undiagnosed",
@@ -172,7 +200,11 @@
    "definition_caveat": null,
    "icd10cm_title": null,
    "icd10cm_billable": null,
-   "icd10cm_blank_reason": "There is no ICD-10-CM code for not yet having a diagnosis. R69, \"Illness, unspecified\", is a code for an unspecified illness, not for a search; using it here would put a diagnosis on someone who does not have one."
+   "icd10cm_blank_reason": "There is no ICD-10-CM code for not yet having a diagnosis. R69, \"Illness, unspecified\", is a code for an unspecified illness, not for a search; using it here would put a diagnosis on someone who does not have one.",
+   "sex_note": null,
+   "sex_note_source": null,
+   "sex_note_source_url": null,
+   "sex_note_blank_reason": "Not a diagnosis, so there is no published prevalence to split by sex. The only thing this row can be read by sex on is what the register's own respondents say, which is published there as a count with its N."
   }
  ],
  "_when_there_is_no_figure": "We have not found a published federal annual figure for this condition. That is a statement about what we could find, not a claim that none exists anywhere — if you know of one, say so and we will price it and cite it.",
@@ -205,5 +237,6 @@
   "verified_on": "2026-09-09",
   "rerun": "python3 data/verify_conditions.py"
  },
- "_no_code_is_not_an_oversight": "Some rows here carry no ICD-10-CM code on purpose, and the count is printed from the data rather than written into the prose. AHRQ MEPS prices a CLINICAL CATEGORY (\"adults treated for heart disease\", \"adults treated for diabetes\"), which spans dozens of codes; picking one code to stand for it would misdescribe the population the figure came from. And there is no code for not yet having a diagnosis. A blank we can explain beats a code we cannot defend."
+ "_no_code_is_not_an_oversight": "Some rows here carry no ICD-10-CM code on purpose, and the count is printed from the data rather than written into the prose. AHRQ MEPS prices a CLINICAL CATEGORY (\"adults treated for heart disease\", \"adults treated for diabetes\"), which spans dozens of codes; picking one code to stand for it would misdescribe the population the figure came from. And there is no code for not yet having a diagnosis. A blank we can explain beats a code we cannot defend.",
+ "_sex_note_rule": "Each condition carries what a federal source we opened and read says about sex, with the URL and the date it was read, or a written reason for the blank. Every one of these is PREVALENCE, never a dollar: none of the fee schedules we price from carries a sex field — the CMS physician fee schedule, the clinical laboratory fee schedule and the hospital outpatient file price a code, not a person — and no figure in this file is ever adjusted by sex. Where a federal file is silent, the blank says which file was read and where it stops, because a silence in the federal data is a finding about the data. data/verify_conditions.py re-reads every sex_note in its own source and fails if the source no longer says it."
 }

@@ -57,6 +57,14 @@ say()  { printf '%s\n' "$*"; }
 cleanup() {
   if [ -n "$DEV_PID" ] && kill -0 "$DEV_PID" 2>/dev/null; then kill "$DEV_PID" 2>/dev/null; wait "$DEV_PID" 2>/dev/null; fi
   DEV_PID=""
+  # `wrangler pages dev` runs the worker in a workerd CHILD process, and killing
+  # the parent leaves that child holding the port. Measured 2026-09-09: the next
+  # run refused to start because pid 94700 was still on 8841 twenty minutes after
+  # its wrangler had gone. Only this script's own port is ever touched, and only
+  # by the pid that is listening on it — never by a name pattern.
+  local held
+  held="$(lsof -ti "tcp:$PORT" 2>/dev/null)"
+  if [ -n "$held" ]; then kill $held 2>/dev/null; sleep 1; fi
   rm -f "/tmp/wl-restore-$PORT.pid"
 }
 trap cleanup EXIT INT TERM

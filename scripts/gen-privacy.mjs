@@ -142,12 +142,22 @@ const CHAINED_AS = {
   interviews: { received_at: 'received_at', consent: 'consent', channel: 'channel', follow_up: 'follow_up' },
 };
 
+const DEFECT_FROM_TABLE = new Set(['code_system', 'code', 'loinc', 'label', 'published_value_usd', 'basis', 'basis_meaning', 'year', 'geography', 'population', 'agency', 'source_title', 'source_url', 'source_file', 'source_file_url', 'source_file_sha256', 'source_file_retrieved', 'source_kind', 'source_line', 'audit_status', 'audit_check', 'citation_url', 'counted_as_of']);
+const DEFECT_FROM_AGGREGATE = new Set(['figure_confirmed_right', 'figure_flagged_wrong', 'figure_responses', 'figure_fit_rate_pct']);
+
 /** A CSV header (export/[kind].js) -> its column. */
 function csvColumn(table, header, categoryIds) {
   if (header === 'row_hash') return 'row_hash';
   if (/^rank_\d+$/.test(header)) return 'ranking_json';
   if (header.startsWith('ctx_')) return 'context_json';
   if (table === 'gap_reports' && categoryIds.includes(header)) return 'counts_json';
+  if (table === 'corrections') {
+    // The defect report (export/_defect-report.js) joins each correction to the PUBLIC price table by price_id —
+    // code, agency, source file, audit status, citation — and to the public aggregate of verdicts. None of those
+    // columns is a stored field of the correction; they are functions of price_id (public data) or of verdict counts.
+    if (DEFECT_FROM_TABLE.has(header)) return 'price_id';
+    if (DEFECT_FROM_AGGREGATE.has(header)) return 'verdict';
+  }
   return CHAINED_AS[table]?.[header] ?? null;
 }
 
@@ -265,7 +275,9 @@ export async function model(opts = {}) {
   const CSV = { corrections: 'corrections', gap_reports: 'gap', survey_responses: 'survey' };
   for (const [table, kind] of Object.entries(CSV)) {
     exported[table] = new Set();
-    for (const h of M.exportRows(kind, []).split('\n')[0].split(',')) {
+    // A CSV may open with '#' comment lines (the corrections export carries its provenance there); the header is the first non-comment line.
+    const headerLine = M.exportRows(kind, []).split('\n').find((l) => l.trim() && !l.startsWith('#')) ?? '';
+    for (const h of headerLine.split(',')) {
       const col = csvColumn(table, h, M.CATEGORY_IDS);
       if (!col) die(`the ${kind} CSV publishes column "${h}"; teach csvColumn() in scripts/gen-privacy.mjs which database column it comes from.`);
       exported[table].add(col);

@@ -69,6 +69,11 @@ export async function rowHash(prevHash, publishedFields) {
 /** Newest first. `from` is the instrument version at which the field set began. */
 export const SURVEY_PROJECTIONS = [
   {
+    from: '2026-09-09.3',
+    keys: ['age', 'sex', 'insurance', 'region', 'state', 'stage'],
+    note: 'adds sex, asked from this version on after the Federal Sprint Lead for the Invisible Illness track asked every team on 26 August 2026 to be intentional about sex differences where relevant. Chained from this version on, so ctx_sex is never published outside the walk.',
+  },
+  {
     from: '2026-09-09.2',
     keys: ['age', 'insurance', 'region', 'state', 'stage'],
     note: 'adds the state or territory — published in the CSV since the instrument carried it, and chained from this version on.',
@@ -258,8 +263,47 @@ export async function verifyChain(table, rows) {
 export const CSV_TABLE = { corrections: 'corrections', gap: 'gap_reports', survey: 'survey_responses' };
 
 /** Columns deliberately outside the chain, and why. */
+const JOINED_FROM_TABLE = (what) =>
+  'not part of the correction a person sent: ' + what + ', joined at export time from the published '
+  + 'price table and data/AUDIT.json so the file can be routed to the agency without our bundle. '
+  + 'The price table carries its own version, and every figure in it re-derives from the federal file '
+  + 'it cites — see /method.';
+
 export const UNCHAINED_CSV = {
-  corrections: { row_hash: 'the hash itself: a value cannot be inside its own input.' },
+  corrections: {
+    row_hash: 'the hash itself: a value cannot be inside its own input.',
+    /* Everything below describes the FIGURE, never the person or what they said.
+       Each is reproducible by anyone: take price_id, open /api/table/{id}. */
+    code_system: JOINED_FROM_TABLE('the code system the figure is coded in'),
+    code: JOINED_FROM_TABLE('the CPT or HCPCS code the figure prices'),
+    loinc: JOINED_FROM_TABLE('the LOINC code, where the row is a laboratory test'),
+    label: JOINED_FROM_TABLE('the unit of care in plain words'),
+    published_value_usd: JOINED_FROM_TABLE('the published federal figure'),
+    basis: JOINED_FROM_TABLE('what kind of dollar amount the figure is'),
+    basis_meaning: JOINED_FROM_TABLE('what that basis means, in one clause'),
+    year: JOINED_FROM_TABLE('the year the figure describes'),
+    geography: JOINED_FROM_TABLE('the locality the figure describes'),
+    population: JOINED_FROM_TABLE('the population the figure describes'),
+    agency: JOINED_FROM_TABLE('the body that published the figure'),
+    source_title: JOINED_FROM_TABLE('the publication it appears in'),
+    source_url: JOINED_FROM_TABLE('where the agency publishes it'),
+    source_file: JOINED_FROM_TABLE('the federal file the audit read, by its own name'),
+    source_file_url: JOINED_FROM_TABLE('the exact file, not the landing page'),
+    source_file_sha256: JOINED_FROM_TABLE('the SHA-256 of the bytes the audit read'),
+    source_file_retrieved: JOINED_FROM_TABLE('the day those bytes were retrieved'),
+    source_kind: JOINED_FROM_TABLE('whether the source is a federal file, a publication or an article'),
+    source_line: JOINED_FROM_TABLE('the row, table line or arithmetic the figure was re-read from'),
+    audit_status: JOINED_FROM_TABLE('whether the figure reproduced on the audit date'),
+    audit_check: JOINED_FROM_TABLE('the method the audit used'),
+    citation_url: JOINED_FROM_TABLE('the permalink that renders this figure as a correction report'),
+    counted_as_of: 'the day the file was generated: a property of the download, not of any row in it.',
+    /* Counts across the file, recomputable from the verdict column of the rows
+       themselves — which ARE chained. */
+    figure_confirmed_right: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
+    figure_flagged_wrong: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
+    figure_responses: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
+    figure_fit_rate_pct: 'confirmed_right over responses, recomputable from price_id and verdict, both chained.',
+  },
   gap: { row_hash: 'the hash itself: a value cannot be inside its own input.' },
   survey: { row_hash: 'the hash itself: a value cannot be inside its own input.' },
 };
@@ -304,7 +348,8 @@ export const RECIPES = {
     file: '/api/export/corrections.csv',
     projection: ['received_at', 'price_id', 'verdict', 'believed_usd', 'table_version'],
     steps: [
-      'Download the CSV. The rows are in the order they were written, oldest first.',
+      'Download the CSV. The first line begins with # and names the price-table version and the audit; the header is the next line. The rows are in the order they were written, oldest first.',
+      'Use only these five columns. Every other column describes the FEDERAL FIGURE, not the correction, and is joined at export time from the published price table — none of them is inside the hash.',
       'Start with prev_hash = 64 zeros.',
       'For each row build the object {received_at, price_id, verdict, believed_usd, table_version}, using null for an empty believed_usd and for an empty table_version.',
       'Serialize it as JSON with the keys sorted, no whitespace, then take SHA-256 of prev_hash concatenated with that string, lower-case hex.',

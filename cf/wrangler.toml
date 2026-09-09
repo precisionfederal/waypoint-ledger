@@ -12,3 +12,6 @@ binding = "DB"
 database_name = "YOUR-PAGES-PROJECT"        # wrangler pages project create YOUR-PAGES-PROJECT
 database_id = "YOUR_D1_DATABASE_ID"   # wrangler d1 create waypoint-ledger
 migrations_dir = "migrations"
+
+[ai]
+binding = "AI"

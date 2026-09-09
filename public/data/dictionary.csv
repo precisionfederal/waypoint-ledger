@@ -10,13 +10,42 @@ survey.csv,ctx_age,enum or blank,18–29 | 30–44 | 45–64 | 65 or older,optio
 survey.csv,ctx_insurance,enum or blank,Employer plan | Marketplace or individual plan | Medicaid | Medicare | Uninsured | Other or mixed,optional self-description: Coverage during the search
 survey.csv,ctx_region,enum or blank,Northeast | Midwest | South | West | Outside the U.S.,optional self-description: Region
 survey.csv,ctx_stage,enum or blank,Still searching | Diagnosed | Stopped looking,optional self-description: Where you are now
-corrections.csv,received_at,ISO 8601 UTC timestamp,,
-corrections.csv,price_id,string,row identifier in the published price table,joins to the table on /method
-corrections.csv,verdict,enum,right | wrong,the thumb on that ledger line
-corrections.csv,believed_usd,number or blank,dollars,"what the person says they actually paid; a demand signal about the published figure, never used to price a ledger"
-corrections.csv,table_version,string,,the price-table version the thumb was given against
+corrections.csv,received_at,ISO 8601 UTC timestamp,,when the correction was recorded
+corrections.csv,price_id,string,,row identifier in the published price table; joins to /api/table/{id}
+corrections.csv,code_system,CPT | HCPCS | blank,,the code system the row is coded in
+corrections.csv,code,string or blank,,the CPT or HCPCS code the figure prices
+corrections.csv,loinc,string or blank,,"LOINC code where the row is a laboratory test, from the NLM"
+corrections.csv,label,string,,"the unit of care, in the words a person reads on the ledger"
+corrections.csv,published_value_usd,number or blank,,the published federal figure the correction is about
+corrections.csv,basis,enum,,charge | allowed | payment | out_of_pocket | total_expenditure | wage
+corrections.csv,basis_meaning,string,,"what that basis means, in one clause"
+corrections.csv,year,string,,the year the figure describes
+corrections.csv,geography,string,,the locality the figure describes
+corrections.csv,population,string,,the population the figure describes
+corrections.csv,agency,string,,the body that published the figure
+corrections.csv,source_title,string,,"the publication, as the agency titles it"
+corrections.csv,source_url,URL,,where the agency publishes it
+corrections.csv,source_file,string,,"the federal file we read, by its own name"
+corrections.csv,source_file_url,URL,,"the exact file, not the landing page"
+corrections.csv,source_file_sha256,hex,,SHA-256 of the bytes the audit read
+corrections.csv,source_file_retrieved,date,,the day those bytes were retrieved
+corrections.csv,source_kind,string,,federal data file | federal publication | federal web page | peer-reviewed article
+corrections.csv,source_line,string,,"the row, table line or arithmetic the figure was re-read from"
+corrections.csv,audit_status,PASS | FAIL | UNVERIFIED,,whether the figure reproduced from that file on the audit date
+corrections.csv,audit_check,string,,the method the audit used
+corrections.csv,verdict,right | wrong,,the direction of this correction: does the published figure describe this person
+corrections.csv,believed_usd,number or blank,,"what the person said they were billed; a demand signal about the figure, never a price"
+corrections.csv,figure_confirmed_right,integer,,corrections on this figure saying it describes them
+corrections.csv,figure_flagged_wrong,integer,,corrections on this figure saying it does not
+corrections.csv,figure_responses,integer,,the denominator: corrections on this figure in this file
+corrections.csv,figure_fit_rate_pct,integer or blank,,percent of those responses saying the figure fits
+corrections.csv,table_version,string,,the price-table version that was on screen when the thumb was given
+corrections.csv,citation_url,URL,,renders this figure as a paste-ready correction report for the publishing agency
+corrections.csv,counted_as_of,date,,the day this file was generated
+corrections.csv,row_hash,hex or blank,,this row hashed and chained to the row before it; see /api/integrity
 gap.csv,received_at,ISO 8601 UTC timestamp,,
 gap.csv,care-not-sought … life-lost,integer or blank,"occasions, times or months as labelled on /gap","events that produce zero rows in MEPS, HCUP and CMS claims"
 gap.csv,rank_1 … rank_6,enum or blank,gap category ids,"the order the person put them in, most costly first"
+"survey.csv, gap.csv",ctx_sex,enum or blank,Female | Male | Intersex | Prefer not to say,"Optional. The Federal Sprint Lead for the Invisible Illness track asked every team, on 26 August 2026, to be intentional about sex differences where relevant. Asked because the federal prevalence files we cite are published by sex, and because NIH expects sex to be accounted for as a biological variable in the research it funds. Optional. It is published only as a count, and it is joined to nothing. Asked as sex, not gender, because sex is the variable the federal prevalence files cited on /method are published by; NIH NOT-OD-15-102, Consideration of Sex as a Biological Variable in NIH-funded Research, 9 June 2015 sets the framing. ""Prefer not to say"" is a stated answer and is published as one; a blank is published as ""not stated"". On the published register any sex cell holding fewer than 11 responses is withheld under the same rule as the state, and the withheld cells are counted in public."
 "survey.csv, gap.csv",ctx_state,enum or blank,"56 options: the 50 states, the District of Columbia and the five U.S. territories","Optional. On the published register any state cell holding fewer than 11 responses is withheld, because a count of one or two people in a named place can identify a person; the number of withheld cells and the responses they hold are published instead. The raw export carries the value as entered."
 all files,(absent),,,"no name, no date of birth, no diagnosis, no IP address, no cookie, no free text. Free-text notes are held but never exported."

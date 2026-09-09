@@ -100,6 +100,8 @@ else
   # Named separately so the red line says which of the two things is wrong.
   if [ -z "$WV_AT" ]; then
     WV_WHY="no successful write has ever been stamped"
+  elif [ -z "$WV_AFTER" ]; then
+    WV_WHY="a write was stamped ($WV_AT) but it cannot be joined to this build's own timestamp"
   else
     WV_WHY="the last successful write ($WV_AT) is ${WV_AFTER}s from this build, so it belongs to a different artifact than the one answering"
   fi

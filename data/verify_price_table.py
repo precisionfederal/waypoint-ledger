@@ -111,7 +111,11 @@ def file_name(key):
     pull up. `member` is the file inside the zip; `file` overrides it where the
     archive's real member name differs from the pattern we match on."""
     s = SOURCES[key]
-    return s.get('file') or s.get('member') or os.path.basename(s['url'].split('?')[0])
+    if s.get('file') or s.get('member'):
+        return s.get('file') or s['member']
+    # a landing page has no file name; the last real path segment is what it is called
+    parts = [x for x in s['url'].split('?')[0].split('/') if x]
+    return parts[-1] if parts else s['url']
 
 
 def _find_local(member):
@@ -645,9 +649,13 @@ def main():
     for row in items:
         rid, val = row['id'], row['value_usd']
         status = method = evidence = None
+        # which federal file this row was checked against, recorded by the branch that
+        # checked it. The export joins on it, so a correction can name the file.
+        src_key = None
 
         # ---- 1. physician fee schedule, recomputed
         if rvu is not None and 'pfs-relative-value-files' in (row.get('source_url') or ''):
+            src_key = 'rvu'
             code = hcpcs_of(row)
             r = rvu.get(code)
             claimed = row.get('pfs_status_indicator')
@@ -698,6 +706,7 @@ def main():
 
         # ---- 2. clinical laboratory fee schedule, looked up
         elif clfs is not None and 'clinical-laboratory-fee-schedule' in (row.get('source_url') or ''):
+            src_key = 'clfs'
             code = (row.get('code') or '').replace('CPT ', '').strip()
             rate = clfs.get(code)
             if rate is None:
@@ -711,6 +720,7 @@ def main():
 
         # ---- 3. hospital outpatient PPS
         elif rid in OPPS_EXPECT:
+            src_key = 'oppsb'
             code, pay, copay = OPPS_EXPECT[rid]
             rec = (opps or {}).get(code)
             if not rec:
@@ -731,6 +741,7 @@ def main():
                     'Addendum B pays $%.2f; the table says $%s' % (rec['payment'], val)
 
         elif rid == 'cms-ed-99284-complete':
+            src_key = 'oppsb+rvu'
             fac = (opps or {}).get('99284')
             phys = (rvu or {}).get('99284')
             if not fac or not phys:
@@ -750,6 +761,7 @@ def main():
         # ---- 4. the report-derived rows
         elif rid in NARRATIVE:
             key, pat = NARRATIVE[rid]
+            src_key = key
             hit = found(key, pat)
             if hit and val is not None and not re.search(money(val), hit):
                 # the sentence is in the document, but it is not the number on the row
@@ -767,10 +779,13 @@ def main():
                     'the sentence carrying this figure is not in the document: /%s/' % pat
 
         elif rid == 'hcup2021-ed-cost-to-charge-ratio':
+            src_key = 'edccr'
             status, method, evidence = check_hcup_ccr(row)
         elif rid.startswith('meps2022-longcovid'):
+            src_key = 'pmc'
             status, method, evidence = check_pmc(row)
         elif rid == 'bls2025-caregiver-replacement-wages':
+            src_key = 'oews'
             status, method, evidence = check_oews(row)
         else:
             status, method, evidence = 'UNVERIFIED', 'no checker', \
@@ -804,7 +819,7 @@ def main():
                             confidence=row.get('confidence'), agency=row.get('agency_display'),
                             code=row.get('code'), loinc=row.get('loinc'),
                             check=method, evidence=evidence, source_url=row.get('source_url'),
-                            extras=extras))
+                            source_key=src_key, extras=extras))
 
     n = len(results)
     counts = {s: sum(1 for r in results if r['status'] == s) for s in ('PASS', 'FAIL', 'UNVERIFIED')}

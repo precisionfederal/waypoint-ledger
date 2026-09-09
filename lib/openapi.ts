@@ -190,6 +190,21 @@ export const OPENAPI: OpenApiDoc = {
         },
       },
     },
+    '/api/map': {
+      post: {
+        operationId: 'mapStory', tags: ['pricing'],
+        summary: 'AI reads a story into units of care; the published table prices them.',
+        description:
+          'Send `story`. The deterministic rules (the same lib/mapper the browser runs) read it first. Every phrase '
+          + 'they leave blank goes to a model with the catalog\'s ids and labels only; the model may answer with a '
+          + 'catalog id or null, never a figure. Care that was not received and spans of time are decided by the rules '
+          + 'and are never sent to the model. The reply carries ids and labels; price them with POST /api/price or '
+          + 'the public table. `model` names the model that answered, or null when none was reachable and the rules\' '
+          + 'answer stands. Cached by the story\'s SHA-256 for 24 hours.',
+        requestBody: { required: true, content: { 'application/json': { schema: { type: 'object', required: ['story'], properties: { story: { type: 'string', maxLength: 2000 } } } } } },
+        responses: { '200': { description: 'ok, tableVersion, model, filled, refused, segments[] {raw, times, countNote, itemId, label, confidence, reason, gapCategory, months, source (rules|model), why}' }, '400': { description: 'no story' }, '429': { description: 'rate limited' } },
+      },
+    },
     '/api/fhir': {
       post: {
         operationId: 'fhirBundle', tags: ['interoperability'],
@@ -474,9 +489,44 @@ export const OPENAPI: OpenApiDoc = {
       get: {
         operationId: 'exportCsv', tags: ['register'],
         summary: 'The de-identified register as CSV.',
-        description: 'Free-text fields are never exported; interviews are never exported at all. Rows are oldest first. data/dictionary.csv describes every column.',
+        description: 'Free-text fields are never exported; interviews are never exported at all. Rows are oldest first. data/dictionary.csv describes every column. kind=corrections returns the same bytes as /api/export/corrections.csv.',
         parameters: [{ name: 'kind', in: 'path', required: true, schema: { type: 'string', enum: ['corrections', 'gap', 'survey'] } }],
         responses: { 200: { description: 'CSV.', content: { 'text/csv': { schema: { type: 'string' } } } }, ...errors(['404', 'Unknown export.']) },
+      },
+    },
+    '/api/export/corrections.csv': {
+      get: {
+        operationId: 'correctionsCsv', tags: ['register'],
+        summary: 'Corrections to published federal figures, joined to the file each figure came from.',
+        description: 'A defect report an analyst at the publishing agency can route without opening this site. '
+          + 'One row per correction, carrying the price row id, the CPT or HCPCS code and the LOINC code where there is one, '
+          + 'the published figure with its basis, year, geography and population, the federal file by name with its URL, '
+          + 'its SHA-256 and the day it was read, the exact line or arithmetic the figure was re-read from, the audit verdict, '
+          + 'the direction of the correction, the counts and fit rate on that figure, the chained row hash, and a permalink '
+          + 'that renders the figure as a paste-ready correction report. The first line is a comment naming the price-table '
+          + 'version and the audit. Free text is never exported. Column meanings are published at /api/export/corrections.json.',
+        responses: { 200: { description: 'CSV.', content: { 'text/csv': { schema: { type: 'string' } } } }, ...errors(['503', 'The export could not be read right now.']) },
+      },
+    },
+    '/api/export/corrections.json': {
+      get: {
+        operationId: 'correctionsJson', tags: ['register'],
+        summary: 'The same corrections file as JSON, shaped as a DCAT distribution, with its column contract.',
+        description: 'Carries the price-table version, the audit line and date, one entry per column (name, type, meaning), '
+          + 'and every row of the CSV plus the CY2024 companion charge where CMS publishes one for that code — the figure an '
+          + 'uninsured person is billed against — with its file, its SHA-256 and the row it was read from.',
+        responses: {
+          200: ok({
+            type: 'object',
+            properties: {
+              '@type': { type: 'string' }, tableVersion: { type: 'string' }, auditLine: { type: 'string' },
+              auditedOn: { type: 'string' }, countedAsOf: { type: 'string' }, n: { type: 'integer' },
+              columns: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, type: { type: 'string' }, note: { type: 'string' } } } },
+              rows: { type: 'array', items: { type: 'object' } },
+            },
+          }),
+          ...errors(['503', 'The export could not be read right now.']),
+        },
       },
     },
     '/api/openapi.json': {

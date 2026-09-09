@@ -19,7 +19,12 @@
     "deploy": "bash scripts/deploy.sh",
     "deploy:dry": "PF_DEPLOY_DRY=1 bash scripts/deploy.sh",
     "typecheck": "tsc --noEmit -p .",
-    "dictionary": "node scripts/gen-dictionary.mjs"
+    "dictionary": "node scripts/gen-dictionary.mjs",
+    "backup": "bash scripts/backup-d1.sh",
+    "restore:local": "bash scripts/restore-d1.sh",
+    "uptime": "bash scripts/uptime-check.sh",
+    "rollback": "bash scripts/rollback.sh",
+    "audit": "npm audit --omit=dev --audit-level=high && npm audit --audit-level=critical"
   },
   "dependencies": {
     "@simplewebauthn/browser": "13.3.0",
@@ -29,10 +34,10 @@
     "react-dom": "19.0.0"
   },
   "devDependencies": {
-    "@types/node": "^22.20.2",
+    "@types/node": "22.10.5",
     "@types/react": "19.0.7",
     "@types/react-dom": "19.0.3",
-    "ajv": "^8.20.0",
+    "ajv": "8.20.0",
     "typescript": "5.7.3",
     "vitest": "3.2.7",
     "wrangler": "4.130.0"

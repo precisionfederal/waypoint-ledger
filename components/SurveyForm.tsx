@@ -1,14 +1,14 @@
 'use client';
 
 /* ==========================================================================
-   THE SURVEY — five questions, two minutes, one shareable link.
+   THE SURVEY — six questions, two minutes, one shareable link.
    /survey?c=<channel> records the recruitment channel so the published sample
    says where it came from. Ranking is done by tapping in order, heaviest first.
    ========================================================================== */
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { BURDENS, BURDEN_IDS, DECIDERS, QUESTIONS, CONTEXT, CONTEXT_KEYS, SURVEY_VERSION, SMALL_CELL_MIN, type BurdenId, type DeciderId, type ContextKey } from '@/lib/survey';
+import { BURDENS, BURDEN_IDS, DECIDERS, QUESTIONS, CONTEXT, CONTEXT_KEYS, SURVEY_VERSION, SMALL_CELL_MIN, SEX_POLICY, SEX_POLICY_URL, type BurdenId, type DeciderId, type ContextKey } from '@/lib/survey';
 
 export default function SurveyForm() {
   const [ranking, setRanking] = useState<BurdenId[]>([]);
@@ -73,7 +73,7 @@ export default function SurveyForm() {
   return (
     <section className="step survey">
       <div className="wrap narrow">
-        <p className="eyebrow">Two minutes · five questions · nothing identifies you</p>
+        <p className="eyebrow">Two minutes · six questions · nothing identifies you</p>
         <h1>Which cost of looking for a diagnosis weighed most?</h1>
         <p className="sub">
           Federal cost studies decide how to weigh money, time and lost work by analyst judgment. We are asking the people who carried it.
@@ -129,11 +129,38 @@ export default function SurveyForm() {
           </label>
         </fieldset>
 
+        {/* Q6 — asked on the face of the form, not inside the disclosure below.
+            The Federal Sprint Lead for the Invisible Illness track asked every
+            team on 26 August 2026 to be intentional about sex differences where
+            relevant; an ask answered inside a collapsed panel is not an answer.
+            Optional like every context field: "Prefer not to say" is recorded as
+            the stated answer it is, and leaving it alone is recorded as
+            "not stated". Neither is ever filled in for you. */}
+        <fieldset className="q">
+          <legend><span className="q-n">6</span>{CONTEXT.sex.label} <span className="micro">optional</span></legend>
+          <p className="micro">
+            Asked because the federal prevalence files we cite are published by sex, and because NIH expects sex to be accounted for
+            as a biological variable in the research it funds &mdash;{' '}
+            <a href={SEX_POLICY_URL} target="_blank" rel="noopener noreferrer">{SEX_POLICY}</a>. It is published only as a count.
+            Where a federal file is silent on sex, <Link href="/method#sex">/method</Link> says so.
+          </p>
+          <div className="choice-grid">
+            {CONTEXT.sex.options.map((o: string) => (
+              <Choice key={o} name="sex" value={o} label={o} checked={context.sex === o}
+                      onChange={() => setContext((p) => ({ ...p, sex: p.sex === o ? undefined : o }))} />
+            ))}
+          </div>
+          <p className="micro">
+            Published on <Link href="/register">the register</Link> only where at least {SMALL_CELL_MIN} people have given the same answer,
+            under the same rule as the state. Below that it is withheld and the withholding is counted in public.
+          </p>
+        </fieldset>
+
         <details className="q q-optional">
           <summary>Optional: who you are, so the sample can say who it covers</summary>
           <p className="micro">Used only to publish who answered and who did not. Leave any of these blank.</p>
           <div className="ctx-grid">
-            {(CONTEXT_KEYS as ContextKey[]).map((k) => (
+            {(CONTEXT_KEYS as ContextKey[]).filter((k) => k !== 'sex').map((k) => (
               <label key={k} className="field">
                 <span>{CONTEXT[k].label}</span>
                 <select value={context[k] ?? ''} onChange={(e) => setContext((p) => ({ ...p, [k]: e.target.value || undefined }))}>

@@ -459,6 +459,18 @@ export function totalLabels(ctx: Ctx): TotalLabels {
       secondary: null,
     };
   }
+  /* 🔴 NOBODY ANSWERED, SO THE HEADLINE SAYS SO AND SAYS HOW TO CHANGE IT.
+     The largest number on the page used to arrive labelled "What the published
+     Medicare figures add up to" for a visitor who had not been asked anything —
+     honest about the basis, silent about the fact that it is a reference and
+     that one tap re-labels every row. The Change control sits directly above
+     this line, so the label names the basis and points at it. */
+  if (!ctx.coverage) {
+    return {
+      primary: `Medicare allowed amounts${where} — say who pays for your care and this changes`,
+      secondary: null,
+    };
+  }
   return { primary: `What the published Medicare figures add up to${where}`, secondary: null };
 }
 

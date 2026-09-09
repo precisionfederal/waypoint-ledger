@@ -37,7 +37,10 @@ function Header() {
           <AccountLink />
         </nav>
         <div className="bar-right">
-          <Link href={entries.length ? '/ledger' : '/journey'} className="btn primary small hide-sm">{entries.length ? 'Open my ledger' : 'Start'}</Link>
+          {/* "Start" alone is on the list of link texts that tell a screen reader and a
+              crawler nothing. "Start a ledger" is the same 14 characters as the other
+              state of this button, so the bar does not move. */}
+          <Link href={entries.length ? '/ledger' : '/journey'} className="btn primary small hide-sm">{entries.length ? 'Open my ledger' : 'Start a ledger'}</Link>
           <button className="menu-btn" type="button" aria-expanded={open} aria-controls="topnav" aria-label={open ? 'Close the menu' : 'Open the menu'} onClick={() => setOpen((o) => !o)}><Icon.Menu /></button>
         </div>
       </div>

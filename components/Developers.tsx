@@ -372,7 +372,7 @@ export default function Developers() {
         <div className="card">
           <p className="lbl">1 &middot; Price a story</p>
           <p>The same call the site itself makes. One request, one journey, every line traceable.</p>
-          <pre style={pre}><code>{CURL_PRICE}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_PRICE}</code></pre>
           <p className="micro">Real response. Long coverage statements and three further segments are elided, marked with an ellipsis key:</p>
           <pre style={preOut} tabIndex={0} aria-label="Response to the pricing request"><code>{OUT_PRICE}</code></pre>
           <p>
@@ -388,7 +388,7 @@ export default function Developers() {
         <div className="card">
           <p className="lbl">2 &middot; Read one unit of care, with its provenance</p>
           <p>Every row carries who it describes, who it does not, and the rules about adding it to anything else.</p>
-          <pre style={pre}><code>{CURL_TABLE}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_TABLE}</code></pre>
           <pre style={preOut} tabIndex={0} aria-label="Response for one row of the price table"><code>{OUT_TABLE}</code></pre>
           <p>
             <strong>What to notice.</strong> <code>rules.summable</code> and
@@ -403,7 +403,7 @@ export default function Developers() {
         <div className="card">
           <p className="lbl">3 &middot; Save a journey and get a link back</p>
           <p>Anonymous by default. A journey holds units of care, counts and the words the person typed. Nothing else.</p>
-          <pre style={pre}><code>{CURL_JOURNEY}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_JOURNEY}</code></pre>
           <p className="micro">Real response &mdash; the <code>url</code> echoes the host you called; this run was against a local instance of this code:</p>
           <pre style={preOut} tabIndex={0} aria-label="Response to saving a journey"><code>{OUT_JOURNEY}</code></pre>
           <p>
@@ -420,7 +420,7 @@ export default function Developers() {
             describes them, which figure applies instead if it does not, and what that service costs from the
             cheapest CMS locality to the dearest.
           </p>
-          <pre style={pre}><code>{CURL_FIT}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_FIT}</code></pre>
           <p className="micro">Real response. Long fields already shown above are elided with an ellipsis key:</p>
           <pre style={preOut} tabIndex={0} aria-label="Response to a pricing request with coverage and state"><code>{OUT_FIT}</code></pre>
           <p>
@@ -440,7 +440,7 @@ export default function Developers() {
             is on Medicaid, and they are over-represented in exactly the population this tool is built for.
             So the API does not return a zero.
           </p>
-          <pre style={pre}><code>{CURL_MEDICAID}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_MEDICAID}</code></pre>
           <pre style={preOut} tabIndex={0} aria-label="Fitted totals when no published figure applies"><code>{OUT_MEDICAID}</code></pre>
           <p>
             <code>totalUsd</code> is <code>null</code>, never <code>0</code>, because a zero would be read as
@@ -487,7 +487,7 @@ export default function Developers() {
             <code>valueUsd</code> is never overwritten, so the national figure and the local one can never be
             confused for each other.
           </p>
-          <pre style={pre}><code>{CURL_PLACE}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_PLACE}</code></pre>
           <p className="micro">Real response, one field elided and marked:</p>
           <pre style={preOut} tabIndex={0} aria-label="One priced row for a CMS payment locality"><code>{OUT_PLACE}</code></pre>
           <p>
@@ -512,7 +512,7 @@ export default function Developers() {
             The application itself is downloadable in one file. Not a description of a repository: the source,
             the data, the migrations, the tests and a README you can run from.
           </p>
-          <pre style={pre}><code>{CURL_TAKE_IT}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_TAKE_IT}</code></pre>
           <p className="micro">
             The code is <a href="/LICENSE.txt">Apache-2.0</a>; the data is CC0 1.0, public domain &mdash;{' '}
             <a href="/NOTICE.txt">NOTICE</a> says which is which, line by line. The five DCAT-US fields that
@@ -531,7 +531,7 @@ export default function Developers() {
             provenance and the public counts in one call &mdash; no bundle, no join, no account. Add{' '}
             <code>?format=text</code> and there is nothing to parse.
           </p>
-          <pre style={pre}><code>{CURL_CITATION}</code></pre>
+          <pre style={pre} tabIndex={0}><code>{CURL_CITATION}</code></pre>
           <pre style={preOut} tabIndex={0} aria-label="A citation block as plain text"><code>{OUT_CITATION}</code></pre>
           <p className="micro">
             Without <code>?format=text</code> the same call returns JSON with the figure, the publisher, the
@@ -546,7 +546,18 @@ export default function Developers() {
           claims file, and how the people who carried the burden ranked it. Counts and a de-identified CSV,
           not free text.
         </p>
-        <div className="table-scroll">
+        <p className="sub">
+          <strong>The corrections export is a defect report, not a comment box.</strong> Every row carries the
+          price row id, the CPT or HCPCS code (and the LOINC code where the row is a lab), the published figure
+          with its basis, year, geography and population, the federal file <em>by name</em> with its URL, its
+          SHA-256 and the day we read it, the exact line or arithmetic the figure was re-read from, the audit
+          verdict, the direction of the correction, the counts and fit rate on that figure, the chained row hash,
+          and a permalink that renders it as a paste-ready report for the agency that published the number. The
+          first line of the CSV is a comment naming the price-table version and the audit;{' '}
+          <a href="/api/export/corrections.json">/api/export/corrections.json</a> publishes the same rows with the
+          column contract beside them. Free text is never exported.
+        </p>
+        <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>Data</th><th>JSON</th><th>CSV</th></tr></thead>
             <tbody>
@@ -559,7 +570,7 @@ export default function Developers() {
               <tr><td>The licence, as a file counsel can read</td><td><a href="/LICENSE.txt">LICENSE</a></td><td><a href="/NOTICE.txt">NOTICE</a></td></tr>
               <tr><td>One figure&rsquo;s provenance and counts</td><td><a href="/api/citation/cms-99213">/api/citation/&#123;id&#125;</a></td><td><a href="/api/citation/cms-99213?format=text">as plain text</a></td></tr>
               <tr><td>The hash-chain head of every count</td><td><a href="/api/integrity">/api/integrity</a></td><td>&mdash;</td></tr>
-              <tr><td>Corrections to published figures</td><td><a href="/api/corrections">/api/corrections</a></td><td><a href="/api/export/corrections.csv">corrections.csv</a></td></tr>
+              <tr><td>Corrections to published figures</td><td><a href="/api/corrections">/api/corrections</a></td><td><a href="/api/export/corrections.csv">corrections.csv</a> · <a href="/api/export/corrections.json">corrections.json</a></td></tr>
               <tr><td>Care that no claim recorded</td><td><a href="/api/gap">/api/gap</a></td><td><a href="/api/export/gap.csv">gap.csv</a></td></tr>
               <tr><td>How people ranked the burdens</td><td><a href="/api/survey">/api/survey</a></td><td><a href="/api/export/survey.csv">survey.csv</a></td></tr>
               <tr><td>Written interviews (count only, ever)</td><td><a href="/api/interview">/api/interview</a></td><td>&mdash;</td></tr>
@@ -569,7 +580,7 @@ export default function Developers() {
         </div>
 
         <h2>Every route</h2>
-        <div className="table-scroll">
+        <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>Method</th><th>Path</th><th>What it does</th></tr></thead>
             <tbody>

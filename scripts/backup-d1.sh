@@ -77,6 +77,29 @@ META="$DIR/$TS.json"
 say "backup-d1: $PROJECT ($MODE) -> $FILE"
 
 # --------------------------------------------------------------------------
+# The local-mode dumper (see the --local branch below).
+local_dump() {
+  local state="$1" out="$2" dbf tables
+  dbf="$(find "$state/v3/d1/miniflare-D1DatabaseObject" -maxdepth 1 -name '*.sqlite' ! -name 'metadata.sqlite' 2>/dev/null | head -1)"
+  [ -n "$dbf" ] || { printf 'no local D1 database under %s\n' "$state" >&2; return 1; }
+  # NO ORDER BY: sqlite_master's own order is creation order, which is the only
+  # order in which the foreign keys resolve. Alphabetical put `credentials`
+  # before `users` and the restore died on "no such table: main.users".
+  tables="$(sqlite3 "$dbf" "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE '_cf_%' AND name NOT LIKE 'sqlite_%';")" || return 1
+  : > "$out"
+  printf 'PRAGMA defer_foreign_keys=TRUE;\n' >> "$out"
+  local t
+  for t in $tables; do
+    sqlite3 "$dbf" ".dump '$t'" \
+      | grep -v '^PRAGMA foreign_keys=OFF;$' \
+      | grep -v '^BEGIN TRANSACTION;$' \
+      | grep -v '^COMMIT;$' \
+      | grep -v "^DELETE FROM sqlite_sequence;$" >> "$out" || return 1
+  done
+  [ -s "$out" ]
+}
+
+# --------------------------------------------------------------------------
 # 1  the counts before
 BEFORE="$(curl -sS -m 25 "$ORIGIN/api/health" 2>/dev/null)"
 BEFORE_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
@@ -91,7 +114,14 @@ LIVE_COMMIT="$(printf '%s' "$BEFORE" | jq -r '.build.fullCommit // "unknown"' 2>
 # --------------------------------------------------------------------------
 # 2  the export. READ-ONLY: `d1 export` runs a SELECT and writes a file.
 if [ "$MODE" = "local" ]; then
-  ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --local --persist-to "$ROOT/cf/.wrangler/state-$STATE_NAME" --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+  # `wrangler d1 export --local` has no --persist-to (checked against 4.40.2:
+  # its OPTIONS are --local/--remote/--output/--table/--no-schema/--no-data), so
+  # it can only read the DEFAULT state directory. A lane's database lives in its
+  # own state dir, so the local dump is taken with sqlite3 against exactly that
+  # file, table by table, skipping miniflare's own _cf_ bookkeeping tables.
+  # This path exists so the verification below can be exercised against rows.
+  # THE DAILY BACKUP IS THE --remote PATH BELOW and it is wrangler's own export.
+  local_dump "$ROOT/cf/.wrangler/state-$STATE_NAME" "$FILE" >"$DIR/.$TS.export.log" 2>&1
 else
   ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --remote --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
 fi
@@ -117,7 +147,7 @@ printf '%s' "$AFTER" | jq -e '.ok == true' >/dev/null 2>&1 || AFTER=''
 TABLES_IN_FILE="$(grep -c 'CREATE TABLE' "$FILE")"
 [ "$TABLES_IN_FILE" -ge 6 ] && ok "$TABLES_IN_FILE CREATE TABLE statements" || fail "only $TABLES_IN_FILE CREATE TABLE statements in the dump"
 for t in "${SQL_TABLES[@]}"; do
-  if grep -qE "CREATE TABLE \"?$t\"? " "$FILE"; then ok "schema: $t"; else fail "the dump has no CREATE TABLE for $t"; fi
+  if grep -qE "^CREATE TABLE \"?$t\"?[ (]" "$FILE"; then ok "schema: $t"; else fail "the dump has no CREATE TABLE for $t"; fi
 done
 
 # --------------------------------------------------------------------------
@@ -129,7 +159,7 @@ COUNTS_JSON='{}'
 i=0
 for key in "${HEALTH_KEYS[@]}"; do
   t="${SQL_TABLES[$i]}"; i=$((i+1))
-  n="$(grep -c "^INSERT INTO \"$t\" " "$FILE")"
+  n="$(grep -cE "^INSERT INTO \"?$t\"?[ (]" "$FILE")"
   COUNTS_JSON="$(printf '%s' "$COUNTS_JSON" | jq --arg t "$t" --argjson n "$n" '. + {($t): $n}')"
   if [ -z "$BEFORE" ] || [ -z "$AFTER" ]; then
     say "  skip  $t: $n rows in the dump (health was unreadable, so nothing to compare)"

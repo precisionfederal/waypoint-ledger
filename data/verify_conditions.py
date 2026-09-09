@@ -30,6 +30,15 @@ WHAT IT CHECKS
      source the row cites — the PDF or the article page, fetched fresh.
   5. Every condition with price_row_id null: no dollar figure appears anywhere
      in its object. An absence must stay an absence.
+  6. Every sex_note: re-read in the federal file it cites, by the URL the row
+     itself publishes, and the figures in the sentence found there. A note whose
+     source no longer says it is a FAIL, not a note to fix later.
+  7. Every condition with sex_note null: a written blank reason, no source and
+     no source URL — and where the reason names a page, that page is fetched
+     and proved to be the page that was read.
+  8. No sex anywhere in the price table: no priced row carries a field whose
+     name mentions sex, because none of the fee schedules is published by sex
+     and no figure here is ever adjusted by it.
 
 Usage
   python3 data/verify_conditions.py                # fetch what it needs
@@ -39,6 +48,7 @@ Usage
 Writes data/CONDITIONS-AUDIT.json. Exits 1 on any FAIL.
 """
 import argparse, hashlib, html as htmllib, json, os, re, shutil, subprocess, sys, time, zipfile
+import urllib.parse
 import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -102,6 +112,79 @@ FIGURE_CHECKS = {
     'meps2022-benchmark-diabetes': [
         (r'\$5,810 per adult with treated diabetes', 'the mean, $5,810 per adult with treated diabetes'),
     ],
+}
+
+# ------------------------------------------------------------------ sex notes
+# The Federal Sprint Lead for the Invisible Illness track asked every team, on
+# 26 August 2026, to be intentional about sex differences where relevant. Every
+# sentence conditions.json prints about sex is re-read here in the federal file
+# it names. `cite` is the human page the row publishes; `url` is what this
+# script fetches — for the Household Pulse tables that is the same dataset
+# through its API, so the check reads the numbers rather than a rendering of
+# them. A note with no entry here is a FAIL: an unverifiable sentence about sex
+# is exactly the kind of sentence this product exists not to print.
+SEX_SOURCES = {
+    'long-covid': dict(
+        # The whole By-Sex block for survey period 72, not just the two cells the
+        # sentence quotes: a two-row answer is small enough to be mistaken for an
+        # API error page, and the wider block is the evidence a reader can audit.
+        key='pulse-longcovid-sex', kind='json', min_bytes=2000, sentinel='subgroup',
+        url=("https://data.cdc.gov/resource/gsea-w83j.json?"
+             "$where=`group`='By Sex' AND state='United States' AND time_period='72'"),
+        cite='https://data.cdc.gov/National-Center-for-Health-Statistics/Post-COVID-Conditions/gsea-w83j',
+        title='CDC/NCHS Household Pulse Survey — Post-COVID Conditions (gsea-w83j), survey period 72'),
+    'me-cfs': dict(
+        key='db488', kind='pdf', min_bytes=100000,
+        url='https://www.cdc.gov/nchs/data/databriefs/db488.pdf',
+        cite='https://www.cdc.gov/nchs/data/databriefs/db488.pdf',
+        title='NCHS Data Brief No. 488, December 2023'),
+    'endometriosis': dict(
+        key='owh-endometriosis', kind='html', min_bytes=20000, sentinel='endometriosis',
+        url='https://womenshealth.gov/a-z-topics/endometriosis',
+        cite='https://womenshealth.gov/a-z-topics/endometriosis',
+        title="HHS Office on Women's Health — Endometriosis"),
+    'fibromyalgia': dict(
+        key='niams-fibromyalgia', kind='html', min_bytes=10000, sentinel='fibromyalgia',
+        url='https://www.niams.nih.gov/health-topics/fibromyalgia',
+        cite='https://www.niams.nih.gov/health-topics/fibromyalgia',
+        title='NIH NIAMS — Fibromyalgia'),
+}
+# What must be found in that source, and what it proves. The long COVID row is
+# JSON, so it is parsed rather than pattern-matched: see sex_pulse_check.
+SEX_CHECKS = {
+    'me-cfs': [
+        (r'Women\s*\(1\.7%\)', 'women 1.7%'),
+        (r'men\s*\(0\.9%\)', 'men 0.9%'),
+        (r'1\.3%\s*of\s*adults\s*had\s*ME/CFS', 'all adults 1.3%'),
+    ],
+    'endometriosis': [
+        (r'at least 11% of women', 'at least 11% of women'),
+        (r'6\s*\u00bd\s*million women', 'more than 6 1/2 million women'),
+    ],
+    'fibromyalgia': [
+        (r'Anyone can get fibromyalgia, but more women get it than men',
+         'the NIAMS sentence, word for word'),
+    ],
+}
+# The blanks that name a page. Fetching it proves the page we cite is the page
+# we read; the pattern proves it is still that page. A blank reason is a
+# finding about the federal data, so it is checked like any other finding.
+SEX_BLANK_SOURCES = {
+    'heart-disease': dict(
+        key='cdc-heart-facts', kind='html', min_bytes=20000, sentinel='heart disease',
+        url='https://www.cdc.gov/heart-disease/data-research/facts-stats/index.html',
+        pattern=r'leading cause of death for men, women',
+        title='CDC Heart Disease Facts'),
+    'diabetes': dict(
+        key='cdc-diabetes-report', kind='html', min_bytes=20000, sentinel='diabetes',
+        url='https://www.cdc.gov/diabetes/php/data-research/index.html',
+        pattern=r'Estimated percentage of the U\.S\. population with diabetes',
+        title='CDC National Diabetes Statistics Report'),
+    'sickle-cell': dict(
+        key='cdc-scd-data', kind='html', min_bytes=20000, sentinel='sickle cell',
+        url='https://www.cdc.gov/sickle-cell/data/index.html',
+        pattern=r'Data and Statistics on Sickle Cell Disease',
+        title='CDC Data and Statistics on Sickle Cell Disease'),
 }
 
 CACHE = os.path.expanduser('~/.cache/waypoint-ledger')
@@ -199,16 +282,24 @@ def flat(code):
 
 
 # --------------------------------------------------------------------------- figures
-def source_text(row_id):
-    """The cited source, as text, fetched fresh (or from cache)."""
-    spec = FIGURE_SOURCES.get(row_id)
-    if not spec:
-        return None, 'no source is registered in this script for %s' % row_id
-    ext = '.pdf' if spec['kind'] == 'pdf' else '.html'
-    path = fetch('sources/' + spec['key'], spec['url'], ext,
+EXT = {'pdf': '.pdf', 'html': '.html', 'json': '.json'}
+
+
+def spec_text(spec):
+    """One fetch-and-read for every kind of cited source: a PDF through
+    pdftotext, an HTML page stripped to text, a JSON API answer left exactly as
+    the server sent it. Returns (text, error); a source that could not be read
+    is an error, never an empty string that would read as a silent source."""
+    ext = EXT.get(spec['kind'], '.html')
+    url = spec['url']
+    if spec['kind'] == 'json':                      # SoQL carries spaces and quotes
+        url = urllib.parse.quote(url, safe=":/?&=$,`'%-._~+*()!;@[]")
+    path = fetch('sources/' + spec['key'], url, ext,
                  min_bytes=spec.get('min_bytes', 0), sentinel=spec.get('sentinel'))
     if not path:
         return None, STATE.get('sources/' + spec['key'], {}).get('error', 'not fetched')
+    if spec['kind'] == 'json':
+        return open(path, encoding='utf-8', errors='replace').read(), None
     if spec['kind'] == 'pdf':
         txt = path + '.txt'
         if not os.path.exists(txt):
@@ -223,6 +314,45 @@ def source_text(row_id):
     t = re.sub(r'<(script|style)[^>]*>.*?</\1>', ' ', t, flags=re.S | re.I)
     t = htmllib.unescape(re.sub(r'<[^>]+>', ' ', t))
     return re.sub(r'\s+', ' ', t), None
+
+
+def source_text(row_id):
+    """The source a priced row is cited to, as text."""
+    spec = FIGURE_SOURCES.get(row_id)
+    if not spec:
+        return None, 'no source is registered in this script for %s' % row_id
+    return spec_text(spec)
+
+
+def sex_pulse_check(text):
+    """The long COVID sex figures, parsed rather than pattern-matched: the CDC
+    serves them as JSON, so this reads the cells the sentence quotes. Returns
+    (ok, detail). Survey period 72 is named in the sentence, so it is what is
+    asked for — a later period is a new sentence, not a silent update."""
+    try:
+        rows = json.loads(text)
+    except Exception as e:                                    # noqa: BLE001
+        return False, 'the API answer did not parse as JSON: %s' % e
+    INDICATOR = 'Currently experiencing long COVID, as a percentage of all adults'
+    want = {'Female': ('6.8', '6.2', '7.4'), 'Male': ('3.7', '3.3', '4.3')}
+    seen, bad = {}, []
+    for r in rows:
+        if r.get('indicator') != INDICATOR:
+            continue
+        sub = r.get('subgroup')
+        if sub in want:
+            seen[sub] = (r.get('value'), r.get('lowci'), r.get('highci'), r.get('time_period_label'))
+    for sub, (v, lo, hi) in want.items():
+        got = seen.get(sub)
+        if not got:
+            bad.append('%s is not in the answer' % sub)
+        elif (got[0], got[1], got[2]) != (v, lo, hi):
+            bad.append('%s reads %s (%s-%s), the note says %s (%s-%s)' % (sub, got[0], got[1], got[2], v, lo, hi))
+    if bad:
+        return False, '; '.join(bad)
+    return True, 'women %s (%s-%s) and men %s (%s-%s), %s' % (
+        seen['Female'][0], seen['Female'][1], seen['Female'][2],
+        seen['Male'][0], seen['Male'][1], seen['Male'][2], seen['Female'][3])
 
 
 def add(check, status, detail, evidence=None):
@@ -384,6 +514,90 @@ def main():
             'row %s = $%s%s, %s' % (rid, want,
                                     (' (%s-%s)' % (rng[0], rng[1])) if rng else '',
                                     row.get('year')))
+
+    # ------------------------------------------------- 6, 7, 8: sex differences
+    # The one instruction the program gave every team in writing. A sentence
+    # about sex is held to exactly the standard a dollar figure is held to:
+    # named file, published URL, re-read here, or it does not ship.
+    for c in rows:
+        cid = c['id']
+        note = c.get('sex_note')
+        src, url = c.get('sex_note_source'), c.get('sex_note_source_url')
+        if not note:
+            reason = c.get('sex_note_blank_reason')
+            if not reason or len(reason) < 40:
+                add('%s sex blank' % cid, 'FAIL',
+                    'sex_note is null with no written reason; a silence in the federal data is a finding and must be stated')
+            elif src or url:
+                add('%s sex blank' % cid, 'FAIL',
+                    'sex_note is null but the row still carries a source — an absence must stay an absence')
+            else:
+                add('%s sex blank' % cid, 'PASS', reason[:150])
+            spec = SEX_BLANK_SOURCES.get(cid)
+            if spec:
+                if spec['url'] not in (reason or ''):
+                    add('%s sex blank page' % cid, 'FAIL',
+                        'the blank reason does not name the page this script reads: %s' % spec['url'])
+                else:
+                    text, err = spec_text(spec)
+                    if text is None:
+                        add('%s sex blank page' % cid, 'UNVERIFIED', err or 'not fetched')
+                    elif re.search(spec['pattern'], text, re.I):
+                        add('%s sex blank page' % cid, 'PASS',
+                            'read %s and it is still the page the blank reason names' % spec['title'])
+                    else:
+                        add('%s sex blank page' % cid, 'FAIL',
+                            '%s no longer reads as the page the blank reason names' % spec['title'])
+            continue
+
+        money = re.findall(r'\$[0-9][0-9,]*', note)
+        if money:
+            add('%s sex note' % cid, 'FAIL',
+                'a sex note carries a dollar amount (%s); no federal fee schedule we price from is published by sex'
+                % ', '.join(money))
+            continue
+        spec = SEX_SOURCES.get(cid)
+        if not spec:
+            add('%s sex note' % cid, 'FAIL',
+                'a sentence about sex with no source registered in this script — it cannot be re-read, so it cannot ship')
+            continue
+        if not src:
+            add('%s sex note' % cid, 'FAIL', 'sex_note with no sex_note_source')
+            continue
+        if url != spec['cite']:
+            add('%s sex note' % cid, 'FAIL',
+                'the row publishes %r; this script reads %r. The citation and the check must be the same file.'
+                % (url, spec['cite']))
+            continue
+        text, err = spec_text(spec)
+        if text is None:
+            add('%s sex note' % cid, 'UNVERIFIED', 'could not read %s: %s' % (spec['title'], err))
+            continue
+        if spec['kind'] == 'json':
+            ok, detail = sex_pulse_check(text)
+            add('%s sex note' % cid, 'PASS' if ok else 'FAIL',
+                ('re-read in %s: %s' % (spec['title'], detail)) if ok
+                else ('%s does not say it: %s' % (spec['title'], detail)),
+                note[:120])
+            continue
+        proof, missing = [], []
+        for pattern, says in SEX_CHECKS.get(cid, []):
+            (proof if re.search(pattern, text, re.I) else missing).append(says)
+        if not SEX_CHECKS.get(cid):
+            add('%s sex note' % cid, 'FAIL', 'no pattern is registered for this note, so nothing was actually checked')
+        elif missing:
+            add('%s sex note' % cid, 'FAIL',
+                '%s does not carry: %s' % (spec['title'], '; '.join(missing)), note[:120])
+        else:
+            add('%s sex note' % cid, 'PASS',
+                'read in %s: %s' % (spec['title'], '; '.join(proof)), note[:120])
+
+    # 8: the price table itself must be silent on sex, because the files are.
+    sexy = sorted({k for r in prices.values() for k in r if 'sex' in k.lower()})
+    add('price table carries no sex field', 'FAIL' if sexy else 'PASS',
+        ('priced rows carry %s' % ', '.join(sexy)) if sexy else
+        'no priced row carries a field naming sex: the CMS fee schedules price a code, not a person, '
+        'and no figure here is adjusted by sex')
 
     # ------------------------------------------------------------ report
     n = lambda s: sum(1 for r in RESULTS if r['status'] == s)                # noqa: E731

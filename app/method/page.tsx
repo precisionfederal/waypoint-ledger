@@ -7,6 +7,7 @@ import { promises as fs } from 'node:fs';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import Link from 'next/link';
+import { CONTEXT, SMALL_CELL_MIN, SEX_POLICY, SEX_POLICY_URL, SEX_ASK_ORIGIN } from '@/lib/survey';
 
 export const dynamic = 'force-static';
 
@@ -47,9 +48,12 @@ interface ConditionsFile {
                       checked_against?: { fiscal_year: number; in_effect: string; url: string }[] };
   _no_code_is_not_an_oversight?: string;
   _when_there_is_no_figure?: string;
+  _sex_note_rule?: string;
   conditions: { id: string; label: string; icd10cm: string | null; icd10cm_title: string | null;
                 icd10cm_billable: boolean | null; icd10cm_blank_reason?: string | null;
-                price_row_id: string | null; figure_kind: string | null }[];
+                price_row_id: string | null; figure_kind: string | null;
+                sex_note?: string | null; sex_note_source?: string | null;
+                sex_note_source_url?: string | null; sex_note_blank_reason?: string | null }[];
 }
 interface StatePrices {
   _formula: string; _conversion_factor: number; _source_files: string[];
@@ -86,7 +90,7 @@ function md(src: string): { html: string; toc: { id: string; text: string }[] } 
     if (table.length) {
       const rows = table.filter((r) => !/^\|\s*-/.test(r)).map((r) => r.replace(/^\||\|$/g, '').split('|').map((c) => c.trim()));
       const [h, ...b] = rows;
-      out.push(`<div class="table-scroll"><table class="ledger-table"><thead><tr>${h.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead><tbody>${b.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
+      out.push(`<div class="table-scroll" tabindex="0"><table class="ledger-table"><thead><tr>${h.map((c) => `<th>${inline(c)}</th>`).join('')}</tr></thead><tbody>${b.map((r) => `<tr>${r.map((c) => `<td>${inline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`);
       table = [];
     }
   };
@@ -98,7 +102,10 @@ function md(src: string): { html: string; toc: { id: string; text: string }[] } 
       const text = line.replace(/^#+\s*/, '').replace(/🔴|⚠️/g, '').trim();
       const id = text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       if (level <= 2) toc.push({ id, text });
-      out.push(`<h${level + 1} id="${id}">${inline(text)}</h${level + 1}>`);
+      /* The document under this page has an <h1> now, so its own "##" sections are
+         h2 and "###" is h3. Math.max keeps a stray "#" from minting a second h1. */
+      const tag = Math.max(2, level);
+      out.push(`<h${tag} id="${id}">${inline(text)}</h${tag}>`);
     } else if (/^\s*[-*]\s+/.test(line)) {
       if (para.length || (list.length && listTag !== 'ul')) flush();
       listTag = 'ul'; list.push(`<li>${inline(line.replace(/^\s*[-*]\s+/, ''))}</li>`);
@@ -144,6 +151,8 @@ export default async function MethodPage() {
   const condPriced = condRows.filter((c) => c.price_row_id);
   const condUnpriced = condRows.filter((c) => !c.price_row_id);
   const icdYears = conds?._icd10cm_source?.checked_against ?? [];
+  const condSexed = condRows.filter((c) => c.sex_note);
+  const condSexBlank = condRows.filter((c) => !c.sex_note);
 
   /* How each class of figure is made — counted from the audit, not asserted. */
   const byCheck = new Map<string, { n: number; pass: number; agencies: Set<string> }>();
@@ -179,7 +188,11 @@ export default async function MethodPage() {
     <section className="step">
       <div className="wrap method-page">
         <p className="eyebrow">How this number is made</p>
-        <h2>Every figure in the ledger, and every one we would not print</h2>
+        {/* This was an h2, which left /method with no h1: the one page that explains
+            every number had no top-level heading for a screen reader to land on.
+            .page-h1 is the site's own class for a panel page (see /gap), and it
+            renders at 35.2px against the 34.4px this line had, so nothing moves. */}
+        <h1 className="page-h1">Every figure in the ledger, and every one we would not print</h1>
         <p className="sub">
           Nothing here is modelled, averaged or estimated. Each figure was read out of a published
           federal file, or is the product of figures on that file with the formula printed. This page
@@ -194,7 +207,7 @@ export default async function MethodPage() {
 
         {audit && (
           <>
-            <h3 id="audit">The audit</h3>
+            <h2 id="audit">The audit</h2>
             <div className="card">
               <p>
                 <strong>
@@ -243,8 +256,8 @@ export default async function MethodPage() {
               )}
             </div>
 
-            <h3 id="classes">How each class of figure is made</h3>
-            <div className="table-scroll">
+            <h2 id="classes">How each class of figure is made</h2>
+            <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <thead>
                   <tr>
@@ -274,8 +287,8 @@ export default async function MethodPage() {
               redo it. The laboratory rows need no arithmetic at all: the rate is a column on the file.
             </p>
 
-            <h3 id="sources">The files, and what they hash to</h3>
-            <div className="table-scroll">
+            <h2 id="sources">The files, and what they hash to</h2>
+            <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <thead>
                   <tr>
@@ -308,7 +321,7 @@ export default async function MethodPage() {
 
         {states && iowa && iowa99213 && (
           <>
-            <h3 id="locality">Where you live</h3>
+            <h2 id="locality">Where you live</h2>
             <div className="card">
               <p>
                 Medicare does not pay one national price. It multiplies each half of the payment by a
@@ -339,7 +352,7 @@ export default async function MethodPage() {
 
         {conds && (
           <>
-            <h3 id="conditions">Which condition, and its code</h3>
+            <h2 id="conditions">Which condition, and its code</h2>
             <div className="card">
               <p>
                 The year-ahead figure is not one number written into the page. You choose the
@@ -354,7 +367,7 @@ export default async function MethodPage() {
                 and offers to count the absence, because a missing federal figure is a finding about
                 the data, not a blank to fill with the nearest number to hand.
               </p>
-              <div className="table-scroll">
+              <div className="table-scroll" tabIndex={0}>
                 <table className="ledger-table">
                   <thead>
                     <tr>
@@ -414,7 +427,122 @@ export default async function MethodPage() {
           </>
         )}
 
-        <h3 id="take-the-data">Take the data</h3>
+        {conds && (
+          <>
+            <h2 id="ai">How the AI reads a story</h2>
+            <p>
+              A person types what happened in her own words. The deterministic rules in this codebase read the story first and map
+              every phrase they recognise to a unit of care. Each phrase the rules leave blank is then shown to a language model
+              together with the catalog of units, as ids and labels only. The model may answer with one of those ids, or with nothing.
+            </p>
+            <p>
+              The model never sees a price and never returns one. The published federal table prices the unit it named, exactly as
+              it prices a unit the rules matched. Care that was never received and any span of time are decided by the rules and are
+              never sent to the model, so nothing that did not happen can be priced by a guess. A chip the model named carries the
+              mark <span className="lp-chip" style={{ padding: '.1rem .5rem' }}><span className="lp-ai">AI read</span></span> and the person can change it like any other line.
+            </p>
+            <p>
+              The reader is <a href="/api/map">POST /api/map</a>. It answers with the model that read the story, or with the rules alone
+              when no model was reachable, so the tool never waits on one. Run without it by deleting the AI binding: the product is
+              the same, minus the filled blanks.
+            </p>
+
+            <h2 id="sex">Sex differences</h2>
+            <div className="card">
+              <p>
+                {SEX_ASK_ORIGIN} This is the answer, and it is held to the same standard as every
+                dollar on this site: a named federal file, the URL the row itself publishes, re-read
+                by a script anyone can run &mdash; or the row says plainly that the file is silent.
+              </p>
+
+              <h3>What we ask</h3>
+              <p>
+                One optional question on the burden survey: <strong>{CONTEXT.sex.label}</strong>,
+                with {CONTEXT.sex.options.map((o: string, i: number) => (
+                  <span key={o}>{i > 0 ? ', ' : ''}<em>{o}</em></span>
+                ))}. It is asked as sex, not gender, because sex is the variable the federal
+                prevalence files below are published by. The framing is NIH&rsquo;s own:{' '}
+                <a href={SEX_POLICY_URL} target="_blank" rel="noopener noreferrer">{SEX_POLICY}</a>{' '}
+                states the expectation that researchers &ldquo;account for the possible role of sex
+                as a biological variable&rdquo;, in data collection, analysis and reporting alike.
+                Nothing is pre-selected, nothing is filled in for you, and &ldquo;Prefer not to
+                say&rdquo; is recorded as the stated answer it is &mdash; distinct from leaving the
+                question alone, which is published as &ldquo;not stated&rdquo;.
+              </p>
+
+              <h3>What we publish</h3>
+              <p>
+                Two things, and they are not the same thing. <strong>Who answered</strong>, on{' '}
+                <Link href="/register">the register</Link>, under the same rule as the state: any
+                answer holding fewer than {SMALL_CELL_MIN} responses is withheld, and the number of
+                withheld cells and the responses they hold are published, so the table still adds
+                up. And <strong>how each sex ranked the five burdens</strong> &mdash; the reason the
+                question exists, since a ranking that cannot be read by sex cannot answer the ask.
+                That one is a cross-tabulation, so it is suppressed on the server before it is
+                served rather than hidden in the page: narrowing a group twice makes a small cell
+                small twice. Each group is the same count of the same answers as the total above
+                it, computed by the same function. No weighting, no imputation, no extrapolation.
+              </p>
+              <p>
+                The survey holds no name, no account and no identifier, so a sex answer joins to
+                nothing. It is a column in an anonymous count, and that is the whole of it.
+              </p>
+
+              <h3>What the federal files do and do not split by sex</h3>
+              <p>
+                <strong>None of the price rows.</strong> The CMS physician fee schedule, the
+                clinical laboratory fee schedule and the hospital outpatient file price a{' '}
+                <em>code</em>, not a person: they carry no sex field, so no figure on this site is
+                adjusted by sex and none of them can be read by it. Where sex appears in the
+                federal record for these conditions, it appears in <em>prevalence</em> &mdash; how
+                many people have the thing &mdash; and never in what a year of it costs.
+              </p>
+              <p>
+                <strong>{condSexed.length} of the {condRows.length} conditions carry a federal
+                sentence about sex. {condSexBlank.length} do not</strong>, and each of those says
+                which page was read and where it stops, because a silence in the federal data is a
+                finding about the data.
+              </p>
+              <div className="table-scroll" tabIndex={0}>
+                <table className="ledger-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Condition</th>
+                      <th scope="col">What a federal file says by sex</th>
+                      <th scope="col">The file</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {condRows.map((c) => (
+                      <tr key={c.id}>
+                        <th scope="row">{c.label}</th>
+                        <td>{c.sex_note ?? <span className="blank">{c.sex_note_blank_reason}</span>}</td>
+                        <td>
+                          {c.sex_note_source_url
+                            ? <a href={c.sex_note_source_url} target="_blank" rel="noopener noreferrer">{c.sex_note_source}</a>
+                            : <span className="blank">none found</span>}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p>{conds._sex_note_rule}</p>
+              {condAudit && (
+                <p>
+                  Every sentence in that table is re-read in its own source by{' '}
+                  <code>python3 data/verify_conditions.py</code>, which fails if the file no longer
+                  says it, if a note carries a dollar amount, or if any priced row grows a field
+                  naming sex. Last run {condAudit.generated.slice(0, 10)}:{' '}
+                  <strong>{condAudit.pass} pass, {condAudit.fail} fail, {condAudit.unverified}{' '}
+                  unverified</strong> across the whole condition file.
+                </p>
+              )}
+            </div>
+          </>
+        )}
+
+        <h2 id="take-the-data">Take the data</h2>
         <div className="card">
           <p>
             The whole table is published as open data, versioned, with every field described and the

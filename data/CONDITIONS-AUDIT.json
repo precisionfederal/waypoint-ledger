@@ -1,12 +1,12 @@
 {
- "generated": "2026-09-09T18:00:22Z",
- "conditions_version": "2026-09-09.2",
- "table_version": "2026-09-08.1-verified",
+ "generated": "2026-09-09T20:02:27Z",
+ "conditions_version": "2026-09-09.3",
+ "table_version": "2026-09-09.1",
  "conditions": 9,
  "coded": 6,
  "priced": 3,
- "checks": 33,
- "pass": 33,
+ "checks": 46,
+ "pass": 46,
  "fail": 0,
  "unverified": 0,
  "icd10cm_years_checked": [
@@ -69,6 +69,55 @@
    "bytes": 447121,
    "retrieved": "cache",
    "url": "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf"
+  },
+  "sources/pulse-longcovid-sex": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/pulse-longcovid-sex.json",
+   "sha256": "408429a0611582f45881098d821173cb86d794a18defbdb52aab974c4449a855",
+   "bytes": 7296,
+   "retrieved": "cache",
+   "url": "https://data.cdc.gov/resource/gsea-w83j.json?$where=`group`='By%20Sex'%20AND%20state='United%20States'%20AND%20time_period='72'"
+  },
+  "sources/cdc-heart-facts": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-heart-facts.html",
+   "sha256": "f6e156a24fb1d23f8d1045fd67ee143ce90717a6a1df44b04e2ee7df191ea4df",
+   "bytes": 60207,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/heart-disease/data-research/facts-stats/index.html"
+  },
+  "sources/cdc-diabetes-report": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-diabetes-report.html",
+   "sha256": "a76b904d4b8958902b43911c5107b7a879d85ad8e5d6eb95ed51f177c24d51d4",
+   "bytes": 56453,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/diabetes/php/data-research/index.html"
+  },
+  "sources/db488": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/db488.pdf",
+   "sha256": "7a2b6a900eaeac022294ec8d8708c1c75a7a40de252de7125d9435a3f2299b83",
+   "bytes": 439149,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/nchs/data/databriefs/db488.pdf"
+  },
+  "sources/niams-fibromyalgia": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/niams-fibromyalgia.html",
+   "sha256": "46fe4b6ba20a7f9773536283e27f07475e481f38ab10106b4a870fe21e2254ea",
+   "bytes": 53011,
+   "retrieved": "cache",
+   "url": "https://www.niams.nih.gov/health-topics/fibromyalgia"
+  },
+  "sources/owh-endometriosis": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/owh-endometriosis.html",
+   "sha256": "375ead07ed53e341b9cdd31ec9cf757f8809b34048953fba5abc7f6fdd2720ce",
+   "bytes": 88762,
+   "retrieved": "cache",
+   "url": "https://womenshealth.gov/a-z-topics/endometriosis"
+  },
+  "sources/cdc-scd-data": {
+   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-scd-data.html",
+   "sha256": "2f528645550a3c3712ee208387a82f2f86b627bd88d031e33e9bba45a4c70dfe",
+   "bytes": 56861,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/sickle-cell/data/index.html"
   }
  },
  "results": [
@@ -268,6 +317,84 @@
    "check": "undiagnosed asserts no figure",
    "status": "PASS",
    "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "long-covid sex note",
+   "status": "PASS",
+   "detail": "re-read in CDC/NCHS Household Pulse Survey \u2014 Post-COVID Conditions (gsea-w83j), survey period 72: women 6.8 (6.2-7.4) and men 3.7 (3.3-4.3), Aug 20 - Sep 16, 2024",
+   "evidence": "CDC/NCHS Household Pulse Survey, 20 August to 16 September 2024: 6.8 percent of women (95% CI 6.2-7.4) and 3.7 percent o"
+  },
+  {
+   "check": "heart-disease sex blank",
+   "status": "PASS",
+   "detail": "CDC's Heart Disease Facts publishes the share of all deaths caused by heart disease by race and ethnicity, not by sex, and says only that heart diseas",
+   "evidence": null
+  },
+  {
+   "check": "heart-disease sex blank page",
+   "status": "PASS",
+   "detail": "read CDC Heart Disease Facts and it is still the page the blank reason names",
+   "evidence": null
+  },
+  {
+   "check": "diabetes sex blank",
+   "status": "PASS",
+   "detail": "CDC's National Diabetes Statistics Report page publishes national totals and no split by sex. Read 9 September 2026 at https://www.cdc.gov/diabetes/ph",
+   "evidence": null
+  },
+  {
+   "check": "diabetes sex blank page",
+   "status": "PASS",
+   "detail": "read CDC National Diabetes Statistics Report and it is still the page the blank reason names",
+   "evidence": null
+  },
+  {
+   "check": "me-cfs sex note",
+   "status": "PASS",
+   "detail": "read in NCHS Data Brief No. 488, December 2023: women 1.7%; men 0.9%; all adults 1.3%",
+   "evidence": "CDC/NCHS, National Health Interview Survey 2021-2022: 1.7 percent of women and 0.9 percent of men had ME/CFS at the time"
+  },
+  {
+   "check": "pots-dysautonomia sex blank",
+   "status": "PASS",
+   "detail": "We have found no federal publication giving POTS prevalence by sex. That is a statement about what we could find, not a claim that none exists \u2014 if yo",
+   "evidence": null
+  },
+  {
+   "check": "fibromyalgia sex note",
+   "status": "PASS",
+   "detail": "read in NIH NIAMS \u2014 Fibromyalgia: the NIAMS sentence, word for word",
+   "evidence": "NIH NIAMS says plainly: \u201cAnyone can get fibromyalgia, but more women get it than men.\u201d It publishes a direction and no f"
+  },
+  {
+   "check": "endometriosis sex note",
+   "status": "PASS",
+   "detail": "read in HHS Office on Women's Health \u2014 Endometriosis: at least 11% of women; more than 6 1/2 million women",
+   "evidence": "HHS Office on Women's Health: \u201cResearchers think that at least 11% of women, or more than 6 \u00bd million women in the Unite"
+  },
+  {
+   "check": "sickle-cell sex blank",
+   "status": "PASS",
+   "detail": "CDC's Data and Statistics on Sickle Cell Disease publishes counts and birth prevalence by race and ethnicity, and no split by sex. Read 9 September 20",
+   "evidence": null
+  },
+  {
+   "check": "sickle-cell sex blank page",
+   "status": "PASS",
+   "detail": "read CDC Data and Statistics on Sickle Cell Disease and it is still the page the blank reason names",
+   "evidence": null
+  },
+  {
+   "check": "undiagnosed sex blank",
+   "status": "PASS",
+   "detail": "Not a diagnosis, so there is no published prevalence to split by sex. The only thing this row can be read by sex on is what the register's own respond",
+   "evidence": null
+  },
+  {
+   "check": "price table carries no sex field",
+   "status": "PASS",
+   "detail": "no priced row carries a field naming sex: the CMS fee schedules price a code, not a person, and no figure here is adjusted by sex",
    "evidence": null
   }
  ]

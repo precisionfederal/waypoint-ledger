@@ -201,9 +201,32 @@ describe('the agency on the face of every row', () => {
 describe('the total says what it is', () => {
   it('never calls a stack of Medicare figures "all payers combined"', () => {
     for (const ctx of [{}, { locality: 'IA-00' }, { coverage: 'medicare' as Coverage }]) {
-      expect(totalLabels(ctx).primary).toBe(
-        ctx.locality ? 'What the published Medicare figures add up to in Iowa' : 'What the published Medicare figures add up to');
       expect(totalLabels(ctx).primary).not.toMatch(/all payers/i);
+    }
+    expect(totalLabels({ coverage: 'medicare' }).primary)
+      .toBe('What the published Medicare figures add up to');
+    expect(totalLabels({ coverage: 'medicare', locality: 'IA-00' }).primary)
+      .toBe('What the published Medicare figures add up to in Iowa');
+  });
+
+  /* 🔴 R4, results #1(c): the default visitor — the one who answered nothing —
+     met the biggest number on the page labelled as a Medicare total, with no
+     sign that a tap re-labels every row under it. */
+  it('tells a visitor who chose no coverage what the basis is and how to change it', () => {
+    const l = totalLabels({});
+    expect(l.primary).toBe('Medicare allowed amounts — say who pays for your care and this changes');
+    expect(l.secondary).toBeNull();
+    // it still names the locality when one is set, and still names Medicare
+    expect(totalLabels({ locality: 'IA-00' }).primary)
+      .toBe('Medicare allowed amounts in Iowa — say who pays for your care and this changes');
+    expect(l.primary).toMatch(/medicare/i);
+    // and it never claims the figure is theirs
+    expect(l.primary).not.toMatch(/you paid|your bill|what you paid/i);
+  });
+
+  it('stops inviting an answer the moment one is given', () => {
+    for (const coverage of ['employer', 'marketplace', 'medicare', 'medicaid', 'uninsured', 'unsure'] as Coverage[]) {
+      expect(totalLabels({ coverage }).primary).not.toMatch(/say who pays/i);
     }
   });
   it('never labels a Medicare stack as what Medicaid pays', () => {

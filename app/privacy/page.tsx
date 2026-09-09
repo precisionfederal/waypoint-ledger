@@ -25,7 +25,7 @@ function Fields({ e }: { e: PrivacyEndpoint }) {
           What is sent, and where each part lands: {e.accepts.map((a) => `${a.field} → ${a.column}`).join(' · ')}
         </p>
       )}
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0}>
         <table>
           <caption className="tbl-cap">Every column of {e.table}, written by {e.handler}</caption>
           <thead>

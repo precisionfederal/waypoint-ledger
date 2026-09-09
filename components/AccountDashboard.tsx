@@ -168,7 +168,7 @@ function MyCorrections() {
   }
   return (
     <div className="table-card card" style={{ padding: 0 }}>
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0}>
         <table className="ledger-table">
           <caption className="sr-only">Corrections you have sent, newest first</caption>
           <thead>

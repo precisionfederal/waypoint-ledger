@@ -132,7 +132,7 @@ export default function Adopt() {
         </div>
 
         <h2>What you are starting from</h2>
-        <div className="table-scroll">
+        <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>File</th><th>What is in it</th><th>Take it</th></tr></thead>
             <tbody>
@@ -248,7 +248,7 @@ export default function Adopt() {
         </div>
 
         <h2>The two commands that keep it honest</h2>
-        <div className="table-scroll">
+        <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <thead><tr><th>Command</th><th>What it refuses</th></tr></thead>
             <tbody>

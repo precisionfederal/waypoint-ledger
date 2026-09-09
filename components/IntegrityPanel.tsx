@@ -43,7 +43,7 @@ export default function IntegrityPanel() {
 
   return (
     <>
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0}>
         <table className="ledger-table">
           <caption className="sr-only">The current head of each chain in the register</caption>
           <thead>

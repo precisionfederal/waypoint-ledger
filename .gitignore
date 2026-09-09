@@ -6,6 +6,11 @@ cf/out/
 cf/.stage/
 shots2/
 cf/.dev.vars
+# and every backup of it. `cf/.dev.vars` alone does not match
+# `cf/.dev.vars.20260909T195900Z.bak`, which rotate-secrets.sh writes and which
+# holds the value that was just retired — still a live secret until the rotation
+# has propagated everywhere.
+cf/.dev.vars.*
 cf/.wrangler/
 .wrangler/
 data/*.jsonl

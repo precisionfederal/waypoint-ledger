@@ -428,7 +428,7 @@ header.site .wrap.bar{max-width:82rem}
    tables inside long-form prose. */
 .prose table{font-size:1rem}
 .prose td,.prose th{font-size:.9375rem}
-.prose code,.prose .mono,.prose td code{font-size:.9em}
+.prose code,.prose .mono,.prose td code{font-size:max(.9em,12.5px)}  /* same 12px floor as the base rule; see app/globals.css */
 
 /* Targets a thumb can hit. Inline links inside running prose keep their line
    box (WCAG 2.5.8 exempts them); everything that is a control does not. */
@@ -503,3 +503,6 @@ header.site .wrap.bar{max-width:82rem}
    page furniture above it is tightened — no type was made smaller. */
 .ledger .ctx-shell{margin-bottom:var(--sp-3)}
 .page>.wrap>h1+.sub{margin-bottom:var(--sp-3)}
+
+/* the AI reader's mark on a chip — a phrase the rules left blank and the model named from the catalog */
+.lp-chip .lp-ai{font-family:var(--font-m);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;padding:.1rem .4rem;border-radius:999px;background:var(--brand);color:var(--ground)}

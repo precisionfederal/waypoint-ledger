@@ -135,10 +135,26 @@ function singular(w: string): string {
   return w;
 }
 
+/* 🔴 THE TWO-LETTER WORDS THE CATALOG ITSELF DEPENDS ON.
+
+   tokens() dropped every word of two characters. That silently collapsed
+   "chest CT" to "chest", "PT visit" to "visit" and "PT test" to "test" — and
+   because the one surviving word was then 100% of what was left of the
+   candidate, it scored as a full match. So any sentence with the word chest
+   matched a CT of the chest, and any sentence with the word visit matched a
+   physical therapy session, at a score well above the confidence floor.
+
+   Measured 2026-09-09 over data/test-fixtures/map-eval.json: 39 published
+   candidates collapsed to a single common token this way, and it produced 11
+   of the 13 wrong units in that run. The filter is symmetric — it runs over
+   the person's words and over the candidate alike — so a real "CT" still
+   matches and a bare "chest" no longer does. */
+const SHORT_TOKENS = new Set(['ct', 'pt', 'gi', 'hs', 'pe', 'ck', 'nt', 't4', '2d']);
+
 function tokens(s: string): string[] {
   return normalize(s)
     .split(' ')
-    .filter((w) => w.length > 2 && !STOP.has(w) && !COUNT_NOISE.has(w))
+    .filter((w) => (w.length > 2 || SHORT_TOKENS.has(w)) && !STOP.has(w) && !COUNT_NOISE.has(w))
     .map(singular);
 }
 
@@ -576,6 +592,10 @@ export interface ParsedSegment {
   raw: string;
   times: number;
   result: MapResult;
+  /** Who read the phrase: the deterministic rules, or the AI reader filling a blank the rules left. */
+  source?: 'rules' | 'model';
+  /** The model's one-line reason, shown on the chip. Null for a rules match. */
+  modelWhy?: string | null;
   /** The arithmetic behind a count, in words, when the count was not simply stated.
    *  e.g. "twice a week × 26 weeks = 52". Shown on the line; never hidden. */
   countNote?: string | null;
@@ -883,3 +903,36 @@ export function parseJourney(story: string, table: PriceItem[]): ParsedSegment[]
   return out;
 }
 
+
+
+/* ── The AI reader, from the browser ─────────────────────────────────────────
+   POST /api/map runs these same rules on the server, then lets a model fill
+   only the phrases the rules left blank, only with an id the catalog holds.
+   Offline, or on any error, the rules' answer stands. Prices never travel:
+   the reply carries ids and this side prices them from the same table. */
+export interface ModelRead { segments: ParsedSegment[]; model: string | null }
+
+export async function parseJourneyWithModel(
+  story: string,
+  table: PriceItem[],
+  fetchImpl: typeof fetch = fetch,
+  signal?: AbortSignal,
+): Promise<ModelRead> {
+  const local = parseJourney(story, table);
+  if (!story.trim()) return { segments: local, model: null };
+  try {
+    const r = await fetchImpl('/api/map', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ story }),
+      signal,
+    });
+    if (!r.ok) return { segments: local, model: null };
+    const data = (await r.json()) as { ok?: boolean; model?: string | null; segments?: import('./map-model').WireSegment[] };
+    if (!data.ok || !Array.isArray(data.segments)) return { segments: local, model: null };
+    const { fromWire } = await import('./map-model');
+    return { segments: fromWire(data.segments, table), model: data.model ?? null };
+  } catch {
+    return { segments: local, model: null };
+  }
+}

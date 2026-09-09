@@ -180,13 +180,17 @@ describe('the CSV an agency opens', () => {
   });
   it('publishes row_hash as the last column of every export', () => {
     for (const kind of ['corrections', 'gap', 'survey']) {
-      const cols = (exportRows(kind, []) as string).trim().split(',');
+      /* corrections.csv leads with a # comment naming the table version and the
+         audit; the header is the first line that is not a comment. */
+      const header = (exportRows(kind, []) as string).trim().split('\n').filter((l) => !l.startsWith('#'))[0];
+      const cols = header.split(',');
       expect(cols[cols.length - 1]).toBe('row_hash');
     }
   });
   it('carries the hash of the row it exports', () => {
     const csv = exportRows('corrections', [{ ...corr(), rowHash: 'a'.repeat(64) }]) as string;
-    expect(csv.trim().split('\n')[1].endsWith('a'.repeat(64))).toBe(true);
+    const rows = csv.trim().split('\n').filter((l) => !l.startsWith('#')).slice(1);
+    expect(rows[0].endsWith('a'.repeat(64))).toBe(true);
   });
 });
 

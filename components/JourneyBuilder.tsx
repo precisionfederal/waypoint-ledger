@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ITEMS, UNPRICEABLE, useStore } from '@/lib/store';
 import { search } from '@/lib/search';
-import { parseJourney, type ParsedSegment } from '@/lib/mapper';
+import { parseJourney, parseJourneyWithModel, type ParsedSegment } from '@/lib/mapper';
 import { CATEGORIES, categoryKey } from '@/lib/categories';
 import { priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION } from '@/lib/table';
@@ -42,10 +42,23 @@ export function useLivePreview(story: string): LivePreview {
     return () => clearTimeout(t);
   }, [story]);
 
+  /* The rules answer instantly. The AI reader answers a moment later, for the
+     phrases the rules left blank, and only if the story has not changed since. */
+  const [modelRead, setModelRead] = useState<{ story: string; segments: ParsedSegment[]; model: string | null } | null>(null);
+  useEffect(() => {
+    if (!debounced.trim()) return;
+    const ctl = new AbortController();
+    parseJourneyWithModel(debounced, ITEMS, fetch, ctl.signal).then((r) => {
+      if (!ctl.signal.aborted && r.model) setModelRead({ story: debounced, ...r });
+    });
+    return () => ctl.abort();
+  }, [debounced]);
+
   return useMemo(() => {
-    const segments = debounced.trim() ? parseJourney(debounced, ITEMS) : [];
+    const rules = debounced.trim() ? parseJourney(debounced, ITEMS) : [];
+    const segments = modelRead && modelRead.story === debounced ? modelRead.segments : rules;
     return { segments, ...previewTotals(segments), pending: debounced !== story };
-  }, [debounced, story]);
+  }, [debounced, story, modelRead]);
 }
 
 /** The preview's arithmetic: one published figure times the count in the phrase. */
@@ -95,6 +108,7 @@ export function LivePreviewChips({ preview, onExample }: { preview: LivePreview;
           return it ? (
             <li key={`${i}-${it.id}`} className={`lp-chip${low ? ' is-low' : ''}`}>
               <b>{it.label}</b>
+              {s.source === 'model' && <span className="lp-ai" title={s.modelWhy ? `AI read this as ${it.label}: ${s.modelWhy}` : `AI read this as ${it.label}`}>AI read</span>}
               <span className="lp-x">×{s.times}</span>
               {s.countNote && <span className="lp-note">{s.countNote}</span>}
               {low && <span className="lp-low" title="A one-word match. Open the line and change it if this is not what you had.">worth a check</span>}

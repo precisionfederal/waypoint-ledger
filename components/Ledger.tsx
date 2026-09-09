@@ -183,6 +183,9 @@ export default function Ledger() {
       point: yearAhead.point, low: yearAhead.low, high: yearAhead.high,
       year: Number(yearAhead.year), population: yearAhead.population, source: yearAhead.sourceTitle,
     } : null;
+  /* The person's own words, joined, for the year-ahead invitation. Read on this
+     device only: it is already what the ledger is made of, and it is not sent. */
+  const typedWords = useMemo(() => st.entries.map((e) => e.raw).join(' · '), [st.entries]);
   /* The card people post carries exactly what the share link carries. */
   const card = useMemo(() => shareCardData(lines, st.entries.length, st.unpricedHits.length), [lines, st.entries.length, st.unpricedHits.length]);
   const appointments = st.entries.reduce((a, e) => a + e.times, 0);
@@ -512,7 +515,7 @@ export default function Ledger() {
       </div>
 
       <section className="card table-card">
-        <div className="table-scroll">
+        <div className="table-scroll" tabIndex={0}>
           <table className="ledger-table">
             <caption className="sr-only">Every step of your journey, the unit of care it maps to, the published federal figure, the line total, and a control to say whether that figure describes you.</caption>
             <thead><tr><th scope="col">What happened</th><th scope="col" className="r">Times</th><th scope="col" className="r">Figure</th><th scope="col" className="r">Line total</th><th scope="col">Is this figure right?</th></tr></thead>
@@ -624,7 +627,11 @@ export default function Ledger() {
         </section>
       )}
 
-      <YearAheadCard />
+      {/* 🔴 The card no longer goes blank for a visitor who chose nothing. It is
+          handed the person's own phrases so it can offer the published figure
+          their words already name — conditionally worded, never assigned to
+          them, and never written back as their choice. */}
+      <YearAheadCard impliedFrom={typedWords} />
 
       {sos ? (
         <details className="more-block sos-fold">

@@ -17,7 +17,7 @@ import { json, bad, readJson, str, int, channelOf, count, isDryRun, dryOk } from
 import { cachedAggregate, writeProbe } from './_counters.js';
 import { all, encrypt, userOf } from './_db.js';
 import { appendChained } from './_hash.js';
-import { BURDEN_IDS as BURDENS, DECIDER_IDS as DECIDERS, CONTEXT as CTX, SURVEY_VERSION } from '../../../lib/survey-def.js';
+import { BURDEN_IDS as BURDENS, DECIDER_IDS as DECIDERS, CONTEXT as CTX, SURVEY_VERSION, SMALL_CELL_MIN, SEX_ASK_ORIGIN } from '../../../lib/survey-def.js';
 
 const CONTEXT = Object.fromEntries(Object.entries(CTX).map(([k, v]) => [k, v.options]));
 
@@ -55,10 +55,11 @@ export function validateSurvey(b) {
   };
 }
 
-export function aggregateSurvey(rows) {
-  if (!rows.length) return { ok: true, n: 0, note: 'No survey responses yet. This endpoint reports only what people have actually sent.' };
-  const count_ = (arr) => arr.reduce((m, v) => ((m[v] = (m[v] || 0) + 1), m), {});
-  const ranking = BURDENS.map((id) => {
+/** The five burdens with how a set of respondents placed them. Pure; used for
+ *  the whole sample and, unchanged, for each published sex group, so a group
+ *  can never be computed by a different rule than the total it sits under. */
+export function rankOf(rows) {
+  return BURDENS.map((id) => {
     const positions = rows.map((r) => r.ranking.indexOf(id) + 1).filter((p) => p > 0);
     return {
       burden: id,
@@ -67,6 +68,56 @@ export function aggregateSurvey(rows) {
       meanRank: positions.length ? +(positions.reduce((a, b) => a + b, 0) / positions.length).toFixed(2) : null,
     };
   }).sort((a, b) => (a.meanRank ?? 9) - (b.meanRank ?? 9));
+}
+
+/* ==========================================================================
+   THE RANKING, READ BY SEX.
+
+   The Federal Sprint Lead for the Invisible Illness track asked every team on
+   26 August 2026 to be intentional about sex differences where relevant. A
+   burden ranking that cannot be read by sex cannot answer that, so this is the
+   cross-tabulation, and it is the reason the instrument asks.
+
+   It is suppressed HERE, on the server, and not in the browser: a marginal
+   count is one number about a lot of people, but a cross-tabulation narrows
+   the group twice, so a small cell must never leave the machine holding it.
+   Any sex group under SMALL_CELL_MIN is not served at all; the number of
+   withheld groups and the responses they hold ARE served, so the table still
+   adds up in public. No weighting, no imputation: each group is the same count
+   of the same answers, computed by the same function as the total.
+   ========================================================================== */
+export function rankingBySex(rows, min = SMALL_CELL_MIN) {
+  const groups = new Map();
+  let notStated = 0;
+  for (const r of rows) {
+    const v = r.context && r.context.sex;
+    if (!v) { notStated++; continue; }
+    if (!groups.has(v)) groups.set(v, []);
+    groups.get(v).push(r);
+  }
+  const published = [];
+  let withheldGroups = 0, withheldResponses = 0;
+  for (const [sex, rs] of groups) {
+    if (rs.length >= min) published.push({ sex, n: rs.length, ranking: rankOf(rs) });
+    else { withheldGroups++; withheldResponses += rs.length; }
+  }
+  published.sort((a, b) => b.n - a.n);
+  return {
+    min,
+    stated: rows.length - notStated,
+    notStated,
+    groups: published,
+    withheldGroups,
+    withheldResponses,
+    why: SEX_ASK_ORIGIN,
+    method: `Each group is the same count of the same answers as the total above it, computed by the same function. A sex group holding fewer than ${min} responses is withheld here rather than served and hidden later, because a cross-tabulation narrows the group twice. Nothing is weighted, imputed or extrapolated.`,
+  };
+}
+
+export function aggregateSurvey(rows) {
+  if (!rows.length) return { ok: true, n: 0, note: 'No survey responses yet. This endpoint reports only what people have actually sent.' };
+  const count_ = (arr) => arr.reduce((m, v) => ((m[v] = (m[v] || 0) + 1), m), {});
+  const ranking = rankOf(rows);
   const clin = rows.map((r) => r.clinicians).filter((n) => typeof n === 'number').sort((a, b) => a - b);
   const coverage = {};
   for (const k of Object.keys(CONTEXT)) coverage[k] = count_(rows.map((r) => (r.context && r.context[k]) || 'not stated'));
@@ -77,6 +128,7 @@ export function aggregateSurvey(rows) {
     firstAt: dates[0], lastAt: dates[dates.length - 1],
     channels: count_(rows.map((r) => r.channel || 'direct')),
     ranking,
+    rankingBySex: rankingBySex(rows),
     unasked: count_(rows.map((r) => r.unasked)),
     lead: count_(rows.map((r) => r.lead)),
     decide: count_(rows.map((r) => r.decide)),

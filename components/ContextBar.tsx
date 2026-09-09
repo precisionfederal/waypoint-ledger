@@ -63,15 +63,21 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
     st.setLocality((sole ?? g?.localities[0])?.key);
   }
 
+  /* 🔴 THE CHIP NAMES THE BASIS EVEN WHEN NOBODY HAS ANSWERED.
+     "This ledger is not fitted yet · Not answered" told a first-time visitor
+     that something was missing without telling them what they were looking at.
+     The honest default is a sentence: no coverage chosen, so these are the
+     national Medicare reference figures — and the button beside it changes
+     that in one tap. */
   const summary = answered
     ? `${coverage ? COVERAGE_LABEL[coverage] : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}`
-    : 'Not answered · national Medicare figures';
+    : 'No coverage chosen — Medicare reference figures, national';
 
   if (collapsed) {
     return (
       <section className={`${s.bar} ${s.collapsed} ctx-shell`} aria-labelledby="ctx-h">
         <p className={s.sumLine} id="ctx-h">
-          <span className={s.sumLbl}>{answered ? 'This ledger is fitted for' : 'This ledger is not fitted yet'}</span>
+          <span className={s.sumLbl}>This ledger is fitted for</span>
           <b className={s.sumVal}>{summary}</b>
         </p>
         <button type="button" className={s.change} aria-expanded={false} onClick={() => setOpen(true)}>

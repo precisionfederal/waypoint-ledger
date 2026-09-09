@@ -9,7 +9,7 @@ import * as React from 'react';
 (globalThis as unknown as { React: typeof React }).React = React;
 import { readFileSync, existsSync } from 'node:fs';
 import { previewTotals, shareCardData } from '../components/JourneyBuilder';
-import TotalReveal, { relationTo } from '../components/TotalReveal';
+import TotalReveal, { TotalComparison, relationTo } from '../components/TotalReveal';
 import { parseJourney, type ParsedSegment } from '../lib/mapper';
 import { priceJourney } from '../lib/pricing';
 import { TABLE, SELECTABLE } from '../lib/table';
@@ -196,5 +196,148 @@ describe('copy — the product never asserts what a person paid', () => {
   it('the reveal is labelled in a human sentence, not an accounting header', () => {
     const src = readFileSync('components/TotalReveal.tsx', 'utf8');
     expect(src).toContain("label = 'What the published prices add up to'");
+  });
+});
+
+/* ==========================================================================
+   R4 · results #1 — THE DEFAULT VISITOR.
+
+   A person who answers none of the three fit questions and only types their
+   sentence is the most likely judge and the most likely patient. Round 4 found
+   they got the weakest product we ship: "Prefer not to say" rendered
+   pre-selected, so nothing was ever "chosen", so the year-ahead card returned
+   null and the largest published figure in the product — the $1,619 to $6,578
+   MEPS interval — was nowhere on the page.
+
+   These tests hold the fix in place: nothing is pre-selected, no path renders a
+   blank where a published figure exists, and no figure on the invitation is
+   ever attributed to the person reading it.
+   ========================================================================== */
+describe('the year-ahead card for a visitor who chose nothing', () => {
+  const render = async (el: React.ReactElement) => {
+    const { renderToStaticMarkup } = await import('react-dom/server');
+    return renderToStaticMarkup(el);
+  };
+  const invite = async (implied: string | null, declined = false) => {
+    const { YearAheadInvitation } = await import('../components/ConditionPicker');
+    return render(React.createElement(YearAheadInvitation, { implied, declined }));
+  };
+
+  it('offers the published interval instead of a blank when nothing is implied', async () => {
+    const html = await invite(null);
+    expect(html).toContain('$1,619 to $6,578');
+    expect(html).toContain('Point estimate $4,098');
+    expect(html).toContain('pick your condition to narrow this');
+    expect(html).toContain('Shown apart, never added to the total above');
+  });
+
+  it('lists the other published figures rather than averaging them into one span', async () => {
+    const html = await invite(null);
+    expect(html).toContain('$4,900');   // treated heart disease, MEPS SB#562
+    expect(html).toContain('$5,810');   // treated diabetes, MEPS SB#568
+    expect(html).toContain('listed and never');
+    // the two-bases error: an excess low end and a gross high end are never one range
+    expect(html).not.toContain('$1,619 to $5,810');
+    expect(html).not.toMatch(/average of|averaged across/i);
+  });
+
+  it('never tells the reader the figure is theirs', async () => {
+    for (const html of [await invite(null), await invite('long-covid'), await invite('fibromyalgia')]) {
+      expect(html).toMatch(/if you are looking into|pick your condition/i);
+      expect(html).not.toMatch(/you have|your long COVID|what you paid|you spent/i);
+    }
+  });
+
+  it('answers with the implied condition when the person already typed it', async () => {
+    const html = await invite('long-covid');
+    expect(html).toContain('if you are looking into long COVID');
+    expect(html).toContain('$1,619 to $6,578');
+    expect(html).toContain('Who this describes:');
+  });
+
+  it('shows the absence, with the way to count it, for a condition with no figure', async () => {
+    const html = await invite('fibromyalgia');
+    expect(html).toContain('No published figure');
+    expect(html).toContain('Count this gap');
+    expect(html).not.toMatch(/\$\d/);   // never a substitute number
+  });
+
+  it('respects a person who declined, and still shows them something', async () => {
+    const html = await invite(null, true);
+    expect(html).toContain('You chose not to say');
+    expect(html).not.toMatch(/Nothing is chosen yet/);
+    expect(html).toContain('$1,619 to $6,578');
+  });
+});
+
+describe('what the person already typed', () => {
+  const implied = async (text: string | null) => {
+    const { impliedConditionId } = await import('../components/ConditionPicker');
+    return impliedConditionId(text);
+  };
+
+  it('reads the condition out of their own words', async () => {
+    expect(await implied('four years of appointments after long COVID')).toBe('long-covid');
+    expect(await implied('my fibromyalgia flared')).toBe('fibromyalgia');
+    expect(await implied('endometriosis surgery')).toBe('endometriosis');
+  });
+
+  it('reads a published synonym the file already carries', async () => {
+    expect(await implied('PASC clinic referral')).toBe('long-covid');
+    expect(await implied('chronic fatigue syndrome workup')).toBe('me-cfs');
+  });
+
+  it('says nothing when the words name nothing', async () => {
+    expect(await implied('three MRIs and an echocardiogram')).toBeNull();
+    expect(await implied('')).toBeNull();
+    expect(await implied(null)).toBeNull();
+  });
+
+  it('never matches a fragment inside a longer word', async () => {
+    // "endo" is a real synonym; it must not fire inside "endoscopy"
+    expect(await implied('upper endoscopy')).toBeNull();
+  });
+
+  it('takes the first condition named, not the last', async () => {
+    expect(await implied('long COVID, then they said fibromyalgia')).toBe('long-covid');
+  });
+});
+
+describe('the money screen defers the survey methods instead of printing them', () => {
+  it('names the subject in a phrase and links to the card that carries it in full', () => {
+    const y = {
+      point: 4098, low: 1619, high: 6578, year: 2022,
+      population: 'U.S. civilian noninstitutionalized adults 18 and older; 17,119 survey respondents standing for about 254 million adults, of whom 1,196 reported long COVID',
+      source: '2022 Medical Expenditure Panel Survey',
+    };
+    const { renderToStaticMarkup } = require('react-dom/server') as typeof import('react-dom/server');
+    const html = renderToStaticMarkup(
+      React.createElement(TotalComparison, { totalUsd: 2049, yearAhead: y }),
+    );
+    expect(html).toContain('an adult reporting long COVID');
+    expect(html).not.toContain('17,119');
+    expect(html).toContain('#year-ahead-who');
+    expect(html).toContain('$1,619 to $6,578');
+  });
+
+  it('keeps a short population inline, because there is nothing to defer', () => {
+    const y = { point: 4098, low: 1619, high: 6578, year: 2022, population: 'adults 18 and older' };
+    const { renderToStaticMarkup } = require('react-dom/server') as typeof import('react-dom/server');
+    const html = renderToStaticMarkup(
+      React.createElement(TotalComparison, { totalUsd: 2049, yearAhead: y }),
+    );
+    expect(html).toContain('For adults 18 and older');
+    expect(html).not.toContain('#year-ahead-who');
+  });
+
+  /* The standing subject in TotalReveal names long COVID. That is only honest
+     while long COVID is the ONLY condition carrying an `excess` figure — the
+     one kind the ledger ever feeds into this band. If a second one is added,
+     this test fails and the subject has to come from the row. */
+  it('is guarded: exactly one condition carries an excess figure, and it is long COVID', () => {
+    const raw = JSON.parse(readFileSync('data/conditions.json', 'utf8')) as
+      { conditions: { id: string; figure_kind?: string | null }[] };
+    const excess = raw.conditions.filter((c) => c.figure_kind === 'excess');
+    expect(excess.map((c) => c.id)).toEqual(['long-covid']);
   });
 });

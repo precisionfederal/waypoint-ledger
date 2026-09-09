@@ -45,8 +45,6 @@ jobs:
       # quietly resolves a different tree is not the build anyone reviewed.
       - name: install
         run: npm ci
-      - name: build stamp (public/build.json is generated, never committed)
-        run: node scripts/gen-build-json.mjs
 
       - name: types
         run: npx tsc --noEmit -p .
@@ -68,3 +66,117 @@ jobs:
             test -e "cf/out/$f" || { echo "MISSING cf/out/$f"; exit 1; }
           done
           echo "every published path is in the export"
+
+  # ==========================================================================
+  # DEPS — the supply chain, proved on every push (deps lane, 2026-09-09).
+  #
+  # Two questions a reviewer of a public health tool will ask, answered by a
+  # command instead of a sentence: does anything we ship have a known hole, and
+  # may we lawfully publish what we depend on? The audit runs with --omit=dev
+  # because the production bar is the runtime tree: a hole in vitest never
+  # reaches a visitor. The full-tree audit still fails on critical, so a
+  # laptop-compromising toolchain advisory cannot sit here unread.
+  # ==========================================================================
+  deps:
+    name: audit · licences
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      # npm ci also IS the lockfile check: it exits non-zero when package.json
+      # and package-lock.json disagree, so drift cannot reach a green badge.
+      - name: install from the lockfile
+        run: npm ci
+
+      # The bar Bo set: zero high or critical in what the site actually serves.
+      - name: no known holes in the runtime tree
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: nothing critical anywhere, including the toolchain
+        run: npm audit --audit-level=critical
+
+      # Every runtime package must be permissive enough to publish the source
+      # under Apache-2.0. The single copyleft entry allowed is sharp's libvips
+      # platform binary: next's image optimiser is build-time only, the export
+      # sets images.unoptimized, and no byte of it is in cf/out or the public
+      # repo — verified 2026-09-09 by grepping the export for libvips.
+      - name: every runtime licence is publishable
+        run: |
+          cat > /tmp/licence-check.mjs <<'EOF'
+          import { execFileSync } from 'node:child_process';
+          import { readFileSync } from 'node:fs';
+          import path from 'node:path';
+          const ALLOW = new Set(['MIT', 'Apache-2.0', 'BSD-2-Clause', 'BSD-3-Clause', 'ISC', '0BSD',
+            'CC-BY-4.0', 'MIT OR Apache-2.0', 'BlueOak-1.0.0', 'Unlicense', 'CC0-1.0']);
+          const COPYLEFT_OK = /^@img\/sharp-libvips-/;
+          let out = '';
+          try { out = execFileSync('npm', ['ls', '--omit=dev', '--all', '--parseable'], { encoding: 'utf8' }); }
+          catch (e) { out = (e.stdout || ''); }
+          const root = process.cwd();
+          const dirs = [...new Set(out.split('\n').filter((d) => d.includes('node_modules')))];
+          const bad = [];
+          let n = 0;
+          for (const dir of dirs) {
+            let pkg;
+            try { pkg = JSON.parse(readFileSync(path.join(dir, 'package.json'), 'utf8')); } catch { continue; }
+            n++;
+            const lic = pkg.license || (Array.isArray(pkg.licenses) && pkg.licenses[0] && pkg.licenses[0].type) || '';
+            const name = pkg.name || path.relative(root, dir);
+            if (ALLOW.has(lic)) continue;
+            if (COPYLEFT_OK.test(name)) { console.log(`note  ${name}@${pkg.version} ${lic} — build-time only, not in cf/out`); continue; }
+            bad.push(`${name}@${pkg.version} → ${lic || '(no licence field)'}`);
+          }
+          console.log(`${n} runtime packages checked`);
+          if (bad.length) { console.error('licences that are not on the allowlist:'); for (const b of bad) console.error('  ' + b); process.exit(1); }
+          console.log('every runtime licence is permissive and compatible with the Apache-2.0 export');
+          EOF
+          node /tmp/licence-check.mjs
+
+  # ==========================================================================
+  # The security job. Two questions a stranger can watch being answered:
+  # does the review still hold, and is there a secret in anything we publish.
+  #
+  # The dependency audit is NOT here. It is the `deps` job above, which runs
+  # `npm audit --omit=dev --audit-level=high` on the runtime tree, a critical
+  # sweep over the whole toolchain, and the licence allowlist. One gate, one
+  # place: a second copy would be a second thing to disagree with the first.
+  # ==========================================================================
+  security:
+    name: the security review · no secret is served
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: install from the lockfile
+        run: npm ci
+
+      # tests/security.test.ts is already inside the suite the `check` job runs.
+      # It runs again on its own here so that a break reads as "the security
+      # review failed" in the job list, instead of as one red line among 800.
+      # Its live half needs a wrangler stack and is skipped without SEC_BASE;
+      # what runs here is the source and export half.
+      - name: the security review still passes
+        run: npx vitest run tests/security.test.ts
+
+      - name: the static export, so there is something built to search
+        run: npm run build:static
+
+      # No secret file exists on a runner, so this is the pattern half: a
+      # private key, an AWS id, a GitHub or Slack token, a JWT or a hard-coded
+      # bearer token anywhere in the tree, and the .dev.vars family being
+      # commitable. On a developer machine the same script also searches every
+      # built tree for the real ADMIN_TOKEN and INTERVIEW_KEY.
+      - name: nothing we serve or commit carries a secret
+        run: bash scripts/secrets-scan.sh

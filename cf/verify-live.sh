@@ -78,7 +78,13 @@ CODE="$(curl -sS -m 20 -o /dev/null -w '%{http_code}' -X POST "$ORIGIN/api/price
 
 say "the register's own claims"
 CSV="$(curl -sS -m 20 "$ORIGIN/api/export/corrections.csv")"
-printf '%s' "$CSV" | head -n1 | grep -q 'row_hash' && ok "corrections.csv carries row_hash" || fail "corrections.csv has no row_hash column"
+# The header row, not line 1: BUILD-7's data lane put a provenance preamble
+# above it (a `#` line naming the price table, the counting date and what the
+# counts are not). `head -n1` read that comment and reported a healthy export as
+# broken — the same shape of false red that Round 3's 2.5 MB slurp produced. A
+# gate that cries wolf on a healthy file is worse than no gate.
+CSV_HEADER="$(printf '%s' "$CSV" | grep -v '^[[:space:]]*#' | grep -v '^[[:space:]]*$' | head -n1)"
+printf '%s' "$CSV_HEADER" | grep -q 'row_hash' && ok "corrections.csv carries row_hash" || fail "corrections.csv has no row_hash column"
 if printf '%s' "$CSV" | tail -n +2 | grep -qE '(^|,)[=+@]'; then
   fail "a csv cell begins with a formula character and was not escaped"
 else

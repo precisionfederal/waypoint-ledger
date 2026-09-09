@@ -250,7 +250,7 @@ export default function Admin() {
 
         {tab === 'corrections' && (
           <section className="card table-card">
-            <div className="table-scroll">
+            <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <thead><tr><th scope="col">Received</th><th scope="col">Published figure</th><th scope="col">Verdict</th><th scope="col" className="r">Said they paid</th><th scope="col">What they wrote</th><th scope="col">Table</th></tr></thead>
                 <tbody>

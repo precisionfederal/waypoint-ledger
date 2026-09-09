@@ -91,133 +91,152 @@
     "bytes": 2622166,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/files/zip/rvu26c-updated-06-30-2026.zip",
-    "title": "CMS CY2026 National Physician Fee Schedule Relative Value File (RVU26C, July release)"
+    "title": "CMS CY2026 National Physician Fee Schedule Relative Value File (RVU26C, July release)",
+    "file": "PPRRVU2026_Jul_nonQPP.csv"
    },
    "clfs": {
     "sha256": "f5a090789c40fe791b478a735c7cf5399e86726adc788f11829435cb0ca4d7d5",
     "bytes": 599628,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/files/zip/26clabq3.zip",
-    "title": "CMS Clinical Laboratory Fee Schedule, CY2026 Q3 public use file"
+    "title": "CMS Clinical Laboratory Fee Schedule, CY2026 Q3 public use file",
+    "file": "PUF_CLFS_CY2026_Q3V1.csv"
    },
    "oppsb": {
     "sha256": "1f34d9770231f66b877fc84ce2bd08dceb562309729dfb597e1ff8dafcfc9006",
     "bytes": 1102872,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/files/zip/january-2026-opps-addendum-b.zip",
-    "title": "CMS January 2026 Hospital Outpatient PPS Addendum B"
+    "title": "CMS January 2026 Hospital Outpatient PPS Addendum B",
+    "file": "2026 January Web Addendum B.12.29.25.csv"
    },
    "gpci": {
     "sha256": "7850e2987d12e46930e49033f96829b5ae11f60dd1f19965329b38cf08b05264",
     "bytes": 5957,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/files/zip/rvu26c-updated-06-30-2026.zip",
-    "title": "CMS CY2026 Geographic Practice Cost Indices, Addendum E (RVU26C, July release)"
+    "title": "CMS CY2026 Geographic Practice Cost Indices, Addendum E (RVU26C, July release)",
+    "file": "GPCI2026.csv"
    },
    "phygeo": {
     "sha256": "c26956788333d03c0080017121c19e8e4d9990e9fa8ff385d7e1a2849c45074a",
     "bytes": 42078094,
     "retrieved": "2026-09-09",
     "url": "https://data.cms.gov/sites/default/files/2026-05/e534c74b-79b8-4892-8a95-5a17e2dfec9f/MUP_PHY_R26_P05_V10_D24_Geo.csv",
-    "title": "CMS, Medicare Physician & Other Practitioners — by Geography and Service, calendar year 2024"
+    "title": "CMS, Medicare Physician & Other Practitioners — by Geography and Service, calendar year 2024",
+    "file": "MUP_PHY_R26_P05_V10_D24_Geo.csv"
    },
    "pmc": {
     "sha256": "3bc6a22cc2522257691b939ee0a671bfb615e597272c080a2617f0301fb93830",
     "bytes": 230662,
     "retrieved": "2026-09-09",
     "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/",
-    "title": "Long COVID Is Associated with Excess Direct Healthcare Expenditures Among Adults in the United States (MEPS 2022), PubMed Central"
+    "title": "Long COVID Is Associated with Excess Direct Healthcare Expenditures Among Adults in the United States (MEPS 2022), PubMed Central",
+    "file": "PMC12607343"
    },
    "st532": {
     "sha256": "7594854b7202c1d89276df52b13f661473ba8bf6ec117ebb831e40f0f47d031a",
     "bytes": 375901,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_files/publications/st532/stat532.pdf",
-    "title": "AHRQ MEPS Statistical Brief #532"
+    "title": "AHRQ MEPS Statistical Brief #532",
+    "file": "stat532.pdf"
    },
    "meps2014t1": {
     "sha256": "61222b6f8aa81d5a1ace2655816978b17c81eb9096893e5baac25811516f465f",
     "bytes": 20176,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_stats/summ_tables/hc/mean_expend/2014/table1.pdf",
-    "title": "AHRQ MEPS HC Summary Table 1, 2014"
+    "title": "AHRQ MEPS HC Summary Table 1, 2014",
+    "file": "table1.pdf"
    },
    "st484": {
     "sha256": "5a8ce1d026fcc4a716ff254951123101c83ef1e65f3a654f92478022a658c7b3",
     "bytes": 249142,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_files/publications/st484/stat484.pdf",
-    "title": "AHRQ MEPS Statistical Brief #484"
+    "title": "AHRQ MEPS Statistical Brief #484",
+    "file": "stat484.pdf"
    },
    "sb311": {
     "sha256": "9e9de553a0cb598d19b280e96a197910acf9e68bbf698a38a3d163960bcafbb7",
     "bytes": 4918461,
     "retrieved": "2026-09-09",
     "url": "https://hcup-us.ahrq.gov/reports/statbriefs/sb311-ED-visit-costs-2021.pdf",
-    "title": "AHRQ HCUP Statistical Brief #311"
+    "title": "AHRQ HCUP Statistical Brief #311",
+    "file": "sb311-ED-visit-costs-2021.pdf"
    },
    "edccr": {
     "sha256": "6149dfbc874ba9d34be3314814aa461a9ee833120c603feba4dab6608e691783",
     "bytes": 105103,
     "retrieved": "2026-09-09",
     "url": "https://hcup-us.ahrq.gov/db/ccr/ed-ccr/SummaryStats_edcc2021neds.PDF",
-    "title": "AHRQ HCUP ED cost-to-charge ratio summary statistics, 2021"
+    "title": "AHRQ HCUP ED cost-to-charge ratio summary statistics, 2021",
+    "file": "SummaryStats_edcc2021neds.PDF"
    },
    "st562": {
     "sha256": "48a3f6e69893647bc5a7cc2121894a11d387ac973fba0bf4e517b610f12a42c1",
     "bytes": 486305,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf",
-    "title": "AHRQ MEPS Statistical Brief #562"
+    "title": "AHRQ MEPS Statistical Brief #562",
+    "file": "stat562.pdf"
    },
    "st568": {
     "sha256": "78f76227dd8e0884b1bcecb5e18f2324f1dd23a6720f6b24b5b63278f7716f05",
     "bytes": 447121,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf",
-    "title": "AHRQ MEPS Statistical Brief #568"
+    "title": "AHRQ MEPS Statistical Brief #568",
+    "file": "stat568.pdf"
    },
    "st560": {
     "sha256": "8cfa01585457046cb81ef7c3eb0e75f79cdf9ef4d91f6bff4fa93a597c245647",
     "bytes": 963680,
     "retrieved": "2026-09-09",
     "url": "https://meps.ahrq.gov/data_files/publications/st560/stat560.pdf",
-    "title": "AHRQ MEPS Statistical Brief #560"
+    "title": "AHRQ MEPS Statistical Brief #560",
+    "file": "stat560.pdf"
    },
    "partb": {
     "sha256": "a0726e0c8b05ad9f167120808648b55c6c85395f9cd42ec28ab74356658b2892",
     "bytes": 67205,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles",
-    "title": "CMS fact sheet, 2026 Medicare Parts A and B premiums and deductibles"
+    "title": "CMS fact sheet, 2026 Medicare Parts A and B premiums and deductibles",
+    "file": "2026-medicare-parts-b-premiums-deductibles"
    },
    "partd": {
     "sha256": "e48ad7fee52468385cbb0ca9f82a578f58a435a96bb57f247252fe4f2a79723a",
     "bytes": 460891,
     "retrieved": "2026-09-09",
     "url": "https://www.cms.gov/files/document/final-cy-2026-part-d-redesign-program-instruction.pdf",
-    "title": "CMS Final CY2026 Part D Redesign Program Instructions"
+    "title": "CMS Final CY2026 Part D Redesign Program Instructions",
+    "file": "final-cy-2026-part-d-redesign-program-instruction.pdf"
    },
    "blswk": {
     "sha256": "d382be171d6b19c8b0d94c48e9d811dea3dd1df51e8ff26aa0398c33c6cb43bd",
     "bytes": 53612,
     "retrieved": "2026-09-09",
     "url": "https://www.bls.gov/news.release/wkyeng.nr0.htm",
-    "title": "BLS Usual Weekly Earnings of Wage and Salary Workers, second quarter 2026"
+    "title": "BLS Usual Weekly Earnings of Wage and Salary Workers, second quarter 2026",
+    "file": "wkyeng.nr0.htm"
    },
    "oews": {
     "sha256": "852250997ceff9b721ff68f63e877d818f9c1ec8b1b69dd367958faedd5282b2",
     "bytes": 289615,
     "retrieved": "2026-09-09",
     "url": "https://www.bls.gov/oes/special-requests/oesm25nat.zip",
-    "title": "BLS Occupational Employment and Wage Statistics, May 2025 national estimates"
+    "title": "BLS Occupational Employment and Wage Statistics, May 2025 national estimates",
+    "file": "national_M2025_dl.xlsx"
    },
    "gsa": {
     "sha256": "bc35942eae02d670c33392fa815619de621b98acc8cc21650e2be1e5bcb20003",
     "bytes": 191365,
     "retrieved": "2026-09-09",
     "url": "https://www.gsa.gov/travel/plan-a-trip/transportation-airfare-rates-pov-rates/pov-mileage-reimbursement",
-    "title": "GSA privately owned vehicle mileage reimbursement rates"
+    "title": "GSA privately owned vehicle mileage reimbursement rates",
+    "file": "pov-mileage-reimbursement"
    }
   }
  },
@@ -302,6 +321,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.85 total non-facility RVUs x $33.4009 = $95.19",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -388,6 +408,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "4.06 total non-facility RVUs x $33.4009 = $135.61",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -469,6 +490,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.76 total non-facility RVUs x $33.4009 = $192.39",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -549,6 +571,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.52 total non-facility RVUs x $33.4009 = $117.57",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -639,6 +662,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.31 total non-facility RVUs x $33.4009 = $177.36",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -721,6 +745,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "7.09 total non-facility RVUs x $33.4009 = $236.81",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -798,6 +823,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "1.78 total non-facility RVUs x $33.4009 = $59.45",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -845,6 +871,7 @@
     "check": "OPPS Addendum B lookup",
     "evidence": "G0463 pays $136.02 under APC 5012, minimum unadjusted copayment $27.21",
     "source_url": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient-pps/quarterly-addenda-updates/january-2026-addendum-b",
+    "source_key": "oppsb",
     "extras": []
    }
   },
@@ -921,6 +948,7 @@
     "check": "two published figures added, both re-read",
     "evidence": "hospital APC 5024 $426.30 + physician facility payment $118.24 = $544.54",
     "source_url": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient-pps/quarterly-addenda-updates/january-2026-addendum-b",
+    "source_key": "oppsb+rvu",
     "extras": []
    }
   },
@@ -964,6 +992,7 @@
     "check": "OPPS Addendum B lookup",
     "evidence": "99284 pays $426.30 under APC 5024, minimum unadjusted copayment $85.26",
     "source_url": "https://www.cms.gov/medicare/payment/prospective-payment-systems/hospital-outpatient-pps/quarterly-addenda-updates/january-2026-addendum-b",
+    "source_key": "oppsb",
     "extras": []
    }
   },
@@ -1007,6 +1036,7 @@
     "check": "PFS re-derivation, facility setting",
     "evidence": "3.54 total facility RVUs x $33.4009 = $118.24",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -1079,6 +1109,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 85025 pays $7.77 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1150,6 +1181,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 80053 pays $10.56 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1219,6 +1251,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 80048 pays $8.46 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1289,6 +1322,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 84443 pays $16.80 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1360,6 +1394,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86038 pays $12.09 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1430,6 +1465,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 85652 pays $2.70 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1499,6 +1535,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86140 pays $5.18 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1567,6 +1604,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86141 pays $12.95 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1638,6 +1676,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 85379 pays $10.18 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1708,6 +1747,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82728 pays $13.63 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1775,6 +1815,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86618 pays $17.03 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1841,6 +1882,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86617 pays $15.49 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -1920,6 +1962,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.99 total non-facility RVUs x $33.4009 = $33.07",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -1999,6 +2042,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.97 total non-facility RVUs x $33.4009 = $132.60",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2077,6 +2121,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "4.99 total non-facility RVUs x $33.4009 = $166.67",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2157,6 +2202,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.89 total non-facility RVUs x $33.4009 = $196.73",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2235,6 +2281,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.85 total non-facility RVUs x $33.4009 = $195.40",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2313,6 +2360,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "9.49 total non-facility RVUs x $33.4009 = $316.97",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2394,6 +2442,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.89 total non-facility RVUs x $33.4009 = $29.73",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2468,6 +2517,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "1.90 total non-facility RVUs x $33.4009 = $63.46",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2546,6 +2596,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "1.49 total non-facility RVUs x $33.4009 = $49.77",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2628,6 +2679,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.04 total non-facility RVUs x $33.4009 = $168.34",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2710,6 +2762,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "4.96 total non-facility RVUs x $33.4009 = $165.67",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2788,6 +2841,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.11 total non-facility RVUs x $33.4009 = $70.48",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2868,6 +2922,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.19 total non-facility RVUs x $33.4009 = $173.35",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -2948,6 +3003,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.41 total non-facility RVUs x $33.4009 = $113.90",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -3025,6 +3081,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.00 total non-facility RVUs x $33.4009 = $167.00",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -3089,6 +3146,7 @@
     "check": "read in the cited MEPS 2022 analysis",
     "evidence": "$4,098 with its 95% interval $1,619 to $6,578; the same figures on the Table 3 line, with the cost ratio 1.54; gross annual spending $11,305.3 long COVID against $7,161.9 no COVID; payer share of the excess, $3,705",
     "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/",
+    "source_key": "pmc",
     "extras": []
    }
   },
@@ -3143,6 +3201,7 @@
     "check": "read in the cited MEPS 2022 analysis (a null result)",
     "evidence": "the Table 3 out-of-pocket line: $236 excess, 95% CI -95 to 566, p = 0.162; the authors' own sentence that it is not significant",
     "source_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/",
+    "source_key": "pmc",
     "extras": []
    }
   },
@@ -3193,6 +3252,7 @@
     "check": "read in the cited report",
     "evidence": "median out-of-pocket spending for drugs among all individuals who purchased at least one drug was $93, and this fell to $54 in 2018",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st532/stat532.pdf",
+    "source_key": "st532",
     "extras": [
      {
       "label": "p95 $945",
@@ -3248,6 +3308,7 @@
     "check": "read in the cited table",
     "evidence": "All visits 1,876.37 52.86 $190 $2.9 $28 $0.8",
     "source_url": "https://meps.ahrq.gov/data_stats/summ_tables/hc/mean_expend/2014/table1.pdf",
+    "source_key": "meps2014t1",
     "extras": []
    }
   },
@@ -3292,6 +3353,7 @@
     "check": "read in the cited table",
     "evidence": "61.28 1.95 $1,048 $40.3 $95 $6.8",
     "source_url": "https://meps.ahrq.gov/data_stats/summ_tables/hc/mean_expend/2014/table1.pdf",
+    "source_key": "meps2014t1",
     "extras": []
    }
   },
@@ -3336,6 +3398,7 @@
     "check": "read in the cited table",
     "evidence": "All visits 167.82 9.39 $927 $58.0 $54 $3.8",
     "source_url": "https://meps.ahrq.gov/data_stats/summ_tables/hc/mean_expend/2014/table1.pdf",
+    "source_key": "meps2014t1",
     "extras": []
    }
   },
@@ -3377,6 +3440,7 @@
     "check": "read in the cited report",
     "evidence": "means for primary care providers (general practitioners, family practitioners, and internists), pediatricians, and psychiatrists The overall mean out-of- of $166, $161, and $143, respectively, were below the national ave",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st484/stat484.pdf",
+    "source_key": "st484",
     "extras": []
    }
   },
@@ -3418,6 +3482,7 @@
     "check": "read in the cited report",
     "evidence": "pediatricians, and psychiatrists The overall mean out-of- of $166, $161, and $143",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st484/stat484.pdf",
+    "source_key": "st484",
     "extras": []
    }
   },
@@ -3459,6 +3524,7 @@
     "check": "read in the cited report",
     "evidence": "cardiologists ($303)",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st484/stat484.pdf",
+    "source_key": "st484",
     "extras": []
    }
   },
@@ -3515,6 +3581,7 @@
     "check": "read in the cited report",
     "evidence": "average cost per visit of $750",
     "source_url": "https://hcup-us.ahrq.gov/reports/statbriefs/sb311-ED-visit-costs-2021.pdf",
+    "source_key": "sb311",
     "extras": [
      {
       "label": "age split $440 / $1,110",
@@ -3575,6 +3642,7 @@
     "check": "all-payer ED cost-to-charge ratio, 2021",
     "evidence": "N=993 hospitals, min 0.02, max 1.49, mean 0.21, SD 0.14 — read on the summary line",
     "source_url": "https://hcup-us.ahrq.gov/db/ccr/ed-ccr/SummaryStats_edcc2021neds.PDF",
+    "source_key": "edccr",
     "extras": []
    }
   },
@@ -3618,6 +3686,7 @@
     "check": "read in the cited report",
     "evidence": "$4,900 per adult",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf",
+    "source_key": "st562",
     "extras": [
      {
       "label": "median $660",
@@ -3664,6 +3733,7 @@
     "check": "read in the cited report",
     "evidence": "$5,810 per adult with treated diabetes",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf",
+    "source_key": "st568",
     "extras": []
    }
   },
@@ -3715,6 +3785,7 @@
     "check": "read in the cited report",
     "evidence": "2022 $147,071 $67,321 $44,595 $13,158 $374 $6,765",
     "source_url": "https://meps.ahrq.gov/data_files/publications/st560/stat560.pdf",
+    "source_key": "st560",
     "extras": []
    }
   },
@@ -3762,6 +3833,7 @@
     "check": "read in the cited report",
     "evidence": "annual deductible for all Medicare Part B beneficiaries will be $283 in 2026",
     "source_url": "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles",
+    "source_key": "partb",
     "extras": [
      {
       "label": "standard premium $202.90",
@@ -3812,6 +3884,7 @@
     "check": "read in the cited report",
     "evidence": "annual OOP threshold of $2,100 for CY 2026",
     "source_url": "https://www.cms.gov/files/document/final-cy-2026-part-d-redesign-program-instruction.pdf",
+    "source_key": "partd",
     "extras": [
      {
       "label": "max deductible $615",
@@ -3867,6 +3940,7 @@
     "check": "read in the cited report",
     "evidence": "Median weekly earnings of full-time workers were $1,251 in the second quarter of 2026",
     "source_url": "https://www.bls.gov/news.release/wkyeng.nr0.htm",
+    "source_key": "blswk",
     "extras": [
      {
       "label": "men $1,380",
@@ -3928,6 +4002,7 @@
     "check": "$17.21 median hourly, Home Health and Personal Care Aides (31-1120)",
     "evidence": "plus 31-1131 $20.32, 29-1141 $46.90, 00-0000 $24.51, employment 4,305,810 — all read in the OEWS file",
     "source_url": "https://www.bls.gov/oes/current/oes_nat.htm",
+    "source_key": "oews",
     "extras": []
    }
   },
@@ -3974,6 +4049,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.25 total non-facility RVUs x $33.4009 = $75.15",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4021,6 +4097,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.73 total non-facility RVUs x $33.4009 = $24.38",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4064,6 +4141,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.46 total non-facility RVUs x $33.4009 = $15.36",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4106,6 +4184,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.20 total non-facility RVUs x $33.4009 = $73.48",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4149,6 +4228,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.08 total non-facility RVUs x $33.4009 = $169.68",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4192,6 +4272,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "20.17 total non-facility RVUs x $33.4009 = $673.70",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4235,6 +4316,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "14.44 total non-facility RVUs x $33.4009 = $482.31",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4278,6 +4360,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.99 total non-facility RVUs x $33.4009 = $99.87",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4321,6 +4404,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.19 total non-facility RVUs x $33.4009 = $106.55",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4364,6 +4448,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.74 total non-facility RVUs x $33.4009 = $191.72",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4407,6 +4492,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "6.12 total non-facility RVUs x $33.4009 = $204.41",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4449,6 +4535,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.42 total non-facility RVUs x $33.4009 = $114.23",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4490,6 +4577,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.15 total non-facility RVUs x $33.4009 = $105.21",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4532,6 +4620,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "5.66 total non-facility RVUs x $33.4009 = $189.05",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4575,6 +4664,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "8.99 total non-facility RVUs x $33.4009 = $300.27",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4617,6 +4707,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "11.32 total non-facility RVUs x $33.4009 = $378.10",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4660,6 +4751,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "12.54 total non-facility RVUs x $33.4009 = $418.85",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4702,6 +4794,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.93 total non-facility RVUs x $33.4009 = $97.86",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4745,6 +4838,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.87 total non-facility RVUs x $33.4009 = $29.06",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4788,6 +4882,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "4.48 total non-facility RVUs x $33.4009 = $149.64",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4831,6 +4926,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.82 total non-facility RVUs x $33.4009 = $94.19",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4873,6 +4969,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.66 total non-facility RVUs x $33.4009 = $122.25",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4916,6 +5013,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.11 total non-facility RVUs x $33.4009 = $3.67",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -4958,6 +5056,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "1.07 total non-facility RVUs x $33.4009 = $35.74",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -5001,6 +5100,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "2.06 total non-facility RVUs x $33.4009 = $68.81",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -5050,6 +5150,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82306 pays $29.60 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5098,6 +5199,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82607 pays $15.08 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5147,6 +5249,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 83036 pays $9.71 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5196,6 +5299,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 80061 pays $13.39 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5244,6 +5348,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 84439 pays $9.02 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5292,6 +5397,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82947 pays $3.93 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5341,6 +5447,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 81001 pays $3.17 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5389,6 +5496,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 87086 pays $8.07 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5438,6 +5546,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 87635 pays $51.31 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5485,6 +5594,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 83735 pays $6.70 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5534,6 +5644,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82550 pays $6.51 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5582,6 +5693,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 83880 pays $39.26 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5627,6 +5739,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 84484 pays $12.47 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5676,6 +5789,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 85610 pays $4.29 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5724,6 +5838,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 85730 pays $6.01 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5772,6 +5887,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86235 pays $17.93 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5820,6 +5936,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86225 pays $13.74 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5866,6 +5983,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86003 pays $5.22 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5913,6 +6031,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 84402 pays $25.47 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -5961,6 +6080,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 83001 pays $18.58 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6009,6 +6129,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82670 pays $27.94 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6056,6 +6177,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 84146 pays $19.38 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6104,6 +6226,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 83550 pays $8.74 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6151,6 +6274,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 82746 pays $14.70 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6198,6 +6322,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86780 pays $13.24 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6246,6 +6371,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 87340 pays $10.33 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6294,6 +6420,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 86803 pays $14.27 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6342,6 +6469,7 @@
     "check": "CLFS lookup",
     "evidence": "CPT 87389 pays $24.08 on the CY2026 Q3 file",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+    "source_key": "clfs",
     "extras": []
    }
   },
@@ -6388,6 +6516,7 @@
     "check": "read in the cited report",
     "evidence": "no government-owned automobile was authorized or available $0.76 per mile",
     "source_url": "https://www.gsa.gov/travel/plan-a-trip/transportation-airfare-rates-pov-rates/pov-mileage-reimbursement",
+    "source_key": "gsa",
     "extras": []
    }
   },
@@ -6465,6 +6594,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.15 total non-facility RVUs x $33.4009 = $5.01",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6540,6 +6670,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "3.22 total non-facility RVUs x $33.4009 = $107.55",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6616,6 +6747,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "6.59 total non-facility RVUs x $33.4009 = $220.11",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6690,6 +6822,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.56 total non-facility RVUs x $33.4009 = $18.70",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6764,6 +6897,7 @@
     "check": "PFS re-derivation, non-facility setting",
     "evidence": "0.56 total non-facility RVUs x $33.4009 = $18.70",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6807,6 +6941,7 @@
     "check": "PFS status indicator, read in the file",
     "evidence": "99401 carries status N — non-covered. CMS publishes 0.48 work, 0.68 non-facility practice expense and 0.03 malpractice RVUs for it and pays nothing, so this row carries no figure",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   },
@@ -6850,6 +6985,7 @@
     "check": "PFS status indicator, read in the file",
     "evidence": "99408 carries status N — non-covered. CMS publishes 0.65 work, 0.36 non-facility practice expense and 0.04 malpractice RVUs for it and pays nothing, so this row carries no figure",
     "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+    "source_key": "rvu",
     "extras": []
    }
   }

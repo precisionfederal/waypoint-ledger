@@ -28,3 +28,9 @@
 .meta{margin:0 0 var(--sp-2);font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
 .caveat{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9rem;line-height:1.45;color:var(--ink-3)}
 .acts{display:flex;flex-wrap:wrap;gap:.6rem;margin-top:var(--sp-3)}
+
+/* --------------------------------- the invitation, for a visitor who chose nothing */
+.invite{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9375rem;line-height:1.45;color:var(--ink-2);font-weight:600}
+.alts{margin:0 0 var(--sp-2);padding-left:1.1rem;font-size:.9375rem;line-height:1.5;color:var(--ink-3)}
+.alts li{margin:0 0 .35rem}
+.alts b{color:var(--ink-2)}

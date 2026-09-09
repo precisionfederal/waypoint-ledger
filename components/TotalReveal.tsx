@@ -137,7 +137,7 @@ export function TotalComparison({ totalUsd, yearAhead, basisNote = null }: {
  * alternative.
  */
 function NoComparison({ y, note }: { y: YearAhead; note: string | null }) {
-  const who = y.population ?? 'an adult reporting long COVID';
+  const { who, deferred } = subjectOf(y);
   const src = y.source ?? `${y.year} Medical Expenditure Panel Survey`;
   return (
     <p className="reveal-compare">
@@ -146,9 +146,32 @@ function NoComparison({ y, note }: { y: YearAhead; note: string | null }) {
       <span className="rc-note">
         {note ? `${note} ` : ''}Point estimate {usd(y.point)}, {src}, 95% interval. It already
         contains the visits and tests above, so it is shown apart and never added to them.
+        <WhoLink show={deferred} />
       </span>
     </p>
   );
+}
+
+/* 🔴 THE MONEY SCREEN IS NOT WHERE A SURVEY'S METHODS SECTION GOES.
+   `population` on the long COVID row is ninety words — coverage, respondent
+   counts, the comparison group and the journal citation. Printed inline it was
+   the second thing under the total, and people bounced off it. Nothing is
+   deleted: over this many characters the band names the subject in a phrase and
+   links to the year-ahead card, which now prints the population in full under
+   "Who this describes". Phillips asked for one tap, not for a wall. */
+const SUBJECT_MAX = 90;
+const STANDING_SUBJECT = 'an adult reporting long COVID';
+
+function subjectOf(y: YearAhead): { who: string; deferred: boolean } {
+  const p = y.population;
+  if (p && p.length <= SUBJECT_MAX) return { who: p, deferred: false };
+  return { who: STANDING_SUBJECT, deferred: true };
+}
+
+/** The tap that carries the coverage statement, when it is too long to inline. */
+function WhoLink({ show }: { show: boolean }) {
+  if (!show) return null;
+  return <> <a className="rc-who" href="#year-ahead-who">Who this describes &rarr;</a></>;
 }
 
 /**
@@ -164,7 +187,7 @@ export function relationTo(total: number, low: number, high: number): 'larger th
 /** One sentence. Two published figures, compared, never summed. */
 function Comparison({ total, y, note = null }: { total: number; y: YearAhead; note?: string | null }) {
   const relation = relationTo(total, y.low, y.high);
-  const who = y.population ?? 'an adult reporting long COVID';
+  const { who, deferred } = subjectOf(y);
   const src = y.source ?? `${y.year} Medical Expenditure Panel Survey`;
   return (
     <p className="reveal-compare">
@@ -174,6 +197,7 @@ function Comparison({ total, y, note = null }: { total: number; y: YearAhead; no
       <span className="rc-note">
         {note ? `${note} ` : ''}Point estimate {usd(y.point)}, {src}, 95% interval. It already
         contains the visits and tests above, so it is shown apart and never added to them.
+        <WhoLink show={deferred} />
       </span>
     </p>
   );

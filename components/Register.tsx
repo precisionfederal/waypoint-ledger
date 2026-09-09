@@ -21,7 +21,7 @@ import { TABLE } from '@/lib/table';
 import { usd } from '@/lib/pricing';
 import gapData from '@/data/invisible-events.json';
 import spRaw from '@/data/state-prices.json';
-import { BURDENS, DECIDERS, QUESTIONS, CONTEXT, CONTEXT_KEYS, SMALL_CELL_MIN, suppressSmallCells, type ContextKey } from '@/lib/survey';
+import { BURDENS, DECIDERS, QUESTIONS, CONTEXT, CONTEXT_KEYS, SMALL_CELL_MIN, suppressSmallCells, SEX_POLICY, SEX_POLICY_URL, SEX_ASK_ORIGIN, type ContextKey } from '@/lib/survey';
 import {
   publisherOf, documentOf, fitRate, citationText, correctionsCsv,
   PUBLISHER_FULL, PUBLISHER_ROUTE, type CiteRow, type Publisher,
@@ -32,7 +32,9 @@ interface GapRow { category: string; respondentsReporting: number; totalReported
 interface WeightRow { category: string; rankedFirstBy: number; rankedAtAllBy: number }
 interface Gap { respondents: number; firstAt?: string; lastAt?: string; gap: GapRow[]; communityWeights: WeightRow[]; coverage?: Record<string, Record<string, number>> }
 interface RankRow { burden: string; rankedFirstBy: number; rankedLastBy: number; meanRank: number | null }
-interface Survey { n: number; firstAt?: string; lastAt?: string; channels?: Record<string, number>; ranking?: RankRow[]; unasked?: Record<string, number>; lead?: Record<string, number>; decide?: Record<string, number>; clinicians?: { n: number; median?: number; mean?: number; max?: number }; coverage?: Record<string, Record<string, number>> }
+interface SexGroup { sex: string; n: number; ranking: RankRow[] }
+interface RankingBySex { min: number; stated: number; notStated: number; groups: SexGroup[]; withheldGroups: number; withheldResponses: number; why?: string; method?: string }
+interface Survey { n: number; firstAt?: string; lastAt?: string; channels?: Record<string, number>; ranking?: RankRow[]; rankingBySex?: RankingBySex; unasked?: Record<string, number>; lead?: Record<string, number>; decide?: Record<string, number>; clinicians?: { n: number; median?: number; mean?: number; max?: number }; coverage?: Record<string, Record<string, number>> }
 interface Interviews { n: number; firstAt?: string; lastAt?: string; consent?: Record<string, number> }
 interface Change { id?: string; date: string; said: string; changed: string; who: string }
 interface RegisterPayload {
@@ -278,10 +280,11 @@ export default function Register() {
             <Coverage
               title="Who answered the ranking, and who did not"
               coverage={sv.coverage}
-              keys={(CONTEXT_KEYS as ContextKey[]).filter((k) => k !== 'state')}
+              keys={(CONTEXT_KEYS as ContextKey[]).filter((k) => k !== 'state' && k !== 'sex')}
               labels={Object.fromEntries((CONTEXT_KEYS as ContextKey[]).map((k) => [k, CONTEXT[k].label]))}
               n={sv.n}
             />
+            <SexCoverage counts={sv.coverage?.sex} bySex={sv.rankingBySex} n={sv.n} />
             <StateCoverage counts={sv.coverage?.state} n={sv.n} />
             <div className="dist">
               <h3>Where they came from <span className="dist-n">{sv.n} of {sv.n} carry a channel</span></h3>
@@ -314,7 +317,7 @@ export default function Register() {
         {gap && gap.gap.length === 0 && <p className="sub">No reports yet. <Link href="/gap">Report what no dataset counted.</Link></p>}
         {gap && gap.gap.length > 0 && (
           <>
-            <div className="table-scroll">
+            <div className="table-scroll" tabIndex={0}>
               <table className="ledger-table">
                 <caption className="tbl-cap">Of {gap.respondents} {gap.respondents === 1 ? 'person' : 'people'}, first {day(gap.firstAt)}, latest {day(gap.lastAt)}.</caption>
                 <thead><tr><th scope="col">What happened</th><th scope="col" className="r">People reporting</th><th scope="col" className="r">Events reported</th><th scope="col" className="r">Per person</th></tr></thead>
@@ -336,15 +339,19 @@ export default function Register() {
 
         {/* ---------------- downloads ---------------- */}
         <h2 className="sig-h">Take the data</h2>
-        <p className="sub">De-identified CSV, the data dictionary that describes every field, and the method. An agency, a researcher or a committee staffer can use these without asking us.</p>
+        <p className="sub">De-identified CSV, the data dictionary that describes every field, and the method. An agency, a researcher or a committee staffer can use these without asking us. The corrections file carries the federal file, its SHA-256 and the line each figure was read from, so a correction can be routed to the office that published the number.</p>
         <div className="dl-grid">
           <a className="dl-card" href="/api/export/survey.csv">
             <span className="dl-fmt">CSV</span><h3>Burden rankings</h3>
             <p>One row per response: the five burdens in the order that person put them, with the date and the channel.</p>
           </a>
           <a className="dl-card" href="/api/export/corrections.csv">
-            <span className="dl-fmt">CSV</span><h3>Corrections</h3>
-            <p>Every thumb, bound to the published row it is about, with the count of right and wrong on that row.</p>
+            <span className="dl-fmt">CSV</span><h3>Corrections, ready to route</h3>
+            <p>Every thumb joined to the federal file behind the figure: the file by name, its URL, its SHA-256, the line the figure was read from, the audit verdict, the counts and the fit rate. An analyst at the agency that published the number can act on it without opening this site.</p>
+          </a>
+          <a className="dl-card" href="/api/export/corrections.json" target="_blank" rel="noopener noreferrer">
+            <span className="dl-fmt">JSON</span><h3>The same file, machine-readable</h3>
+            <p>A DCAT distribution carrying its own column contract, the price-table version, the audit date, and the CY2024 charge an uninsured person is billed against where CMS publishes one.</p>
           </a>
           <a className="dl-card" href="/api/export/gap.csv">
             <span className="dl-fmt">CSV</span><h3>Uncounted care</h3>
@@ -427,7 +434,7 @@ function DocumentBlock({ title, rows, asOf }: { title: string; rows: CiteRow[]; 
         {rows.length} of the {inTable} {inTable === 1 ? 'row' : 'rows'} we price from this file {rows.length === 1 ? 'has' : 'have'} at least one thumb.
         {url && <> <a href={url} target="_blank" rel="noopener noreferrer">The published file</a>.</>}
       </p>
-      <div className="table-scroll">
+      <div className="table-scroll" tabIndex={0}>
         <table className="ledger-table">
           <thead>
             <tr>
@@ -488,6 +495,81 @@ function Coverage({ title, coverage, keys, labels, n }: { title: string; coverag
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+/* THE SEX CELL — the Federal Sprint Lead's ask, answered as a published count.
+
+   Two things are published here and they are not the same thing: WHO ANSWERED,
+   under the same small-cell rule as the state; and HOW EACH SEX RANKED THE FIVE
+   BURDENS, which the API suppresses on the server before it is served, because
+   a cross-tabulation narrows the group twice. "Prefer not to say" is a stated
+   answer and appears as one; leaving the question alone appears as "not stated".
+   Neither is ever filled in. Where a federal file cannot be read by sex, /method
+   says which file and where it stops. */
+function SexCoverage({ counts, bySex, n }: { counts?: Record<string, number>; bySex?: RankingBySex; n: number }) {
+  const raw = { ...(counts ?? {}) };
+  delete raw['not stated'];
+  const stated = Object.values(raw).reduce((a, b) => a + b, 0);
+  const { shown, suppressedCells, suppressedTotal } = suppressSmallCells(raw);
+  const rows = Object.entries(shown).sort((a, b) => b[1] - a[1]);
+  const groups = bySex?.groups ?? [];
+  return (
+    <div className="dist coverage sex-cov">
+      <h3>Sex <span className="dist-n">{stated} of {n} answered</span></h3>
+      <p className="micro">
+        {SEX_ASK_ORIGIN} Asked as sex, not gender, because sex is the variable the federal prevalence files we cite are published by, and
+        because NIH expects it to be accounted for as a biological variable in the research it funds &mdash;{' '}
+        <a href={SEX_POLICY_URL} target="_blank" rel="noopener noreferrer">{SEX_POLICY}</a>. A count under {SMALL_CELL_MIN} in one
+        answer can identify a person, so it is withheld &mdash; and the withholding is counted here rather than hidden, under the same
+        rule as the state.
+      </p>
+      {rows.length > 0 ? (
+        <ul className="dist-list">{rows.map(([k, c]) => <li key={k}><span>{k}</span><b>{c}<i> of {n}</i></b></li>)}</ul>
+      ) : (
+        <p className="micro">No answer has reached {SMALL_CELL_MIN} responses yet, so no sex cell is published.</p>
+      )}
+      <p className="micro">
+        {suppressedCells === 0
+          ? `Nothing withheld: every sex cell published above is at or over ${SMALL_CELL_MIN}.`
+          : `Withheld: ${suppressedCells} ${suppressedCells === 1 ? 'answer' : 'answers'} holding ${suppressedTotal} ${suppressedTotal === 1 ? 'response' : 'responses'} between them, each under ${SMALL_CELL_MIN}.`}
+        {' '}{n - stated} of {n} did not answer.
+      </p>
+
+      <h4 className="doc-h">How each sex ranked the five burdens</h4>
+      {groups.length > 0 ? (
+        <>
+          <div className="table-scroll" tabIndex={0}>
+            <table className="ledger-table">
+              <thead>
+                <tr>
+                  <th scope="col">Burden</th>
+                  {groups.map((g) => <th key={g.sex} scope="col" className="r">{g.sex}<span className="li-sub">n {g.n}</span></th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {BURDENS.map((b) => (
+                  <tr key={b.id}>
+                    <th scope="row">{B_LABEL[b.id] ?? b.id}</th>
+                    {groups.map((g) => {
+                      const r = g.ranking.find((x) => x.burden === b.id);
+                      return <td key={g.sex} className="r">{r?.meanRank ?? '—'}<i className="of"> mean place · {r?.rankedFirstBy ?? 0} first</i></td>;
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="micro">{bySex?.method}</p>
+        </>
+      ) : (
+        <p className="micro">
+          No sex group has reached {SMALL_CELL_MIN} responses, so no ranking is published by sex.
+          {bySex && bySex.withheldGroups > 0 && ` Withheld: ${bySex.withheldGroups} ${bySex.withheldGroups === 1 ? 'group' : 'groups'} holding ${bySex.withheldResponses} ${bySex.withheldResponses === 1 ? 'response' : 'responses'} between them.`}
+          {' '}The cross-tabulation is suppressed on the server, before it is served, and not in this page.
+        </p>
+      )}
     </div>
   );
 }

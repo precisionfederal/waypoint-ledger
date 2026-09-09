@@ -83,35 +83,231 @@
    "field": "received_at",
    "type": "ISO 8601 UTC timestamp",
    "values": "",
-   "note": ""
+   "note": "when the correction was recorded"
   },
   {
    "file": "corrections.csv",
    "field": "price_id",
    "type": "string",
-   "values": "row identifier in the published price table",
-   "note": "joins to the table on /method"
+   "values": "",
+   "note": "row identifier in the published price table; joins to /api/table/{id}"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "code_system",
+   "type": "CPT | HCPCS | blank",
+   "values": "",
+   "note": "the code system the row is coded in"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "code",
+   "type": "string or blank",
+   "values": "",
+   "note": "the CPT or HCPCS code the figure prices"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "loinc",
+   "type": "string or blank",
+   "values": "",
+   "note": "LOINC code where the row is a laboratory test, from the NLM"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "label",
+   "type": "string",
+   "values": "",
+   "note": "the unit of care, in the words a person reads on the ledger"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "published_value_usd",
+   "type": "number or blank",
+   "values": "",
+   "note": "the published federal figure the correction is about"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "basis",
+   "type": "enum",
+   "values": "",
+   "note": "charge | allowed | payment | out_of_pocket | total_expenditure | wage"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "basis_meaning",
+   "type": "string",
+   "values": "",
+   "note": "what that basis means, in one clause"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "year",
+   "type": "string",
+   "values": "",
+   "note": "the year the figure describes"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "geography",
+   "type": "string",
+   "values": "",
+   "note": "the locality the figure describes"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "population",
+   "type": "string",
+   "values": "",
+   "note": "the population the figure describes"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "agency",
+   "type": "string",
+   "values": "",
+   "note": "the body that published the figure"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_title",
+   "type": "string",
+   "values": "",
+   "note": "the publication, as the agency titles it"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_url",
+   "type": "URL",
+   "values": "",
+   "note": "where the agency publishes it"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_file",
+   "type": "string",
+   "values": "",
+   "note": "the federal file we read, by its own name"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_file_url",
+   "type": "URL",
+   "values": "",
+   "note": "the exact file, not the landing page"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_file_sha256",
+   "type": "hex",
+   "values": "",
+   "note": "SHA-256 of the bytes the audit read"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_file_retrieved",
+   "type": "date",
+   "values": "",
+   "note": "the day those bytes were retrieved"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_kind",
+   "type": "string",
+   "values": "",
+   "note": "federal data file | federal publication | federal web page | peer-reviewed article"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "source_line",
+   "type": "string",
+   "values": "",
+   "note": "the row, table line or arithmetic the figure was re-read from"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "audit_status",
+   "type": "PASS | FAIL | UNVERIFIED",
+   "values": "",
+   "note": "whether the figure reproduced from that file on the audit date"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "audit_check",
+   "type": "string",
+   "values": "",
+   "note": "the method the audit used"
   },
   {
    "file": "corrections.csv",
    "field": "verdict",
-   "type": "enum",
-   "values": "right | wrong",
-   "note": "the thumb on that ledger line"
+   "type": "right | wrong",
+   "values": "",
+   "note": "the direction of this correction: does the published figure describe this person"
   },
   {
    "file": "corrections.csv",
    "field": "believed_usd",
    "type": "number or blank",
-   "values": "dollars",
-   "note": "what the person says they actually paid; a demand signal about the published figure, never used to price a ledger"
+   "values": "",
+   "note": "what the person said they were billed; a demand signal about the figure, never a price"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "figure_confirmed_right",
+   "type": "integer",
+   "values": "",
+   "note": "corrections on this figure saying it describes them"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "figure_flagged_wrong",
+   "type": "integer",
+   "values": "",
+   "note": "corrections on this figure saying it does not"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "figure_responses",
+   "type": "integer",
+   "values": "",
+   "note": "the denominator: corrections on this figure in this file"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "figure_fit_rate_pct",
+   "type": "integer or blank",
+   "values": "",
+   "note": "percent of those responses saying the figure fits"
   },
   {
    "file": "corrections.csv",
    "field": "table_version",
    "type": "string",
    "values": "",
-   "note": "the price-table version the thumb was given against"
+   "note": "the price-table version that was on screen when the thumb was given"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "citation_url",
+   "type": "URL",
+   "values": "",
+   "note": "renders this figure as a paste-ready correction report for the publishing agency"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "counted_as_of",
+   "type": "date",
+   "values": "",
+   "note": "the day this file was generated"
+  },
+  {
+   "file": "corrections.csv",
+   "field": "row_hash",
+   "type": "hex or blank",
+   "values": "",
+   "note": "this row hashed and chained to the row before it; see /api/integrity"
   },
   {
    "file": "gap.csv",
@@ -133,6 +329,13 @@
    "type": "enum or blank",
    "values": "gap category ids",
    "note": "the order the person put them in, most costly first"
+  },
+  {
+   "file": "survey.csv, gap.csv",
+   "field": "ctx_sex",
+   "type": "enum or blank",
+   "values": "Female | Male | Intersex | Prefer not to say",
+   "note": "Optional. The Federal Sprint Lead for the Invisible Illness track asked every team, on 26 August 2026, to be intentional about sex differences where relevant. Asked because the federal prevalence files we cite are published by sex, and because NIH expects sex to be accounted for as a biological variable in the research it funds. Optional. It is published only as a count, and it is joined to nothing. Asked as sex, not gender, because sex is the variable the federal prevalence files cited on /method are published by; NIH NOT-OD-15-102, Consideration of Sex as a Biological Variable in NIH-funded Research, 9 June 2015 sets the framing. \"Prefer not to say\" is a stated answer and is published as one; a blank is published as \"not stated\". On the published register any sex cell holding fewer than 11 responses is withheld under the same rule as the state, and the withheld cells are counted in public."
   },
   {
    "file": "survey.csv, gap.csv",

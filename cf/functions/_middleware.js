@@ -2,7 +2,7 @@
 import { bad, MAX_BODY } from './api/_http.js';
 import { networkKey } from './api/_hash.js';
 
-const LIMITS = { 'POST /api/price': 300, 'POST /api/fhir': 300, 'POST /api/journeys': 30, 'POST /api/auth/password/login': 60, 'POST /api/auth/password/signup': 20, 'POST /api/auth/password/recover': 30, 'POST /api/auth/password/change': 30, ADMIN: 300, DEFAULT_WRITE: 20 }; // per hashed IP per hour
+const LIMITS = { 'POST /api/price': 300, 'POST /api/fhir': 300, 'POST /api/map': 120, 'POST /api/journeys': 30, 'POST /api/auth/password/login': 60, 'POST /api/auth/password/signup': 20, 'POST /api/auth/password/recover': 30, 'POST /api/auth/password/change': 30, ADMIN: 300, DEFAULT_WRITE: 20 }; // per hashed IP per hour
 
 /* ---------------------------------------------------------------------------
    THE ADMIN DOOR.
@@ -193,8 +193,22 @@ export async function onRequest({ request, env, next }) {
   /* An HTML answer is the only thing on this origin that can run script, so it
      is the only thing worth buffering. The body is re-served unchanged; only the
      header is derived from it. */
-  const html = await res.text();
   const key = res.headers.get('etag') || `p:${url.pathname}`;
+
+  /* A HEAD has the headers and none of the body, so there is nothing to hash.
+     Answering it with `script-src 'self'` and no hashes would advertise a policy
+     that would break the page the GET returns — a scanner reads that and a
+     careful reader is misled. If a GET for this exact ETag has already been
+     served, the policy for it is known and is repeated here; otherwise no CSP is
+     claimed, because a body-less answer cannot run anything. */
+  if (method === 'HEAD') {
+    const known = CSP_CACHE.get(key);
+    if (known) h.set('content-security-policy', known);
+    else h.delete('content-security-policy');
+    return new Response(null, { status: res.status, statusText: res.statusText, headers: h });
+  }
+
+  const html = await res.text();
   let csp = CSP_CACHE.get(key);
   if (!csp) {
     csp = await cspForHtml(html);

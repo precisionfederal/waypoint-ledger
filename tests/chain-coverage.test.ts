@@ -25,10 +25,14 @@ const UNCHAINED_CSV = UNCHAINED_CSV_ as Record<string, Record<string, string>>;
 const RECIPES = RECIPES_ as Record<string, { file: string; projection: string[]; steps: string[] }>;
 const PUBLISHED = PUBLISHED_ as Record<string, (r: Record<string, unknown>) => Record<string, unknown>>;
 import { exportRows } from '../cf/functions/api/export/[kind].js';
+import { SURVEY_VERSION } from '../lib/survey-def.js';
 import { CATEGORY_IDS } from '../cf/functions/api/gap.js';
 
-/** The header the export really writes today, taken from the export itself. */
-const headerOf = (kind: string) => String(exportRows(kind, [])).trim().split(',');
+/** The header the export really writes today, taken from the export itself.
+ *  corrections.csv leads with a # comment naming the table version and the audit,
+ *  so the header is the first line that is not a comment. */
+const headerOf = (kind: string) =>
+  String(exportRows(kind, [])).trim().split('\n').filter((l) => !l.startsWith('#'))[0].split(',');
 const opts = { countKeys: CATEGORY_IDS };
 
 describe('the published CSV and the chain cover the same columns', () => {
@@ -48,11 +52,17 @@ describe('the published CSV and the chain cover the same columns', () => {
     expect(byColumn.rank_3).toBe('ranking');
   });
 
-  it('WOULD HAVE CAUGHT THE DEFECT: under the old field set, ctx_state is uncovered', () => {
+  it('WOULD HAVE CAUGHT THE DEFECT: under the old field set, every field added since is uncovered', () => {
     const old = SURVEY_PROJECTIONS[SURVEY_PROJECTIONS.length - 1].keys;
     expect(old).not.toContain('state');
     const cov = chainCoverage('survey', headerOf('survey'), { ...opts, ctxKeys: old });
-    expect(cov.uncovered).toEqual(['ctx_state']);
+    /* The list is derived from the projections rather than written out, so the next
+       widening of the instrument lands in this assertion instead of passing quietly.
+       ctx_state was the original defect; ctx_sex joined it when the instrument began
+       asking sex. */
+    const added = SURVEY_CTX_KEYS.filter((k) => !old.includes(k)).map((k) => 'ctx_' + k);
+    expect(added).toContain('ctx_state');
+    expect([...cov.uncovered].sort()).toEqual([...added].sort());
   });
 
   it('a column nobody described is a failure, not a shrug', () => {
@@ -63,9 +73,28 @@ describe('the published CSV and the chain cover the same columns', () => {
   it('the only way out is an entry that states the reason', () => {
     for (const kind of Object.keys(CSV_TABLE)) {
       const cov = chainCoverage(kind, headerOf(kind), opts);
-      expect(cov.unchained.map((u) => u.column)).toEqual(['row_hash']);
+      /* Nothing is exempt without a written reason, and every exemption in force is
+         a column the file really publishes — not a stale entry nobody removed. */
+      expect(cov.unchained.map((u) => u.column)).toContain('row_hash');
       for (const u of cov.unchained) expect(u.reason.length).toBeGreaterThan(20);
-      expect(Object.keys(UNCHAINED_CSV[kind])).toEqual(['row_hash']);
+      for (const [column, reason] of Object.entries(UNCHAINED_CSV[kind])) {
+        expect(headerOf(kind)).toContain(column);
+        expect(reason.length).toBeGreaterThan(20);
+      }
+    }
+    /* gap and survey publish exactly the chained projection: the hash is the only exemption. */
+    for (const kind of ['gap', 'survey']) expect(Object.keys(UNCHAINED_CSV[kind])).toEqual(['row_hash']);
+  });
+
+  it('corrections.csv exempts only columns that describe the FIGURE, and each says so', () => {
+    const cov = chainCoverage('corrections', headerOf('corrections'), opts);
+    /* the five fields a stranger rebuilds the chain from are covered, not exempt */
+    expect(cov.covered.map((c) => c.column).sort())
+      .toEqual(['believed_usd', 'price_id', 'received_at', 'table_version', 'verdict']);
+    expect(cov.uncovered).toEqual([]);
+    for (const u of cov.unchained) {
+      if (u.column === 'row_hash') continue;
+      expect(u.reason).toMatch(/joined at export time|count over the rows|property of the download|recomputable/);
     }
   });
 
@@ -102,7 +131,9 @@ describe('a row is walked under the field set of its own version', () => {
     expect(surveyCtxKeysFor('v')).not.toContain('state');
     expect(surveyCtxKeysFor(null)).not.toContain('state');
     expect(surveyCtxKeysFor(undefined)).not.toContain('state');
-    expect(surveyCtxKeysFor('2026-09-09.2')).toEqual(SURVEY_CTX_KEYS);
+    /* The field set in force is the one the instrument is shipping today, whatever
+       version that is: a new projection must never leave this assertion behind. */
+    expect(surveyCtxKeysFor(SURVEY_VERSION)).toEqual(SURVEY_CTX_KEYS);
   });
 
   it('state changes the hash under the new version and cannot under the old one', async () => {

@@ -27,7 +27,10 @@ const rec = (b: unknown): SurveyRecord => {
   return v.record;
 };
 const err = (b: unknown): string => (validateSurvey(b) as { error?: string }).error ?? '';
-const agg = (rows: SurveyRecord[]) => aggregateSurvey(rows) as SurveyAggregate;
+/* The aggregate grew a by-sex cross-tabulation, so the cast goes through
+   `unknown`: this interface names the fields these tests read, not every
+   field the endpoint serves. */
+const agg = (rows: SurveyRecord[]) => aggregateSurvey(rows) as unknown as SurveyAggregate;
 
 const VALID = {
   ranking: ['time', 'oop', 'work', 'unpaid', 'forgone'],
@@ -41,12 +44,12 @@ const VALID = {
 };
 
 describe('the instrument itself', () => {
-  it('is five burdens, four deciders, four context questions and ten interview questions', () => {
+  it('is five burdens, four deciders, six context questions and ten interview questions', () => {
     expect(BURDENS).toHaveLength(5);
     expect(new Set(BURDEN_IDS).size).toBe(5);
     expect(DECIDERS).toHaveLength(4);
     expect(new Set(DECIDER_IDS).size).toBe(4);
-    expect(CONTEXT_KEYS).toEqual(['age', 'insurance', 'region', 'state', 'stage']);
+    expect(CONTEXT_KEYS).toEqual(['age', 'sex', 'insurance', 'region', 'state', 'stage']);
     expect(INTERVIEW_QUESTIONS).toHaveLength(10);
     expect(SURVEY_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\./);
   });
