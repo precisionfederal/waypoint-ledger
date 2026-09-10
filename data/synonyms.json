@@ -1,6 +1,6 @@
 {
   "_README": "Extra plain-language synonyms for rows that ALREADY EXIST in data/prices.json. Merged into the table by lib/table.ts. This file never carries a price, a source or a new row: it changes only which published row a person's own words land on. Every key is checked against data/prices.json by tests/mapper.test.ts, and no phrase may belong to two rows.",
-  "_version": "2026-09-09",
+  "_version": "2026-09-09b",
   "_rules": [
     "A phrase goes here only if the row it points at is the unit of care a person means by it.",
     "No phrase may appear under two ids: an ambiguous word (a bare 'scan', a bare 'test') is left out rather than guessed.",
@@ -11,7 +11,11 @@
     "cms-99213": "Medicare pays a telehealth office visit at the same physician fee schedule amount as the in-person visit, so 'video visit' and 'telehealth' land on the established-patient row rather than a separate figure.",
     "cms-99204": "Every specialty name a person says ('endocrinologist', 'GI doctor', 'second opinion') is the same billed unit: a first visit with a new specialist. The figure does not change by specialty.",
     "cms-pt-exercise-15": "'PT' and 'physio' are read as a physical therapy exercise session, which is billed in 15-minute units.",
-    "cms-proc-egd-biopsy": "A bare 'endoscopy' is read as an upper endoscopy, the common lay meaning; a colonoscopy has its own row and its own phrases."
+    "cms-proc-egd-biopsy": "A bare 'endoscopy' is read as an upper endoscopy, the common lay meaning; a colonoscopy has its own row and its own phrases.",
+    "cms-lab-venipuncture": "The needle stick has its own published rate on the clinical laboratory fee schedule, separate from every test run on the sample. A person who had four tests drawn at one visit paid for four tests and one venipuncture, which is why it is its own row rather than folded into the blood count.",
+    "cms-test-home-sleep-basic": "A home sleep apnea test and an overnight study in a sleep lab are different services with different published rates, so \"home sleep test\" is bound to the home study rather than to the lab one.",
+    "cms-speech-therapy": "Speech therapy is a therapy service under CPT 92507, not psychotherapy; without this line the phrase landed on the counselling row because both carry the word therapy.",
+    "cms-img-mammo-screen": "A bare \"mammogram\" is bound to the screening study, which is the one most people mean. The phrases naming a lump or a callback are bound to the diagnostic row instead."
   },
   "synonyms": {
     "cms-99213": [
@@ -483,6 +487,341 @@
     "cms-lab-hiv": [
       "HIV screen",
       "HIV antibody test"
+    ],
+    "cms-lab-venipuncture": [
+      "venipuncture",
+      "the fee for drawing my blood",
+      "phlebotomy fee"
+    ],
+    "cms-img-dexa": [
+      "bone density test",
+      "dexa",
+      "dexa bone scan"
+    ],
+    "cms-img-mammo-screen": [
+      "mammogram",
+      "my mammogram",
+      "went for a mammogram"
+    ],
+    "cms-img-mammo-dx-uni": [
+      "mammogram to look at a lump",
+      "second mammogram after a callback"
+    ],
+    "cms-test-home-sleep-basic": [
+      "home sleep test",
+      "sleep test at home",
+      "took a sleep test home"
+    ],
+    "cms-test-sleep-cpap": [
+      "cpap titration",
+      "night to set up my cpap"
+    ],
+    "cms-speech-therapy": [
+      "speech therapy",
+      "saw a speech therapist for treatment"
+    ],
+    "cms-ot-eval-low": [
+      "occupational therapy evaluation appointment",
+      "first occupational therapy assessment"
+    ],
+    "cms-pt-manual-therapy-15": [
+      "hands on manual therapy",
+      "manual therapy in physio"
+    ],
+    "cms-mh-group-therapy": [
+      "group therapy meeting",
+      "group session with a therapist"
+    ],
+    "cms-mh-family-therapy": [
+      "family therapy",
+      "couples counselling session"
+    ],
+    "cms-chiro-3-4-regions": [
+      "chiropractor visit",
+      "chiropractic treatment"
+    ],
+    "cms-acupuncture-15": [
+      "acupuncture",
+      "acupuncture appointment"
+    ],
+    "cms-proc-colonoscopy-polyp": [
+      "polyp removed during a colonoscopy",
+      "colonoscopy where a polyp came out"
+    ],
+    "cms-proc-colonoscopy-biopsy": [
+      "biopsies taken during a colonoscopy"
+    ],
+    "cms-g0121-screening-colonoscopy": [
+      "colonoscopy for screening",
+      "routine screening colonoscopy"
+    ],
+    "cms-proc-lumbar-puncture": [
+      "spinal tap procedure",
+      "lumbar puncture procedure"
+    ],
+    "cms-proc-epley": [
+      "epley",
+      "canalith repositioning for vertigo"
+    ],
+    "cms-proc-skin-biopsy-punch": [
+      "punch biopsy of skin"
+    ],
+    "cms-proc-skin-biopsy-shave": [
+      "shave biopsy of skin"
+    ],
+    "cms-path-tissue-exam": [
+      "pathology reading of a biopsy",
+      "pathologist examined the tissue"
+    ],
+    "cms-proc-earwax-removal": [
+      "removing impacted ear wax"
+    ],
+    "cms-proc-injection-im": [
+      "injection given at the clinic",
+      "shot given at my appointment"
+    ],
+    "cms-proc-iv-infusion-first-hour": [
+      "iv infusion appointment",
+      "infusion at the infusion centre"
+    ],
+    "cms-proc-epidural-interlaminar": [
+      "epidural injection for back pain",
+      "steroid epidural in my back"
+    ],
+    "cms-proc-trigger-point-1-2": [
+      "trigger point shots"
+    ],
+    "cms-eye-oct-retina": [
+      "oct scan of my eye",
+      "retinal oct"
+    ],
+    "cms-eye-visual-field": [
+      "visual field testing",
+      "test of my peripheral vision"
+    ],
+    "cms-test-tympanometry": [
+      "tympanometry test"
+    ],
+    "cms-img-us-thyroid": [
+      "ultrasound of my thyroid gland",
+      "thyroid scan by ultrasound"
+    ],
+    "cms-img-us-kidneys": [
+      "ultrasound of my kidney",
+      "renal ultrasound scan"
+    ],
+    "cms-img-us-breast": [
+      "ultrasound of a breast lump"
+    ],
+    "cms-img-us-transvaginal": [
+      "internal ultrasound scan",
+      "transvaginal scan"
+    ],
+    "cms-img-cta-chest": [
+      "ct scan to rule out a clot in my lung",
+      "ct angiogram for a pulmonary embolism"
+    ],
+    "cms-img-nuclear-stress": [
+      "nuclear stress test of my heart",
+      "myocardial perfusion imaging"
+    ],
+    "cms-img-bone-scan": [
+      "nuclear bone scan of my body"
+    ],
+    "cms-img-stress-echo": [
+      "stress echocardiogram test"
+    ],
+    "cms-img-tee": [
+      "transesophageal echo"
+    ],
+    "cms-test-gastric-emptying": [
+      "gastric emptying scan"
+    ],
+    "cms-test-capsule-endoscopy": [
+      "capsule endoscopy study",
+      "camera pill for my small bowel"
+    ],
+    "cms-test-breath-hydrogen": [
+      "breath test for sibo",
+      "lactose breath test"
+    ],
+    "cms-test-spirometry-bronchodilator": [
+      "spirometry with an inhaler"
+    ],
+    "cms-lab-strep-rapid": [
+      "strep test",
+      "rapid test for strep throat"
+    ],
+    "cms-lab-flu-rapid": [
+      "flu test",
+      "rapid test for influenza"
+    ],
+    "cms-lab-celiac-ttg": [
+      "celiac test",
+      "tested me for coeliac"
+    ],
+    "cms-lab-psa": [
+      "psa blood test"
+    ],
+    "cms-lab-cortisol": [
+      "cortisol blood test"
+    ],
+    "cms-lab-uric-acid": [
+      "uric acid blood test"
+    ],
+    "cms-lab-hepatic-panel": [
+      "liver function panel",
+      "liver enzymes panel"
+    ],
+    "cms-lab-renal-panel": [
+      "kidney function panel"
+    ],
+    "cms-lab-electrolytes": [
+      "electrolytes panel"
+    ],
+    "cms-lab-mono": [
+      "mono test",
+      "test for mono"
+    ],
+    "cms-lab-h-pylori-breath": [
+      "breath test for h pylori"
+    ],
+    "cms-lab-chlamydia": [
+      "test for chlamydia"
+    ],
+    "cms-lab-gonorrhea": [
+      "test for gonorrhea"
+    ],
+    "cms-lab-fit-stool": [
+      "stool test for blood",
+      "fit test for colon screening"
+    ],
+    "cms-lab-cologuard": [
+      "stool dna test",
+      "cologuard"
+    ],
+    "cms-lab-gtt": [
+      "glucose tolerance testing"
+    ],
+    "cms-lab-insulin": [
+      "insulin blood test"
+    ],
+    "cms-lab-thyroid-antibodies": [
+      "thyroid antibodies test",
+      "tpo antibodies"
+    ],
+    "cms-lab-ccp": [
+      "anti ccp antibody test"
+    ],
+    "cms-lab-rheumatoid-factor": [
+      "rheumatoid factor blood test"
+    ],
+    "cms-lab-homocysteine": [
+      "homocysteine blood test"
+    ],
+    "cms-lab-microalbumin": [
+      "microalbumin urine test"
+    ],
+    "cms-lab-blood-type": [
+      "blood type test"
+    ],
+    "cms-lab-hcg-quant": [
+      "quantitative pregnancy test"
+    ],
+    "cms-lab-hcg-qual": [
+      "pregnancy blood test"
+    ],
+    "cms-lab-total-t4": [
+      "total t4 level"
+    ],
+    "cms-lab-free-t3": [
+      "free t3 level"
+    ],
+    "cms-lab-bun": [
+      "bun blood test"
+    ],
+    "cms-lab-creatinine": [
+      "creatinine blood test"
+    ],
+    "cms-lab-lactate": [
+      "lactate blood test"
+    ],
+    "cms-lab-iron": [
+      "serum iron level"
+    ],
+    "cms-98016": [
+      "quick virtual check in with my clinic"
+    ],
+    "cms-99483": [
+      "memory assessment appointment"
+    ],
+    "cms-ed-99285-physician": [
+      "the er doctor's own bill for a serious visit"
+    ],
+    "cms-proc-vaccine-admin": [
+      "fee to give me a vaccine"
+    ],
+    "cms-treat-allergy-shot": [
+      "allergy shot",
+      "allergy immunotherapy dose"
+    ],
+    "cms-test-patch-testing-per-test": [
+      "allergy patch test"
+    ],
+    "cms-proc-wart-removal": [
+      "wart freezing",
+      "having warts frozen off"
+    ],
+    "cms-proc-abscess-drainage": [
+      "draining an abscess"
+    ],
+    "cms-proc-wound-repair-simple": [
+      "getting stitches"
+    ],
+    "cms-surg-cataract": [
+      "cataract operation"
+    ],
+    "cms-surg-carpal-tunnel": [
+      "carpal tunnel operation"
+    ],
+    "cms-surg-knee-arthroscopy": [
+      "knee scope operation"
+    ],
+    "cms-proc-breast-biopsy-us": [
+      "breast biopsy with ultrasound guidance"
+    ],
+    "cms-proc-endometrial-biopsy": [
+      "biopsy of my uterine lining"
+    ],
+    "cms-proc-colposcopy-biopsy": [
+      "colposcopy with a biopsy"
+    ],
+    "cms-img-xray-lumbar": [
+      "x ray of my lumbar spine"
+    ],
+    "cms-img-xray-knee-3": [
+      "they took x rays of my knee"
+    ],
+    "cms-img-mri-cervical-nc": [
+      "mri of my cervical spine"
+    ],
+    "cms-img-mri-upper-joint-nc": [
+      "mri of my shoulder joint"
+    ],
+    "cms-img-ct-sinus": [
+      "ct scan of my sinuses"
+    ],
+    "cms-img-ct-lumbar": [
+      "ct scan of my lumbar spine"
+    ],
+    "cms-img-mra-head": [
+      "mra of my brain arteries"
+    ],
+    "cms-test-eeg-awake-drowsy": [
+      "eeg while awake and drowsy"
+    ],
+    "cms-test-ncs-1-2": [
+      "nerve conduction study of one or two nerves"
     ]
   }
 }

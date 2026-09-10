@@ -4,7 +4,7 @@
 import { describe, it, expect } from 'vitest';
 import { parseJourney } from '../lib/mapper';
 import { SELECTABLE } from '../lib/table';
-import { catalogFor, candidatesOf, buildUserPrompt, parseModelJson, applyModel, toWire, fromWire, SYSTEM_PROMPT } from '../lib/map-model';
+import { catalogFor, candidatesOf, rulesReadOf, buildUserPrompt, parseModelJson, applyModel, toWire, fromWire, SYSTEM_PROMPT } from '../lib/map-model';
 
 const STORY = 'I saw my primary care doctor twice, then a cardiologist, then the heart ultrasound thing, and I never got the sleep study because it was denied, and six months of waiting';
 
@@ -104,5 +104,68 @@ describe('one clause, one line', () => {
     expect(fromWire(wire, SELECTABLE)[cands[1]].absorbed).toBe(true);
     // Priced once: the absorbed fragment carries no unit.
     expect(r.segments.filter((s) => s.result.item?.id === emg.id).length).toBe(1);
+  });
+});
+
+describe('the model sees what the rules already read', () => {
+  it('lists every phrase the rules answered, with the id it landed on', () => {
+    const segs = parseJourney(STORY, SELECTABLE);
+    const read = rulesReadOf(segs);
+    const cands = candidatesOf(segs);
+    // The two lists partition the segments: every phrase is asked about or shown as read.
+    expect(read.length + cands.length).toBe(segs.length);
+    for (const r of read) expect(cands).not.toContain(r.index);
+    expect(read.some((r) => r.id !== null)).toBe(true);
+  });
+
+  it('puts the already-read phrases in the prompt, and still never a price', () => {
+    const segs = parseJourney(STORY, SELECTABLE);
+    const text = buildUserPrompt(catalogFor(SELECTABLE), ['the heart ultrasound thing'], STORY, rulesReadOf(segs));
+    expect(text).toMatch(/ALREADY READ by a keyword matcher/);
+    expect(text).not.toMatch(/\$\d/);
+    expect(text).not.toMatch(/valueUsd/);
+  });
+
+  it('tells the model that denied, refused and unaffordable care is null', () => {
+    expect(SYSTEM_PROMPT).toMatch(/NEGATION/);
+    expect(SYSTEM_PROMPT).toMatch(/could not afford/);
+    expect(SYSTEM_PROMPT).toMatch(/it never changes an answer, a count or a price/);
+  });
+});
+
+describe('a flag is a report, never an override', () => {
+  const story = 'two visits to my primary care doctor and the heart ultrasound thing';
+
+  it('carries the flag to the wire and leaves the rules answer exactly as it was', () => {
+    const segs = parseJourney(story, SELECTABLE);
+    const cands = candidatesOf(segs);
+    const read = rulesReadOf(segs);
+    expect(read.length).toBeGreaterThan(0);
+    const before = segs.map((s) => s.result.item?.id ?? null);
+    const r = applyModel(segs, cands, [{ r: 0, flag: 'this looks like a specialist visit' }], SELECTABLE, read);
+    expect(r.filled).toEqual([]);
+    expect(r.segments.map((s) => s.result.item?.id ?? null)).toEqual(before);
+    expect(r.flags).toEqual([{ scope: 'read', index: read[0].index, raw: read[0].raw, ruleId: read[0].id, flag: 'this looks like a specialist visit' }]);
+    const wire = toWire(r.segments, r.flags);
+    expect(wire[read[0].index].flag).toBe('this looks like a specialist visit');
+    // The flag never reaches the priced side: fromWire ignores it.
+    expect(fromWire(wire, SELECTABLE)[read[0].index].result.item?.id ?? null).toBe(before[read[0].index]);
+  });
+
+  it('drops a flag whose index names no phrase, and never invents a segment', () => {
+    const segs = parseJourney(story, SELECTABLE);
+    const r = applyModel(segs, candidatesOf(segs), [{ r: 99, flag: 'nowhere' }], SELECTABLE, rulesReadOf(segs));
+    expect(r.flags).toEqual([]);
+    expect(r.segments.length).toBe(segs.length);
+  });
+
+  it('parses an answer that carries an id and a flag together, and keeps both jobs separate', () => {
+    const a = parseModelJson('{"map":[{"i":0,"id":"cms-99213","why":"visit"},{"r":1,"flag":"the rules read a wait as care"}]}');
+    expect(a.length).toBe(2);
+    expect(a[0].i).toBe(0);
+    expect(a[0].id).toBe('cms-99213');
+    expect(a[1].r).toBe(1);
+    expect(a[1].flag).toBe('the rules read a wait as care');
+    expect(a[1].id).toBeNull();
   });
 });

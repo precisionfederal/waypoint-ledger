@@ -229,7 +229,7 @@ export function countTrips(tripsIn: number): BurdenCard {
     limit: 'Miles, parking, fuel, a bus fare and a day of someone else driving are all real, and they differ so much by person that a single national figure would describe almost nobody.',
     source: { priceId: null, title: null, url: null, year: null, describes: null },
     alternatives: [],
-    noFigureReason: 'No published federal figure in this price table prices a trip to care. The column stays blank rather than get filled with an estimate.',
+    noFigureReason: 'No published federal figure prices a trip to care, so this column stays blank rather than get filled with an estimate. The table does carry the federal mileage rate — GSA, $0.76 a mile from 1 July 2026 — which reimburses federal travellers for a mile driven on official business. It is an input you can apply to your own miles, it is not a medical price, and nothing here adds it for you.',
   };
 }
 

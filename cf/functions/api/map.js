@@ -8,23 +8,59 @@
    comes back: the response carries ids, and the table prices them on either
    side of the wire.
 
-   Providers, in order: OpenAI (OPENAI_API_KEY, gpt-5.4-nano, ~1 s, then
-   gpt-5-mini), Anthropic (ANTHROPIC_API_KEY), then Cloudflare Workers AI (the
-   AI binding). None reachable → the rules'
+   The model also sees every phrase the rules DID read, with the id they landed
+   on, so it reads the whole story. It may answer {"r":n,"flag":"…"} to say a
+   rules answer looks wrong: that is a report, carried on the wire as `flag`,
+   and it never overrides a unit, a count or a price.
+
+   Providers, in order: OpenAI (OPENAI_API_KEY, the models in OPENAI_MODELS or
+   READER_MODELS, strongest first), Anthropic (ANTHROPIC_API_KEY), then
+   Cloudflare Workers AI (the AI binding). None reachable → the rules'
    answer, marked `model: null`, so the product never waits on a model.
    Answers are cached in KV by the story's SHA-256 for a day. */
 import { json, bad, readJson, count } from './_http.js';
 import { parseJourney } from '../../../lib/mapper.ts';
 import { SELECTABLE, TABLE_VERSION } from '../../../lib/table.ts';
-import { catalogFor, candidatesOf, SYSTEM_PROMPT, buildUserPrompt, parseModelJson, applyModel, toWire } from '../../../lib/map-model.ts';
+import { catalogFor, candidatesOf, rulesReadOf, SYSTEM_PROMPT, buildUserPrompt, parseModelJson, applyModel, toWire } from '../../../lib/map-model.ts';
 
-export const OPENAI_MODELS = ['gpt-5.4-nano', 'gpt-5-mini'];
+/* Which model reads the story — measured, not assumed. 209 sentences of a patient's own words
+   (data/test-fixtures/map-eval.json) through this exact prompt and these exact guarantees, four
+   models, 2026-09-09 (scripts/eval-models.mjs; table in data/test-fixtures/READER-EVAL.md):
+
+     gpt-5.5        F1 83.8  precision 79.0  recall 89.1  p95 3771 ms  0 wrong units added
+     gpt-5.4        F1 83.3  precision 78.6  recall 88.6  p95 2540 ms  1
+     gpt-5.4-mini   F1 83.2  precision 78.3  recall 88.6  p95 2407 ms  2
+     gpt-5.4-nano   F1 81.5  precision 77.2  recall 86.4  p95 4627 ms  4
+
+   gpt-5.5 is first: the strongest reader on every axis, and the only one that added no unit a
+   careful reader would call wrong, with a p95 well inside the 9 s timeout. gpt-5.4-mini is the
+   fallback — the next strongest, and the fastest — for when the first errors or times out.
+   READER_MODELS (a comma list) overrides both without a code change; READER_EFFORT overrides the
+   reasoning effort, which the same measurement says buys nothing at medium. */
+export const OPENAI_MODELS = ['gpt-5.5', 'gpt-5.4-mini'];
+export const modelsFor = (env) => {
+  const raw = String(env?.READER_MODELS || '').trim();
+  const list = raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : [];
+  return list.length ? list : OPENAI_MODELS;
+};
+const effortFor = (env) => {
+  const e = String(env?.READER_EFFORT || '').trim().toLowerCase();
+  return ['minimal', 'low', 'medium', 'high'].includes(e) ? e : 'low';
+};
 export const ANTHROPIC_MODEL = 'claude-sonnet-5';
 export const WORKERS_AI_MODELS = ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3-70b-instruct-fp8-fast', '@cf/meta/llama-3.1-8b-instruct'];
 const TIMEOUT_MS = 9000;
 const MAX_STORY = 2000;
 const CACHE_TTL = 24 * 3600;
-const PROMPT_VERSION = 'map-4';
+const PROMPT_VERSION = 'map-6';
+/* The cache key carries a hash of the prompt itself, so editing the prompt invalidates the cache
+   without anyone remembering to bump a constant. A stale answer read back after a prompt change is
+   the quietest way to measure the wrong thing. */
+let promptHashMemo = null;
+async function promptHash() {
+  if (!promptHashMemo) promptHashMemo = (await sha256(SYSTEM_PROMPT)).slice(0, 12);
+  return promptHashMemo;
+}
 // The paid path has a ceiling and a kill switch: a global KV counter per hour (READER_HOURLY_CEILING,
 // default 2000 model calls), and the counter is read fail-CLOSED — if KV cannot answer, the model is
 // skipped, never the request. READER_OFF=1 pauses the model entirely. The rules' answer always ships.
@@ -53,14 +89,14 @@ async function sha256(s) {
 
 async function askOpenAI(env, system, user) {
   let lastErr = null;
-  for (const model of OPENAI_MODELS) {
+  for (const model of modelsFor(env)) {
     try {
       const r = await withTimeout(fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${env.OPENAI_API_KEY}` },
         body: JSON.stringify({
           model,
-          reasoning_effort: 'low',
+          reasoning_effort: effortFor(env),
           response_format: { type: 'json_object' },
           max_completion_tokens: 1500,
           messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
@@ -114,18 +150,22 @@ async function askWorkersAi(env, system, user) {
 export async function readWithModel(env, story, debug = false) {
   const segments = parseJourney(story, SELECTABLE);
   const candidates = candidatesOf(segments);
-  const base = { tableVersion: TABLE_VERSION, model: null, filled: 0, refused: 0 };
+  // `flags` is always present, empty when no model spoke, so a caller never has to test for it.
+  const base = { tableVersion: TABLE_VERSION, model: null, filled: 0, refused: 0, flags: [] };
   if (!candidates.length) return { ...base, segments: toWire(segments), note: 'the rules read every phrase' };
   const provider = env.OPENAI_API_KEY ? askOpenAI : env.ANTHROPIC_API_KEY ? askAnthropic : env.AI ? askWorkersAi : null;
   if (!provider) return { ...base, segments: toWire(segments), note: 'no model configured' };
   const gate = await readerAllowed(env);
   if (!gate.ok) return { ...base, segments: toWire(segments), note: gate.why };
-  const user = buildUserPrompt(catalogFor(SELECTABLE), candidates.map((i) => segments[i].raw), story);
+  const alreadyRead = rulesReadOf(segments);
+  const user = buildUserPrompt(catalogFor(SELECTABLE), candidates.map((i) => segments[i].raw), story, alreadyRead);
   try {
     const { text, model } = await provider(env, SYSTEM_PROMPT, user);
     const answers = parseModelJson(text);
-    const applied = applyModel(segments, candidates, answers, SELECTABLE);
-    return { tableVersion: TABLE_VERSION, model, filled: applied.filled.length, refused: applied.refused.length, segments: toWire(applied.segments), ...(debug ? { modelText: String(text).slice(0, 1500), asked: candidates.map((i) => segments[i].raw) } : {}) };
+    const applied = applyModel(segments, candidates, answers, SELECTABLE, alreadyRead);
+    // `flags` is the model's report on phrases the RULES read. It is carried on the wire and never
+    // overrides anything: the unit, the count and the price on those phrases are the rules' answer.
+    return { tableVersion: TABLE_VERSION, model, filled: applied.filled.length, refused: applied.refused.length, flags: applied.flags, segments: toWire(applied.segments, applied.flags), ...(debug ? { modelText: String(text).slice(0, 1500), asked: candidates.map((i) => segments[i].raw) } : {}) };
   } catch (e) {
     return { ...base, segments: toWire(segments), note: `model unavailable: ${String(e.message || e).slice(0, 80)}` };
   }
@@ -137,7 +177,8 @@ export async function onRequestPost({ request, env }) {
   const story = typeof body.story === 'string' ? body.story.trim().slice(0, MAX_STORY) : '';
   if (!story) return bad('POST a JSON body: {"story":"…"}');
   const debug = new URL(request.url).searchParams.get('debug') === '1';
-  const key = `map:${PROMPT_VERSION}:${TABLE_VERSION}:${await sha256(story)}`;
+  // The model list is part of the key: switching READER_MODELS must never serve another model's answer.
+  const key = `map:${PROMPT_VERSION}.${await promptHash()}:${TABLE_VERSION}:${modelsFor(env).join('+')}:${await sha256(story)}`;
   let hit = null;
   try { hit = env.LEDGER ? await env.LEDGER.get(key, 'json') : null; } catch { hit = null; }
   if (hit && hit.model && !debug) { await count(env, 'map'); return json({ ok: true, cached: true, ...hit }); }

@@ -94,10 +94,14 @@ describe('UX-2 fix 13 — the export is labelled what the file actually is', () 
 
 describe('UX-2 fix 14 — the drawer answers "show me the source" in one glance', () => {
   it('the link to the published file sits under the figure and above every other measure', () => {
-    const figure = at(drawer, '<div className="fig-card">');
+    /* UX-3 rebuilt this drawer into seven blocks (tests/drawer.test.ts pins the
+       order and proves no fact was lost). The rule below is unchanged; only the
+       anchors moved, because the gradient card is now block 2 and the CY2024
+       provenance is inside "Where it comes from". */
+    const figure = at(drawer, '${ds.block} ${ds.figure}');
     const link = at(drawer, 'Open the source and check this number');
-    const alternate = at(drawer, 'The other published measure of this same service');
-    const fileTable = at(drawer, 'Where the CY2024 figures come from');
+    const alternate = at(drawer, '<p className={ds.eyebrow}>The other published measure</p>');
+    const fileTable = at(drawer, 'The CY2024 claims file behind the charge figures —');
     expect(link).toBeGreaterThan(figure);
     expect(link).toBeLessThan(alternate);
     expect(link).toBeLessThan(fileTable);

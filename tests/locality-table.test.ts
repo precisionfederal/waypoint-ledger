@@ -9,9 +9,10 @@
    published file is not stale.
    ========================================================================== */
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { LOCALITIES, LOCALITY_ROW_COUNT, localityFigure } from '../lib/fit';
 import audit from '../data/AUDIT.json';
 
@@ -130,7 +131,15 @@ describe('public/data/locality-prices.csv — the open data', () => {
 
   it('🔴 is not stale — regenerating produces byte-for-byte the same file', () => {
     const before = readPub('locality-prices.csv');
-    execFileSync('node', ['scripts/gen-locality-table.mjs'], { cwd: root, stdio: 'pipe' });
-    expect(readPub('locality-prices.csv')).toBe(before);
+    // The JSON twin carries the run date; regenerating on a later day re-stamps it and dirties
+    // the tree under a deploy (seen 2026-09-10 00:30 UTC). Put the committed bytes back after.
+    const jsonPath = join(root, 'public/data/locality-prices.json');
+    const jsonBefore = readFileSync(jsonPath, 'utf8');
+    try {
+      execFileSync('node', ['scripts/gen-locality-table.mjs'], { cwd: root, stdio: 'pipe' });
+      expect(readPub('locality-prices.csv')).toBe(before);
+    } finally {
+      writeFileSync(jsonPath, jsonBefore);
+    }
   }, 30_000);
 });

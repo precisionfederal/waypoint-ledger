@@ -1,9 +1,7 @@
 {
   "_what": "Each state's own published Medicaid fee-schedule page. Medicaid rates are set by each state and no national federal file publishes them, so this list is the only honest place to send a Medicaid enrollee for their own rate.",
-  "_how_verified": "data/verify_medicaid_links.py fetches each candidate URL and keeps it only when the response is 2xx AND the page names a fee schedule/rate AND names Medicaid or that state's own Medicaid program. Anything else is omitted.",
+  "_how_verified": "data/verify_medicaid_links.py fetches each candidate URL and keeps it only when the response is 2xx AND the page names a fee schedule/rate AND names Medicaid or that state's own Medicaid program AND the body is not a 'not found' screen. A state whose site refuses a bare HTTP client is opened in headless Chrome and judged on what actually rendered. Anything else is omitted.",
   "_verified_on": "2026-09-09",
-  "_states_published": 47,
-  "_states_omitted": 4,
   "_programs_note": "What each state calls its own Medicaid program. Carried for every state, including the ones whose fee-schedule address could not be fetched, so the product can still name where the rate is published.",
   "programs": {
     "AK": {
@@ -211,6 +209,8 @@
       "program": "Wyoming Medicaid"
     }
   },
+  "_states_published": 50,
+  "_states_omitted": 1,
   "states": {
     "AK": {
       "state_name": "Alaska",
@@ -231,12 +231,21 @@
       "found_from": "https://medicaid.alabama.gov/",
       "verified_on": "2026-09-09"
     },
+    "AR": {
+      "state_name": "Arkansas",
+      "program": "Arkansas Medicaid",
+      "url": "https://humanservices.arkansas.gov/divisions-shared-services/medical-services/helpful-information-for-providers/fee-schedules/",
+      "http_status": 200,
+      "page_title": "Fee Schedules - Arkansas Department of Human Services",
+      "verified_by": "content+browser: Chrome rendered the page and it names this state's Medicaid fee schedule (the site refuses a bare HTTP client)",
+      "verified_on": "2026-09-09"
+    },
     "AZ": {
       "state_name": "Arizona",
       "program": "AHCCCS",
-      "url": "https://www.azahcccs.gov/PlansProviders/RatesAndBilling/FFS/feeschedules.html",
+      "url": "https://www.azahcccs.gov/PlansProviders/FeeForServiceHealthPlans/physicianrates.html",
       "http_status": 200,
-      "page_title": "Page/Document not found",
+      "page_title": "Fee-For-Service Physician Fee Schedules",
       "verified_by": "content: the page names a Medicaid fee schedule or rate",
       "verified_on": "2026-09-09"
     },
@@ -353,6 +362,15 @@
       "found_from": "https://www.in.gov/medicaid/providers/",
       "verified_on": "2026-09-09"
     },
+    "KS": {
+      "state_name": "Kansas",
+      "program": "KanCare",
+      "url": "https://portal.kmap-state-ks.us/PublicPage/ProviderPricing/FeeSchedules",
+      "http_status": 200,
+      "page_title": "FeeSchedules",
+      "verified_by": "content+browser: Chrome rendered the page and it names this state's Medicaid fee schedule (the site refuses a bare HTTP client)",
+      "verified_on": "2026-09-09"
+    },
     "KY": {
       "state_name": "Kentucky",
       "program": "Kentucky Medicaid",
@@ -370,6 +388,15 @@
       "http_status": 200,
       "page_title": "Medicaid | Department of Health | State of Louisiana | Medicaid Fee Schedules Index",
       "verified_by": "content: the page names a Medicaid fee schedule or rate",
+      "verified_on": "2026-09-09"
+    },
+    "MA": {
+      "state_name": "Massachusetts",
+      "program": "MassHealth",
+      "url": "https://www.mass.gov/info-details/masshealth-payment-and-coverage-guideline-tools",
+      "http_status": 200,
+      "page_title": "MassHealth Payment and Coverage Guideline Tools | Mass.gov",
+      "verified_by": "content+browser: Chrome rendered the page and it names this state's Medicaid fee schedule (the site refuses a bare HTTP client)",
       "verified_on": "2026-09-09"
     },
     "MD": {
@@ -471,7 +498,7 @@
       "program": "NJ FamilyCare",
       "url": "https://www.njmmis.com/RateInformation.aspx",
       "http_status": 200,
-      "page_title": "2",
+      "page_title": "3",
       "verified_by": "content: the page names a Medicaid fee schedule or rate",
       "found_from": "https://www.njmmis.com/",
       "verified_on": "2026-09-09"
@@ -659,132 +686,54 @@
   },
   "_omitted": [
     {
-      "state": "AR",
-      "state_name": "Arkansas",
-      "reason": "no address tried, and no fee-schedule link on the program's own front door, returned a 2xx page that proves it is that state's Medicaid fee schedule. Omitted rather than guessed.",
-      "tried": [
-        {
-          "url": "https://medicaid.mmis.arkansas.gov/general/units/fees.aspx",
-          "http_status": 0,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://medicaid.mmis.arkansas.gov/Provider/Docs/rates.aspx",
-          "http_status": 0,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://humanservices.arkansas.gov/divisions-shared-services/medical-services/helpful-information-for-providers/fee-schedules/",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://medicaid.mmis.arkansas.gov/Provider/Docs/fees.aspx",
-          "http_status": 0,
-          "rate_words": false,
-          "program_words": false
-        }
-      ],
-      "program": "Arkansas Medicaid"
-    },
-    {
-      "state": "KS",
-      "state_name": "Kansas",
-      "reason": "no address tried, and no fee-schedule link on the program's own front door, returned a 2xx page that proves it is that state's Medicaid fee schedule. Omitted rather than guessed.",
-      "tried": [
-        {
-          "url": "https://portal.kmap-state-ks.us/PublicPage/ProviderPricing",
-          "http_status": 302,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.kmap-state-ks.us/Public/pricing.asp",
-          "http_status": 302,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://portal.kmap-state-ks.us/PublicPage/ProviderPricing/ProviderPricingHome",
-          "http_status": 302,
-          "rate_words": false,
-          "program_words": false
-        }
-      ],
-      "program": "KanCare"
-    },
-    {
-      "state": "MA",
-      "state_name": "Massachusetts",
-      "reason": "no address tried, and no fee-schedule link on the program's own front door, returned a 2xx page that proves it is that state's Medicaid fee schedule. Omitted rather than guessed.",
-      "tried": [
-        {
-          "url": "https://www.mass.gov/service-details/masshealth-provider-fee-schedules",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.mass.gov/info-details/masshealth-provider-fee-schedules",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.mass.gov/lists/masshealth-provider-fee-schedules",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.mass.gov/lists/masshealth-provider-fee-schedules",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.mass.gov/service-details/masshealth-provider-rates",
-          "http_status": 403,
-          "rate_words": false,
-          "program_words": false
-        }
-      ],
-      "program": "MassHealth"
-    },
-    {
       "state": "MN",
       "state_name": "Minnesota",
-      "reason": "no address tried, and no fee-schedule link on the program's own front door, returned a 2xx page that proves it is that state's Medicaid fee schedule. Omitted rather than guessed.",
+      "program": "Minnesota Health Care Programs",
+      "reason": "no address tried, no fee-schedule link on the program's own front door, and no page opened in Chrome, returned a 2xx page that proves it is that state's Medicaid fee schedule. Omitted rather than guessed.",
       "tried": [
         {
-          "url": "https://mn.gov/dhs/mhcp-fee-schedule/",
+          "url": "https://mn.gov/dhs/health-care/medical-assistance/finding-medicaid-payment-rates/",
           "http_status": 200,
           "rate_words": false,
-          "program_words": false
+          "program_words": false,
+          "not_found_page": false
         },
         {
-          "url": "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926",
+          "url": "https://mn.gov/dhs/partners-and-providers/policies-procedures/minnesota-health-care-programs/provider/billing/fee-schedule/",
           "http_status": 200,
           "rate_words": false,
-          "program_words": false
-        },
-        {
-          "url": "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926",
-          "http_status": 200,
-          "rate_words": false,
-          "program_words": false
+          "program_words": false,
+          "not_found_page": false
         },
         {
           "url": "https://mn.gov/dhs/mhcp-fee-schedule/",
           "http_status": 200,
           "rate_words": false,
-          "program_words": false
+          "program_words": false,
+          "not_found_page": false
+        },
+        {
+          "url": "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926",
+          "http_status": 200,
+          "rate_words": false,
+          "program_words": false,
+          "not_found_page": false
+        },
+        {
+          "url": "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926",
+          "http_status": 200,
+          "rate_words": false,
+          "program_words": false,
+          "not_found_page": false
+        },
+        {
+          "url": "https://mn.gov/dhs/mhcp-fee-schedule/",
+          "http_status": 200,
+          "rate_words": false,
+          "program_words": false,
+          "not_found_page": false
         }
-      ],
-      "program": "Minnesota Health Care Programs"
+      ]
     }
   ]
 }

@@ -1,37 +1,1861 @@
 {
-  "_README": "Thirty diagnostic-journey sentences and the units of care a careful reader would say each one names. Used by scripts/eval-mapper.mjs to measure the deterministic matcher alone against the matcher plus the AI reader (POST /api/map). Nothing here is a real person: every sentence was written for this file from the long-COVID diagnostic-journey vocabulary, and there is no PHI in it. `expect` is a SET of catalog ids from data/prices.json — the metric ignores counts and order, because segmentation differs between the two readers and the question is which units were found. An empty `expect` is a sentence that must produce NO priced unit at all: care that did not happen, or a length of time.",
-  "_written_by": "BUILD-8 measurement lane, 2026-09-09. The expectations are one careful reader's judgment, not an external gold standard — that limit is stated wherever the numbers are quoted.",
-  "_version": "map-eval-1",
+  "_README": "Two hundred and nine sentences a real patient might type, and the units of care a careful reader would say each one names. Used by scripts/eval-mapper.mjs (rules alone vs rules plus the AI reader, end to end through POST /api/map) and by scripts/eval-models.mjs (one model against another on the same corpus). Nothing here is a real person: every sentence was written for this file from the catalog's own labels and plain_language_synonyms, and there is no PHI in it. `expect` is a SET of catalog ids from data/prices.json - the metric ignores counts and order, because segmentation differs between readers and the question is which units were found. An empty `expect` is a sentence that must produce NO priced unit at all: a wait, a symptom, a feeling, care that was refused or denied or skipped, care someone else had, or care only wondered about. `kind` groups the sentences so precision can be read per category: control, lay, count, wait, not-received, symptom, mixed, typo, place, hypothetical, someone-else, demo.",
+  "_written_by": "Cases 1-30: BUILD-8 measurement lane, 2026-09-09. Cases 31-185 and 186-209: READER-2 lane, 2026-09-09, written by hand from data/prices.json labels and data/synonyms.json - no model wrote a sentence or an expectation. The expectations are one careful reader's judgment, not an external gold standard; that limit is stated wherever the numbers are quoted.",
+  "_version": "map-eval-3",
+  "_catalog_checked_against": "data/prices.json + data/prices-additions-2026-09-09.json (251 selectable rows on 2026-09-09); every id in every `expect` is checked to exist and be selectable by scripts/eval-models.mjs, which exits 2 on an orphan.",
   "cases": [
-    { "id": 1,  "story": "saw my regular doctor three times, then a cardiologist, an echo and a Holter", "expect": ["cms-99213", "cms-99204", "cms-img-echo", "cms-test-holter"], "note": "the control sentence — the rules have always read this one" },
-    { "id": 2,  "story": "they slid me into the doughnut machine to look at my head", "expect": ["cms-img-ct-head-nc"], "note": "lay description of a CT scanner" },
-    { "id": 3,  "story": "the lung doctor had me blow into a tube as hard as I could", "expect": ["cms-test-spirometry"], "note": "spirometry described by what it feels like" },
-    { "id": 4,  "story": "I wore a little box on my chest with wires taped to me for two days", "expect": ["cms-test-holter"], "note": "a Holter monitor, never named" },
-    { "id": 5,  "story": "they strapped me to a table and tipped me upright until I nearly passed out", "expect": ["cms-test-tilt-table"], "note": "tilt-table test, never named" },
-    { "id": 6,  "story": "they stood me against the big flat plate and took a picture of my chest", "expect": ["cms-img-cxr"], "note": "chest X-ray by description" },
-    { "id": 7,  "story": "a nurse drew blood to check my thyroid", "expect": ["cms-lab-tsh"], "note": "the test named by the organ, not the assay" },
-    { "id": 8,  "story": "they checked my iron stores and my B12", "expect": ["cms-lab-ferritin", "cms-lab-b12"], "note": "two labs in one breath" },
-    { "id": 9,  "story": "I pedalled a bike with a mask over my face while they measured my breathing", "expect": ["cms-test-cpet"], "note": "CPET by description" },
-    { "id": 10, "story": "they put sticky pads on my chest and printed a strip", "expect": ["cms-test-ecg"], "note": "ECG by description" },
-    { "id": 11, "story": "I spent a night in the sleep lab with wires stuck in my hair", "expect": ["cms-test-sleep-study"], "note": "polysomnography by description" },
-    { "id": 12, "story": "they sent me for the camera down my throat and took a snip while they were in there", "expect": ["cms-proc-egd-biopsy"], "note": "upper endoscopy with biopsy, never named" },
-    { "id": 13, "story": "I could not afford the specialist so I never went", "expect": [], "note": "care that did not happen — the negation override must hold" },
-    { "id": 14, "story": "six months of waiting for the neurology appointment", "expect": [], "note": "a length of time — the duration override must hold" },
-    { "id": 15, "story": "the insurer refused the MRI of my brain", "expect": [], "note": "care denied — never priced" },
-    { "id": 16, "story": "went back to my regular doctor and was told it was all anxiety", "expect": ["cms-99213"], "note": "the visit really was billed; being dismissed rides along with it" },
-    { "id": 17, "story": "an ultrasound of my belly", "expect": ["cms-img-us-abdomen"], "note": "plain word for the abdomen" },
-    { "id": 18, "story": "they wanted to rule out lupus so they ran the double stranded DNA one", "expect": ["cms-lab-dsdna"], "note": "a specific antibody named the way a patient repeats it" },
-    { "id": 19, "story": "the neurologist put needles in my leg muscles to test the nerves", "expect": ["cms-99204", "cms-test-emg"], "note": "a specialist visit and the study they did" },
-    { "id": 20, "story": "they scanned my brain with the dye and again without it", "expect": ["cms-img-mri-brain-both"], "note": "with and without contrast, in lay words" },
-    { "id": 21, "story": "physical therapy twice a week for three months", "expect": ["cms-pt-exercise-15"], "note": "the rules' count arithmetic; the unit must survive it" },
-    { "id": 22, "story": "an hour with a psychologist doing memory and attention puzzles", "expect": ["cms-test-neuropsych-1h"], "note": "neuropsychological testing by description" },
-    { "id": 23, "story": "they pushed a swab right up my nose to test me for covid", "expect": ["cms-lab-covid-pcr"], "note": "the index event of a long-COVID journey" },
-    { "id": 24, "story": "I had the camera at the other end as well", "expect": ["cms-proc-colonoscopy"], "note": "colonoscopy, obliquely — the hardest sentence in the set" },
-    { "id": 25, "story": "the emergency room once when my heart would not slow down", "expect": ["cms-ed-99284-complete"], "note": "an ER visit the rules already read" },
-    { "id": 26, "story": "they measured how well my lungs move oxygen into my blood", "expect": ["cms-test-dlco"], "note": "diffusing capacity by description" },
-    { "id": 27, "story": "they ran a wand over the arteries in my neck", "expect": ["cms-img-carotid-duplex"], "note": "carotid duplex by description" },
-    { "id": 28, "story": "a first appointment with a psychiatrist to be assessed", "expect": ["cms-mh-psych-eval"], "note": "named plainly" },
-    { "id": 29, "story": "the clot test came back high so they scanned my chest with contrast", "expect": ["cms-lab-ddimer", "cms-img-ct-chest-c"], "note": "the D-dimer to CT pulmonary angiogram path" },
-    { "id": 30, "story": "I filled in the little questionnaire about my mood in the waiting room", "expect": ["cms-96127"], "note": "a scored screening questionnaire" }
+    {
+      "id": 1,
+      "kind": "control",
+      "story": "saw my regular doctor three times, then a cardiologist, an echo and a Holter",
+      "expect": [
+        "cms-99213",
+        "cms-99204",
+        "cms-img-echo",
+        "cms-test-holter"
+      ],
+      "note": "the control sentence — the rules have always read this one"
+    },
+    {
+      "id": 2,
+      "kind": "lay",
+      "story": "they slid me into the doughnut machine to look at my head",
+      "expect": [
+        "cms-img-ct-head-nc"
+      ],
+      "note": "lay description of a CT scanner"
+    },
+    {
+      "id": 3,
+      "kind": "lay",
+      "story": "the lung doctor had me blow into a tube as hard as I could",
+      "expect": [
+        "cms-test-spirometry"
+      ],
+      "note": "spirometry described by what it feels like"
+    },
+    {
+      "id": 4,
+      "kind": "lay",
+      "story": "I wore a little box on my chest with wires taped to me for two days",
+      "expect": [
+        "cms-test-holter"
+      ],
+      "note": "a Holter monitor, never named"
+    },
+    {
+      "id": 5,
+      "kind": "lay",
+      "story": "they strapped me to a table and tipped me upright until I nearly passed out",
+      "expect": [
+        "cms-test-tilt-table"
+      ],
+      "note": "tilt-table test, never named"
+    },
+    {
+      "id": 6,
+      "kind": "lay",
+      "story": "they stood me against the big flat plate and took a picture of my chest",
+      "expect": [
+        "cms-img-cxr"
+      ],
+      "note": "chest X-ray by description"
+    },
+    {
+      "id": 7,
+      "kind": "lay",
+      "story": "a nurse drew blood to check my thyroid",
+      "expect": [
+        "cms-lab-tsh"
+      ],
+      "note": "the test named by the organ, not the assay"
+    },
+    {
+      "id": 8,
+      "kind": "lay",
+      "story": "they checked my iron stores and my B12",
+      "expect": [
+        "cms-lab-ferritin",
+        "cms-lab-b12"
+      ],
+      "note": "two labs in one breath"
+    },
+    {
+      "id": 9,
+      "kind": "lay",
+      "story": "I pedalled a bike with a mask over my face while they measured my breathing",
+      "expect": [
+        "cms-test-cpet"
+      ],
+      "note": "CPET by description"
+    },
+    {
+      "id": 10,
+      "kind": "lay",
+      "story": "they put sticky pads on my chest and printed a strip",
+      "expect": [
+        "cms-test-ecg"
+      ],
+      "note": "ECG by description"
+    },
+    {
+      "id": 11,
+      "kind": "lay",
+      "story": "I spent a night in the sleep lab with wires stuck in my hair",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "polysomnography by description"
+    },
+    {
+      "id": 12,
+      "kind": "lay",
+      "story": "they sent me for the camera down my throat and took a snip while they were in there",
+      "expect": [
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "upper endoscopy with biopsy, never named"
+    },
+    {
+      "id": 13,
+      "kind": "not-received",
+      "story": "I could not afford the specialist so I never went",
+      "expect": [],
+      "note": "care that did not happen — the negation override must hold"
+    },
+    {
+      "id": 14,
+      "kind": "wait",
+      "story": "six months of waiting for the neurology appointment",
+      "expect": [],
+      "note": "a length of time — the duration override must hold"
+    },
+    {
+      "id": 15,
+      "kind": "not-received",
+      "story": "the insurer refused the MRI of my brain",
+      "expect": [],
+      "note": "care denied — never priced"
+    },
+    {
+      "id": 16,
+      "kind": "mixed",
+      "story": "went back to my regular doctor and was told it was all anxiety",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "the visit really was billed; being dismissed rides along with it"
+    },
+    {
+      "id": 17,
+      "kind": "lay",
+      "story": "an ultrasound of my belly",
+      "expect": [
+        "cms-img-us-abdomen"
+      ],
+      "note": "plain word for the abdomen"
+    },
+    {
+      "id": 18,
+      "kind": "lay",
+      "story": "they wanted to rule out lupus so they ran the double stranded DNA one",
+      "expect": [
+        "cms-lab-dsdna"
+      ],
+      "note": "a specific antibody named the way a patient repeats it"
+    },
+    {
+      "id": 19,
+      "kind": "mixed",
+      "story": "the neurologist put needles in my leg muscles to test the nerves",
+      "expect": [
+        "cms-99204",
+        "cms-test-emg"
+      ],
+      "note": "a specialist visit and the study they did"
+    },
+    {
+      "id": 20,
+      "kind": "lay",
+      "story": "they scanned my brain with the dye and again without it",
+      "expect": [
+        "cms-img-mri-brain-both"
+      ],
+      "note": "with and without contrast, in lay words"
+    },
+    {
+      "id": 21,
+      "kind": "count",
+      "story": "physical therapy twice a week for three months",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "the rules' count arithmetic; the unit must survive it"
+    },
+    {
+      "id": 22,
+      "kind": "lay",
+      "story": "an hour with a psychologist doing memory and attention puzzles",
+      "expect": [
+        "cms-test-neuropsych-1h"
+      ],
+      "note": "neuropsychological testing by description"
+    },
+    {
+      "id": 23,
+      "kind": "lay",
+      "story": "they pushed a swab right up my nose to test me for covid",
+      "expect": [
+        "cms-lab-covid-pcr"
+      ],
+      "note": "the index event of a long-COVID journey"
+    },
+    {
+      "id": 24,
+      "kind": "lay",
+      "story": "I had the camera at the other end as well",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "colonoscopy, obliquely — the hardest sentence in the set"
+    },
+    {
+      "id": 25,
+      "kind": "lay",
+      "story": "the emergency room once when my heart would not slow down",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "an ER visit the rules already read"
+    },
+    {
+      "id": 26,
+      "kind": "lay",
+      "story": "they measured how well my lungs move oxygen into my blood",
+      "expect": [
+        "cms-test-dlco"
+      ],
+      "note": "diffusing capacity by description"
+    },
+    {
+      "id": 27,
+      "kind": "lay",
+      "story": "they ran a wand over the arteries in my neck",
+      "expect": [
+        "cms-img-carotid-duplex"
+      ],
+      "note": "carotid duplex by description"
+    },
+    {
+      "id": 28,
+      "kind": "lay",
+      "story": "a first appointment with a psychiatrist to be assessed",
+      "expect": [
+        "cms-mh-psych-eval"
+      ],
+      "note": "named plainly"
+    },
+    {
+      "id": 29,
+      "kind": "mixed",
+      "story": "the clot test came back high so they scanned my chest with contrast",
+      "expect": [
+        "cms-lab-ddimer",
+        "cms-img-ct-chest-c"
+      ],
+      "note": "the D-dimer to CT pulmonary angiogram path"
+    },
+    {
+      "id": 30,
+      "kind": "lay",
+      "story": "I filled in the little questionnaire about my mood in the waiting room",
+      "expect": [
+        "cms-96127"
+      ],
+      "note": "a scored screening questionnaire"
+    },
+    {
+      "id": 31,
+      "kind": "lay",
+      "story": "they wrapped a cuff on my arm and had me walk the treadmill until my heart raced",
+      "expect": [
+        "cms-test-stress-test"
+      ],
+      "note": "treadmill stress test by description"
+    },
+    {
+      "id": 32,
+      "kind": "lay",
+      "story": "I wore a patch on my chest for a month so they could catch the flutter",
+      "expect": [
+        "cms-test-event-monitor"
+      ],
+      "note": "30-day event monitor, never named"
+    },
+    {
+      "id": 33,
+      "kind": "lay",
+      "story": "they stuck little discs all over my scalp and watched my brain while I slept",
+      "expect": [
+        "cms-test-eeg"
+      ],
+      "note": "EEG awake and asleep"
+    },
+    {
+      "id": 34,
+      "kind": "lay",
+      "story": "they ran a probe with cold jelly along the arteries in my neck",
+      "expect": [
+        "cms-img-carotid-duplex"
+      ],
+      "note": "carotid duplex by description"
+    },
+    {
+      "id": 35,
+      "kind": "lay",
+      "story": "they scanned my belly with the jelly and the wand",
+      "expect": [
+        "cms-img-us-abdomen"
+      ],
+      "note": "abdominal ultrasound by description"
+    },
+    {
+      "id": 36,
+      "kind": "lay",
+      "story": "a scan of my lower back inside the tunnel machine",
+      "expect": [
+        "cms-img-mri-lumbar-nc"
+      ],
+      "note": "lumbar MRI by description"
+    },
+    {
+      "id": 37,
+      "kind": "lay",
+      "story": "they put my knee in the tube and took pictures of the inside of the joint",
+      "expect": [
+        "cms-img-mri-joint-nc"
+      ],
+      "note": "joint MRI by description"
+    },
+    {
+      "id": 38,
+      "kind": "lay",
+      "story": "they ran the dye into my arm and then scanned my belly and hips",
+      "expect": [
+        "cms-img-ct-abd-pelvis-c"
+      ],
+      "note": "CT abdomen and pelvis with contrast"
+    },
+    {
+      "id": 39,
+      "kind": "lay",
+      "story": "a big shot of cortisone straight into my knee joint",
+      "expect": [
+        "cms-proc-joint-injection"
+      ],
+      "note": "large joint injection"
+    },
+    {
+      "id": 40,
+      "kind": "lay",
+      "story": "they pricked my forearm in neat rows to see what I react to",
+      "expect": [
+        "cms-test-allergy-skin-per-test"
+      ],
+      "note": "allergy skin testing by description"
+    },
+    {
+      "id": 41,
+      "kind": "lay",
+      "story": "I sat in the soundproof booth and pressed the button when I heard the beeps",
+      "expect": [
+        "cms-test-hearing"
+      ],
+      "note": "audiometry by description"
+    },
+    {
+      "id": 42,
+      "kind": "lay",
+      "story": "the eye doctor dilated my pupils and went through everything for the first time",
+      "expect": [
+        "cms-eye-exam-new"
+      ],
+      "note": "comprehensive eye exam, new patient"
+    },
+    {
+      "id": 43,
+      "kind": "lay",
+      "story": "a clinician spent an hour testing my memory and my attention",
+      "expect": [
+        "cms-test-neurobehavioral-1h"
+      ],
+      "note": "neurobehavioral status exam; 96116 vs 96132 is a known confusable pair"
+    },
+    {
+      "id": 44,
+      "kind": "lay",
+      "story": "the urine sample I gave went off to the lab to be grown",
+      "expect": [
+        "cms-lab-urine-culture"
+      ],
+      "note": "urine culture, described"
+    },
+    {
+      "id": 45,
+      "kind": "lay",
+      "story": "they checked the average of my blood sugar over three months",
+      "expect": [
+        "cms-lab-a1c"
+      ],
+      "note": "A1c described by what it measures"
+    },
+    {
+      "id": 46,
+      "kind": "lay",
+      "story": "they tested whether my body was attacking itself",
+      "expect": [
+        "cms-lab-ana"
+      ],
+      "note": "ANA described by what it looks for"
+    },
+    {
+      "id": 47,
+      "kind": "lay",
+      "story": "they measured the vitamin you get from the sun",
+      "expect": [
+        "cms-lab-vitamin-d"
+      ],
+      "note": "vitamin D, described"
+    },
+    {
+      "id": 48,
+      "kind": "lay",
+      "story": "the test for damage to the heart muscle came back normal",
+      "expect": [
+        "cms-lab-troponin"
+      ],
+      "note": "troponin, described"
+    },
+    {
+      "id": 49,
+      "kind": "lay",
+      "story": "they checked the hormone that goes up when the heart is straining",
+      "expect": [
+        "cms-lab-bnp"
+      ],
+      "note": "BNP, described"
+    },
+    {
+      "id": 50,
+      "kind": "lay",
+      "story": "they tested how fast my blood clots before the procedure",
+      "expect": [
+        "cms-lab-pt-inr"
+      ],
+      "note": "PT/INR, described"
+    },
+    {
+      "id": 51,
+      "kind": "lay",
+      "story": "a swab pushed up my nose for the virus",
+      "expect": [
+        "cms-lab-covid-pcr"
+      ],
+      "note": "COVID PCR, described"
+    },
+    {
+      "id": 52,
+      "kind": "lay",
+      "story": "they checked the level of the male hormone",
+      "expect": [
+        "cms-lab-free-testosterone"
+      ],
+      "note": "free testosterone, described"
+    },
+    {
+      "id": 53,
+      "kind": "lay",
+      "story": "they checked all my cholesterol numbers",
+      "expect": [
+        "cms-lab-lipid-panel"
+      ],
+      "note": "lipid panel, described"
+    },
+    {
+      "id": 54,
+      "kind": "lay",
+      "story": "they looked at my liver and my gallbladder with the ultrasound",
+      "expect": [
+        "cms-img-us-abdomen"
+      ],
+      "note": "abdominal ultrasound named by organ"
+    },
+    {
+      "id": 55,
+      "kind": "lay",
+      "story": "a picture of my lungs with the flat plate against my back",
+      "expect": [
+        "cms-img-cxr"
+      ],
+      "note": "chest X-ray, described"
+    },
+    {
+      "id": 56,
+      "kind": "lay",
+      "story": "they scanned my head in the tunnel with no dye at all",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "brain MRI without contrast"
+    },
+    {
+      "id": 57,
+      "kind": "lay",
+      "story": "a whole night in the lab with wires everywhere and a camera on me",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "polysomnography, described"
+    },
+    {
+      "id": 58,
+      "kind": "lay",
+      "story": "they strapped a mask on me and had me pedal until I could not go on",
+      "expect": [
+        "cms-test-cpet"
+      ],
+      "note": "CPET, described"
+    },
+    {
+      "id": 59,
+      "kind": "lay",
+      "story": "they had me breathe a strange gas and hold my breath for ten seconds",
+      "expect": [
+        "cms-test-dlco"
+      ],
+      "note": "DLCO, described"
+    },
+    {
+      "id": 60,
+      "kind": "lay",
+      "story": "they sealed me into a glass box and told me to pant",
+      "expect": [
+        "cms-test-lung-volumes"
+      ],
+      "note": "body plethysmography, described"
+    },
+    {
+      "id": 61,
+      "kind": "lay",
+      "story": "they buckled me to a table that tipped me head-up for forty minutes",
+      "expect": [
+        "cms-test-tilt-table"
+      ],
+      "note": "tilt-table test, described"
+    },
+    {
+      "id": 62,
+      "kind": "lay",
+      "story": "the camera went in the other end to look at my bowel",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "colonoscopy, obliquely"
+    },
+    {
+      "id": 63,
+      "kind": "lay",
+      "story": "they numbed my throat, put the scope down and pinched off a piece of tissue",
+      "expect": [
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "EGD with biopsy, described"
+    },
+    {
+      "id": 64,
+      "kind": "lay",
+      "story": "a first hour with a physical therapist who measured everything I could do",
+      "expect": [
+        "cms-pt-eval-low"
+      ],
+      "note": "PT evaluation"
+    },
+    {
+      "id": 65,
+      "kind": "lay",
+      "story": "forty five minutes with a counselor every week",
+      "expect": [
+        "cms-mh-therapy-45"
+      ],
+      "note": "45-minute psychotherapy with a count"
+    },
+    {
+      "id": 66,
+      "kind": "lay",
+      "story": "an hour long session with my therapist",
+      "expect": [
+        "cms-mh-therapy-60"
+      ],
+      "note": "60-minute psychotherapy"
+    },
+    {
+      "id": 67,
+      "kind": "lay",
+      "story": "the intake with psychiatry where they asked me about everything",
+      "expect": [
+        "cms-mh-psych-eval"
+      ],
+      "note": "psychiatric diagnostic evaluation"
+    },
+    {
+      "id": 68,
+      "kind": "lay",
+      "story": "the nurse asked me the yearly questions about how much I drink",
+      "expect": [
+        "cms-g0442"
+      ],
+      "note": "annual alcohol misuse screening"
+    },
+    {
+      "id": 69,
+      "kind": "lay",
+      "story": "before the visit they screened me for depression the way they do every year",
+      "expect": [
+        "cms-g0444"
+      ],
+      "note": "annual depression screening"
+    },
+    {
+      "id": 70,
+      "kind": "lay",
+      "story": "a nurse called me two weeks after I got out of the hospital to go through my medicines",
+      "expect": [
+        "cms-99495"
+      ],
+      "note": "transitional care management"
+    },
+    {
+      "id": 71,
+      "kind": "lay",
+      "story": "a session with a health psychologist about coping with being ill",
+      "expect": [
+        "cms-96156"
+      ],
+      "note": "health behavior assessment"
+    },
+    {
+      "id": 72,
+      "kind": "lay",
+      "story": "the hospital sent a second bill just for using their clinic room",
+      "expect": [
+        "cms-g0463-hospital-clinic-fee"
+      ],
+      "note": "hospital clinic facility fee"
+    },
+    {
+      "id": 73,
+      "kind": "lay",
+      "story": "they took blood and counted the red and the white cells",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "CBC, described"
+    },
+    {
+      "id": 74,
+      "kind": "lay",
+      "story": "the full chemistry panel with the liver and the kidney numbers",
+      "expect": [
+        "cms-lab-cmp"
+      ],
+      "note": "CMP"
+    },
+    {
+      "id": 75,
+      "kind": "lay",
+      "story": "just the electrolytes panel that time",
+      "expect": [
+        "cms-lab-electrolytes"
+      ],
+      "note": "the electrolyte panel is its own row (CPT 80051) since the 2026-09-09 additions; it is not the basic metabolic panel"
+    },
+    {
+      "id": 76,
+      "kind": "lay",
+      "story": "they watched how fast the blood settled in the tube",
+      "expect": [
+        "cms-lab-esr"
+      ],
+      "note": "ESR, described"
+    },
+    {
+      "id": 77,
+      "kind": "lay",
+      "story": "the marker for inflammation came back high",
+      "expect": [
+        "cms-lab-crp"
+      ],
+      "note": "CRP"
+    },
+    {
+      "id": 78,
+      "kind": "lay",
+      "story": "the high sensitivity version of the inflammation test",
+      "expect": [
+        "cms-lab-hscrp"
+      ],
+      "note": "hs-CRP"
+    },
+    {
+      "id": 79,
+      "kind": "lay",
+      "story": "they tested me for the tick illness after the rash",
+      "expect": [
+        "cms-lab-lyme-screen"
+      ],
+      "note": "Lyme screening test"
+    },
+    {
+      "id": 80,
+      "kind": "lay",
+      "story": "a second confirming Lyme test after the first one",
+      "expect": [
+        "cms-lab-lyme-confirm"
+      ],
+      "note": "Lyme confirmatory test"
+    },
+    {
+      "id": 81,
+      "kind": "lay",
+      "story": "they checked the muscle enzyme after my legs ached for weeks",
+      "expect": [
+        "cms-lab-ck"
+      ],
+      "note": "creatine kinase"
+    },
+    {
+      "id": 82,
+      "kind": "lay",
+      "story": "the magnesium came back low",
+      "expect": [
+        "cms-lab-magnesium"
+      ],
+      "note": "magnesium level"
+    },
+    {
+      "id": 83,
+      "kind": "lay",
+      "story": "they checked the folate and the B twelve",
+      "expect": [
+        "cms-lab-folate",
+        "cms-lab-b12"
+      ],
+      "note": "two labs, one spelled out in words"
+    },
+    {
+      "id": 84,
+      "kind": "lay",
+      "story": "the iron panel with the binding capacity",
+      "expect": [
+        "cms-lab-iron-binding"
+      ],
+      "note": "TIBC"
+    },
+    {
+      "id": 85,
+      "kind": "lay",
+      "story": "they ran the hepatitis C antibody and the HIV screen",
+      "expect": [
+        "cms-lab-hep-c-ab",
+        "cms-lab-hiv"
+      ],
+      "note": "two named labs"
+    },
+    {
+      "id": 86,
+      "kind": "lay",
+      "story": "the hepatitis B surface antigen was negative",
+      "expect": [
+        "cms-lab-hep-b-surface-ag"
+      ],
+      "note": "a lab named by its result"
+    },
+    {
+      "id": 87,
+      "kind": "lay",
+      "story": "the syphilis screen was part of that panel",
+      "expect": [
+        "cms-lab-syphilis"
+      ],
+      "note": "syphilis antibody"
+    },
+    {
+      "id": 88,
+      "kind": "lay",
+      "story": "they checked my estrogen and my FSH",
+      "expect": [
+        "cms-lab-estradiol",
+        "cms-lab-fsh"
+      ],
+      "note": "two hormone labs"
+    },
+    {
+      "id": 89,
+      "kind": "lay",
+      "story": "the prolactin level was checked twice",
+      "expect": [
+        "cms-lab-prolactin"
+      ],
+      "note": "one lab with a count"
+    },
+    {
+      "id": 90,
+      "kind": "lay",
+      "story": "they ran the TSH and then the free T4",
+      "expect": [
+        "cms-lab-tsh",
+        "cms-lab-free-t4"
+      ],
+      "note": "two thyroid labs"
+    },
+    {
+      "id": 91,
+      "kind": "lay",
+      "story": "the clotting time test before the scope",
+      "expect": [
+        "cms-lab-ptt"
+      ],
+      "note": "aPTT"
+    },
+    {
+      "id": 92,
+      "kind": "lay",
+      "story": "they ran the panel for the extractable nuclear antigens",
+      "expect": [
+        "cms-lab-ena"
+      ],
+      "note": "ENA panel"
+    },
+    {
+      "id": 93,
+      "kind": "lay",
+      "story": "the blood allergy panel for foods",
+      "expect": [
+        "cms-lab-ige-per-allergen"
+      ],
+      "note": "IgE per allergen"
+    },
+    {
+      "id": 94,
+      "kind": "lay",
+      "story": "a fasting blood sugar first thing in the morning",
+      "expect": [
+        "cms-lab-glucose"
+      ],
+      "note": "glucose"
+    },
+    {
+      "id": 95,
+      "kind": "lay",
+      "story": "they dipped my urine and then looked at it under the microscope",
+      "expect": [
+        "cms-lab-urinalysis"
+      ],
+      "note": "urinalysis with microscopy"
+    },
+    {
+      "id": 96,
+      "kind": "count",
+      "story": "physical therapy three times a week for six months",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "the unit must survive the arithmetic"
+    },
+    {
+      "id": 97,
+      "kind": "count",
+      "story": "I saw my regular doctor twice a month for a year",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "a stated cadence over a year"
+    },
+    {
+      "id": 98,
+      "kind": "count",
+      "story": "four MRIs of my brain in two years",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "a plural unit"
+    },
+    {
+      "id": 99,
+      "kind": "count",
+      "story": "blood work every month for eighteen months",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "blood work maps to the CBC row"
+    },
+    {
+      "id": 100,
+      "kind": "count",
+      "story": "three trips to the emergency room in one winter",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "ER with a count"
+    },
+    {
+      "id": 101,
+      "kind": "count",
+      "story": "therapy every other week for nine months",
+      "expect": [
+        "cms-mh-therapy-45"
+      ],
+      "note": "fortnightly cadence"
+    },
+    {
+      "id": 102,
+      "kind": "count",
+      "story": "two echoes, six months apart",
+      "expect": [
+        "cms-img-echo"
+      ],
+      "note": "a count and an interval in one breath"
+    },
+    {
+      "id": 103,
+      "kind": "count",
+      "story": "I have had the breathing test five times now",
+      "expect": [
+        "cms-test-spirometry"
+      ],
+      "note": "spirometry, repeated"
+    },
+    {
+      "id": 104,
+      "kind": "count",
+      "story": "ten sessions of PT and then they stopped approving it",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "the sessions happened; the refusal is of more"
+    },
+    {
+      "id": 105,
+      "kind": "count",
+      "story": "the covid test twice in one week",
+      "expect": [
+        "cms-lab-covid-pcr"
+      ],
+      "note": "short-window repeat"
+    },
+    {
+      "id": 106,
+      "kind": "wait",
+      "story": "eight months on the waiting list for neurology",
+      "expect": [],
+      "note": "duration override"
+    },
+    {
+      "id": 107,
+      "kind": "wait",
+      "story": "I waited almost a year to be seen at all",
+      "expect": [],
+      "note": "duration override"
+    },
+    {
+      "id": 108,
+      "kind": "wait",
+      "story": "three years from the first symptom to a name for it",
+      "expect": [],
+      "note": "the diagnostic odyssey stated as time"
+    },
+    {
+      "id": 109,
+      "kind": "wait",
+      "story": "the referral sat with the insurer for eleven weeks",
+      "expect": [],
+      "note": "time, not care"
+    },
+    {
+      "id": 110,
+      "kind": "wait",
+      "story": "two hours in the waiting room before anybody called my name",
+      "expect": [],
+      "note": "time inside a visit is still time"
+    },
+    {
+      "id": 111,
+      "kind": "wait",
+      "story": "a four month gap between the scan and anyone telling me the result",
+      "expect": [],
+      "note": "names a scan only as the endpoint of a wait"
+    },
+    {
+      "id": 112,
+      "kind": "not-received",
+      "story": "they wanted to do an MRI of my brain but I could not pay for it",
+      "expect": [],
+      "note": "negation override"
+    },
+    {
+      "id": 113,
+      "kind": "not-received",
+      "story": "the insurance denied the sleep study twice",
+      "expect": [],
+      "note": "denied care is never priced"
+    },
+    {
+      "id": 114,
+      "kind": "not-received",
+      "story": "I skipped the colonoscopy because of what it would cost",
+      "expect": [],
+      "note": "skipped"
+    },
+    {
+      "id": 115,
+      "kind": "not-received",
+      "story": "my doctor suggested physical therapy and I never went",
+      "expect": [],
+      "note": "never went"
+    },
+    {
+      "id": 116,
+      "kind": "not-received",
+      "story": "they offered me the tilt table test but I said no",
+      "expect": [],
+      "note": "declined"
+    },
+    {
+      "id": 117,
+      "kind": "not-received",
+      "story": "the specialist would not see me without a referral so I never got the appointment",
+      "expect": [],
+      "note": "never happened"
+    },
+    {
+      "id": 118,
+      "kind": "not-received",
+      "story": "I could not afford the allergy testing",
+      "expect": [],
+      "note": "cost barrier"
+    },
+    {
+      "id": 119,
+      "kind": "not-received",
+      "story": "we cancelled the echo when the bill for the first one arrived",
+      "expect": [],
+      "note": "cancelled; the earlier one is not itemised here"
+    },
+    {
+      "id": 120,
+      "kind": "not-received",
+      "story": "the plan refused to cover the neuropsych testing",
+      "expect": [],
+      "note": "denied"
+    },
+    {
+      "id": 121,
+      "kind": "not-received",
+      "story": "I put off the endoscopy for two years",
+      "expect": [],
+      "note": "deferred care, an idiom the rules may miss"
+    },
+    {
+      "id": 122,
+      "kind": "not-received",
+      "story": "they never ran the Lyme test even though I asked",
+      "expect": [],
+      "note": "never ran"
+    },
+    {
+      "id": 123,
+      "kind": "not-received",
+      "story": "no one ever ordered an EMG for me",
+      "expect": [],
+      "note": "never ordered"
+    },
+    {
+      "id": 124,
+      "kind": "symptom",
+      "story": "I was so exhausted I could not lift my arms",
+      "expect": [],
+      "note": "fatigue"
+    },
+    {
+      "id": 125,
+      "kind": "symptom",
+      "story": "my heart pounded every single time I stood up",
+      "expect": [],
+      "note": "reads like POTS; still a symptom"
+    },
+    {
+      "id": 126,
+      "kind": "symptom",
+      "story": "the brain fog got so bad I forgot my own address",
+      "expect": [],
+      "note": "cognitive symptom, not testing"
+    },
+    {
+      "id": 127,
+      "kind": "symptom",
+      "story": "I ached everywhere and nothing helped",
+      "expect": [],
+      "note": "pain"
+    },
+    {
+      "id": 128,
+      "kind": "symptom",
+      "story": "I felt like nobody believed me",
+      "expect": [],
+      "note": "dismissal as a feeling"
+    },
+    {
+      "id": 129,
+      "kind": "symptom",
+      "story": "I stopped being able to work",
+      "expect": [],
+      "note": "a loss, not a unit of care"
+    },
+    {
+      "id": 130,
+      "kind": "symptom",
+      "story": "the dizziness came in waves for months",
+      "expect": [],
+      "note": "symptom plus a duration"
+    },
+    {
+      "id": 131,
+      "kind": "symptom",
+      "story": "I lost twenty pounds without trying",
+      "expect": [],
+      "note": "a number that is not care"
+    },
+    {
+      "id": 132,
+      "kind": "symptom",
+      "story": "my hands went numb at night",
+      "expect": [],
+      "note": "neuropathic symptom, near the EMG row"
+    },
+    {
+      "id": 133,
+      "kind": "symptom",
+      "story": "I was frightened it really was all in my head",
+      "expect": [],
+      "note": "fear, not the psychiatric evaluation row"
+    },
+    {
+      "id": 134,
+      "kind": "symptom",
+      "story": "the shortness of breath got worse on the stairs",
+      "expect": [],
+      "note": "near the pulmonary rows"
+    },
+    {
+      "id": 135,
+      "kind": "symptom",
+      "story": "I cried in the car after every appointment",
+      "expect": [],
+      "note": "appointment mentioned, no unit named"
+    },
+    {
+      "id": 136,
+      "kind": "mixed",
+      "story": "I saw my regular doctor three times, waited five months for neurology, then had a brain MRI with and without dye",
+      "expect": [
+        "cms-99213",
+        "cms-img-mri-brain-both"
+      ],
+      "note": "unit, wait, unit"
+    },
+    {
+      "id": 137,
+      "kind": "mixed",
+      "story": "the ER once, an ECG while I was there, and then the insurance denied the follow-up echo",
+      "expect": [
+        "cms-ed-99284-complete",
+        "cms-test-ecg"
+      ],
+      "note": "two units and one denial"
+    },
+    {
+      "id": 138,
+      "kind": "mixed",
+      "story": "after eight months of waiting the rheumatologist ran the ANA and the sed rate",
+      "expect": [
+        "cms-99204",
+        "cms-lab-ana",
+        "cms-lab-esr"
+      ],
+      "note": "wait, specialist visit, two labs"
+    },
+    {
+      "id": 139,
+      "kind": "mixed",
+      "story": "urgent care sent me for a chest x-ray, then I was too tired to go back",
+      "expect": [
+        "cms-99203",
+        "cms-img-cxr"
+      ],
+      "note": "urgent care bills the new-patient office visit"
+    },
+    {
+      "id": 140,
+      "kind": "mixed",
+      "story": "two years of exhaustion, four blood draws, one CT of my head, and no answers",
+      "expect": [
+        "cms-lab-cbc",
+        "cms-img-ct-head-nc"
+      ],
+      "note": "duration, symptom, two units"
+    },
+    {
+      "id": 141,
+      "kind": "mixed",
+      "story": "my primary care visit, a thyroid test, and a referral I never used",
+      "expect": [
+        "cms-99214",
+        "cms-lab-tsh"
+      ],
+      "note": "two units and an unused referral"
+    },
+    {
+      "id": 142,
+      "kind": "mixed",
+      "story": "they did the covid swab in the parking lot and six months later I got into the post covid clinic",
+      "expect": [
+        "cms-lab-covid-pcr",
+        "cms-99205"
+      ],
+      "note": "the index test and the long-COVID intake"
+    },
+    {
+      "id": 143,
+      "kind": "mixed",
+      "story": "a sleep study, a tilt table test, and a heart monitor for two days",
+      "expect": [
+        "cms-test-sleep-study",
+        "cms-test-tilt-table",
+        "cms-test-holter"
+      ],
+      "note": "three tests; the 48-hour monitor is the Holter"
+    },
+    {
+      "id": 144,
+      "kind": "mixed",
+      "story": "they put me on the treadmill with the stickers, and later I wore the thirty day patch",
+      "expect": [
+        "cms-test-stress-test",
+        "cms-test-event-monitor"
+      ],
+      "note": "two cardiac tests that are easy to conflate"
+    },
+    {
+      "id": 145,
+      "kind": "mixed",
+      "story": "an hour of cognitive testing with a clinician and then therapy every week",
+      "expect": [
+        "cms-test-neurobehavioral-1h",
+        "cms-mh-therapy-45"
+      ],
+      "note": "testing plus recurring therapy"
+    },
+    {
+      "id": 146,
+      "kind": "mixed",
+      "story": "an upper endoscopy with a biopsy, and they wanted a colonoscopy too but I could not afford it",
+      "expect": [
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "one unit done, one refused in the same sentence"
+    },
+    {
+      "id": 147,
+      "kind": "mixed",
+      "story": "physical therapy twice a week for four months after the PT evaluation",
+      "expect": [
+        "cms-pt-eval-low",
+        "cms-pt-exercise-15"
+      ],
+      "note": "evaluation and sessions"
+    },
+    {
+      "id": 148,
+      "kind": "mixed",
+      "story": "the D-dimer was high so they scanned my chest with contrast and kept me in the ER",
+      "expect": [
+        "cms-lab-ddimer",
+        "cms-img-ct-chest-c",
+        "cms-ed-99284-complete"
+      ],
+      "note": "the PE pathway"
+    },
+    {
+      "id": 149,
+      "kind": "mixed",
+      "story": "a hearing test, an eye exam and a cortisone shot in my knee, all in one month",
+      "expect": [
+        "cms-test-hearing",
+        "cms-eye-exam-new",
+        "cms-proc-joint-injection"
+      ],
+      "note": "three unrelated units"
+    },
+    {
+      "id": 150,
+      "kind": "mixed",
+      "story": "they screened me for depression at the visit and then sent me to psychiatry",
+      "expect": [
+        "cms-g0444",
+        "cms-mh-psych-eval"
+      ],
+      "note": "screening then evaluation"
+    },
+    {
+      "id": 151,
+      "kind": "mixed",
+      "story": "a pelvic ultrasound, an ultrasound of my belly, and a CT of the belly with dye",
+      "expect": [
+        "cms-img-us-pelvic",
+        "cms-img-us-abdomen",
+        "cms-img-ct-abd-pelvis-c"
+      ],
+      "note": "three neighbouring imaging rows"
+    },
+    {
+      "id": 152,
+      "kind": "mixed",
+      "story": "the neurologist ordered nerve conduction studies and an MRI of my lower back",
+      "expect": [
+        "cms-99204",
+        "cms-test-emg",
+        "cms-img-mri-lumbar-nc"
+      ],
+      "note": "visit and two studies"
+    },
+    {
+      "id": 153,
+      "kind": "mixed",
+      "story": "I had the lung function testing, the gas transfer and the body box on the same day",
+      "expect": [
+        "cms-test-spirometry",
+        "cms-test-dlco",
+        "cms-test-lung-volumes"
+      ],
+      "note": "the full PFT set"
+    },
+    {
+      "id": 154,
+      "kind": "mixed",
+      "story": "three years, eleven doctors, and the only tests were a CBC and a metabolic panel",
+      "expect": [
+        "cms-lab-cbc",
+        "cms-lab-cmp"
+      ],
+      "note": "a duration, a count of doctors with no visit named, two labs"
+    },
+    {
+      "id": 155,
+      "kind": "mixed",
+      "story": "after the hospital they did the transitional care call and then a follow-up with my doctor",
+      "expect": [
+        "cms-99495",
+        "cms-99213"
+      ],
+      "note": "two visit-type rows in sequence"
+    },
+    {
+      "id": 156,
+      "kind": "typo",
+      "story": "echocardigram and a holter moniter",
+      "expect": [
+        "cms-img-echo",
+        "cms-test-holter"
+      ],
+      "note": "two misspellings"
+    },
+    {
+      "id": 157,
+      "kind": "typo",
+      "story": "they did an MRI of my brian",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "brain -> brian, the classic"
+    },
+    {
+      "id": 158,
+      "kind": "typo",
+      "story": "colonscopy last spring",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "dropped letter"
+    },
+    {
+      "id": 159,
+      "kind": "typo",
+      "story": "spirometery and a chest xray",
+      "expect": [
+        "cms-test-spirometry",
+        "cms-img-cxr"
+      ],
+      "note": "added letter, and xray unspaced"
+    },
+    {
+      "id": 160,
+      "kind": "typo",
+      "story": "sleap study at the hospital",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "phonetic misspelling"
+    },
+    {
+      "id": 161,
+      "kind": "typo",
+      "story": "they checked my thyriod",
+      "expect": [
+        "cms-lab-tsh"
+      ],
+      "note": "transposed letters"
+    },
+    {
+      "id": 162,
+      "kind": "typo",
+      "story": "vitamin d and b12 levles",
+      "expect": [
+        "cms-lab-vitamin-d",
+        "cms-lab-b12"
+      ],
+      "note": "two labs, one transposition"
+    },
+    {
+      "id": 163,
+      "kind": "typo",
+      "story": "i saw a cardiologst and then a nuerologist",
+      "expect": [
+        "cms-99204"
+      ],
+      "note": "two specialists, one billed unit each time"
+    },
+    {
+      "id": 164,
+      "kind": "typo",
+      "story": "emg and ncv testing on my left leg",
+      "expect": [
+        "cms-test-emg"
+      ],
+      "note": "abbreviations a patient copies off the order"
+    },
+    {
+      "id": 165,
+      "kind": "typo",
+      "story": "ct scan of my abdomen and pelvis w contrast",
+      "expect": [
+        "cms-img-ct-abd-pelvis-c"
+      ],
+      "note": "texting shorthand"
+    },
+    {
+      "id": 166,
+      "kind": "typo",
+      "story": "they ran a ddimer",
+      "expect": [
+        "cms-lab-ddimer"
+      ],
+      "note": "hyphen lost"
+    },
+    {
+      "id": 167,
+      "kind": "typo",
+      "story": "physcial therapy for my neck twice a week",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "transposition plus a count"
+    },
+    {
+      "id": 168,
+      "kind": "typo",
+      "story": "ekg in the er",
+      "expect": [
+        "cms-test-ecg",
+        "cms-ed-99284-complete"
+      ],
+      "note": "all lower case, two units"
+    },
+    {
+      "id": 169,
+      "kind": "typo",
+      "story": "my pcp ordered a1c and lipids",
+      "expect": [
+        "cms-lab-a1c",
+        "cms-lab-lipid-panel"
+      ],
+      "note": "abbreviations only"
+    },
+    {
+      "id": 170,
+      "kind": "typo",
+      "story": "they did a duplex of my neck arteries",
+      "expect": [
+        "cms-img-carotid-duplex"
+      ],
+      "note": "the technical word a patient repeats"
+    },
+    {
+      "id": 171,
+      "kind": "place",
+      "story": "I live in Houston and had an echo and a stress test at the med center",
+      "expect": [
+        "cms-img-echo",
+        "cms-test-stress-test"
+      ],
+      "note": "a city is not a unit of care"
+    },
+    {
+      "id": 172,
+      "kind": "place",
+      "story": "in Texas they made me wait nine months for the sleep study, which I finally had",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "a state, a wait, and a unit that did happen"
+    },
+    {
+      "id": 173,
+      "kind": "place",
+      "story": "my doctor in Boise ordered a CT of my head",
+      "expect": [
+        "cms-img-ct-head-nc"
+      ],
+      "note": "a city with a scan"
+    },
+    {
+      "id": 174,
+      "kind": "place",
+      "story": "we moved from Ohio to Arizona in the middle of all the testing and I had two brain MRIs",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "two states named"
+    },
+    {
+      "id": 175,
+      "kind": "place",
+      "story": "the clinic in Washington ran the TSH and the free T4",
+      "expect": [
+        "cms-lab-tsh",
+        "cms-lab-free-t4"
+      ],
+      "note": "Washington is ambiguous city vs state; neither is care"
+    },
+    {
+      "id": 176,
+      "kind": "place",
+      "story": "I drove from rural Iowa to Des Moines for a tilt table test",
+      "expect": [
+        "cms-test-tilt-table"
+      ],
+      "note": "state and city in one sentence"
+    },
+    {
+      "id": 177,
+      "kind": "place",
+      "story": "the ER in Miami did an ECG and a troponin",
+      "expect": [
+        "cms-ed-99284-complete",
+        "cms-test-ecg",
+        "cms-lab-troponin"
+      ],
+      "note": "three units and a city"
+    },
+    {
+      "id": 178,
+      "kind": "place",
+      "story": "in NY the neurologist finally did the EMG",
+      "expect": [
+        "cms-99204",
+        "cms-test-emg"
+      ],
+      "note": "a postal abbreviation"
+    },
+    {
+      "id": 179,
+      "kind": "place",
+      "story": "Mississippi is where I grew up but the colonoscopy was done here",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "a state named for biography, not care"
+    },
+    {
+      "id": 180,
+      "kind": "place",
+      "story": "I was in Indiana for the allergy skin testing",
+      "expect": [
+        "cms-test-allergy-skin-per-test"
+      ],
+      "note": "a state that is also a name"
+    },
+    {
+      "id": 181,
+      "kind": "hypothetical",
+      "story": "I read online that a tilt table test might explain it",
+      "expect": [],
+      "note": "a test read about, never had"
+    },
+    {
+      "id": 182,
+      "kind": "someone-else",
+      "story": "my sister had an MRI and hers showed something",
+      "expect": [],
+      "note": "another person's care"
+    },
+    {
+      "id": 183,
+      "kind": "hypothetical",
+      "story": "I want to ask about an EEG at my next appointment",
+      "expect": [],
+      "note": "future, not received"
+    },
+    {
+      "id": 184,
+      "kind": "hypothetical",
+      "story": "the bill said echocardiogram but I never had one",
+      "expect": [],
+      "note": "a unit named on a bill and denied in the same breath"
+    },
+    {
+      "id": 185,
+      "kind": "demo",
+      "story": "saw my regular doctor three times, then a cardiologist, the heart ultrasound thing, then they put electrodes on my legs and shocked the nerves, then the ER once when my heart was racing",
+      "expect": [
+        "cms-99213",
+        "cms-99204",
+        "cms-img-echo",
+        "cms-test-emg",
+        "cms-ed-99284-complete"
+      ],
+      "note": "THE DEMO SENTENCE, verbatim from shots2/demo-path.mjs. Five units; the fragment \"shocked the nerves\" must be absorbed into the EMG, not priced twice."
+    },
+    {
+      "id": 186,
+      "kind": "lay",
+      "story": "a mammogram, the screening one they call you in for every year",
+      "expect": [
+        "cms-img-mammo-screen"
+      ],
+      "note": "screening mammogram"
+    },
+    {
+      "id": 187,
+      "kind": "lay",
+      "story": "a bone density scan of my hips and spine",
+      "expect": [
+        "cms-img-dexa"
+      ],
+      "note": "DEXA"
+    },
+    {
+      "id": 188,
+      "kind": "lay",
+      "story": "an ultrasound of my thyroid after they felt a lump",
+      "expect": [
+        "cms-img-us-thyroid"
+      ],
+      "note": "thyroid ultrasound"
+    },
+    {
+      "id": 189,
+      "kind": "lay",
+      "story": "a spinal tap to check the fluid around my brain",
+      "expect": [
+        "cms-proc-lumbar-puncture"
+      ],
+      "note": "lumbar puncture"
+    },
+    {
+      "id": 190,
+      "kind": "lay",
+      "story": "a home sleep test with a belt round my chest and a probe on my finger",
+      "expect": [
+        "cms-test-home-sleep-full"
+      ],
+      "note": "home sleep apnea test with effort and oxygen"
+    },
+    {
+      "id": 191,
+      "kind": "lay",
+      "story": "the breathing test again after they gave me the inhaler",
+      "expect": [
+        "cms-test-spirometry-bronchodilator"
+      ],
+      "note": "spirometry pre and post bronchodilator"
+    },
+    {
+      "id": 192,
+      "kind": "lay",
+      "story": "a barium swallow where I had to drink the chalky drink",
+      "expect": [
+        "cms-img-upper-gi-series"
+      ],
+      "note": "upper GI series"
+    },
+    {
+      "id": 193,
+      "kind": "lay",
+      "story": "a camera pill I swallowed to look at my small bowel",
+      "expect": [
+        "cms-test-capsule-endoscopy"
+      ],
+      "note": "capsule endoscopy"
+    },
+    {
+      "id": 194,
+      "kind": "lay",
+      "story": "thirty minutes with my therapist",
+      "expect": [
+        "cms-mh-therapy-30"
+      ],
+      "note": "the 30-minute psychotherapy row, not the 45"
+    },
+    {
+      "id": 195,
+      "kind": "lay",
+      "story": "group therapy on Tuesday nights",
+      "expect": [
+        "cms-mh-group-therapy"
+      ],
+      "note": "group psychotherapy"
+    },
+    {
+      "id": 196,
+      "kind": "lay",
+      "story": "family therapy with my husband in the room",
+      "expect": [
+        "cms-mh-family-therapy"
+      ],
+      "note": "family therapy with the patient present"
+    },
+    {
+      "id": 197,
+      "kind": "lay",
+      "story": "speech therapy once a week for my word finding",
+      "expect": [
+        "cms-speech-therapy"
+      ],
+      "note": "speech and language therapy"
+    },
+    {
+      "id": 198,
+      "kind": "lay",
+      "story": "the chiropractor adjusted three areas of my spine",
+      "expect": [
+        "cms-chiro-3-4-regions"
+      ],
+      "note": "chiropractic, three or four regions"
+    },
+    {
+      "id": 199,
+      "kind": "lay",
+      "story": "an x-ray of my knee from three angles",
+      "expect": [
+        "cms-img-xray-knee-3"
+      ],
+      "note": "knee X-ray, three views"
+    },
+    {
+      "id": 200,
+      "kind": "lay",
+      "story": "an MRI of my neck without any dye",
+      "expect": [
+        "cms-img-mri-cervical-nc"
+      ],
+      "note": "cervical spine MRI"
+    },
+    {
+      "id": 201,
+      "kind": "lay",
+      "story": "a CT of my sinuses because of the headaches",
+      "expect": [
+        "cms-img-ct-sinus"
+      ],
+      "note": "sinus CT"
+    },
+    {
+      "id": 202,
+      "kind": "lay",
+      "story": "a nuclear stress test with the injection and the pictures",
+      "expect": [
+        "cms-img-nuclear-stress"
+      ],
+      "note": "myocardial perfusion imaging"
+    },
+    {
+      "id": 203,
+      "kind": "lay",
+      "story": "an echo done through my throat with the probe",
+      "expect": [
+        "cms-img-tee"
+      ],
+      "note": "transesophageal echocardiogram"
+    },
+    {
+      "id": 204,
+      "kind": "lay",
+      "story": "a colonoscopy where they took out a polyp",
+      "expect": [
+        "cms-proc-colonoscopy-polyp"
+      ],
+      "note": "colonoscopy with polypectomy"
+    },
+    {
+      "id": 205,
+      "kind": "lay",
+      "story": "a gastric emptying study with the eggs and the scanner",
+      "expect": [
+        "cms-test-gastric-emptying"
+      ],
+      "note": "gastric emptying study"
+    },
+    {
+      "id": 206,
+      "kind": "lay",
+      "story": "the breath test for lactose",
+      "expect": [
+        "cms-test-breath-hydrogen"
+      ],
+      "note": "hydrogen breath test"
+    },
+    {
+      "id": 207,
+      "kind": "lay",
+      "story": "my first Medicare annual wellness visit",
+      "expect": [
+        "cms-g0438"
+      ],
+      "note": "the initial annual wellness visit"
+    },
+    {
+      "id": 208,
+      "kind": "not-received",
+      "story": "they talked about a spinal tap but I refused it",
+      "expect": [],
+      "note": "a new-catalog unit named and declined"
+    },
+    {
+      "id": 209,
+      "kind": "hypothetical",
+      "story": "the mammogram is booked for next month",
+      "expect": [],
+      "note": "care in the future is not care received"
+    }
   ]
 }

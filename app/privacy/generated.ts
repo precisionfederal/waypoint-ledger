@@ -9,7 +9,7 @@ export interface PrivacyField { column: string; gloss: string; kept: string; enc
 export interface PrivacyAccepts { field: string; column: string }
 export interface PrivacyEndpoint { id: string; method: string; path: string; table: string; handler: string; what: string; publicly: string; fields: PrivacyField[]; accepts: PrivacyAccepts[]; notes: string[] }
 
-export const PRIVACY_GENERATED_ON = "2026-09-09";
+export const PRIVACY_GENERATED_ON = "2026-09-10";
 export const PRIVACY_MIGRATIONS = ["0001_init.sql","0002_integrity.sql","0003_users.sql","0004_journey_privacy.sql","0006_agg.sql"];
 export const PRIVACY_SCHEMA_FINGERPRINT = "892edf4dbbb8";
 export const PRIVACY_COLUMN_COUNT = 97;

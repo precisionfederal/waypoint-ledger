@@ -18,7 +18,7 @@ _omitted with the reason, so the absence is visible rather than filled.
 Run:  python3 data/verify_medicaid_links.py
 """
 from __future__ import annotations
-import json, re, sys, datetime, concurrent.futures, subprocess, pathlib
+import json, os, re, shutil, sys, tempfile, datetime, concurrent.futures, subprocess, pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
 OUT = HERE / "medicaid-fee-schedules.json"
@@ -32,7 +32,7 @@ UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
 CANDIDATES: dict[str, tuple[str, str, list[str]]] = {
  "AL": ("Alabama", "Alabama Medicaid Agency", ["https://medicaid.alabama.gov/content/4.0_Programs/4.2_Fee_Schedules.aspx"]),
  "AK": ("Alaska", "Alaska Medicaid", ["https://extranet-sp.dhss.alaska.gov/hcs/medicaidalaska/Provider/Sites/FeeSchedule.html", "https://health.alaska.gov/en/services/medicaid-provider-assistance/", "https://health.alaska.gov/en/providers/rates-and-audit/", "https://health.alaska.gov/en/division-of-health-care-services/rates/", "https://health.alaska.gov/en/division-of-health-care-services/rates-and-audit/", "https://health.alaska.gov/dhcs/Pages/ratesandaudit/default.aspx"]),
- "AZ": ("Arizona", "AHCCCS", ["https://www.azahcccs.gov/PlansProviders/RatesAndBilling/FFS/feeschedules.html"]),
+ "AZ": ("Arizona", "AHCCCS", ["https://www.azahcccs.gov/PlansProviders/FeeForServiceHealthPlans/physicianrates.html", "https://www.azahcccs.gov/PlansProviders/RatesAndBilling/FFS/AHCCCSprovider_rateanalysis.html"]),
  "AR": ("Arkansas", "Arkansas Medicaid", ["https://humanservices.arkansas.gov/divisions-shared-services/medical-services/helpful-information-for-providers/fee-schedules/", "https://humanservices.arkansas.gov/wp-content/uploads/PHYSICN-fees.pdf", "https://medicaid.mmis.arkansas.gov/general/units/fees.aspx", "https://medicaid.mmis.arkansas.gov/Provider/Docs/rates.aspx", "https://humanservices.arkansas.gov/divisions-shared-services/medical-services/helpful-information-for-providers/fee-schedules/", "https://medicaid.mmis.arkansas.gov/Provider/Docs/fees.aspx"]),
  "CA": ("California", "Medi-Cal", ["https://www.dhcs.ca.gov/services/medi-cal/Pages/Medi-CalFeeforService.aspx", "https://files.medi-cal.ca.gov/Rates", "https://files.medi-cal.ca.gov/pubsdoco/rates/rateshome.aspx", "https://mcweb.apps.prd.cammis.medi-cal.ca.gov/rates"]),
  "CO": ("Colorado", "Health First Colorado", ["https://hcpf.colorado.gov/provider-rates-fee-schedule"]),
@@ -51,7 +51,7 @@ CANDIDATES: dict[str, tuple[str, str, list[str]]] = {
  "LA": ("Louisiana", "Healthy Louisiana / Louisiana Medicaid", ["https://www.lamedicaid.com/provweb1/fee_schedules/feeschedulesindex.htm"]),
  "ME": ("Maine", "MaineCare", ["https://www.maine.gov/dhhs/oms/providers/rate-setting", "https://www.maine.gov/dhhs/oms/rates/rate-setting"]),
  "MD": ("Maryland", "Maryland Medicaid", ["https://health.maryland.gov/mmcp/pages/provider-information.aspx", "https://health.maryland.gov/mmcp/provider/Pages/professional-services.aspx", "https://health.maryland.gov/mmcp/Pages/Provider-Fee-Schedules.aspx", "https://health.maryland.gov/mmcp/Pages/Professional-Services.aspx", "https://health.maryland.gov/mmcp/pages/Fee-Schedules.aspx", "https://health.maryland.gov/mmcp/provider/Pages/Fee-Schedules.aspx"]),
- "MA": ("Massachusetts", "MassHealth", ["https://www.mass.gov/lists/provider-payment-rates-community-health-care-providers-ambulatory-care", "https://www.mass.gov/info-details/masshealth-payment-and-coverage-guideline-tools", "https://www.mass.gov/service-details/masshealth-provider-fee-schedules", "https://www.mass.gov/info-details/masshealth-provider-fee-schedules", "https://www.mass.gov/lists/masshealth-provider-fee-schedules", "https://www.mass.gov/lists/masshealth-provider-fee-schedules", "https://www.mass.gov/service-details/masshealth-provider-rates"]),
+ "MA": ("Massachusetts", "MassHealth", ["https://www.mass.gov/lists/provider-payment-rates-community-health-care-providers-ambulatory-care", "https://www.mass.gov/regulations/101-CMR-31700-rates-for-medicine-services", "https://www.mass.gov/info-details/masshealth-payment-and-coverage-guideline-tools"]),
  "MI": ("Michigan", "Michigan Medicaid", ["https://www.michigan.gov/mdhhs/assistance-programs/medicaid/portalhome/medicaid-providers/billing-and-reimbursement", "https://www.michigan.gov/mdhhs/doing-business/providers/providers/billingreimbursement/physicians-practitioners-medical-clinics", "https://www.michigan.gov/mdhhs/assistance-programs/medicaid/portalhome/medicaid-providers/medicaid-provider-resources/medicaid-fee-schedules", "https://www.michigan.gov/mdhhs/doing-business/providers/providers/medicaid/policyforms", "https://www.michigan.gov/mdhhs/assistance-programs/medicaid/portalhome/medicaid-providers/medicaid-provider-fee-schedule-and-rates"]),
  "MN": ("Minnesota", "Minnesota Health Care Programs", ["https://mn.gov/dhs/health-care/medical-assistance/finding-medicaid-payment-rates/", "https://mn.gov/dhs/partners-and-providers/policies-procedures/minnesota-health-care-programs/provider/billing/fee-schedule/", "https://mn.gov/dhs/mhcp-fee-schedule/", "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926", "https://www.dhs.state.mn.us/main/idcplg?IdcService=GET_DYNAMIC_CONVERSION&RevisionSelectionMethod=LatestReleased&dDocName=id_008926", "https://mn.gov/dhs/mhcp-fee-schedule/"]),
  "MS": ("Mississippi", "Mississippi Medicaid", ["https://medicaid.ms.gov/providers/fee-schedules-and-rates/"]),
@@ -126,8 +126,13 @@ HUBS: dict[str, list[str]] = {
  "WY": ["https://health.wyo.gov/healthcarefin/medicaid/", "https://wymedicaid.portal.conduent.com/"],
 }
 
+NOT_FOUND = re.compile(
+    r"page\s*/\s*document\s*not\s*found|page\s+not\s+found|document\s+not\s+found|"
+    r"404\s*(?:-|:)?\s*(?:error|not\s+found)|the\s+page\s+you\s+(?:requested|are\s+looking\s+for)"
+    r"\s+(?:could\s+not\s+be\s+found|does\s+not\s+exist)|we\s+can'?t\s+find\s+that\s+page", re.I)
+
 RATE_WORDS = re.compile(r"fee\s*schedule|reimbursement\s*rate|provider\s*rate|rate\s*setting|max(?:imum)?\s*(?:allowable)?\s*fee", re.I)
-PROG_WORDS = re.compile(r"medicaid|medi-cal|masshealth|ahcccs|soonercare|tenncare|kancare|forwardhealth|husky|med-?quest|apple\s*health|mainecare|health\s*first\s*colorado|mo\s*healthnet|njfamilycare|nj\s*familycare|turquoise\s*care|cardinal\s*care|healthy\s*connections|green\s*mountain|oregon\s*health\s*plan|health\s*coverage\s*programs|medical\s*assistance", re.I)
+PROG_WORDS = re.compile(r"medicaid|medi-cal|masshealth|ahcccs|soonercare|tenncare|kancare|forwardhealth|husky|med-?quest|apple\s*health|mainecare|health\s*first\s*colorado|mo\s*healthnet|njfamilycare|nj\s*familycare|turquoise\s*care|cardinal\s*care|healthy\s*connections|green\s*mountain|oregon\s*health\s*plan|health\s*coverage\s*programs|medical\s*assistance|kmap|kansas\s*medical\s*assistance", re.I)
 
 
 def fetch(url: str) -> tuple[int, str, str]:
@@ -178,8 +183,12 @@ def check(code: str) -> dict:
         hay = f"{title}\n{text}"
         rate_ok = bool(RATE_WORDS.search(hay))
         prog_ok = bool(PROG_WORDS.search(hay))
-        tried.append({"url": url, "http_status": status, "rate_words": rate_ok, "program_words": prog_ok})
-        if 200 <= status < 300 and rate_ok and prog_ok:
+        # A site can answer 200 and still be a "Page/Document not found" screen —
+        # Arizona shipped for weeks that way. The body decides, not the status.
+        gone = bool(NOT_FOUND.search(f"{title}\n{text[:4000]}"))
+        tried.append({"url": url, "http_status": status, "rate_words": rate_ok,
+                      "program_words": prog_ok, "not_found_page": gone})
+        if 200 <= status < 300 and rate_ok and prog_ok and not gone:
             return {"ok": True, "state": code, "state_name": name, "program": program,
                     "url": eff, "requested_url": url, "http_status": status,
                     "page_title": title, "tried": tried,
@@ -261,6 +270,116 @@ def discover(code: str) -> dict | None:
     return None
 
 
+# ---------------------------------------------------------------------------
+# STAGE 3 — THE PAGE A REAL PERSON WOULD SEE.
+#
+# Four states' fee schedules are behind a bot filter that answers a bare HTTP
+# client with 403, a login redirect loop, or a captcha, while the same address
+# opens normally in a browser. Omitting a page that works for the person is as
+# wrong as publishing one that does not, so the last stage opens the candidate
+# in the same engine the person uses (headless Chrome, via Playwright) and
+# applies the SAME content test to what actually rendered. Nothing is assumed:
+# a state reaches the file only if Chrome loaded it and the rendered text names
+# that state's Medicaid fee schedule.
+#
+# If node, Playwright or Chrome is missing, this stage is skipped and the state
+# stays omitted with its reason. It never invents a link.
+# ---------------------------------------------------------------------------
+
+NODE = os.environ.get("PF_NODE") or shutil.which("node") or "/Users/bo/.nvm/versions/node/v25.3.0/bin/node"
+PLAYWRIGHT = os.environ.get("PF_PLAYWRIGHT") or "/Users/bo/.nvm/versions/node/v25.3.0/lib/node_modules/playwright/index.mjs"
+CHROME = os.environ.get("PF_CHROME") or "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+
+BROWSER_JS = """
+import { chromium } from %(pw)s;
+const urls = JSON.parse(process.argv[2]);
+const b = await chromium.launch({ executablePath: %(chrome)s });
+const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
+for (const u of urls) {
+  const page = await ctx.newPage();
+  const out = { url: u, status: 0, title: '', final: u, text: '' };
+  try {
+    const r = await page.goto(u, { waitUntil: 'domcontentloaded', timeout: 45000 });
+    out.status = r ? r.status() : 0;
+    await page.waitForTimeout(2500);
+    out.title = (await page.title()).slice(0, 200);
+    out.final = page.url();
+    out.text = (await page.evaluate(() => document.body ? document.body.innerText : '')).slice(0, 40000);
+  } catch (e) { out.error = String(e).slice(0, 160); }
+  console.log(JSON.stringify(out));
+  await page.close();
+}
+await b.close();
+"""
+
+
+def browser_pages(urls: list[str]) -> dict[str, dict]:
+    """{url: {status, title, final, text}} as Chrome rendered it. Never raises."""
+    if not urls or not os.path.exists(NODE) or not os.path.exists(PLAYWRIGHT) or not os.path.exists(CHROME):
+        return {}
+    js = BROWSER_JS % {"pw": json.dumps(PLAYWRIGHT), "chrome": json.dumps(CHROME)}
+    with tempfile.NamedTemporaryFile("w", suffix=".mjs", delete=False) as f:
+        f.write(js)
+        path = f.name
+    try:
+        p = subprocess.run([NODE, path, json.dumps(urls)], capture_output=True, text=True,
+                           errors="replace", timeout=60 * len(urls) + 60)
+        out = {}
+        for line in p.stdout.splitlines():
+            line = line.strip()
+            if not line.startswith("{"):
+                continue
+            try:
+                d = json.loads(line)
+            except Exception:
+                continue
+            out[d["url"]] = d
+        return out
+    except Exception:
+        return {}
+    finally:
+        try:
+            os.unlink(path)
+        except OSError:
+            pass
+
+
+def browser_check(rows: list[dict]) -> list[dict]:
+    """Re-try every failed state in Chrome. Returns the ones that now pass."""
+    urls, owner = [], {}
+    for r in rows:
+        for t in r["tried"]:
+            if t["url"] not in owner:
+                owner[t["url"]] = r["state"]
+                urls.append(t["url"])
+    if not urls:
+        return []
+    pages = browser_pages(urls)
+    won = []
+    for r in rows:
+        for t in r["tried"]:
+            d = pages.get(t["url"])
+            if not d or not (200 <= int(d.get("status") or 0) < 300):
+                continue
+            hay = f"{d.get('title','')}\n{d.get('text','')}"
+            if NOT_FOUND.search(hay[:4000]):
+                continue
+            prog = re.compile(re.escape(r["program"]), re.I)
+            if not RATE_WORDS.search(hay):
+                continue
+            if not (PROG_WORDS.search(hay) or prog.search(hay)):
+                continue
+            won.append({"ok": True, "state": r["state"], "state_name": r["state_name"],
+                        "program": r["program"], "url": d.get("final") or t["url"],
+                        "requested_url": t["url"], "http_status": int(d["status"]),
+                        "page_title": re.sub(r"\s+", " ", d.get("title", "")).strip()[:160],
+                        "tried": r["tried"],
+                        "verified_by": "content+browser: Chrome rendered the page and it names this "
+                                       "state's Medicaid fee schedule (the site refuses a bare HTTP client)"})
+            break
+    return won
+
+
 def main() -> int:
     only = None
     for a in sys.argv[1:]:
@@ -283,6 +402,14 @@ def main() -> int:
             good.append(f)
         else:
             bad.append(r)
+    if bad:
+        print(f"stage 2: {len(good)} verified, {len(bad)} to open in a browser", flush=True)
+        won = browser_check(bad)
+        if won:
+            got = {r["state"] for r in won}
+            good.extend(won)
+            bad = [r for r in bad if r["state"] not in got]
+            print(f"stage 3: Chrome recovered {sorted(got)}", flush=True)
     today = datetime.date.today().isoformat()
     doc = {
         "_what": "Each state's own published Medicaid fee-schedule page. Medicaid rates are set by "
@@ -290,7 +417,9 @@ def main() -> int:
                  "honest place to send a Medicaid enrollee for their own rate.",
         "_how_verified": "data/verify_medicaid_links.py fetches each candidate URL and keeps it only "
                          "when the response is 2xx AND the page names a fee schedule/rate AND names "
-                         "Medicaid or that state's own Medicaid program. Anything else is omitted.",
+                         "Medicaid or that state's own Medicaid program AND the body is not a "
+                         "'not found' screen. A state whose site refuses a bare HTTP client is opened "
+                         "in headless Chrome and judged on what actually rendered. Anything else is omitted.",
         "_verified_on": today,
         "_programs_note": "What each state calls its own Medicaid program. Carried for every "
                           "state, including the ones whose fee-schedule address could not be "
@@ -304,15 +433,18 @@ def main() -> int:
                                 **({"found_from": r["found_from"]} if r.get("found_from") else {}),
                                 "verified_on": today} for r in sorted(good, key=lambda r: r["state"])},
         "_omitted": [{"state": r["state"], "state_name": r["state_name"], "program": r["program"],
-                      "reason": "no address tried, and no fee-schedule link on the program's own "
-                                "front door, returned a 2xx page that proves it is that state's "
-                                "Medicaid fee schedule. Omitted rather than guessed.",
+                      "reason": "no address tried, no fee-schedule link on the program's own front "
+                                "door, and no page opened in Chrome, returned a 2xx page that proves "
+                                "it is that state's Medicaid fee schedule. Omitted rather than guessed.",
                       "tried": r["tried"]} for r in sorted(bad, key=lambda r: r["state"])],
     }
     if only and OUT.exists():
         # A partial run tops up the published list; it never drops a state that
         # was already fetched and proved on an earlier pass.
         prev = json.loads(OUT.read_text())
+        # A partial run must never shrink the program names either: every state
+        # keeps the name it calls its own Medicaid program, published or not.
+        doc["programs"] = dict(sorted({**prev.get("programs", {}), **doc["programs"]}.items()))
         merged_states = {**prev.get("states", {}), **doc["states"]}
         for code in doc["states"]:
             prev["_omitted"] = [o for o in prev.get("_omitted", []) if o["state"] != code]

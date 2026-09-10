@@ -20,6 +20,7 @@
    ========================================================================== */
 
 import type { PriceItem } from './types';
+import { placeOnlyPhrase } from './state-detect';
 
 /** How sure the match is. Reported to the person; never used to invent a figure. */
 export type MatchConfidence = 'high' | 'medium' | 'low' | 'none';
@@ -1143,6 +1144,9 @@ function connectorPieces(seg: string): string[] {
 export function parseJourney(story: string, table: PriceItem[]): ParsedSegment[] {
   const out: ParsedSegment[] = [];
   for (const seg of splitJourney(story, protectionsFor(table))) {
+    // A clause that only says WHERE the person lives is context for the fit, never a line on the
+    // journey (state lane, 2026-09-09: "I live in Houston." was printing as an unpriced chip).
+    if (placeOnlyPhrase(seg)) continue;
     /* 🔴 The whole segment is read for a refusal, a denial or a bare span BEFORE
        it is cut at its joining words. Otherwise "the specialist that I never
        saw" splits into "the specialist" and prices a visit that never happened,

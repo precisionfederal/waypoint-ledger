@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Re-derive every dollar figure in prices-additions-2026-09-08.json straight from the
-CMS source files, independently of how they were built.
+Re-derive every dollar figure in BOTH additions files straight from the CMS source
+files, independently of how they were built:
+
+    data/prices-additions-2026-09-08.json   (53 rows, assembled 2026-09-08)
+    data/prices-additions-2026-09-09.json   (157 rows, assembled 2026-09-09)
 
   PFS rows  (confidence DERIVED, code CPT nnnnn): value_usd must equal
             round(total non-facility RVU x conversion factor, 2), both read on the
@@ -26,7 +29,15 @@ DEFAULT_SRC = ("/private/tmp/claude-501/-Users-bo-Documents-100M-Lifetime-Revenu
 SRC = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SRC
 RVU_CSV  = os.path.join(SRC, 'rvu26c', 'PPRRVU2026_Jul_nonQPP.csv')
 CLAB_CSV = os.path.join(SRC, 'clab',  'PUF_CLFS_CY2026_Q3V1.csv')
-ADDITIONS = os.path.join(HERE, 'prices-additions-2026-09-08.json')
+ADDITIONS_FILES = [os.path.join(HERE, 'prices-additions-2026-09-08.json'),
+                   os.path.join(HERE, 'prices-additions-2026-09-09.json')]
+
+CODE_PREFIX = re.compile(r'^(?:CPT|HCPCS)\s+')
+
+def hcpcs_of(item):
+    """The bare HCPCS/CPT code a row cites. A row may write 'CPT 94729, add-on' or
+       'HCPCS G0438'; the file is keyed on the code alone."""
+    return CODE_PREFIX.sub('', item['code']).split(',')[0].strip()
 
 def sha256(path):
     h = hashlib.sha256()
@@ -60,36 +71,63 @@ def load_clab(path):
     return out
 
 def main():
-    for p in (RVU_CSV, CLAB_CSV, ADDITIONS):
+    for p in [RVU_CSV, CLAB_CSV] + ADDITIONS_FILES:
         if not os.path.exists(p):
             print('FATAL missing file: %s' % p); return 2
 
-    data = json.load(open(ADDITIONS))
     rvu, clab = load_rvu(RVU_CSV), load_clab(CLAB_CSV)
     fails = []
+    checked = 0
+    seen_ids, seen_codes = {}, {}
 
-    # --- the conversion factor must be one value across the whole file, and the
-    #     value the JSON claims.
+    # --- the conversion factor must be one value across the whole file
     cfs = {v['cf'] for v in rvu.values() if v['cf'] > 0}
     if len(cfs) != 1:
         fails.append('conversion factor is not constant in the RVU file: %r' % cfs)
     cf = cfs.pop() if len(cfs) == 1 else None
-    if cf != data['_conversion_factor']:
-        fails.append('conversion factor mismatch: file %r vs JSON %r' % (cf, data['_conversion_factor']))
     print('conversion factor read from RVU26C CONV FACTOR column: $%.4f' % cf)
 
-    # --- file integrity
-    src = data.get('_source_files', {})
-    for label, path, key in (('PFS csv', RVU_CSV, 'pfs_csv_sha256'),
-                             ('CLFS csv', CLAB_CSV, 'clfs_csv_sha256')):
-        got = sha256(path)
-        if src.get(key) != got:
-            fails.append('%s SHA256 mismatch: recorded %s, actual %s' % (label, src.get(key), got))
-        else:
-            print('SHA256 OK  %s  %s' % (label, got))
+    for additions in ADDITIONS_FILES:
+        data = json.load(open(additions))
+        print('\n=== %s — %d rows ===' % (os.path.basename(additions), len(data['items'])))
+        if cf != data['_conversion_factor']:
+            fails.append('%s: conversion factor mismatch: file %r vs JSON %r'
+                         % (os.path.basename(additions), cf, data['_conversion_factor']))
 
+        # --- file integrity: each additions file names the bytes it was built from
+        src = data.get('_source_files', {})
+        for label, path, key in (('PFS csv', RVU_CSV, 'pfs_csv_sha256'),
+                                 ('CLFS csv', CLAB_CSV, 'clfs_csv_sha256')):
+            got = sha256(path)
+            if src.get(key) != got:
+                fails.append('%s: %s SHA256 mismatch: recorded %s, actual %s'
+                             % (os.path.basename(additions), label, src.get(key), got))
+            else:
+                print('SHA256 OK  %s  %s' % (label, got))
+        checked += len(data['items'])
+        run_rows(data, rvu, clab, fails, seen_ids, seen_codes, os.path.basename(additions))
+
+    print('\n%d rows checked across %d files' % (checked, len(ADDITIONS_FILES)))
+    if fails:
+        print('FAILURES (%d):' % len(fails))
+        for f in fails:
+            print('  - ' + f)
+        return 1
+    print('ALL ROWS PASS — every figure reproduces from the CMS source files.')
+    return 0
+
+
+def run_rows(data, rvu, clab, fails, seen_ids, seen_codes, where):
     for it in data['items']:
-        rid, code = it['id'], it['code'].replace('CPT ', '').strip()
+        rid, code = it['id'], hcpcs_of(it)
+        # No id and no code may be claimed twice, here or by the other additions file:
+        # two rows for one code is two prices for one unit of care.
+        if rid in seen_ids:
+            fails.append('%s: id %s already used in %s' % (where, rid, seen_ids[rid]))
+        seen_ids[rid] = where
+        if code in seen_codes:
+            fails.append('%s: %s already priced in %s' % (where, it['code'], seen_codes[code]))
+        seen_codes[code] = where
         val = it['value_usd']
         if it['confidence'] == 'DERIVED':
             r = rvu.get(code)
@@ -128,15 +166,6 @@ def main():
                   % ('PASS' if ok else 'FAIL', rid, code, rate, val))
         else:
             fails.append('%s: unexpected confidence %r' % (rid, it['confidence']))
-
-    print('\n%d rows checked' % len(data['items']))
-    if fails:
-        print('FAILURES (%d):' % len(fails))
-        for f in fails:
-            print('  - ' + f)
-        return 1
-    print('ALL ROWS PASS — every figure reproduces from the CMS source files.')
-    return 0
 
 if __name__ == '__main__':
     sys.exit(main())

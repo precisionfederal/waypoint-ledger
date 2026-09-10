@@ -1,0 +1,56 @@
+BLOOD AND LAB TESTS
+
+Complete blood count
+≈
+
+REFERENCE PRICE. This is what Medicare allows for this service. Say what coverage you have and this line will tell you whether that describes you.
+
+$7.77
+
+Medicare allowed amount · 2026 · CPT 85025
+
+READ IN THE SOURCE
+
+CPT 85025
+·
+LOINC 57021-8
+— CBC W Auto Differential panel - Blood
+Confirmed at NLM Clinical Table Search Service, LOINC table (https://clinicaltables.nlm.nih.gov/apidoc/loinc_items/v3/doc.html)
+
+Open the source and check this number
+The other published measure of this same service
+
+$37.12 — average charge submitted for this service in CY2024, carried on this row as an alternate measure.
+
+Where the CY2024 figures come from
+
+CMS, Medicare Physician & Other Practitioners — by Geography and Service, calendar year 2024 (released 2026-05)
+
+File
+MUP_PHY_R26_P05_V10_D24_Geo.csv
+Row
+Rndrng_Prvdr_Geo_Lvl=National, HCPCS_Cd=85025, Place_Of_Srvc=O
+Setting
+O — provider office / non-facility setting
+SHA-256
+c26956788333d03c0080017121c19e8e4d9990e9fa8ff385d7e1a2849c45074a
+Retrieved
+2026-09-09
+
+READ, not computed. CMS publishes one National row per HCPCS code per place of service in this file, and this figure is that row's field, rounded to the cent. Nothing is averaged, weighted or adjusted here. Open the file, filter to the row named above, and you will see the same number.
+
+Agency
+CMS
+Geography
+United States, one national rate (the lab fee schedule has no geographic adjustment)
+Population
+Medicare Part B beneficiaries; any laboratory billing Medicare
+Source
+CMS, Clinical Laboratory Fee Schedule, CY2026 Quarter 3 (PUF_CLFS_CY2026_Q3V1), effective 2026-01-01
+LOINC
+57021-8 — CBC W Auto Differential panel - Blood
+Who this number does and does not describe
+
+The standard blood count ordered at almost every workup visit. Medicare pays 100 percent of this rate and a Medicare patient owes nothing for it — clinical laboratory tests carry no deductible and no coinsurance under Part B. That $0 is MEDICARE-ONLY and is the single most misleading number in this dataset if it is copied into an out-of-pocket column. If you have private insurance you pay your deductible and then coinsurance on a negotiated rate that is normally higher than this one. If you are uninsured you are billed the charge shown beside this figure. There is one national rate with no geographic adjustment, because Congress set it from reported private-payer rates. The average CHARGE submitted for this test in 2024 was $37.12 — 4.8 times this rate.
+
+Close

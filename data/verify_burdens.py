@@ -221,14 +221,42 @@ def main():
         record(state, f'alternate rate {k}',
                f'{money(v)} x 40 = {money(got)}' if got is not None else 'missing from the row')
 
-    # what must NOT exist: a per-trip federal figure anywhere in the table
-    trip_rows = [i['id'] for i in items
-                 if re.search(r'\b(mileage|per[- ]trip|travel)\b', (i.get('label') or ''), re.I)]
-    state = 'PASS' if not trip_rows else 'FAIL'
+    # Two things must hold at once, and only both together keep the trips card honest.
+    #
+    # (a) NOTHING PRICES A TRIP. A row naming travel that is ALSO summable would be a per-trip
+    #     figure able to enter a medical total, and no federal file publishes one.
+    # (b) NOTHING IS HIDDEN. The table does carry a federal per-mile reimbursement rate as a
+    #     non-summable INPUT row. A card telling a person no federal figure exists at all,
+    #     while the table held one, would be concealing it — so the card must name it.
+    #
+    # This replaced a blanket 'no travel row may exist' assertion on 2026-09-09, which failed
+    # the moment the GSA rate was added. The assertion was wrong, not the table: an INPUT ONLY
+    # reimbursement rate per mile is not a price for a trip.
+    travel_rows = [i for i in items
+                   if re.search(r'\b(mileage|per[- ]trip|travel)\b', (i.get('label') or ''), re.I)]
+    priced_trip = [i['id'] for i in travel_rows if i.get('summable')]
+    state = 'PASS' if not priced_trip else 'FAIL'
     fails += state == 'FAIL'
-    record(state, 'trips stay blank',
-           'no row in the table prices a trip, which is what the trips card says on its face'
-           if state == 'PASS' else f'the table now carries {trip_rows} — the trips card must be updated, not left saying no figure exists')
+    record(state, 'no row prices a trip',
+           'no summable row in the table prices a trip, which is what the trips card says on its face'
+           if state == 'PASS' else f'{priced_trip} is summable — a per-trip figure could enter a medical total')
+
+    card_path = os.path.join(os.path.dirname(HERE), 'lib', 'burdens.ts')
+    card = ''
+    if os.path.exists(card_path):
+        whole = open(card_path, encoding='utf-8').read()
+        card = whole[whole.find('export function countTrips'):][:2000]
+    for i in travel_rows:
+        if i.get('summable'):
+            continue
+        named = ('%.2f' % i['value_usd']) in card
+        state = 'PASS' if named else 'FAIL'
+        fails += state == 'FAIL'
+        record(state, f"the trips card names the input row {i['id']}",
+               f"the card tells the person the table holds {money(i['value_usd'])} a mile, so the input is offered rather than hidden"
+               if named else
+               f"the table holds {i['id']} at {money(i['value_usd'])} and the trips card never mentions it — "
+               f"a person is told no federal figure exists while one sits in the table")
 
     unver = sum(1 for s, _, _ in results if s == 'UNVERIFIED')
     p = sum(1 for s, _, _ in results if s == 'PASS')

@@ -1,12 +1,114 @@
-/* The standards line — the codes a clinician or a health-data analyst reads first.
-   Mono for the codes because they are identifiers, not prose; the long common name
-   sits beside them in the body face so a person who does not know LOINC still
-   learns what the test is. Same tokens as the rest of the drawer; nothing new. */
-.standards{
-  display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .5rem;
-  margin:.5rem 0 0;padding:.55rem .7rem;
-  background:var(--surface-2);border-radius:var(--r-md);
-  font-size:.9rem;line-height:1.45;color:var(--ink-2);
+/* ==========================================================================
+   THE DRAWER'S BLOCKS.
+
+   Bo, 2026-09-09, on this drawer in dark mode: "so hard to read … hard to parse.
+   Feels flat." Flat was literal — the panel behind a block and the panel behind
+   the drawer were 1.09:1 apart, which the eye reads as one surface. Every block
+   here is separated by TONE and by space, never by a hairline: a step up to
+   --surface-2, a small radius, and a gap of ground between it and the next one.
+
+   The type floor of this product (app/product.css §1: nothing under 13 px, ever)
+   governs every size below, so the eyebrows are .8125rem and not smaller.
+   ========================================================================== */
+
+.block{
+  background:var(--surface-2);
+  border-radius:var(--r-sm);
+  /* --sp-3 down the block, --sp-4 across it: 12 px of air above a line of text
+     reads as a block, 12 px beside it reads as a crop. */
+  padding:var(--sp-3) var(--sp-4);
 }
-.standards b{font-family:var(--font-m);font-weight:700;letter-spacing:.01em;color:var(--ink-1)}
-.standards .micro{flex:1 1 100%;margin:.15rem 0 0}
+
+/* The name of a block. Never an h3 — a block is a label on a group of facts,
+   not a paragraph with a title. */
+.eyebrow{
+  font-family:var(--font-d);font-size:.8125rem;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);
+  margin:0 0 var(--sp-2);
+}
+
+/* ---------- 2 · the figure ----------
+   The one block that keeps the brand gradient. It is the answer the drawer was
+   opened for, and on the near-black ground it is the only thing that should
+   carry colour. */
+.figure{
+  background:var(--grad);color:#fff;
+  border-radius:var(--r-md);
+  padding:var(--sp-4);
+}
+.figRow{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-3);flex-wrap:wrap}
+.figNum{margin:0;flex:0 1 auto}
+.pill{
+  display:inline-flex;align-items:center;gap:.35rem;white-space:nowrap;
+  font-family:var(--font-d);font-size:.8125rem;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:.32rem .7rem;border-radius:var(--r-pill);
+  background:rgba(0,0,0,.28);color:#fff;border:1px solid rgba(255,255,255,.34);
+  margin-top:.35rem;
+}
+.pillYes{border-color:rgba(120,235,180,.85)}
+.pillNo{border-color:rgba(255,150,165,.9)}
+.pillRef{border-color:rgba(255,255,255,.4)}
+/* The verdict's first sentence, and only the first: the rest of it is in block 6. */
+.why{margin:var(--sp-3) 0 0;font-size:1.05rem;line-height:1.5;color:#fff;max-width:52ch}
+.figCap{margin:.5rem 0 .6rem;font-size:.95rem}
+.figNote{margin:.55rem 0 0;font-size:.8125rem;line-height:1.5;color:rgba(255,255,255,.85);max-width:60ch}
+
+/* ---------- 4, 5, 7 · the facts, as label and value ----------
+   Eight facts in prose is a paragraph nobody finishes. Eight facts in two
+   columns is a thing a person scans in a second and stops at the one they came
+   for. */
+.dl{
+  display:grid;grid-template-columns:minmax(5.5rem,auto) minmax(0,1fr);
+  gap:.45rem var(--sp-4);margin:0;font-size:.95rem;
+}
+.dl dt{
+  font-family:var(--font-d);font-size:.8125rem;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);
+  line-height:1.65;
+}
+.dl dd{margin:0;color:var(--ink-2);line-height:1.5;overflow-wrap:anywhere}
+.dl + .dl{margin-top:var(--sp-2)}
+.mono{font-family:var(--font-m);font-size:.875rem;color:var(--ink)}
+.otherNum{font-family:var(--font-d);font-weight:800;font-size:1.15rem;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* A note under a list: the method, the caveat, the "READ, not computed". Two
+   lines at this width, and never the same weight as the facts above it. */
+.note{margin:var(--sp-2) 0 0;font-size:.8125rem;line-height:1.5;color:var(--ink-3);max-width:62ch}
+.sub{margin:var(--sp-3) 0 var(--sp-2);font-size:.8125rem;line-height:1.5;color:var(--ink-3)}
+
+/* ---------- the hash ----------
+   A 64-character hash is never read; it is compared, and then only by someone
+   who has the file open. Twelve characters is enough to compare, the title
+   attribute and a screen-reader span carry all 64, and Copy puts all 64 on the
+   clipboard. */
+.hash{display:inline-flex;align-items:center;gap:.45rem;flex-wrap:wrap}
+.hash code{
+  font-family:var(--font-m);font-size:.8125rem;color:var(--ink-2);
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:.18rem .45rem;
+}
+.copy{
+  font-family:var(--font-d);font-size:.8125rem;font-weight:700;
+  min-height:2.25rem;padding:.2rem .7rem;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-pill);
+  color:var(--brand-3);cursor:pointer;
+}
+.copy:hover{border-color:var(--brand-3)}
+
+/* ---------- 6 · who this describes ----------
+   The row's own words, regrouped into one- and two-sentence paragraphs at a
+   line a person's eye can carry, in --ink-2 rather than the grey it used to be,
+   with the figures inside set bold so a scan finds them. */
+.who .p{
+  color:var(--ink-2);font-size:.9875rem;line-height:1.6;
+  max-width:62ch;margin:0 0 var(--sp-3);
+}
+.who .p:last-of-type{margin-bottom:0}
+.who .p b{color:var(--ink);font-weight:700}
+
+@media (max-width:560px){
+  .dl{grid-template-columns:minmax(0,1fr);gap:.15rem}
+  .dl dt{line-height:1.4;margin-top:var(--sp-2)}
+  .dl dt:first-of-type{margin-top:0}
+}

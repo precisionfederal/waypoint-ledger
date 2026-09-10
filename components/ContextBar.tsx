@@ -27,24 +27,64 @@
      · `bar`  — the legacy card shape, kept for any surface still asking for it.
    ========================================================================== */
 
-import { useMemo, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useStore } from '@/lib/store';
 import { COVERAGE_LABEL, COVERAGE_OPTIONS, STATES, localityOf, soleLocality, type Coverage } from '@/lib/fit';
+import type { StateDetection } from '@/lib/state-detect';
 import s from './ContextBar.module.css';
 import ConditionPicker from './ConditionPicker';
 
 export interface ContextBarProps {
   /** `ask` sits under the journey box; `line` under the ledger's number; `bar` is the card shape. */
   variant?: 'ask' | 'bar' | 'line';
+  /* 🔴 WHERE YOU LIVE IS USUALLY ALREADY IN THE SENTENCE.
+     "I live in Houston" is a person answering the second question before it is
+     asked, and making them find a 54-option select to say it again is the
+     tool's problem, not theirs. `lib/state-detect.ts` reads the place out of
+     the story deterministically, in this browser, and hands it here with the
+     exact words it read. Three things keep that honest: the phrase is shown
+     back, one click changes it, and a word that is two places at once
+     ("Washington", "Kansas City") arrives as a QUESTION, never as an answer. */
+  detected?: StateDetection | null;
 }
 
-export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
+export default function ContextBar({ variant = 'bar', detected = null }: ContextBarProps) {
   const st = useStore();
   const { coverage, locality } = st.ctx;
   const loc = localityOf(locality);
-  const stateCode = loc?.state ?? '';
+  const setLocality = st.setLocality;
+
+  /* What the story said, and whether we may act on it. `fromStory` is the
+     locality this component set from the person's own words; the moment they
+     touch a select themselves, the story stops overriding anything. */
+  const readState = detected?.state ?? null;
+  const placeQuestion = detected?.ask ?? null;
+  const fromStory = useRef<string | null>(null);
+  const theyPicked = useRef(false);
+  const [narrowedTo, setNarrowedTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!st.hydrated || theyPicked.current || !readState) return;
+    if (readState.locality) {
+      // Never write over an answer somebody gave; only over our own earlier read.
+      if (locality && locality !== fromStory.current) return;
+      setNarrowedTo(readState.code);
+      if (locality === readState.locality) return;
+      fromStory.current = readState.locality;
+      setLocality(readState.locality);
+      return;
+    }
+    /* CMS prices this state in more than one place and the story did not say
+       which. The picker opens on that state; the figures stay national until
+       the person picks, because guessing a locality is guessing a price. */
+    if (!locality) setNarrowedTo(readState.code);
+  }, [st.hydrated, readState, locality, setLocality]);
+
+  const stateCode = loc?.state ?? narrowedTo ?? '';
   const group = useMemo(() => STATES.find((g) => g.code === stateCode) ?? null, [stateCode]);
+  const readIt = !!(readState && loc && fromStory.current === loc.key);
+  const waitingOnArea = !!(readState && !loc && narrowedTo);
   const answered = !!(coverage || loc);
   /* Closed is the resting state on every surface. Skipping and pressing Done
      are the same gesture as never opening it: the figures then say plainly, on
@@ -53,10 +93,21 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
   const collapsed = !open;
 
   function pickState(code: string) {
-    if (!code) { st.setLocality(undefined); return; }
+    theyPicked.current = true;
+    setNarrowedTo(code || null);
+    if (!code) { setLocality(undefined); return; }
     const sole = soleLocality(code);
     const g = STATES.find((x) => x.code === code);
-    st.setLocality((sole ?? g?.localities[0])?.key);
+    setLocality((sole ?? g?.localities[0])?.key);
+  }
+
+  /** They answered the "which Washington?" question themselves. */
+  function answerPlace(c: { code: string; locality?: string }) {
+    theyPicked.current = true;
+    setNarrowedTo(c.code);
+    if (c.locality) { setLocality(c.locality); return; }
+    setLocality(undefined);
+    setOpen(true);
   }
 
   /* 🔴 THE LINE NAMES THE BASIS EVEN WHEN NOBODY HAS ANSWERED.
@@ -65,15 +116,47 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
      and "say who pays for your care and this changes" put a to-do item where a
      meaning belongs. The honest default is the basis itself — these are the
      national Medicare reference figures — and Change beside it. */
+  /* 🔴 "National figures · Houston" is a contradiction, and it became the
+     common case the moment the story started setting the locality: once CMS's
+     Houston amount is on the page the figures are NOT national. With no
+     coverage answered the honest label for the basis is the schedule itself. */
   const summary = answered
-    ? `${coverage ? COVERAGE_LABEL[coverage] : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}`
+    ? `${coverage ? COVERAGE_LABEL[coverage] : loc ? 'Medicare reference' : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}`
     : variant === 'ask' ? 'Medicare reference figures, national' : 'Medicare reference · national';
+
+  /* The question a two-place word asks, put in one line rather than guessed.
+     It is the same shape as "· Change", so it reads as part of the line. */
+  const placeChoice = placeQuestion && !loc && !theyPicked.current ? (
+    <span className={s.fitTxt}>
+      You wrote &ldquo;{placeQuestion.phrase}&rdquo; &mdash; which one?
+      {placeQuestion.candidates.map((c) => (
+        <Fragment key={c.code}>
+          {' '}
+          <button type="button" className={s.fitChange} onClick={() => answerPlace(c)}>
+            {c.code === 'DC' ? 'Washington, D.C.' : c.stateName}
+          </button>
+        </Fragment>
+      ))}
+    </span>
+  ) : null;
 
   if (collapsed) {
     const cls = variant === 'ask' ? s.fitLineAsk : variant === 'line' ? s.fitLineNum : s.fitLineBar;
     return (
       <p className={`${s.fitLine} ${cls}`} id="ctx-h">
         <span className={s.fitTxt}>{variant === 'ask' ? 'Priced as ' : ''}{summary}</span>
+        {readIt && (
+          <span className={s.fitTxt} data-read-from={readState!.phrase}>
+            read from &ldquo;{readState!.phrase}&rdquo; in what you typed
+          </span>
+        )}
+        {waitingOnArea && (
+          <span className={s.fitTxt} data-read-from={readState!.phrase}>
+            you wrote &ldquo;{readState!.phrase}&rdquo; &mdash; CMS prices {readState!.stateName} in{' '}
+            {group?.localities.length ?? 0} areas
+          </span>
+        )}
+        {placeChoice}
         <button
           type="button"
           className={s.fitChange}
@@ -82,7 +165,7 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
           aria-label="Change what these figures are priced for: your coverage, where you live, and what you are looking into"
           onClick={() => setOpen(true)}
         >
-          Change
+          {waitingOnArea ? 'Pick your area' : 'Change'}
         </button>
       </p>
     );
@@ -141,6 +224,16 @@ export default function ContextBar({ variant = 'bar' }: ContextBarProps) {
           </div>
           {group && group.localities.length > 1 && (
             <p className={s.hint}>CMS prices {group.name} in {group.localities.length} localities. Pick yours.</p>
+          )}
+          {readIt && (
+            <p className={s.hint}>
+              Read from what you typed: &ldquo;{readState!.phrase}&rdquo;. Change it and every figure re-labels.
+            </p>
+          )}
+          {placeQuestion && !loc && !theyPicked.current && (
+            <p className={s.hint}>
+              {placeQuestion.why} You wrote &ldquo;{placeQuestion.phrase}&rdquo;, so nothing is assumed.
+            </p>
           )}
         </div>
 

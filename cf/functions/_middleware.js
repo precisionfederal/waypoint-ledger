@@ -2,7 +2,7 @@
 import { bad, MAX_BODY } from './api/_http.js';
 import { networkKey } from './api/_hash.js';
 
-const LIMITS = { 'POST /api/price': 300, 'POST /api/fhir': 300, 'POST /api/map': 120, 'POST /api/journeys': 30, 'POST /api/auth/password/login': 60, 'POST /api/auth/password/signup': 20, 'POST /api/auth/password/recover': 30, 'POST /api/auth/password/change': 30, ADMIN: 300, DEFAULT_WRITE: 20 }; // per hashed IP per hour
+const LIMITS = { 'POST /api/price': 300, 'POST /api/fhir': 300, 'POST /api/map': 600 /* read-only mapping; the spend ceiling is the global KV counter in map.js (R6 sense F1, 2026-09-09) */, 'POST /api/journeys': 30, 'POST /api/auth/password/login': 60, 'POST /api/auth/password/signup': 20, 'POST /api/auth/password/recover': 30, 'POST /api/auth/password/change': 30, ADMIN: 300, DEFAULT_WRITE: 20 }; // per hashed IP per hour
 
 /* ---------------------------------------------------------------------------
    THE ADMIN DOOR.

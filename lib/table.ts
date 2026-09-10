@@ -25,6 +25,7 @@
    ========================================================================== */
 
 import raw from '@/data/prices.json';
+import additions0909 from '@/data/prices-additions-2026-09-09.json';
 import extraSynonyms from '@/data/synonyms.json';
 import type { PriceItem, PriceBasis, Attribution, Confidence } from './types';
 
@@ -56,7 +57,30 @@ interface RawItem {
   alternates?: Record<string, unknown>;
 }
 
-const RAW_ITEMS = (raw as { items: RawItem[] }).items;
+/* ==========================================================================
+   THE 2026-09-09 ADDITIONS — 157 more units of care, in their own file
+
+   A person types what happened to them, not what the fee schedule calls it, and
+   a unit the table does not hold reads to them as "this tool has no figure for
+   me". So the table was widened on 2026-09-09 with the things patients actually
+   name: the four other ER levels, therapy and psychiatry, PT/OT/speech, plain
+   X-rays, the ultrasounds, the mammogram and the DEXA, nerve conduction, the
+   home sleep test, colonoscopy with biopsy, the injections and infusions, the
+   skin biopsies, and 41 more labs — including the venipuncture fee itself.
+
+   They live in their own file for the same reason data/synonyms.json does: the
+   published prices.json is never rewritten to widen coverage. Every row here
+   was read out of the same two CMS files the existing rows cite (RVU26C July
+   release; CLFS CY2026 Q3V1), and data/verify_additions.py re-reads both files
+   and recomputes all 210 additions figures from scratch.
+
+   prices.json comes FIRST in this array on purpose: mapUtterance keeps the
+   first row on a tie, so a phrase an existing row already owns stays with it.
+   ========================================================================== */
+const RAW_ITEMS = [
+  ...(raw as { items: RawItem[] }).items,
+  ...(additions0909 as { items: RawItem[] }).items,
+];
 
 /* ==========================================================================
    THE WORDS PEOPLE ACTUALLY USE — data/synonyms.json

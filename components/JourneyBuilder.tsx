@@ -10,6 +10,7 @@ import { priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION } from '@/lib/table';
 import type { PriceItem, PricedLine } from '@/lib/types';
 import ShareCard, { type ShareCardData } from './ShareCard';
+import { detectState } from '@/lib/state-detect';
 import ContextBar from './ContextBar';
 import cs from './ContextBar.module.css';
 import { gapSummary, odysseyClauses } from '@/lib/sheet';
@@ -33,6 +34,8 @@ export interface LivePreview {
   previewTotal: number;
   /** True while the debounce is still waiting on the current keystroke. */
   pending: boolean;
+  /** The AI reader did not answer (busy, capped, offline): the lines shown are the rules' alone. */
+  readerDown: boolean;
 }
 
 const DEBOUNCE_MS = 250;
@@ -47,12 +50,15 @@ export function useLivePreview(story: string): LivePreview {
   /* The rules answer instantly. The AI reader answers a moment later, for the
      phrases the rules left blank, and only if the story has not changed since. */
   const [modelRead, setModelRead] = useState<{ story: string; segments: ParsedSegment[]; model: string | null } | null>(null);
+  const [readerDown, setReaderDown] = useState(false);
   useEffect(() => {
-    if (!debounced.trim()) return;
+    if (!debounced.trim()) { setReaderDown(false); return; }
     const ctl = new AbortController();
     parseJourneyWithModel(debounced, ITEMS, fetch, ctl.signal).then((r) => {
-      if (!ctl.signal.aborted && r.model) setModelRead({ story: debounced, ...r });
-    });
+      if (ctl.signal.aborted) return;
+      if (r.model) { setModelRead({ story: debounced, ...r }); setReaderDown(false); }
+      else setReaderDown(true);
+    }).catch(() => { if (!ctl.signal.aborted) setReaderDown(true); });
     return () => ctl.abort();
   }, [debounced]);
 
@@ -60,8 +66,8 @@ export function useLivePreview(story: string): LivePreview {
     const rules = debounced.trim() ? parseJourney(debounced, ITEMS) : [];
     const read = modelRead && modelRead.story === debounced ? modelRead.segments : rules;
     const segments = read.filter((s) => !s.absorbed);
-    return { segments, ...previewTotals(segments), pending: debounced !== story };
-  }, [debounced, story, modelRead]);
+    return { segments, ...previewTotals(segments), pending: debounced !== story, readerDown: readerDown && modelRead?.story !== debounced };
+  }, [debounced, story, modelRead, readerDown]);
 }
 
 /** The preview's arithmetic: one published figure times the count in the phrase. */
@@ -159,6 +165,11 @@ export default function JourneyBuilder() {
   const lines = useMemo(() => priceJourney(st.entries), [st.entries]);
   const sum = useMemo(() => totals(lines), [lines]);
   const preview = useLivePreview(story);
+  /* 🔴 THE SENTENCE USUALLY SAYS WHERE. "I live in Houston" answers the second
+     of the three questions before it is asked; reading it here means nobody has
+     to find a 54-option select to repeat themselves. It is read in this browser,
+     shown back in their own words, and one click changes it. */
+  const place = useMemo(() => detectState(story), [story]);
   const byCat = useMemo(() => {
     const m: Record<string, PriceItem[]> = {};
     for (const it of ITEMS) (m[categoryKey(it)] ||= []).push(it);
@@ -263,7 +274,7 @@ export default function JourneyBuilder() {
             this person are still asked before the number — but as one line that
             states the basis, with Change beside it. Every chip, every note and
             every stored answer is behind that one click, unchanged. */}
-        <ContextBar variant="ask" />
+        <ContextBar variant="ask" detected={place} />
 
         <section className="card">
           <p className="lbl">Or add one thing at a time</p>
@@ -409,7 +420,12 @@ export default function JourneyBuilder() {
               )}
             </>
           )}
-          <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Running total {usd(sum.totalUsd)} from {sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? `, ${sum.unpricedCount} unpriced` : ''}.</p>
+          {sum.totalUsd === 0 && preview.previewTotal > 0
+            ? <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">So far {usd(preview.previewTotal)} from {preview.matched} priced {preview.matched === 1 ? 'phrase' : 'phrases'} in the sentence you are typing, not added yet.</p>
+            : <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Running total {usd(sum.totalUsd)} from {sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? `, ${sum.unpricedCount} unpriced` : ''}.</p>}
+          {preview.readerDown && preview.segments.length > 0 && (
+            <p className="micro">Our reader is busy. These lines came from the rules alone — anything it could not read is listed as unpriced, and you can add it from the search box.</p>
+          )}
           {st.entries.length
             ? <Link className="btn primary full" href="/ledger" id="see-what-it-cost" data-go="total">See what it cost <Icon.Arrow /></Link>
             : <button className="btn primary full is-disabled" type="button" data-go="total" disabled>See what it cost <Icon.Arrow /></button>}

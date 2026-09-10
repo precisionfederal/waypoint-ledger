@@ -43,8 +43,8 @@
         "open data",
         "provenance"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "describedBy": "https://waypoint-ledger.pages.dev/data/price-dictionary.csv",
       "describedByType": "text/csv",
       "references": [
@@ -63,7 +63,7 @@
         "https://www.cms.gov/newsroom/fact-sheets/2026-medicare-parts-b-premiums-deductibles",
         "https://www.cms.gov/files/document/final-cy-2026-part-d-redesign-program-instruction.pdf",
         "https://www.bls.gov/news.release/wkyeng.nr0.htm",
-        "https://www.bls.gov/oes/current/oes_nat.htm",
+        "https://www.bls.gov/oes/special-requests/oesm25nat.zip",
         "https://www.gsa.gov/travel/plan-a-trip/transportation-airfare-rates-pov-rates/pov-mileage-reimbursement"
       ],
       "distribution": [
@@ -118,7 +118,7 @@
       "landingPage": "https://waypoint-ledger.pages.dev/adopt",
       "identifier": "https://waypoint-ledger.pages.dev/data/locality-prices.csv",
       "title": "Medicare allowed amounts for 52 services in all 109 CMS payment localities",
-      "description": "5668 figures: 52 CPT/HCPCS codes priced for each of the 109 Medicare payment localities across 53 states and territories. Every figure is CMS's own formula — (work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009 — applied to CMS's own published relative value units and geographic practice cost indices, which are printed on the same row together with the SHA-256 of each source file. The generator is also the audit: it recomputed all 5668 figures on 2026-09-09 and found 0 mismatches, and exits non-zero on one cent of drift. For a person who is not on Medicare this is a published reference price, not a bill; for a person on Medicaid it does not describe what their state pays at all.",
+      "description": "5668 figures: 52 CPT/HCPCS codes priced for each of the 109 Medicare payment localities across 53 states and territories. Every figure is CMS's own formula — (work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009 — applied to CMS's own published relative value units and geographic practice cost indices, which are printed on the same row together with the SHA-256 of each source file. The generator is also the audit: it recomputed all 5668 figures on 2026-09-10 and found 0 mismatches, and exits non-zero on one cent of drift. For a person who is not on Medicare this is a published reference price, not a bill; for a person on Medicaid it does not describe what their state pays at all.",
       "keyword": [
         "medicare",
         "physician fee schedule",
@@ -131,8 +131,8 @@
         "open data",
         "reproducible"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "describedBy": "https://waypoint-ledger.pages.dev/data/locality-dictionary.csv",
       "describedByType": "text/csv",
       "isPartOf": "https://waypoint-ledger.pages.dev/data/price-table.csv",
@@ -202,8 +202,8 @@
         "health care costs",
         "open data"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -259,8 +259,8 @@
         "public feedback",
         "open data"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -317,8 +317,8 @@
         "invisible illness",
         "open data"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "describedBy": "https://waypoint-ledger.pages.dev/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -373,8 +373,8 @@
         "survey instrument",
         "open data"
       ],
-      "modified": "2026-09-09",
-      "issued": "2026-09-09",
+      "modified": "2026-09-10",
+      "issued": "2026-09-10",
       "distribution": [
         {
           "@type": "dcat:Distribution",

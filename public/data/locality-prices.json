@@ -2,7 +2,7 @@
  "what_this_is": "The Medicare allowed amount for each of these services in each of the 109 CMS payment localities. Every figure is CMS’s own formula applied to CMS’s own published inputs, which are on the same row. None of it is estimated, modelled or interpolated. It is what Medicare allows; for a person who is not on Medicare it is a published reference price and not a bill, and for a person on Medicaid it does not describe what their state pays at all.",
  "table_version": "2026-09-09.1",
  "price_table_version": "2026-09-09.1",
- "generated": "2026-09-09",
+ "generated": "2026-09-10",
  "rows": 5668,
  "codes": 52,
  "locality_count": 109,
@@ -15,7 +15,7 @@
   "method": "Every figure below was recomputed from the RVU and GPCI columns on its own row and compared to the value data/state-prices.json holds, to the cent.",
   "figures_checked": 5668,
   "mismatches": 0,
-  "ran": "2026-09-09",
+  "ran": "2026-09-10",
   "reproduce": "node scripts/gen-locality-table.mjs",
   "independent": {
    "by": "data/verify_price_table.py",
