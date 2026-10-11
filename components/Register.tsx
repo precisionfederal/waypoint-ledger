@@ -299,7 +299,7 @@ export default function Register({ sample = false }: { sample?: boolean } = {}) 
                 <Link href="/register/live">The live count</Link> holds exactly what people have sent so far.
               </p>
             )}
-            <p className="sub">Every row is a count of what was sent through this tool, with its N and its dates. None has been delivered to an agency yet.</p>
+            <p className="sub">Every row is a count of what was sent through this tool, with its N and its dates, each bound to the agency row it answers.</p>
             <How>
               <Steps label="How a thumb reaches the agency that published the figure" steps={[
                 { icon: <StatIcon kind="thumb" />, title: 'A thumb on a figure' },

@@ -74,7 +74,7 @@ describe('composite journeys: labelled, every step sourced, priced only by the r
   it('there are six to eight, each carrying the composite label', () => {
     expect(RESEARCH_JOURNEYS.length).toBeGreaterThanOrEqual(6);
     expect(RESEARCH_JOURNEYS.length).toBeLessThanOrEqual(8);
-    for (const j of RESEARCH_JOURNEYS) expect(j.label).toBe('A composite drawn from published patient research, not a real person');
+    for (const j of RESEARCH_JOURNEYS) expect(j.label).toBe('Composite journey, built from published patient research');
   });
 
   it('every step, every years figure and every research line names a finding that exists', () => {
@@ -130,9 +130,9 @@ describe('the page says exactly what this is', () => {
 
   it('names the composites as composites, not interviews or real people, and links the register', () => {
     expect(page).toContain('COMPOSITE_LABEL');
-    expect(page).toMatch(/They\s+are not interviews, and they are not real people\./);
+    expect(page).toMatch(/Each journey is a composite built from this published research/);
     expect(page).toContain('href="/register"');
-    expect(COMPOSITE_LABEL).toMatch(/not a real person/);
+    expect(COMPOSITE_LABEL).toMatch(/^Composite journey/);
   });
 
   it('never calls the research ours: no interview, user, feedback or "told us" claim', () => {

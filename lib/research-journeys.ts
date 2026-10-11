@@ -27,7 +27,7 @@ import { priceSentence } from './conditions-catalog';
 import { unpriceableFor } from './price-api';
 import { SELECTABLE } from './table';
 
-export const COMPOSITE_LABEL = 'A composite drawn from published patient research, not a real person';
+export const COMPOSITE_LABEL = 'Composite journey, built from published patient research';
 
 export type SourceKind =
   | 'federal patient research'

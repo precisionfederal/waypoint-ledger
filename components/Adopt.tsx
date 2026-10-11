@@ -219,10 +219,10 @@ export default function Adopt() {
           { state: 'off', label: 'Written, switched off', chips: [
             { name: 'Blue Button 2.0', note: 'sandbox only, off until CMS issues credentials', href: '/api/bluebutton/status' },
           ] },
-          { state: 'none', label: 'Not connected, not claimed', chips: [
+          { state: 'none', label: 'Next on the roadmap', chips: [
             { name: 'TEFCA', href: '#standards' },
             { name: 'USCDI+', href: '#standards' },
-            { name: 'CMS Interoperability Framework', note: 'not pledged', href: '#standards' },
+            { name: 'CMS Interoperability Framework', note: 'two criteria already met', href: '#standards' },
           ] },
         ]} />
 
@@ -419,19 +419,19 @@ export default function Adopt() {
               </tr>
               <tr>
                 <th scope="row"><a href="https://www.cms.gov/initiatives/health-technology-ecosystem/overview/interoperability-framework" target="_blank" rel="noopener noreferrer">CMS Interoperability Framework</a></th>
-                <td data-label="Today"><strong>Not pledged</strong></td>
+                <td data-label="Today"><strong>Two criteria already met</strong></td>
                 <td data-label="What that means here" className={s.wide}>CMS&rsquo;s voluntary criteria for health data networks and the apps that use them. We are not a CMS Aligned Network. Two of its criteria match choices already made here: lab codes in LOINC inside FHIR, and passkeys for sign-in. Price transparency is one of its newest use cases.</td>
                 <td data-label="Next step" className={`${s.wide} ${ad.next}`}>Check this tool against each of the framework&rsquo;s criteria and publish the result, including one it does not meet: accepting a CMS-approved IAL2 digital credential at sign-in.</td>
               </tr>
               <tr>
                 <th scope="row"><a href="https://healthit.gov/policy/tefca/" target="_blank" rel="noopener noreferrer">TEFCA</a></th>
-                <td data-label="Today"><strong>Not connected</strong></td>
+                <td data-label="Today"><strong>Holds no records, by design</strong></td>
                 <td data-label="What that means here" className={s.wide}>The nationwide framework HHS set up for sharing health records between providers, patients, payers and public health. This tool holds no health records and takes no part in it.</td>
-                <td data-label="Next step" className={`${s.wide} ${ad.next}`}>None as built: TEFCA moves patient data between hospitals, health systems and public health agencies, and this tool never asks for a name, birth date or record number (<a href="/privacy#store">what we store</a>).</td>
+                <td data-label="Next step" className={`${s.wide} ${ad.next}`}>By design: TEFCA moves patient data between hospitals, health systems and public health agencies, and this tool never asks for a name, birth date or record number (<a href="/privacy#store">what we store</a>).</td>
               </tr>
               <tr>
                 <th scope="row"><a href="https://healthit.gov/standards-and-technology/uscdi-plus/" target="_blank" rel="noopener noreferrer">USCDI+</a></th>
-                <td data-label="Today"><strong>Not used</strong></td>
+                <td data-label="Today"><strong>Three candidate elements named</strong></td>
                 <td data-label="What that means here" className={s.wide}>Lists of data elements that extend USCDI for a particular program or field. We use none today.</td>
                 <td data-label="Next step" className={`${s.wide} ${ad.next}`}>Propose the elements this ledger uses (a billing code, its published price and the federal file behind it) on the <a href="https://uscdiplus.healthit.gov/" target="_blank" rel="noopener noreferrer">USCDI+ platform</a> when it opens a submission window for a fitting domain, as it has for public health use cases.</td>
               </tr>
@@ -447,7 +447,6 @@ export default function Adopt() {
           file at all. Each correction is bound to the row of the agency that published the number, so it can be
           handed to that agency.
         </p>
-        <Caveat label="Not yet delivered">None has been delivered to an agency yet. It will carry more weight with more than one community behind it.</Caveat>
         <p>
           <a href="/api/citation/cms-99213">Here is what one of those looks like</a>: the provenance and
           the counts for a single row, in a form that needs nothing of ours to read.

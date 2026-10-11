@@ -67,8 +67,7 @@ export default function LivedExperiencePage() {
             told researchers, federal design teams, the National Academies and the U.S. Senate: {LIVED_SOURCES.length} published
             sources and {FINDINGS} findings, each quoted word for word with a link to the page it is on. We then put the steps
             those sources document into {RESEARCH_JOURNEYS.length} typical journeys and priced them with the same reader and the
-            same federal figures as your own ledger. <strong>These journeys are composites drawn from published research. They
-            are not interviews, and they are not real people.</strong> What people have said to us directly is counted on
+            same federal figures as your own ledger. <strong>Each journey is a composite built from this published research, with every step cited.</strong> What people have said to us directly is counted on
             the <Link href="/register">register and its change log</Link>.
           </p>
           <ul className="le-kinds" aria-label="Sources by kind">

@@ -32,6 +32,14 @@ describe('panelCode', () => {
   it('is present with both the channel and the env var', () => {
     expect(panelCode({ PROLIFIC_COMPLETION_CODE: ` ${CODE} ` }, PANEL_CHANNEL)).toEqual({ completionCode: CODE });
   });
+  it('each study can carry its own code, falling back to the shared one', () => {
+    const env = { PROLIFIC_COMPLETION_CODE: CODE, PROLIFIC_COMPLETION_CODE_SURVEY: 'SURV1', PROLIFIC_COMPLETION_CODE_INTERVIEW: ' INTV1 ' };
+    expect(panelCode(env, PANEL_CHANNEL, 'survey')).toEqual({ completionCode: 'SURV1' });
+    expect(panelCode(env, PANEL_CHANNEL, 'interview')).toEqual({ completionCode: 'INTV1' });
+    expect(panelCode({ PROLIFIC_COMPLETION_CODE: CODE }, PANEL_CHANNEL, 'interview')).toEqual({ completionCode: CODE });
+    expect(panelCode({ PROLIFIC_COMPLETION_CODE_SURVEY: 'SURV1' }, PANEL_CHANNEL, 'interview')).toEqual({});
+    expect(panelCode(env, 'advocate', 'survey')).toEqual({});
+  });
   it('the channel arrives normalised: the link label becomes the exact slug the server keeps', () => {
     expect(normalizeChannel('Paid Panel')).toBe(PANEL_CHANNEL);
     expect(normalizeChannel('paid-panel')).toBe(PANEL_CHANNEL);
@@ -63,6 +71,11 @@ describe('POST /api/survey and /api/interview carry the code only for a paid-pan
       const j = await (await fn({ request: post(body(PANEL_CHANNEL)), env: fakeEnv() } as never)).json();
       expect(j.ok).toBe(true);
       expect(j).not.toHaveProperty('completionCode');
+    });
+    it(`${name}: its own code wins over the shared one`, async () => {
+      const own = { [`PROLIFIC_COMPLETION_CODE_${name.toUpperCase()}`]: 'OWN42' };
+      const j = await (await fn({ request: post(body(PANEL_CHANNEL)), env: fakeEnv({ PROLIFIC_COMPLETION_CODE: CODE, ...own }) } as never)).json();
+      expect(j.completionCode).toBe('OWN42');
     });
   }
 });

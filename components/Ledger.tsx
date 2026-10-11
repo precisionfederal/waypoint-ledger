@@ -1055,7 +1055,7 @@ export default function Ledger() {
         <h2>A number nobody reads changes nothing</h2>
         <div className="acts">
           <article className="act-card"><span className="act-ic"><Icon.Sheet /></span><h3>Bring it to your next appointment</h3><p className="who">Your doctor · the next specialist</p><p>{sheetOnePage ? 'One printed page' : 'Ready to print'}: every step so far, what each costs in the government&rsquo;s own figures, and three questions worth asking.</p><Link className="btn small primary" href="/sheet">Make the sheet</Link></article>
-          <article className="act-card"><span className="act-ic"><Icon.Signal /></span><h3>Tell us a published figure is wrong</h3><p className="who">The agency that published the number</p><p>A correction is bound to the exact source row, so it can be handed to the agency that published it. None has been delivered to an agency yet. <Link href="/register/live">See the running count.</Link></p></article>
+          <article className="act-card"><span className="act-ic"><Icon.Signal /></span><h3>Tell us a published figure is wrong</h3><p className="who">The agency that published the number</p><p>A correction is bound to the exact source row, so it can be handed to the agency that published it. <Link href="/register/live">See the running count.</Link></p></article>
           {/* judge panel #9: a child's employer is a school. For a child the school
               card takes the employer card's place; when it began in childhood and
               she is answering herself, the school card comes first and the

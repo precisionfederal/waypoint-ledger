@@ -41,8 +41,10 @@ describe('/adopt Standards (rank 3)', () => {
   });
   it('calls only FHIR live, and claims no integration it does not have', () => {
     expect((table.match(/<strong>Live<\/strong>/g) ?? []).length).toBe(1);
-    expect(table).toContain('<strong>Not connected</strong>');
-    expect(table).toContain('<strong>Not pledged</strong>');
+    /* FINAL-1011: stated as what is true today, never as a connection or pledge we lack. */
+    expect(table).toContain('<strong>Holds no records, by design</strong>');
+    expect(table).toContain('<strong>Two criteria already met</strong>');
+    expect(table).toContain('We are not a CMS Aligned Network.');
     expect(table).not.toMatch(/FHIR integration|integrated with|connected to TEFCA/i);
   });
 });

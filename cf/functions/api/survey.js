@@ -268,7 +268,7 @@ export async function onRequestPost({ request, env }) {
   /* R6 edge #3: the published N is people, not sends. Counted here, outside
      the row, never with it. See cf/functions/api/_senders.js. */
   await markSender(request, env, 'survey');
-  return json({ ok: true, integrity: { prevHash: chain.prevHash, rowHash: chain.rowHash, position: chain.position }, ...panelCode(env, r.channel) });
+  return json({ ok: true, integrity: { prevHash: chain.prevHash, rowHash: chain.rowHash, position: chain.position }, ...panelCode(env, r.channel, 'survey') });
 }
 
 /* FINAL-1011 honest: THE SENDER COUNT CANNOT LEAVE OUR OWN TESTS OUT.

@@ -112,7 +112,7 @@ export async function onRequestPost({ request, env }) {
   /* S-04: the interview count gets the same distinct-sender denominator the
      survey has, counted outside the row and never with it (_senders.js). */
   await markSender(request, env, 'interview');
-  return json({ ok: true, integrity: { prevHash: chain.prevHash, rowHash: chain.rowHash, position: chain.position }, ...panelCode(env, r.channel) });
+  return json({ ok: true, integrity: { prevHash: chain.prevHash, rowHash: chain.rowHash, position: chain.position }, ...panelCode(env, r.channel, 'interview') });
 }
 
 /** `n` stays the number of interviews written, as it always was; `senders` is
