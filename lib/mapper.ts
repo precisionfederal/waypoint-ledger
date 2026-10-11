@@ -942,6 +942,19 @@ function receivedBefore(head: string): boolean {
   return RECEIVED_THEN_WHEN.test(head);
 }
 
+/* FINAL-1011 face (B): "I saw 6 doctors" names how many clinicians, and no kind
+   of care: not which doctors, not a first visit or a return. It was six lines of
+   "No federal figure matched". It is the clinician count the total card prints
+   ("6 clinicians, as counted", lib/search-length.ts), counted with the search
+   and never priced, because we do not know what any of the six visits was. Only
+   the whole phrase: a count with a named clinician or any care beside it ("saw
+   6 doctors including a cardiologist", "6 doctors ordered MRIs") is read as
+   before. "specialists" is not here: four specialists are four first visits.
+   Built on first use: NUM and COUNT_ADJECTIVES are declared further down. */
+let bareClinicianCount: RegExp | null = null;
+export const CLINICIAN_COUNT_REASON =
+  'a number of clinicians, with no kind of visit named: counted beside your total as clinicians seen, never priced. Name a visit (“a neurologist”, “my regular doctor”) and it prices';
+
 /**
  * Read a phrase for the counts no federal file holds.
  *
@@ -1013,6 +1026,16 @@ export function gapSignalFor(raw: string): GapSignal | null {
   const rounds = doctorToDoctor(raw);
   if (rounds) {
     return { category: 'time-searching', matchedOn: rounds.said, months: rounds.months, suppressesPrice: true };
+  }
+  bareClinicianCount ??= new RegExp(
+    '^ (?:(?:i|we|she|he|they|(?:my|our|her|his) \\w+) )?(?:(?:have|had|has|ive|weve|shes|hes|theyve) )?(?:(?:already|also|now) )?'
+    + '(?:(?:seen|saw|see|seeing|visited|consulted|tried|gone to|went to|been to|go to|have been to) )?'
+    + '(?:(?:at least|over|about|around|like|almost|nearly|more than|probably) )?'
+    + `(${NUM}) (?:(?:${COUNT_ADJECTIVES}) )*(?:doctors|physicians|providers|clinicians|practitioners|docs|drs|mds)`
+    + '(?: (?:so far|in total|total|in all|altogether|over the years|since then|by then|now))? $');
+  const bare = bareClinicianCount.exec(hay);
+  if (bare && cliniciansSaid(raw).counted > 0) {
+    return { category: 'time-searching', matchedOn: bare[0].trim(), months: null, suppressesPrice: true, reason: CLINICIAN_COUNT_REASON };
   }
 
   const told = firstCue(hay, DISMISSED) ?? (DISMISS_RE.exec(hay)?.[0].trim() || null);
@@ -1312,6 +1335,12 @@ function splitReturnVisits(row: ParsedSegment, table: PriceItem[]): ParsedSegmen
   if (!it || !it.code) return [row];
   if (!clinicianUnits(table).ids.specialist.has(it.id)) return [row];
   const q = ` ${normalize(row.raw)} `;
+  /* FINAL-1011 face: "saw 6 doctors including a cardiologist" counts the doctors,
+     not the cardiologist. The one specialist named, said once, is one visit; the
+     six are the clinicians count beside the total (lib/search-length.ts). */
+  const named = clinicianMentions(row.raw).filter((m) => m.kind === 'specialist');
+  if (row.times > 1 && named.length === 1 && clinicianCount(q, named[0].noun) === 1
+    && cliniciansSaid(row.raw).counted === row.times) return [{ ...row, times: 1, countNote: null }];
   if (SPECIALIST_PLURAL.test(q) || (MANY_DIFFERENT.test(q) && !/\bmore\b/.test(q))) return [row];
   const allReturn = RETURN_WORDS.test(q);
   if (row.times < 2 && !allReturn) return [row];

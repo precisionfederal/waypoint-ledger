@@ -1,7 +1,7 @@
 /* JUDGE-7 #8 (2026-10-01, the specialty half): "Saw rheumatology 4x,
    neurology 2x, GI 3x" priced $0. */
 import { describe, it, expect } from 'vitest';
-import { parseJourney, SAY_IT_REASON } from '../lib/mapper';
+import { parseJourney, SAY_IT_REASON, CLINICIAN_COUNT_REASON } from '../lib/mapper';
 import { SELECTABLE } from '../lib/table';
 
 const read = (s: string) => parseJourney(s, SELECTABLE).map((g) => [g.result.item?.id ?? null, g.times]);
@@ -18,6 +18,6 @@ describe('JUDGE-7 #8', () => {
   });
   it('"saw 6 doctors" is counted, unpriced, with the say-it reason', () => {
     const r = parseJourney('saw 6 doctors', SELECTABLE);
-    expect(r.map((g) => [g.result.item, g.times, g.result.reason])).toEqual([[null, 6, SAY_IT_REASON]]);
+    expect(r.map((g) => [g.result.item, g.times, g.result.reason])).toEqual([[null, 6, CLINICIAN_COUNT_REASON]]);
   });
 });

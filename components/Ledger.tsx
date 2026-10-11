@@ -11,10 +11,13 @@ import { TABLE_VERSION, checkCombination, bundlingNote } from '@/lib/table';
 import { CATEGORIES, categoryKey, categoryOf } from '@/lib/categories';
 import type { PriceItem, PricedLine } from '@/lib/types';
 import LineDrawer, { BASIS_NAME, blankCaption } from './LineDrawer';
+import { PrivateRangeFace } from './PrivateRange';
 import SiteOfService from './SiteOfService';
 import ContextBar from './ContextBar';
 import BurdenLedger from './BurdenLedger';
 import CareGoneWithout from './CareGoneWithout';
+import WhoPays from './WhoPays';
+import { lineYearNote, totalDollarYear } from '@/lib/whopays';
 import TotalReveal, { TotalComparison } from './TotalReveal';
 import ShareCard from './ShareCard';
 import { shareCardData } from './JourneyBuilder';
@@ -648,6 +651,7 @@ export default function Ledger() {
             tableVersion={TABLE_VERSION}
             label="Published figures for this pattern of care"
             allCited={blankLines === 0}
+            sublabel={totalDollarYear(lines, fits)}
           />
         )}
         <ContextBar variant="line" />
@@ -717,6 +721,11 @@ export default function Ledger() {
           is ever attached to care that did not happen, and nothing in it is
           added to the total above. */}
       {!phone && <CareGoneWithout />}
+
+      {/* FINAL-1011 whopays: the NIH lead's question at the Beta, "how much is cost
+          to the healthcare system, how much is out of pocket, how much is
+          invisible", answered from published rules under the total (lib/whopays). */}
+      <WhoPays lines={lines} ctx={ctx} gaps={gaps} burdens={burdens} compact={phone} />
 
       {/* 🔴 THE LINES COME BEFORE THE FOLDS. The page is called "What it cost,
           line by line", and the first line used to be 1,000 px down (desktop
@@ -820,7 +829,8 @@ export default function Ledger() {
                       </td>
                       <td className="r" data-label="Times"><span className="core-times"><LineStepper entry={l.entry} name={it.label} /><RemoveLine entry={l.entry} name={it.label} />{/* patient2-10: a first visit happens once per specialist (CPT 99202-99205); the wording is fix-access2's (FLOW-FIX-access2.md). */}{/^cms-9920[2-5]$/.test(it.id) && l.entry.times > 1 && <span className="micro core-return-note">Seen the same specialist again? That is a return visit, billed as an established patient.</span>}</span></td>
                       <td className="r" data-label="Figure">
-                        {fit && fit.figureUsd === null ? <em>{blankCaption(forChild)}</em> : <span className="money">{usd(fit ? fit.figureUsd : it.valueUsd, true)}</span>}
+                        {fit && fit.figureUsd === null ? <em>{blankCaption(forChild)}</em> : <span className="money">{usd(fit ? fit.figureUsd : it.valueUsd, true)}</span>}{(() => { const y = fit && fit.figureUsd !== null ? lineYearNote(it, fit) : null; return y ? <span className="micro core-year"> {y}</span> : null; })()}
+                        <PrivateRangeFace item={it} onOpen={() => openDetail(it, l.entry.key)} />
                       </td>
                       <td className="r total" data-label="Line total"><strong>{l.priced ? usd(l.totalUsd, true) : '–'}</strong></td>
                       {paidSum.any && <PaidCell line={l} payable onEdit={setPaidOpen} />}

@@ -10,6 +10,11 @@
    line shows on its face lives here once. lib/private-rates.ts uses the same rule.
    tests/perf-private-rate-lines.test.ts holds the count equal to the one
    privateRangeFor computes from the rates, for every line.
+
+   The same file carries each fee group's lowest and highest rate, so the ledger
+   row can print the range the drawer opens on (faceRange) without the rates.
+   tests/perf-private-rate-lines.test.ts and tests/face.test.ts hold it equal to
+   the drawer's first range, for every line. It is never added to any total.
    ========================================================================== */
 import packed from '@/data/private-rates-lines.json';
 
@@ -34,16 +39,36 @@ export function faceOrder(itemId: string): BillingGroup[] {
       : ['professional', 'facility'];
 }
 
-const LINES = (packed as unknown as { lines: Record<string, Partial<Record<'p' | 'f' | 'n', number>>> }).lines;
+/* p and f: [hospitals, lowest rate, highest rate]; n: hospitals only (its dollars never render). */
+type GroupFace = [number, number, number];
+const LINES = (packed as unknown as { lines: Record<string, { p?: GroupFace; f?: GroupFace; n?: number }> }).lines;
+
+const faceOf = (itemId: string, group: BillingGroup): GroupFace | undefined =>
+  group === 'professional' ? LINES[itemId]?.p : group === 'facility' ? LINES[itemId]?.f : undefined;
 
 /** Hospitals behind the widest range on the line's face; 0 when the line shows none. */
 export function privateRangeHospitals(item: { id: string }): number {
-  const g = LINES[item.id];
-  if (!g) return 0;
   let most = 0;
   for (const group of faceOrder(item.id)) {
-    const n = g[group === 'professional' ? 'p' : 'f'] ?? 0;
+    const n = faceOf(item.id, group)?.[0] ?? 0;
     if (n >= MIN_HOSPITALS && n > most) most = n;
   }
   return most;
+}
+
+/** The range the line's drawer opens on (its first shown group): lowest and highest
+ *  hospital-published rate and how many hospitals publish it. null when fewer than
+ *  MIN_HOSPITALS hospitals publish the line. A reference beside the Medicare figure,
+ *  never a price for the person and never added to any total. */
+export interface FaceRange { group: BillingGroup; low: number; high: number; hospitals: number }
+export function faceRange(item: { id: string }): FaceRange | null {
+  return faceRangeOf(item.id, LINES[item.id]);
+}
+/** The rule alone, for any packed entry (tests hold it below MIN_HOSPITALS). */
+export function faceRangeOf(itemId: string, packedLine: { p?: GroupFace; f?: GroupFace } | undefined): FaceRange | null {
+  for (const group of faceOrder(itemId)) {
+    const g = group === 'professional' ? packedLine?.p : group === 'facility' ? packedLine?.f : undefined;
+    if (g && g[0] >= MIN_HOSPITALS) return { group, hospitals: g[0], low: g[1], high: g[2] };
+  }
+  return null;
 }

@@ -1,7 +1,7 @@
 /* JUDGE-5 #5 (2026-10-01): a span with no number is time searching; a wait is
    one chip; plain English is never told to check its spelling. */
 import { describe, it, expect } from 'vitest';
-import { parseJourney, NO_MATCH_REASON, PLAIN_WORDS_REASON, SAY_IT_REASON } from '../lib/mapper';
+import { parseJourney, NO_MATCH_REASON, PLAIN_WORDS_REASON, SAY_IT_REASON, CLINICIAN_COUNT_REASON } from '../lib/mapper';
 import { SELECTABLE } from '../lib/table';
 
 const read = (s: string) => parseJourney(s, SELECTABLE).map((g) => ({ raw: g.raw, gap: g.result.gapCategory, months: g.result.months, reason: g.result.reason }));
@@ -27,6 +27,6 @@ describe('JUDGE-5 #5', () => {
      from a catalog word; care the table holds under other words says so. */
   it('a near-miss of a catalog word keeps the spelling advice; care said another way says so', () => {
     expect(read('a gastroscpy')[0].reason).toBe(NO_MATCH_REASON);
-    expect(read('saw 6 doctors')[0].reason).toBe(SAY_IT_REASON);
+    expect(read('saw 6 doctors')[0].reason).toBe(CLINICIAN_COUNT_REASON);
   });
 });

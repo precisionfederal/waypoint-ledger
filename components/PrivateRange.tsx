@@ -27,6 +27,7 @@ import {
   otherRangesFor, privateRangeFor, sourceById, unstatedRatesFor, medicareMarkerApplies,
   type ShownRange,
 } from '@/lib/private-rates';
+import { faceRange } from '@/lib/private-rate-lines';
 import { Icon } from './Icons';
 import ps from './PrivateRange.module.css';
 
@@ -82,6 +83,41 @@ function HospitalRows({ r }: { r: ShownRange }) {
         );
       })}
     </ul>
+  );
+}
+
+/* FINAL-1011 face: the range on the ledger row itself, under the Medicare figure,
+   so a person sees what these hospitals posted without opening the line. Its low,
+   high and count are the drawer's first range (faceRange reads them from
+   data/private-rates-lines.json, so the row needs no rates file). A reference,
+   never added to any total; nothing renders below MIN_HOSPITALS hospitals. Pressing
+   it opens the line's drawer at this section, unfolded. */
+export function faceRangeText(item: { id: string }): string | null {
+  const r = faceRange(item);
+  return r ? `Hospitals’ posted negotiated rates: ${money(r.low)}–${money(r.high)} (${plural(r.hospitals, 'hospital')})` : null;
+}
+
+/** After the line's drawer opens, unfold its hospital-rates section and bring it into view. */
+export function revealPrivateRange(tries = 40) {
+  if (typeof window === 'undefined') return;
+  const band = document.querySelector<HTMLElement>('[role="dialog"] [data-private-range], [data-private-range]');
+  const more = band?.querySelector<HTMLDetailsElement>('details');
+  if (!band || !more) { if (tries > 0) requestAnimationFrame(() => revealPrivateRange(tries - 1)); return; }
+  more.open = true;
+  band.scrollIntoView({ block: 'start', behavior: 'auto' });
+  more.querySelector<HTMLElement>('summary')?.focus({ preventScroll: true });
+}
+
+export function PrivateRangeFace({ item, onOpen }: { item: { id: string; label: string }; onOpen: () => void }) {
+  const r = faceRange(item);
+  if (!r) return null;
+  return (
+    <button type="button" className={ps.face} data-private-face={item.id}
+      aria-label={`Hospitals’ posted negotiated rates for ${item.label}: ${money(r.low)} to ${money(r.high)} at ${plural(r.hospitals, 'hospital')}. A reference from hospital price transparency files, not added to any total. Opens the line’s hospital rates.`}
+      onClick={() => { onOpen(); requestAnimationFrame(() => revealPrivateRange()); }}>
+      <span className={ps.faceKind}>Hospitals’ posted negotiated rates</span>
+      <span className={ps.faceFig}><span className={ps.faceAmt}>{money(r.low)}&ndash;{money(r.high)}</span> ({plural(r.hospitals, 'hospital')})</span>
+    </button>
   );
 }
 

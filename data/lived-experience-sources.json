@@ -1,0 +1,1293 @@
+{
+ "_about": "Published lived-experience research gathered for Waypoint Ledger (/lived-experience). Every quote is verbatim from the saved text in data/lived-experience-text/<id>.txt, whose sha256 is recorded here; tests/lived-experience.test.ts re-checks each one. These are published reports, studies and public testimony. None of it is an interview by us, and no composite built from it is a real person.",
+ "_retrieved": "2026-10-11",
+ "sources": [
+  {
+   "id": "hhs-longcovid-2022",
+   "title": "Health+ Long COVID Human-Centered Design Report",
+   "publisher": "Coforma for the U.S. Department of Health and Human Services, Office of the Assistant Secretary for Health (Health+ program)",
+   "year": 2022,
+   "url": "https://www.datocms-assets.com/92185/1676493529-healthplus-long-covid-report.pdf",
+   "landing": "https://healthplusprogram.io/cycles/long-covid",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/hhs-longcovid-2022.txt",
+   "sha256": "fb49176ff99b8970338845920b7f40a846f8500a2abf2b3bbf28503d18739c9b",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "federal patient research",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "hhs-longcovid-2022-f1",
+     "theme": "many-doctors",
+     "finding": "People with long COVID describe a loop of specialist visits; tests often come back normal and lead to yet another referral.",
+     "quote": "Normal results often lead to recommendations to see other specialists",
+     "locator": "PDF page 34"
+    },
+    {
+     "id": "hhs-longcovid-2022-f2",
+     "theme": "tests-normal",
+     "finding": "One participant went to urgent care, a pulmonologist and a cardiologist; the X-ray and EKG were read as normal.",
+     "quote": "‘X-Ray is clear. There’s nothing wrong with you.’ ‘Your EKG is fine. There’s nothing wrong with you.’",
+     "locator": "PDF page 32"
+    },
+    {
+     "id": "hhs-longcovid-2022-f3",
+     "theme": "dismissed",
+     "finding": "Symptoms are often put down to anxiety; one participant was asked about drugs and then given an anxiety diagnosis.",
+     "quote": "So, he also diagnosed me with anxiety.",
+     "locator": "PDF page 52"
+    },
+    {
+     "id": "hhs-longcovid-2022-f4",
+     "theme": "waits",
+     "finding": "People with long COVID can wait months, even a year, for a specialist appointment.",
+     "quote": "A person may spend months, or even a year, waiting for a specialist appointment.",
+     "locator": "PDF page 32"
+    },
+    {
+     "id": "hhs-longcovid-2022-f5",
+     "theme": "out-of-pocket",
+     "finding": "A participant paid about $19,000 out of pocket in one year, mostly for a clinic insurance did not cover.",
+     "quote": "I paid about $19,000 out of pocket for medical bills the entire year.",
+     "locator": "PDF page 48"
+    },
+    {
+     "id": "hhs-longcovid-2022-f6",
+     "theme": "gone-without",
+     "finding": "Without insurance, people skip the hospital and the specialist they were told to see.",
+     "quote": "I didn’t want to go to the hospital because I didn’t have insurance.",
+     "locator": "PDF page 32"
+    },
+    {
+     "id": "hhs-longcovid-2022-f7",
+     "theme": "many-doctors",
+     "finding": "Care usually starts with a primary care visit, urgent care or the emergency room.",
+     "quote": "they likely start by making an appointment with their primary care provider, visiting an urgent care center, or going to the emergency room.",
+     "locator": "PDF page 34"
+    },
+    {
+     "id": "hhs-longcovid-2022-f8",
+     "theme": "many-doctors",
+     "finding": "One participant saw a pulmonologist and a cardiologist several times.",
+     "quote": "I went to a pulmonologist and a cardiologist a number of times.",
+     "locator": "PDF page 32"
+    },
+    {
+     "id": "hhs-longcovid-2022-f9",
+     "theme": "waits",
+     "finding": "Some are eventually referred to a long COVID clinic.",
+     "quote": "may be referred to a Long COVID clinic.",
+     "locator": "PDF page 34"
+    }
+   ]
+  },
+  {
+   "id": "hhs-lyme-2021",
+   "title": "Health+ Lyme Disease Human-Centered Design Report",
+   "publisher": "Coforma for the U.S. Department of Health and Human Services LymeX partnership (Health+ program)",
+   "year": 2021,
+   "url": "https://www.datocms-assets.com/92185/1697176389-healthplus_lymedisease_hcdreport_full.pdf",
+   "landing": "https://healthplusprogram.io/cycles/lyme-disease",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/hhs-lyme-2021.txt",
+   "sha256": "a59c87fe9a3727afdef2a9d566c351cb76543ca405c8a23e0163ff98c731f635",
+   "conditions": [
+    "Lyme disease",
+    "PTLDS"
+   ],
+   "kind": "federal patient research",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "hhs-lyme-2021-f1",
+     "theme": "years",
+     "finding": "One patient quoted in the report took seven and a half years to reach a diagnosis.",
+     "quote": "So seven-and-a-half years to get to diagnosis.",
+     "locator": "PDF page 13"
+    },
+    {
+     "id": "hhs-lyme-2021-f2",
+     "theme": "tests-normal",
+     "finding": "Patients describe years of doctor visits with every test negative and symptoms put down to stress.",
+     "quote": "I was just in and out of doctors for years and all my tests always came back negative",
+     "locator": "PDF page 13"
+    },
+    {
+     "id": "hhs-lyme-2021-f3",
+     "theme": "dismissed",
+     "finding": "Symptoms were attributed to depression, anxiety or stress before Lyme was found.",
+     "quote": "a lot of my symptoms were pawned off to depression or anxiety or stress.",
+     "locator": "PDF page 13"
+    },
+    {
+     "id": "hhs-lyme-2021-f4",
+     "theme": "out-of-pocket",
+     "finding": "The report’s journey maps mark the point where insurance stops paying and costs build up.",
+     "quote": "Insurance usually drops off at this point, and medical costs start to build up",
+     "locator": "PDF page 18"
+    },
+    {
+     "id": "hhs-lyme-2021-f5",
+     "theme": "many-doctors",
+     "finding": "After a panel of negative tests, the primary care doctor refers on to a neurologist.",
+     "quote": "he didn't know what was wrong. So he's like, 'Oh, you need to go see a neurologist.'",
+     "locator": "PDF page 43"
+    },
+    {
+     "id": "hhs-lyme-2021-f6",
+     "theme": "dismissed",
+     "finding": "In the HHS report’s own composite persona, negative tests led to a psychiatric evaluation.",
+     "quote": "The doctor then ordered a psychiatric evaluation on Mia that resulted in no answers.",
+     "locator": "PDF page 37"
+    },
+    {
+     "id": "hhs-lyme-2021-f7",
+     "theme": "out-of-pocket",
+     "finding": "In another HHS persona, the Lyme-literate doctor was paid out of pocket.",
+     "quote": "Sam was forced to pay out of pocket with the little money he had left to see an LLMD",
+     "locator": "PDF page 44"
+    }
+   ]
+  },
+  {
+   "id": "hhs-scd-2020",
+   "title": "Health+ Sickle Cell Disease Human-Centered Design Report",
+   "publisher": "Coforma for the U.S. Department of Health and Human Services (Health+ program)",
+   "year": 2020,
+   "url": "https://www.datocms-assets.com/92185/1707419787-health_sickle_cell_disease-human-centered_design_report-coforma_ruch7od.pdf",
+   "landing": "https://healthplusprogram.io/cycles/sickle-cell-disease",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/hhs-scd-2020.txt",
+   "sha256": "99e90053d0fe90453e2fd75235fa705ce1109e01651e6e8033b2a140f061c361",
+   "conditions": [
+    "sickle cell disease"
+   ],
+   "kind": "federal patient research",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "hhs-scd-2020-f1",
+     "theme": "er",
+     "finding": "People with sickle cell disease describe the ER as a last resort, with long waits and accusations of drug seeking.",
+     "quote": "accusations of “drug seeking”, extended emergency department wait times, and difficulty filling prescriptions.",
+     "locator": "PDF page 2"
+    },
+    {
+     "id": "hhs-scd-2020-f2",
+     "theme": "er",
+     "finding": "Adult ERs are busy and often unfamiliar with sickle cell protocols.",
+     "quote": "Adult ERs are busy, with long wait times",
+     "locator": "PDF page 5"
+    },
+    {
+     "id": "hhs-scd-2020-f3",
+     "theme": "gone-without",
+     "finding": "Gaps in primary care push people toward the ER and hospital, which is costly and traumatic.",
+     "quote": "The disconnect of primary care can result in increased ER visits and hospitalizations",
+     "locator": "PDF page 12"
+    },
+    {
+     "id": "hhs-scd-2020-f4",
+     "theme": "many-doctors",
+     "finding": "A patient said they need a hematologist who knows sickle cell.",
+     "quote": "So that’s why I feel that I really need a hematologist down here.",
+     "locator": "PDF page 16"
+    },
+    {
+     "id": "hhs-scd-2020-f5",
+     "theme": "er",
+     "finding": "In the ER, labs are run before pain is treated.",
+     "quote": "They have to run labs and they have to get the results of the labs",
+     "locator": "PDF page 27"
+    }
+   ]
+  },
+  {
+   "id": "nasem-mecfs-2015",
+   "title": "Beyond Myalgic Encephalomyelitis/Chronic Fatigue Syndrome: Redefining an Illness (Summary)",
+   "publisher": "Institute of Medicine (National Academies Press)",
+   "year": 2015,
+   "url": "https://www.nationalacademies.org/read/19012/chapter/2",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-mecfs-2015.txt",
+   "sha256": "97f2814705ee10a52cc6d33d9b37bfc170199beca5861d09d7a0a09f628a2a2a",
+   "conditions": [
+    "ME/CFS"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-mecfs-2015-f1",
+     "theme": "years",
+     "finding": "Most ME/CFS patients surveyed waited more than a year for a diagnosis; most people with ME/CFS have never been diagnosed.",
+     "quote": "In multiple surveys, 67 to 77 percent of patients have reported that it took longer than 1 year to get a diagnosis",
+     "locator": "Summary, page 1"
+    },
+    {
+     "id": "nasem-mecfs-2015-f2",
+     "theme": "years",
+     "finding": "An estimated 84 to 91 percent of people with ME/CFS are not yet diagnosed.",
+     "quote": "an estimated 84 to 91 percent of patients affected by ME/CFS are not yet diagnosed",
+     "locator": "Summary, page 1"
+    },
+    {
+     "id": "nasem-mecfs-2015-f3",
+     "theme": "work",
+     "finding": "At least a quarter are house- or bedbound at some point; medical costs and lost earnings wreck household finances.",
+     "quote": "High medical costs combined with reduced earning capacity often have devastating effects on patients’ financial status.",
+     "locator": "Summary, page 2"
+    }
+   ]
+  },
+  {
+   "id": "nasem-iaci-2024",
+   "title": "Toward a Common Research Agenda in Infection-Associated Chronic Illnesses: Proceedings of a Workshop (Chapter 2)",
+   "publisher": "National Academies of Sciences, Engineering, and Medicine (National Academies Press)",
+   "year": 2024,
+   "url": "https://www.nationalacademies.org/read/27462/chapter/3",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-iaci-2024.txt",
+   "sha256": "bd72b9e56072de02a12ea9f569fe8b727d03820fcc415280fbd3dad8915c12fa",
+   "conditions": [
+    "infection-associated chronic illness",
+    "long COVID",
+    "ME/CFS",
+    "Lyme disease"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-iaci-2024-f1",
+     "theme": "dismissed",
+     "finding": "A speaker at the National Academies workshop said people are dismissed by their doctors every day.",
+     "quote": "every day people are going in to see their doctors and being dismissed.",
+     "locator": "2 Overview of Infection-Associated Chronic Illnesses, page 16"
+    },
+    {
+     "id": "nasem-iaci-2024-f2",
+     "theme": "believed",
+     "finding": "Speakers asked that people living with these illnesses have their lived experiences supported.",
+     "quote": "those living with these challenges should have their lived experiences supported.",
+     "locator": "2 Overview of Infection-Associated Chronic Illnesses, page 16"
+    }
+   ]
+  },
+  {
+   "id": "nasem-lc-definition-2024",
+   "title": "A Long COVID Definition: A Chronic, Systemic Disease State with Profound Consequences (Summary)",
+   "publisher": "National Academies of Sciences, Engineering, and Medicine (National Academies Press)",
+   "year": 2024,
+   "url": "https://www.nationalacademies.org/read/27768/chapter/2",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-lc-definition-2024.txt",
+   "sha256": "ff9eb2b68bc97a58341866b89ddc21c9bd2beff22cb6e3bfde1d4015c5c2ba65",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-lc-definition-2024-f1",
+     "theme": "tests-normal",
+     "finding": "Long COVID is diagnosed on clinical grounds; no available biomarker proves it.",
+     "quote": "No biomarker currently available demonstrates conclusively the presence of LC.",
+     "locator": "Summary, page 3"
+    },
+    {
+     "id": "nasem-lc-definition-2024-f2",
+     "theme": "work",
+     "finding": "Long COVID can take away work, school, family care and self-care.",
+     "quote": "LC can impair individuals’ ability to work, attend school, take care of family, and care for themselves.",
+     "locator": "Summary, page 3"
+    }
+   ]
+  },
+  {
+   "id": "nasem-scd-2020",
+   "title": "Addressing Sickle Cell Disease: A Strategic Plan and Blueprint for Action (Chapter 5, Health Care Organization and Use)",
+   "publisher": "National Academies of Sciences, Engineering, and Medicine (National Academies Press)",
+   "year": 2020,
+   "url": "https://www.nationalacademies.org/read/25632/chapter/7",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-scd-2020.txt",
+   "sha256": "30fbb67a7c11b5dd19c89201d6e092823572e264bb5d83a3e823d04ed5f195fa",
+   "conditions": [
+    "sickle cell disease"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-scd-2020-f1",
+     "theme": "er",
+     "finding": "Adults with sickle cell disease mostly get acute pain care in the emergency department.",
+     "quote": "Adults with SCD tend to seek acute care, primarily for pain, in the emergency department.",
+     "locator": "5 Health Care Organization and Use, page 185"
+    },
+    {
+     "id": "nasem-scd-2020-f2",
+     "theme": "er",
+     "finding": "Guidelines say pain medicine within 30 minutes of triage, but timely re-dosing is rare in most EDs.",
+     "quote": "it is rare in most EDs, for variety of reasons.",
+     "locator": "5 Health Care Organization and Use, page 213"
+    }
+   ]
+  },
+  {
+   "id": "nasem-lyme-iaci-2025",
+   "title": "Charting a Path Toward New Treatments for Lyme Infection-Associated Chronic Illnesses (Chapter 1, Introduction)",
+   "publisher": "National Academies of Sciences, Engineering, and Medicine (National Academies Press)",
+   "year": 2025,
+   "url": "https://www.nationalacademies.org/read/28578/chapter/3",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-lyme-iaci-2025.txt",
+   "sha256": "d2bed518529d6abcf7479ff08b2b9c5c5c2bf92515cd8dc193cc308ed1b6290c",
+   "conditions": [
+    "Lyme disease",
+    "PTLDS"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-lyme-iaci-2025-f1",
+     "theme": "out-of-pocket",
+     "finding": "Up to half of the illness costs of persistent Lyme symptoms are paid out of pocket, often for therapies insurance does not cover.",
+     "quote": "Up to half of the illness-related costs are borne out-of-pocket",
+     "locator": "1 Introduction, page 27"
+    },
+    {
+     "id": "nasem-lyme-iaci-2025-f2",
+     "theme": "dismissed",
+     "finding": "Without a diagnostic test, people with persistent Lyme symptoms are stigmatized and dismissed.",
+     "quote": "have often led to stigmatization and dismissal of people living with Lyme IACI by the health care system",
+     "locator": "1 Introduction, page 26"
+    }
+   ]
+  },
+  {
+   "id": "nasem-scd-ssa-2025",
+   "title": "Sickle Cell Disease in Social Security Disability Evaluations: Pain and Treatment Settings (Chapter 4, Health Care Delivery)",
+   "publisher": "National Academies of Sciences, Engineering, and Medicine (National Academies Press)",
+   "year": 2025,
+   "url": "https://www.nationalacademies.org/read/29137/chapter/6",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/nasem-scd-ssa-2025.txt",
+   "sha256": "10fcf7e674f23c8b99fad1c2efe16cfc7f084643a658699a27bf3a55dd4cc26a",
+   "conditions": [
+    "sickle cell disease"
+   ],
+   "kind": "national academies",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "nasem-scd-ssa-2025-f1",
+     "theme": "stay",
+     "finding": "An adult with sickle cell disease told the committee a crisis now means five to six days in hospital.",
+     "quote": "My hospitalizations used to be 3 days tops. Now I’m in the hospital 5 to 6 days.",
+     "locator": "4 Health Care Delivery in Sickle Cell Disease, page 89"
+    },
+    {
+     "id": "nasem-scd-ssa-2025-f2",
+     "theme": "er",
+     "finding": "The same person has one to two crises a year and must go to the emergency department for each.",
+     "quote": "I experience one to two crises annually.",
+     "locator": "4 Health Care Delivery in Sickle Cell Disease, page 89"
+    },
+    {
+     "id": "nasem-scd-ssa-2025-f3",
+     "theme": "er",
+     "finding": "Pain medicine came in 62 minutes at an infusion center against 132 minutes in the emergency department.",
+     "quote": "time to administer pain medication at an infusion center was 62 minutes compared to 132 minutes in the emergency department",
+     "locator": "4 Health Care Delivery in Sickle Cell Disease, page 85"
+    }
+   ]
+  },
+  {
+   "id": "plrc-davis-2021",
+   "title": "Characterizing long COVID in an international cohort: 7 months of symptoms and their impact",
+   "publisher": "EClinicalMedicine",
+   "year": 2021,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8280690/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC8280690/fullTextXML",
+   "doi": "10.1016/j.eclinm.2021.101019",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/plrc-davis-2021.txt",
+   "sha256": "9b798112dd2dddadcf343488ea8d9a373a0c4569800bc6d7cb6e63da545eed35",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "patient-organization survey",
+   "where": "56 countries (online survey)",
+   "organization": "Patient-Led Research Collaborative",
+   "findings": [
+    {
+     "id": "plrc-davis-2021-f1",
+     "theme": "years",
+     "finding": "For more than 91 percent of 3,762 respondents, recovery took longer than 35 weeks.",
+     "quote": "For the majority of respondents (>91%), the time to recovery exceeded 35 weeks.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "plrc-davis-2021-f2",
+     "theme": "work",
+     "finding": "45.2 percent needed a reduced work schedule and 22.3 percent were not working because of their health.",
+     "quote": "45.2% (42.9% to 47.2%) of respondents reported requiring a reduced work schedule compared to pre-illness.",
+     "locator": "Section: Impact on work"
+    }
+   ]
+  },
+  {
+   "id": "dysautonomia-shaw-2019",
+   "title": "The face of postural tachycardia syndrome - insights from a large cross-sectional online community-based survey",
+   "publisher": "J Intern Med",
+   "year": 2019,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6790699/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6790699/fullTextXML",
+   "doi": "10.1111/joim.12895",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/dysautonomia-shaw-2019.txt",
+   "sha256": "93d6e8798600b251d2955639af2ee9eb775c977cd4f4f7db3dac2e8fc589c894",
+   "conditions": [
+    "POTS"
+   ],
+   "kind": "patient-organization survey",
+   "where": "United States and other countries (online survey)",
+   "organization": "Dysautonomia International",
+   "findings": [
+    {
+     "id": "dysautonomia-shaw-2019-f1",
+     "theme": "many-doctors",
+     "finding": "People with POTS saw a median of five physicians before diagnosis; 21 percent saw more than ten.",
+     "quote": "On average, patients saw 7 ± 11 [median 5 (IQR 3–8)] physicians prior to a diagnosis of POTS.",
+     "locator": "Section: Diagnostic journey travelled by POTS patients"
+    },
+    {
+     "id": "dysautonomia-shaw-2019-f2",
+     "theme": "dismissed",
+     "finding": "77 percent were told by a physician their symptoms were psychiatric or psychological.",
+     "quote": "There were 3471 (77%) respondents who encountered a physician who suggested their symptoms were due to a psychiatric or psychological problem",
+     "locator": "Section: Misdiagnosis in POTS"
+    },
+    {
+     "id": "dysautonomia-shaw-2019-f3",
+     "theme": "years",
+     "finding": "The median wait from first visit to diagnosis was 24 months; the mean was 4.9 years.",
+     "quote": "Respondents waited a median time of 24 (IQR 6–72) months (4.9 ± 7.1 years) after initial presentation to a physician",
+     "locator": "Section: Diagnostic journey travelled by POTS patients"
+    },
+    {
+     "id": "dysautonomia-shaw-2019-f4",
+     "theme": "er",
+     "finding": "Respondents averaged nine emergency department visits before diagnosis.",
+     "quote": "Number of ED visits prior to diagnosis 9 (16)",
+     "locator": "Section: Diagnostic journey travelled by POTS patients"
+    }
+   ]
+  },
+  {
+   "id": "lymedisease-johnson-2014",
+   "title": "Severity of chronic Lyme disease compared to other chronic conditions: a quality of life survey",
+   "publisher": "PeerJ",
+   "year": 2014,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC3976119/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC3976119/fullTextXML",
+   "doi": "10.7717/peerj.322",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lymedisease-johnson-2014.txt",
+   "sha256": "3319605eb72ce3e47943a4753e0c0755f63d1d458d4d179ad185d8b9555b104b",
+   "conditions": [
+    "Lyme disease",
+    "PTLDS"
+   ],
+   "kind": "patient-organization survey",
+   "where": "United States (online survey)",
+   "organization": "LymeDisease.org",
+   "findings": [
+    {
+     "id": "lymedisease-johnson-2014-f1",
+     "theme": "years",
+     "finding": "61.7 percent of respondents with persistent Lyme symptoms were not diagnosed for at least two years.",
+     "quote": "61.7% were not diagnosed for at least 2 years.",
+     "locator": "Section: Study inclusion and exclusion criteria."
+    },
+    {
+     "id": "lymedisease-johnson-2014-f2",
+     "theme": "out-of-pocket",
+     "finding": "They reported more health care use and greater out-of-pocket medical costs than people with other chronic diseases.",
+     "quote": "increased utilization of healthcare services, and greater out of pocket medical costs.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "hirsch-lyme-2018",
+   "title": "Obstacles to diagnosis and treatment of Lyme disease in the USA: a qualitative study",
+   "publisher": "BMJ Open",
+   "year": 2018,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6009554/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC6009554/fullTextXML",
+   "doi": "10.1136/bmjopen-2017-021367",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/hirsch-lyme-2018.txt",
+   "sha256": "c5152dfa6ac336003a0fcc5b16b7460f48e20daa5a3eb8e7f8b71f3a21ef7f73",
+   "conditions": [
+    "Lyme disease"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "Pennsylvania, United States",
+   "findings": [
+    {
+     "id": "hirsch-lyme-2018-f1",
+     "theme": "er",
+     "finding": "Ten of 26 patients went first to urgent care or the ER, where misdiagnosis was more common.",
+     "quote": "Misdiagnoses were more common in these settings, contributing to treatment delay.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "hirsch-lyme-2018-f2",
+     "theme": "er",
+     "finding": "One patient was told in the ER it was bursitis or tendonitis.",
+     "quote": "I went up to the ER and they told me I had bursitis.",
+     "locator": "Section: Results"
+    },
+    {
+     "id": "hirsch-lyme-2018-f3",
+     "theme": "gone-without",
+     "finding": "Lacking insurance delayed people from seeing a doctor at all.",
+     "quote": "I didn’t have insurance. That was one of the main things.",
+     "locator": "Section: Results"
+    },
+    {
+     "id": "hirsch-lyme-2018-f4",
+     "theme": "many-doctors",
+     "finding": "Half first went to a primary care provider; 38.5 percent first went to urgent care or the ER.",
+     "quote": "Half of the participants first sought care for Lyme disease from a primary care provider",
+     "locator": "Section: Results"
+    }
+   ]
+  },
+  {
+   "id": "lyme-journey-2026",
+   "title": "The Journey of Adult Patients with Lyme Disease in the United States: A Qualitative Interview Study and Patient-Reported, Health-Related Quality-of-Life Assessment",
+   "publisher": "Adv Ther",
+   "year": 2026,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13290776/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13290776/fullTextXML",
+   "doi": "10.1007/s12325-026-03597-1",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lyme-journey-2026.txt",
+   "sha256": "877074fd6263d7e094617c0619430ab8fc24ed2e35d0f37b11bedb00fef08df3",
+   "conditions": [
+    "Lyme disease"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "lyme-journey-2026-f1",
+     "theme": "work",
+     "finding": "Adults with Lyme disease reported fear, anxiety, needing time off work and more time indoors at diagnosis.",
+     "quote": "Participants reported various impacts at diagnosis, such as fear and anxiety, difficulty exercising, needing time off work, and spending increased time indoors.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "lyme-journey-2026-f2",
+     "theme": "tests-normal",
+     "finding": "Most had a Lyme ELISA blood test.",
+     "quote": "Most participants (20/25, 80%) documented having an LD enzyme-linked immunosorbent assay (ELISA) test",
+     "locator": "Section: Participant Characteristics"
+    },
+    {
+     "id": "lyme-journey-2026-f3",
+     "theme": "many-doctors",
+     "finding": "Most were referred on to an infectious disease doctor after the first visit.",
+     "quote": "participants frequently reported being referred to an infectious disease doctor after their initial healthcare provider visit.",
+     "locator": "Section: Diagnosis and Treatment Experience"
+    }
+   ]
+  },
+  {
+   "id": "heds-odyssey-2023",
+   "title": "Comorbidity, misdiagnoses, and the diagnostic odyssey in patients with hypermobile Ehlers-Danlos syndrome",
+   "publisher": "Genet Med Open",
+   "year": 2023,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11613559/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11613559/fullTextXML",
+   "doi": "10.1016/j.gimo.2023.100812",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/heds-odyssey-2023.txt",
+   "sha256": "2dab8d8b95dcf9230d593681e72176d4f14366e63425afc965e902a086bb5688",
+   "conditions": [
+    "hypermobile EDS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "Ehlers-Danlos Society Global Registry",
+   "findings": [
+    {
+     "id": "heds-odyssey-2023-f1",
+     "theme": "many-doctors",
+     "finding": "People with hypermobile EDS saw an average of 15.6 clinicians and waited 10.39 years for the diagnosis.",
+     "quote": "respondents saw an average of 15.6 clinicians (24% reported that they saw 20 or more), and the average time to diagnosis was 10.39 years",
+     "locator": "Section: Diagnostic odyssey"
+    },
+    {
+     "id": "heds-odyssey-2023-f2",
+     "theme": "dismissed",
+     "finding": "Anxiety and depression were the most common alternative diagnoses given before hEDS.",
+     "quote": "Anxiety, depression, and migraines were the most common.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "heds-odyssey-2023-f3",
+     "theme": "many-doctors",
+     "finding": "Most received the diagnosis from a genetics specialist, then a rheumatologist.",
+     "quote": "The majority (57%) received their official diagnosis of hEDS from a genetics specialist",
+     "locator": "Section: Diagnostic odyssey"
+    },
+    {
+     "id": "heds-odyssey-2023-f4",
+     "theme": "many-doctors",
+     "finding": "After genetics, the next most common diagnosing clinicians were rheumatologists and primary care physicians.",
+     "quote": "followed by a rheumatologist (20%) or their primary care physician (5%).",
+     "locator": "Section: Diagnostic odyssey"
+    }
+   ]
+  },
+  {
+   "id": "heds-global-2025",
+   "title": "Defining the Chronic Complexities of hEDS and HSD: A Global Survey of Diagnostic Challenges, Life-Long Comorbidities, and Unmet Needs",
+   "publisher": "J Clin Med",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12386360/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12386360/fullTextXML",
+   "doi": "10.3390/jcm14165636",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/heds-global-2025.txt",
+   "sha256": "1168bc4a1bef18b5caa7359f34139cc829b878b5492ca965d876726389e90626",
+   "conditions": [
+    "hypermobile EDS",
+    "HSD"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "International (online survey)",
+   "findings": [
+    {
+     "id": "heds-global-2025-f1",
+     "theme": "years",
+     "finding": "Survey respondents with hEDS reported an average diagnostic delay of 22.1 years.",
+     "quote": "Participants with hEDS reported a mean of 24 comorbid conditions and an average diagnostic delay of 22.1 years.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "heds-global-2025-f2",
+     "theme": "travel",
+     "finding": "31.3 percent of hEDS respondents travelled 300 miles or more for care.",
+     "quote": "31.3% of hEDS and 9.5% of HSD participants report having traveled 300 or more miles",
+     "locator": "Section: 3.2. Diagnostic Journey"
+    },
+    {
+     "id": "heds-global-2025-f3",
+     "theme": "out-of-pocket",
+     "finding": "Many paid out of pocket for a specialist not covered by insurance.",
+     "quote": "many participants report paying out-of-pocket for medical care from a specialist not covered by insurance.",
+     "locator": "Section: 3.2. Diagnostic Journey"
+    },
+    {
+     "id": "heds-global-2025-f4",
+     "theme": "many-doctors",
+     "finding": "The specialties they visit most are family medicine, cardiology, gastroenterology, neurology and emergency medicine.",
+     "quote": "The most frequently visited specialties included family medicine, cardiology, gastroenterology, neurology/neurosurgery, and emergency medicine.",
+     "locator": "Section: 3.2. Diagnostic Journey"
+    }
+   ]
+  },
+  {
+   "id": "eds-selfdoubt-2025",
+   "title": "Sources and consequences of self-doubt in patients with Ehlers-Danlos syndrome: a qualitative study in Europe and North America",
+   "publisher": "BMJ Open",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12706247/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12706247/fullTextXML",
+   "doi": "10.1136/bmjopen-2025-109681",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/eds-selfdoubt-2025.txt",
+   "sha256": "d1f11b325b018b3c998c933420bc9838125b5ffb30ad51e6bf426cb231b0265b",
+   "conditions": [
+    "EDS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "Europe and North America",
+   "findings": [
+    {
+     "id": "eds-selfdoubt-2025-f1",
+     "theme": "believed",
+     "finding": "Repeated dismissal in health care, especially in childhood, left people with EDS doubting their own pain.",
+     "quote": "Participants attributed much of their self-doubt to repeated dismissal and minimisation of their symptoms in healthcare settings, especially during childhood.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "eds-selfdoubt-2025-f2",
+     "theme": "gone-without",
+     "finding": "Some withdrew from conventional medicine altogether.",
+     "quote": "others withdrew from the conventional medical system altogether.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "eds-pain-2023",
+   "title": "A qualitative study of pain and related symptoms experienced by people with Ehlers-Danlos syndromes",
+   "publisher": "Front Med (Lausanne)",
+   "year": 2023,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10792024/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC10792024/fullTextXML",
+   "doi": "10.3389/fmed.2023.1291189",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/eds-pain-2023.txt",
+   "sha256": "4e83b260d2c845130a30de0387620ba3a2539aa7642073fac7587e5f3d66737b",
+   "conditions": [
+    "EDS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "eds-pain-2023-f1",
+     "theme": "out-of-pocket",
+     "finding": "Few relied on the health care system; most built their own strategies, including complementary care.",
+     "quote": "Very few relied on a “system” of health care and instead developed their own strategies",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "lupus-sloan-2020",
+   "title": "Medically explained symptoms: a mixed methods study of diagnostic, symptom and support experiences of patients with lupus and related systemic autoimmune diseases",
+   "publisher": "Rheumatol Adv Pract",
+   "year": 2020,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7197794/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC7197794/fullTextXML",
+   "doi": "10.1093/rap/rkaa006",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lupus-sloan-2020.txt",
+   "sha256": "291270bb3e86451aad7b25dddad0219c4c701cd746964afb2d9489fe5c9980a0",
+   "conditions": [
+    "lupus"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United Kingdom (LUPUS UK survey)",
+   "findings": [
+    {
+     "id": "lupus-sloan-2020-f1",
+     "theme": "years",
+     "finding": "Mean time from first symptoms to a lupus or related diagnosis was 6 years 11 months.",
+     "quote": "The mean time to diagnosis from first experiencing symptoms was 6 years 11 months.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "lupus-sloan-2020-f2",
+     "theme": "dismissed",
+     "finding": "76 percent had at least one misdiagnosis; mental health misdiagnoses were 47 percent of them.",
+     "quote": "Seventy-six per cent reported at least one misdiagnosis",
+     "locator": "Abstract"
+    },
+    {
+     "id": "lupus-sloan-2020-f3",
+     "theme": "tests-normal",
+     "finding": "One respondent was sent to a psychiatrist because blood results were normal; the psychiatrist sent her back to a new rheumatologist.",
+     "quote": "The rheumatologist sent me to see a psychiatrist because I complained that I felt ill even though the blood results were OK.",
+     "locator": "Section: Delays and misdiagnoses"
+    },
+    {
+     "id": "lupus-sloan-2020-f4",
+     "theme": "many-doctors",
+     "finding": "Clinicians seen included the GP, rheumatologist, lupus specialist, A&E doctor, neurologist and others.",
+     "quote": "GP, rheumatologist, lupus specialist, accident and emergency (A&E) doctor, specialist nurse, physiotherapist, neurologist",
+     "locator": "Section: Clinician support: knowledge, trust and listening skills"
+    },
+    {
+     "id": "lupus-sloan-2020-f5",
+     "theme": "years",
+     "finding": "People whose ANA blood test stayed negative waited 13 years on average.",
+     "quote": "mean delay of 13 years for permanently ANA-negative participants",
+     "locator": "Section: Delays and misdiagnoses"
+    },
+    {
+     "id": "lupus-sloan-2020-f6",
+     "theme": "many-doctors",
+     "finding": "The psychiatrist sent the same respondent back to find a new rheumatologist.",
+     "quote": "I should get a new rheumatologist who knew more about lupus",
+     "locator": "Section: Delays and misdiagnoses"
+    }
+   ]
+  },
+  {
+   "id": "lupus-dos-2025",
+   "title": "Diagnostic overshadowing in systemic lupus erythematosus (SLE): A qualitative study",
+   "publisher": "Lupus",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12174620/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12174620/fullTextXML",
+   "doi": "10.1177/09612033251345184",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lupus-dos-2025.txt",
+   "sha256": "c60d0be3f1adc95aba47cf41dc3ae6f4c41c06718fa8bcdf454280900af4c9ac",
+   "conditions": [
+    "lupus"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United Kingdom",
+   "findings": [
+    {
+     "id": "lupus-dos-2025-f1",
+     "theme": "dismissed",
+     "finding": "GPs put symptoms down to anxiety, stress or \"nothing wrong\" for years.",
+     "quote": "GP said: ‘Maybe there’s an element of anxiety there’.",
+     "locator": "Section: Results"
+    },
+    {
+     "id": "lupus-dos-2025-f2",
+     "theme": "tests-normal",
+     "finding": "Some clinicians stopped investigating because it was too expensive to continue.",
+     "quote": "particularly when the clinician indicated that it was too expensive to keep investigating.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "mecfs-memorial-2026",
+   "title": "Investigating the ME/CFS experience through qualitative analysis of memorial entries",
+   "publisher": "PLoS One",
+   "year": 2026,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13102223/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC13102223/fullTextXML",
+   "doi": "10.1371/journal.pone.0343374",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/mecfs-memorial-2026.txt",
+   "sha256": "8797e30e6415e924533a22be97cee04f8f9a3a6b58589421d9458e9049d7ec47",
+   "conditions": [
+    "ME/CFS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States (National CFIDS Foundation memorial list)",
+   "findings": [
+    {
+     "id": "mecfs-memorial-2026-f1",
+     "theme": "dismissed",
+     "finding": "Published memorial records describe misdiagnosis, dismissal and unhelpful treatment recommendations.",
+     "quote": "Negative healthcare experiences included misdiagnosis and misattribution of symptoms, dismissal, inadequate knowledge and experience with treating ME/CFS, and the recommendation of unhelpful treatments.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "mecfs-lc-uk-2025",
+   "title": "Understanding symptom clusters, diagnosis and healthcare experiences in myalgic encephalomyelitis/chronic fatigue syndrome and long COVID: a cross-sectional survey in the UK",
+   "publisher": "BMJ Open",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11966950/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11966950/fullTextXML",
+   "doi": "10.1136/bmjopen-2024-094658",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/mecfs-lc-uk-2025.txt",
+   "sha256": "56d6382b59447b1da522da2e14e69d2660813e02f1edd7eeec0382428b096102",
+   "conditions": [
+    "ME/CFS",
+    "long COVID"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United Kingdom",
+   "findings": [
+    {
+     "id": "mecfs-lc-uk-2025-f1",
+     "theme": "years",
+     "finding": "Time to an ME/CFS diagnosis ranged widely: 22.1 percent in one to two years, 12.9 percent more than ten.",
+     "quote": "with 22.1% diagnosed within 1–2 years of symptom onset and 12.9% taking more than 10 years.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "me-underserved-2025",
+   "title": "Under-Served Groups and Myalgic Encephalomyelitis Research Workshop; Multiple Barriers to Effective Healthcare, Research and Public Participation",
+   "publisher": "Health Expect",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11911926/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11911926/fullTextXML",
+   "doi": "10.1111/hex.70214",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/me-underserved-2025.txt",
+   "sha256": "db1ba7d6df082141f92f134ade513ba3be16716c00ad230df5850e1232c3ffac",
+   "conditions": [
+    "ME/CFS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United Kingdom",
+   "findings": [
+    {
+     "id": "me-underserved-2025-f1",
+     "theme": "gone-without",
+     "finding": "People with ME from under-served groups face barriers to care twice over.",
+     "quote": "who appear doubly disadvantaged by their illness and their socioeconomic and/or ethnic background.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "scd-discrimination-2024",
+   "title": "Attitudes and Beliefs Regarding Pain and Discrimination Among Black Adults with Sickle Cell Disease: A Mixed Methods Evaluation of an Adapted Chronic Pain Intervention",
+   "publisher": "J Pain Res",
+   "year": 2024,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11550914/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11550914/fullTextXML",
+   "doi": "10.2147/jpr.s469999",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/scd-discrimination-2024.txt",
+   "sha256": "2d2e926cdd35f47a248cb51b11c1dffcd8dd9bb735df8066206e644bb32dc9b5",
+   "conditions": [
+    "sickle cell disease"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "scd-discrimination-2024-f1",
+     "theme": "er",
+     "finding": "Adults with sickle cell disease describe being treated as drug-seeking when they ask for pain relief.",
+     "quote": "they’re looking at you like you’re, you’re a drug addict trying to, and you’re just in pain",
+     "locator": "Section: Pain Theme"
+    },
+    {
+     "id": "scd-discrimination-2024-f2",
+     "theme": "dismissed",
+     "finding": "Most described racism or discrimination in medical settings and clinicians’ lack of knowledge.",
+     "quote": "Most described at least one experience of racism or discrimination in the medical setting",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "lc-employment-2025",
+   "title": "The Impact of Long COVID on Employment and Well-Being: A Qualitative Study of Patient Perspectives",
+   "publisher": "J Gen Intern Med",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11968618/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11968618/fullTextXML",
+   "doi": "10.1007/s11606-024-09062-5",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lc-employment-2025.txt",
+   "sha256": "7d544f480876300a9fb77c92076daf490b6828367f8ebd3f8fff2ec277237500",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "lc-employment-2025-f1",
+     "theme": "work",
+     "finding": "Working through long COVID left little energy, even for recommended appointments.",
+     "quote": "made it difficult to attend recommended healthcare appointments.",
+     "locator": "Abstract"
+    },
+    {
+     "id": "lc-employment-2025-f2",
+     "theme": "out-of-pocket",
+     "finding": "Loss of income and changes in insurance were compounded by high health care costs.",
+     "quote": "loss of income and changes in insurance, which were compounded by high healthcare costs.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "lc-hardship-2025",
+   "title": "Long COVID and financial hardship: A disaggregated analysis at income and education levels",
+   "publisher": "Health Serv Res",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11911214/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11911214/fullTextXML",
+   "doi": "10.1111/1475-6773.14413",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lc-hardship-2025.txt",
+   "sha256": "07d1aca9113fbf11bf435809f5c6a90fbe7b4b65beee4f09849b04a988be16ef",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States (BRFSS 2022)",
+   "findings": [
+    {
+     "id": "lc-hardship-2025-f1",
+     "theme": "work",
+     "finding": "In federal BRFSS data, lost or reduced work hours explained 6 to 20 percent of long COVID financial hardship.",
+     "quote": "lost or reduced hours of employment accounted for a significant portion (6%–20%) of the changes in financial distress.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "lc-stigma-2024",
+   "title": "Barriers to healthcare access and experiences of stigma: Findings from a coproduced Long Covid case-finding study",
+   "publisher": "Health Expect",
+   "year": 2024,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11024953/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11024953/fullTextXML",
+   "doi": "10.1111/hex.14037",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lc-stigma-2024.txt",
+   "sha256": "98d8073a764ef560f7213eebb4ed0a3dc4d90541f4498852eee0a3b6c9748ea1",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "England",
+   "findings": [
+    {
+     "id": "lc-stigma-2024-f1",
+     "theme": "believed",
+     "finding": "Self-doubt, sometimes reinforced by clinicians, kept people from seeking care.",
+     "quote": "There was considerable self‐doubt among participants, sometimes reinforced by interactions with healthcare professionals (HCPs).",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "lc-pots-listen-2025",
+   "title": "Characterization of Postural Orthostatic Tachycardia Syndrome in Long COVID: Self-reported Data From the LISTEN Study",
+   "publisher": "JACC Adv",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12399260/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12399260/fullTextXML",
+   "doi": "10.1016/j.jacadv.2025.101873",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/lc-pots-listen-2025.txt",
+   "sha256": "5cf84af6e1bd7eb64afc72eb95018cd895f9b613f079f8be9fa9b329aaa25027",
+   "conditions": [
+    "POTS",
+    "long COVID"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States (Yale LISTEN study)",
+   "findings": [
+    {
+     "id": "lc-pots-listen-2025-f1",
+     "theme": "out-of-pocket",
+     "finding": "People with long COVID who developed POTS reported more financial difficulty and isolation.",
+     "quote": "Participants with self-reported POTS were younger, had more financial difficulties, more social isolation",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "pots-lived-2025",
+   "title": "A qualitative exploration of illness-related experiences, emotions, and coping among adults with postural orthostatic tachycardia syndrome (POTS)",
+   "publisher": "J Health Psychol",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12534875/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC12534875/fullTextXML",
+   "doi": "10.1177/13591053251315374",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/pots-lived-2025.txt",
+   "sha256": "e7b4552eb3574f39d3b60249bffced9e37d4fee7e3375011be5ce0e517c97bc3",
+   "conditions": [
+    "POTS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "pots-lived-2025-f1",
+     "theme": "tests-normal",
+     "finding": "One participant avoided a tilt-table test for fear a negative result would mean being told nothing was wrong.",
+     "quote": "I was worried that if it wasn’t then I would be treated like, ‘Oh, there is nothing.’",
+     "locator": "Section: Theme 2: Avoidance"
+    }
+   ]
+  },
+  {
+   "id": "pots-journey-2024",
+   "title": "One or many labels? a longitudinal qualitative study of patients' journey to diagnosis at a specialist NHS Postural Tachycardia Syndrome (PoTS) clinic",
+   "publisher": "PLoS One",
+   "year": 2024,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11236186/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11236186/fullTextXML",
+   "doi": "10.1371/journal.pone.0302723",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/pots-journey-2024.txt",
+   "sha256": "ada308e2eb146fabffc5136bd6489fdd154593d600571ef79b8faa791b1df5f8",
+   "conditions": [
+    "POTS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United Kingdom",
+   "findings": [
+    {
+     "id": "pots-journey-2024-f1",
+     "theme": "tests-normal",
+     "finding": "Waiting for a POTS clinic, people go through tilt-table tests and repeated blood tests.",
+     "quote": "every time they do blood tests, basically, they’re finding more problems, so it just feels relentless",
+     "locator": "Section: The value and impact of investigations"
+    },
+    {
+     "id": "pots-journey-2024-f2",
+     "theme": "tests-normal",
+     "finding": "Referral to the specialist POTS clinic follows symptoms and/or a suggestive tilt-table test.",
+     "quote": "suggestive tilt-table test results.",
+     "locator": "Section: Participants"
+    }
+   ]
+  },
+  {
+   "id": "dysautonomia-journey-2025",
+   "title": "The Diagnostic Journey of Dysautonomia Patients: Insights from a Patient-Reported Outcome Study",
+   "publisher": "J Patient Exp",
+   "year": 2025,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11748159/",
+   "fetchedFrom": "https://www.ebi.ac.uk/europepmc/webservices/rest/PMC11748159/fullTextXML",
+   "doi": "10.1177/23743735251314651",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/dysautonomia-journey-2025.txt",
+   "sha256": "0e634b4d54d9d2cbdb0f4daa337ffbf109e87f572f3f9a6af7faa8ffe5e3bf12",
+   "conditions": [
+    "dysautonomia",
+    "POTS"
+   ],
+   "kind": "peer-reviewed qualitative/survey",
+   "where": "United States",
+   "findings": [
+    {
+     "id": "dysautonomia-journey-2025-f1",
+     "theme": "years",
+     "finding": "People with dysautonomia waited 7.7 years on average; cardiologists and neurologists made most diagnoses.",
+     "quote": "The average time to diagnosis was 7.7 years (SD 10 years) and diagnosis was made primarily by cardiologists, followed by neurologists",
+     "locator": "Abstract"
+    },
+    {
+     "id": "dysautonomia-journey-2025-f2",
+     "theme": "many-doctors",
+     "finding": "Diagnoses came from cardiologists, then neurologists, then internists or primary care physicians.",
+     "quote": "diagnosis was made primarily by cardiologists, followed by neurologists, and internists or primary care physicians.",
+     "locator": "Abstract"
+    }
+   ]
+  },
+  {
+   "id": "senate-heim-2024",
+   "title": "Testimony of Nicole Heim, parent of a teenager with long COVID, Senate HELP hearing “Addressing Long COVID: Advancing Research and Improving Patient Care”",
+   "publisher": "U.S. Senate Committee on Health, Education, Labor, and Pensions",
+   "year": 2024,
+   "url": "https://www.help.senate.gov/download/final-_-testimony-nicole-heim-118-help",
+   "landing": "https://www.help.senate.gov/hearings/addressing-long-covid-advancing-research-and-improving-patient-care",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/senate-heim-2024.txt",
+   "sha256": "8b7df302e83ffd961e822d8c1c07810eea5115b30a9380b7aea0e355b37d5543",
+   "conditions": [
+    "long COVID",
+    "POTS"
+   ],
+   "kind": "public testimony",
+   "where": "West Virginia and Washington, D.C.",
+   "findings": [
+    {
+     "id": "senate-heim-2024-f1",
+     "theme": "insurance-denied",
+     "finding": "A parent waited many months, through Medicaid prior authorization, for a pediatric long COVID clinic.",
+     "quote": "After many months of waiting and jumping through prior authorization hoops with Medicaid",
+     "locator": "PDF page 1"
+    },
+    {
+     "id": "senate-heim-2024-f2",
+     "theme": "child",
+     "finding": "Her daughter, sick since age 14, is now homeschooled full-time.",
+     "quote": "is now homeschooled full-time.",
+     "locator": "PDF page 1"
+    },
+    {
+     "id": "senate-heim-2024-f3",
+     "theme": "tests-normal",
+     "finding": "While waiting for the clinic, testing and blood work continued.",
+     "quote": "my daughter’s testing and blood work continued.",
+     "locator": "PDF page 1"
+    }
+   ]
+  },
+  {
+   "id": "senate-vazquez-2024",
+   "title": "Testimony of Angela Meriquez Vazquez, Senate HELP hearing “Addressing Long COVID: Advancing Research and Improving Patient Care”",
+   "publisher": "U.S. Senate Committee on Health, Education, Labor, and Pensions",
+   "year": 2024,
+   "url": "https://www.help.senate.gov/download/angela-vazquez-testimony",
+   "landing": "https://www.help.senate.gov/hearings/addressing-long-covid-advancing-research-and-improving-patient-care",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/senate-vazquez-2024.txt",
+   "sha256": "070cccb8e83f02de32dd4cc1bfab33308586a698e076975b1fc2e71475b46993",
+   "conditions": [
+    "long COVID",
+    "ME/CFS"
+   ],
+   "kind": "public testimony",
+   "where": "Los Angeles, California",
+   "findings": [
+    {
+     "id": "senate-vazquez-2024-f1",
+     "theme": "dismissed",
+     "finding": "Abnormal labs within weeks of infection were dismissed as anxiety.",
+     "quote": "All were dismissed by doctors as anxiety",
+     "locator": "PDF page 1"
+    }
+   ]
+  },
+  {
+   "id": "senate-beale-2024",
+   "title": "Testimony of Rachel Beale, Senate HELP hearing “Addressing Long COVID: Advancing Research and Improving Patient Care”",
+   "publisher": "U.S. Senate Committee on Health, Education, Labor, and Pensions",
+   "year": 2024,
+   "url": "https://www.help.senate.gov/download/rachel-beale-testimony",
+   "landing": "https://www.help.senate.gov/hearings/addressing-long-covid-advancing-research-and-improving-patient-care",
+   "retrieved": "2026-10-11",
+   "textFile": "data/lived-experience-text/senate-beale-2024.txt",
+   "sha256": "94b8bdfa9a102fd20b720d04f8d243fa9153e05ac7f345551a48b25acd794f1e",
+   "conditions": [
+    "long COVID"
+   ],
+   "kind": "public testimony",
+   "where": "Virginia",
+   "findings": [
+    {
+     "id": "senate-beale-2024-f1",
+     "theme": "work",
+     "finding": "A human resources director moved to long-term disability and lost her job.",
+     "quote": "There is nothing that prepares you to hear the words that you no longer have a job.",
+     "locator": "PDF page 1"
+    },
+    {
+     "id": "senate-beale-2024-f2",
+     "theme": "insurance-denied",
+     "finding": "Her disability insurance application was denied twice.",
+     "quote": "I have been denied twice.",
+     "locator": "PDF page 2"
+    },
+    {
+     "id": "senate-beale-2024-f3",
+     "theme": "out-of-pocket",
+     "finding": "Even with good insurance, the copays add up.",
+     "quote": "However, the copays add up. Sometimes we can’t pay for them on time.",
+     "locator": "PDF page 2"
+    },
+    {
+     "id": "senate-beale-2024-f4",
+     "theme": "years",
+     "finding": "She has been sick for almost three years.",
+     "quote": "I’ve been sick for almost three years.",
+     "locator": "PDF page 2"
+    }
+   ]
+  }
+ ]
+}

@@ -319,10 +319,21 @@ export interface PriceResponse {
   fitted: FittedTotals;
 }
 
+const escapeRe = (x: string) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+function unpriceableCue(s: string): RegExp {
+  const k = s.toLowerCase();
+  return k.length <= 12
+    ? new RegExp(`(?:^|[^a-z0-9])${escapeRe(k)}(?:s|es)?(?![a-z0-9])`)
+    : new RegExp(`(?:^|[^a-z0-9])${escapeRe(k.slice(0, 12))}`);
+}
+
 /** A phrase that names a real cost we refuse to price. Same test the app uses. */
 export function unpriceableFor(text: string, list: UnpriceableItem[]): UnpriceableItem | undefined {
   const t = text.toLowerCase();
-  const hit = list.find((u) => [u.label, ...u.synonyms].some((s) => t.includes(s.toLowerCase().slice(0, 12))));
+  /* FINAL-1011 (journeys): a short synonym matches as a whole word only. A bare
+     substring sent "saw a gastroenterologist" to Travel ("gas") and never priced
+     the visit. A long synonym keeps its 12-character prefix match. */
+  const hit = list.find((u) => [u.label, ...u.synonyms].some((s) => unpriceableCue(s).test(t)));
   if (hit) return hit;
   /* "I lost my job as a teacher" (FLOW patient-7): the mapper's own reading of
      lost work, so the line lands where its chip says it is counted. */

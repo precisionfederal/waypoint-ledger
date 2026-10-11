@@ -1,6 +1,6 @@
 /* JUDGE-6 #5 (2026-10-01): plain English is never told to check its spelling. */
 import { describe, it, expect } from 'vitest';
-import { parseJourney, NO_MATCH_REASON, HOSPITAL_STAY_REASON, BARE_ULTRASOUND_REASON, SAY_IT_REASON, PLAIN_WORDS_REASON, readOnPurpose, unpricedByName } from '../lib/mapper';
+import { parseJourney, NO_MATCH_REASON, HOSPITAL_STAY_REASON, BARE_ULTRASOUND_REASON, SAY_IT_REASON, PLAIN_WORDS_REASON, CLINICIAN_COUNT_REASON, readOnPurpose, unpricedByName } from '../lib/mapper';
 import { SELECTABLE } from '../lib/table';
 
 const read = (s: string) => parseJourney(s, SELECTABLE).map((g) => ({ id: g.result.item?.id ?? null, gap: g.result.gapCategory, months: g.result.months, reason: g.result.reason }));
@@ -23,8 +23,8 @@ describe('JUDGE-6 #5', () => {
   });
   it('spelling advice only for a word two letters or fewer from a catalog word', () => {
     expect(read('a gastroscpy')[0].reason).toBe(NO_MATCH_REASON);
-    expect(read('saw 6 doctors')[0].reason).toBe(SAY_IT_REASON);
+    expect(read('saw 6 doctors')[0].reason).toBe(CLINICIAN_COUNT_REASON);
     expect(read('my aunt told me about it')[0].reason).toBe(PLAIN_WORDS_REASON);
-    for (const r of [SAY_IT_REASON, PLAIN_WORDS_REASON, HOSPITAL_STAY_REASON, BARE_ULTRASOUND_REASON]) expect(r).not.toMatch(/spelling/);
+    for (const r of [SAY_IT_REASON, PLAIN_WORDS_REASON, HOSPITAL_STAY_REASON, BARE_ULTRASOUND_REASON, CLINICIAN_COUNT_REASON]) expect(r).not.toMatch(/spelling/);
   });
 });

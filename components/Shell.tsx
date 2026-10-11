@@ -52,6 +52,7 @@ const MORE: MoreGroup[] = [
       { href: '/journey', label: 'Price a journey step by step' },
       { href: '/sheet', label: 'Appointment sheet' },
       { href: '/survey', label: 'Rank the burdens' },
+      { href: '/lived-experience', label: 'What patients told researchers', footerOnly: true },
       { href: '/interview', label: 'Written interview' },
       { href: '/account', label: 'Save across devices' },
     ],

@@ -157,3 +157,48 @@ describe('push through is advice, not an IV push', () => {
     expect(ids('they pushed a drug through my iv')).toContain('cms-proc-iv-push');
   });
 });
+
+/* FINAL-1011 face (B): "I saw 6 doctors" was "No federal figure matched" x6. A
+   count of clinicians with no kind of care named is the clinician count on the
+   total card, never six unmatched lines and never six priced visits: we do not
+   know what any of the six visits was. */
+const unmatched = (s: string) => read(s).filter((g) => !g.result.item && !g.result.gapCategory
+  && !notReadAsCare({ raw: g.raw, item: g.result.item, gapCategory: g.result.gapCategory, months: g.result.months, reason: g.result.reason }));
+describe('(f) a bare count of clinicians is the clinicians count, never lines of care', () => {
+  for (const s of ['I saw 6 doctors', 'I have seen six different doctors', 'saw 6 doctors so far']) {
+    it(`judge-f1 "${s}" is 6 clinicians, as counted, with no priced and no unmatched line`, () => {
+      expect(priced(s)).toEqual([]);
+      expect(unmatched(s)).toEqual([]);
+      const sl = searchLength(entries(s));
+      expect(sl.clinicians).toBe(6);
+      expect(sl.line).toBe('6 clinicians, as counted');
+    });
+  }
+  it('judge-f2 "saw 6 doctors, including a cardiologist" is 6 clinicians and one cardiologist visit priced', () => {
+    const s = 'saw 6 doctors, including a cardiologist';
+    expect(priced(s)).toEqual([['cms-99204', 1]]);
+    expect(unmatched(s)).toEqual([]);
+    expect(searchLength(entries(s)).clinicians).toBe(6);
+  });
+  /* Needs one change in lib/mapper.ts splitReturnVisits (not this lane’s to edit;
+     FINAL-1011/face/REPORT.md "NEEDS"): with no comma the whole clause is one
+     segment, and the cardiologist row takes the count said on "doctors". */
+  it('judge-f3 "saw 6 doctors including a cardiologist" is 6 clinicians and one cardiologist visit priced', () => {
+    const s = 'saw 6 doctors including a cardiologist';
+    expect(priced(s)).toEqual([['cms-99204', 1]]);
+    expect(unmatched(s)).toEqual([]);
+    expect(searchLength(entries(s)).clinicians).toBe(6);
+  });
+  it('judge-f4 a count beside named care or a specialist plural reads as before', () => {
+    expect(priced('saw 4 specialists')).toEqual([['cms-99204', 4]]);
+    expect(priced('took her to the pediatrician six times').map(([, n]) => n).reduce((a, b) => a + b, 0)).toBe(6);
+  });
+  it('judge-f5 "rheumatologist twice" is one first visit and one return visit, by the CMS new-patient rule', () => {
+    expect(priced('saw the rheumatologist twice')).toEqual([['cms-99204', 1], ['cms-99214', 1]]);
+  });
+  it('judge-f6 the demo sentence total is unchanged, $1,204.20 by rules', () => {
+    const s = 'saw my regular doctor three times, then a cardiologist, the heart ultrasound thing, then they put electrodes on my legs and shocked the nerves, then the ER once when my heart was racing';
+    const total = read(s).reduce((a, x) => a + (x.result.item?.valueUsd ?? 0) * x.times, 0);
+    expect(Math.round(total * 100) / 100).toBe(1204.2);
+  });
+});

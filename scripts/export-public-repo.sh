@@ -97,6 +97,7 @@ rsync -a \
   --exclude 'WORK-ORDERS' \
   --exclude '.wrangler' \
   --exclude 'cf/.dev.vars' \
+  --exclude 'data/lived-experience-text' \
   --exclude 'cf/.dev.vars.*' \
   --exclude '.dev.vars' \
   --exclude '.dev.vars.*' \

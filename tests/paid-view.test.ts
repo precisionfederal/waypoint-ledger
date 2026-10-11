@@ -167,7 +167,8 @@ describe('with no paid amount the ledger and the sheet are exactly round 4', () 
   it('the ledger markup is byte-for-byte the same, apart from the one foot link', () => {
     const now = renderWith(Ledger, fakeStore(demoEntries()));
     expect(now.split(FOOT_LINK).length).toBe(2);
-    expect(now.replace(FOOT_LINK, '')).toBe(before);
+    // FINAL-1011 face: the hospital range under each row's figure is new, and the only other addition.
+    expect(now.replace(FOOT_LINK, '').replace(/<button type="button" class="[^"]*" data-private-face="[^"]*"[^>]*>.*?<\/button>/g, '')).toBe(before);
   });
 
   it('no paid column, card, strip or form is rendered', () => {

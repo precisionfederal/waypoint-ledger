@@ -298,11 +298,17 @@ def main():
     with open(os.path.join(APP, 'data', 'private-rates-client.json'), 'w') as f:
         json.dump(packed, f, separators=(',', ':'))
 
-    # 2c. data/private-rates-lines.json: hospitals behind each billing group, per ledger
-    #     line, and nothing else. lib/fit.ts names the count on every page's first load;
-    #     the rates (2b) load only with a line's drawer. lib/private-rate-lines.ts reads it.
-    line_counts = {'_format': 'scripts/payer/build_private_rates.py, step 2c: hospitals behind each billing group, per ledger line, from private-rates-client.json. lib/private-rate-lines.ts reads it so the fit sentence can name the count without the rates in the first-load bundle.',
-                   'lines': {line_id: {g[0]: len(sp['byHospital']) for g, sp in summary['codes'][c]['groups'].items()}
+    # 2c. data/private-rates-lines.json: per ledger line, the hospitals behind each billing
+    #     group and, for the doctor's and hospital's fee groups, that group's lowest and
+    #     highest rate (the same low and high the drawer's range prints), and nothing else.
+    #     lib/fit.ts names the count and the ledger row names the range on first load; the
+    #     rates (2b) load only with a line's drawer. lib/private-rate-lines.ts reads it.
+    #     The not-stated group is a count only: its dollars never render (lib/private-rates.ts).
+    def face_entry(g, sp):
+        n_h = len(sp['byHospital'])
+        return n_h if g == 'not_stated' else [n_h, sp['low'], sp['high']]
+    line_counts = {'_format': 'scripts/payer/build_private_rates.py, step 2c: per ledger line, p and f = [hospitals, lowest rate, highest rate] of that billing group, n = hospitals only, from private-rates-client.json. lib/private-rate-lines.ts reads it so the fit sentence and the ledger row can name the count and range without the rates in the first-load bundle.',
+                   'lines': {line_id: {g[0]: face_entry(g, sp) for g, sp in summary['codes'][c]['groups'].items()}
                              for line_id, c in packed['lines'].items()}}
     with open(os.path.join(APP, 'data', 'private-rates-lines.json'), 'w') as f:
         json.dump(line_counts, f, separators=(',', ':'))
