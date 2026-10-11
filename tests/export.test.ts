@@ -117,29 +117,32 @@ describe('exportRows — the published column order', () => {
   });
 
   it('gap', () => {
-    const csv = exportRows('gap', [{ receivedAt: '2026-09-09T00:00:00.000Z', counts: { dismissed: 3, 'care-denied': 1 }, ranking: ['dismissed', 'care-denied'], note: 'private text', tableVersion: 'v' }]) as string;
-    expect(header(csv)).toEqual(['received_at', 'care-not-sought', 'care-denied', 'dismissed', 'wrong-track', 'time-searching', 'life-lost', 'rank_1', 'rank_2', 'rank_3', 'rank_4', 'rank_5', 'rank_6', 'table_version', 'row_hash']);
-    expect(rowsOf(csv)[0]).toBe('2026-09-09T00:00:00.000Z,,1,3,,,,dismissed,care-denied,,,,,v,');
+    const csv = exportRows('gap', [{ receivedAt: '2026-09-09T14:03:27.512Z', counts: { dismissed: 3, 'care-denied': 1 }, ranking: ['dismissed', 'care-denied'], note: 'private text', context: { ageBand: '45–64', region: 'South' }, tableVersion: 'v', prevHash: '0'.repeat(64), rowHash: 'a'.repeat(64) }]) as string;
+    /* 2026-10-01: the day, never the time, and prev_hash beside row_hash so the links can be checked row by row. */
+    expect(header(csv)).toEqual(['received_on', 'care-not-sought', 'care-denied', 'dismissed', 'wrong-track', 'time-searching', 'life-lost', 'care-made-worse', 'rank_1', 'rank_2', 'rank_3', 'rank_4', 'rank_5', 'rank_6', 'rank_7', 'table_version', 'team_test', 'prev_hash', 'row_hash']);
+    expect(rowsOf(csv)[0]).toBe(`2026-09-09,,1,3,,,,,dismissed,care-denied,,,,,,v,false,${'0'.repeat(64)},${'a'.repeat(64)}`);
     expect(csv).not.toContain('private text');
+    expect(csv).not.toContain('14:03');
+    expect(csv).not.toMatch(/South|45–64/);
   });
 
   it('survey', () => {
-    const rec = validateSurvey({ ranking: ['time', 'oop', 'work', 'unpaid', 'forgone'], unasked: 'unpaid', lead: 'time', decide: 'patients', clinicians: 7, context: { age: '30–44', stage: 'Diagnosed' }, channel: 'demo', sentence: 'a sentence held back', surveyVersion: '2026-09-09.1' }).record;
-    const csv = exportRows('survey', [rec]) as string;
-    /* The context columns are whatever the instrument asks, in its order — the
-       header is asserted against CONTEXT_KEYS so adding a question to
-       lib/survey-def.js moves this file, and never breaks it. */
-    expect(header(csv)).toEqual(['received_at', 'channel', 'rank_1', 'rank_2', 'rank_3', 'rank_4', 'rank_5', 'unasked', 'lead', 'decide', 'clinicians', ...CONTEXT_KEYS.map((k: string) => 'ctx_' + k), 'survey_version', 'row_hash']);
+    const rec = validateSurvey({ ranking: ['time', 'oop', 'work', 'unpaid', 'forgone'], unasked: 'unpaid', lead: 'time', decide: 'patients', clinicians: 7, context: { age: '30–44', stage: 'Diagnosed', sex: 'Female', state: 'Georgia', insurance: 'Medicaid', region: 'South' }, channel: 'demo', sentence: 'a sentence held back' }).record;
+    const csv = exportRows('survey', [{ ...rec, prevHash: '0'.repeat(64), rowHash: 'b'.repeat(64) }]) as string;
+    /* 2026-10-01: one row per answer carrying every self-description could point at a
+       person (R3-advocate A1, R3-parent PAR-04). No ctx_ column is exported; the
+       self-description is published only as counts at /api/survey, suppressed under 11. */
+    expect(header(csv)).toEqual(['received_on', 'channel', 'rank_1', 'rank_2', 'rank_3', 'rank_4', 'rank_5', 'unasked', 'lead', 'decide', 'clinicians', 'survey_version', 'team_test', 'prev_hash', 'row_hash']);
     const cols = header(csv);
     const cells = rowsOf(csv)[0].split(',');
-    const at = (name: string) => cells[cols.indexOf(name)];
+    expect(cells[0]).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(cells.slice(1, 11)).toEqual(['demo', 'time', 'oop', 'work', 'unpaid', 'forgone', 'unpaid', 'time', 'patients', '7']);
-    expect(at('ctx_age')).toBe('30–44');
-    expect(at('ctx_insurance')).toBe('');
-    expect(at('ctx_state')).toBe('');       // not stated in this row
-    expect(at('ctx_stage')).toBe('Diagnosed');
-    for (const k of CONTEXT_KEYS) expect(cols).toContain('ctx_' + k);
+    expect(cells[cols.indexOf('prev_hash')]).toBe('0'.repeat(64));
+    expect(cells[cols.indexOf('row_hash')]).toBe('b'.repeat(64));
+    for (const k of CONTEXT_KEYS) expect(cols).not.toContain('ctx_' + k);
+    for (const v of ['30–44', 'Diagnosed', 'Female', 'Georgia', 'Medicaid', 'South']) expect(csv).not.toContain(v);
     expect(csv).not.toContain('a sentence held back');
+    expect(csv).not.toMatch(/T\d{2}:\d{2}/);
   });
 
   it('refuses a kind that is not published', () => {

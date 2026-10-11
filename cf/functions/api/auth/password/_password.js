@@ -103,7 +103,7 @@ export function passwordProblem(pw, email) {
   if (pw.trim() !== pw) return 'A password cannot start or end with a space.';
   if (/^(.)\1+$/.test(pw)) return 'That is one character repeated. Choose something else.';
   if (new Set(pw.toLowerCase()).size < 4) return 'That is the same few characters over and over. Choose something else.';
-  if (isRun(pw.toLowerCase())) return 'That is a straight run along the keyboard — “1234567890” and “qwertyuiop” are guessed before anything else. Choose another.';
+  if (isRun(pw.toLowerCase())) return 'That is a straight run along the keyboard: “1234567890” and “qwertyuiop” are guessed before anything else. Choose another.';
   const forms = passwordForms(pw);
   if (forms.some((f) => COMMON.has(f))) return 'That is one of the most common passwords on the internet, so it is one of the first ones guessed. Choose another.';
   if (email && forms.includes(String(email).split('@')[0].toLowerCase())) return 'That is your email address. Choose something else.';

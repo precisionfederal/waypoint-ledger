@@ -286,8 +286,10 @@ def discover(code: str) -> dict | None:
 # stays omitted with its reason. It never invents a link.
 # ---------------------------------------------------------------------------
 
-NODE = os.environ.get("PF_NODE") or shutil.which("node") or "/Users/bo/.nvm/versions/node/v25.3.0/bin/node"
-PLAYWRIGHT = os.environ.get("PF_PLAYWRIGHT") or "/Users/bo/.nvm/versions/node/v25.3.0/lib/node_modules/playwright/index.mjs"
+NODE = os.environ.get("PF_NODE") or shutil.which("node") or ""
+# PF_PLAYWRIGHT: the path to playwright/index.mjs (a global install is not on the
+# import path of a temporary script, so it must be named). Unset, the stage is skipped.
+PLAYWRIGHT = os.environ.get("PF_PLAYWRIGHT") or ""
 CHROME = os.environ.get("PF_CHROME") or "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 
 BROWSER_JS = """
@@ -315,6 +317,9 @@ await b.close();
 
 def browser_pages(urls: list[str]) -> dict[str, dict]:
     """{url: {status, title, final, text}} as Chrome rendered it. Never raises."""
+    if urls and not PLAYWRIGHT:
+        print("verify_medicaid_links: PF_PLAYWRIGHT is not set (the path to playwright/index.mjs); "
+              "the browser stage is skipped", file=sys.stderr)
     if not urls or not os.path.exists(NODE) or not os.path.exists(PLAYWRIGHT) or not os.path.exists(CHROME):
         return {}
     js = BROWSER_JS % {"pw": json.dumps(PLAYWRIGHT), "chrome": json.dumps(CHROME)}

@@ -1,0 +1,267 @@
+/* ==========================================================================
+   FLOW-FIX core (2026-09-30 night, after the presentation): the rules for the
+   controls this round added, and the overrides its findings asked for. Kept in
+   its own file so globals.css and product.css stay as they are. Tokens only.
+   ========================================================================== */
+
+/* ---- ledger line controls (patient-10) ---------------------------------- */
+.core-step{display:inline-flex;align-items:center;gap:.15rem;white-space:nowrap}
+.core-step button{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;width:2.75rem;min-width:2.75rem;height:2.75rem;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;padding:0}
+.core-step button:hover:not(:disabled){border-color:var(--brand-3);color:var(--brand-3)}
+.core-step button:disabled{opacity:.4;cursor:default}
+.core-step button:focus-visible{outline:2px solid var(--brand-3);outline-offset:2px}
+.core-step button svg{width:14px;height:14px}
+.core-step-n{min-width:1.6rem;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+/* patient2-11: 44 px at every width, and Remove sits beside the count in its
+   own place, never inside the words the person typed. */
+.core-remove{font-size:.85rem;color:var(--ink-3);text-decoration:underline;text-underline-offset:2px;display:inline-flex;align-items:center;min-height:44px;padding:0 .4rem}
+.core-times{display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:.25rem .5rem}
+.core-remove:hover{color:var(--flag-ink,var(--flag))}
+@media (max-width:720px){
+  /* JUDGE-4 #9: the count sits in its own column beside Figure and Line total
+     (the card rule is at the end of this file): the label above the two 44 px
+     buttons, Remove under them, so the column is as wide as the stepper. */
+  .ledger-table tr:not(.grp) td.r:has(.core-times){flex-direction:column;align-items:flex-start;gap:0}
+  .core-times{display:grid;justify-items:start;justify-content:start;gap:0}
+  .core-times .core-remove{padding:0}
+}
+
+/* ---- 44 px targets the audit measured under it (judge-18, access-12) ----- */
+/* The drawn circle stays 22 px; the summary itself is now the 44 px target, so
+   a measurement of the element (not only its ::after) finds 44. */
+.fp>summary{width:44px;height:44px;margin:-11px;border:0;background:none;border-radius:50%}
+.fp>summary>span{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink-3)}
+.fp>summary:hover,.fp[open]>summary{background:none;color:var(--ink-3);border-color:transparent}
+.fp>summary:hover>span,.fp[open]>summary>span{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.core-hit{display:inline-flex;align-items:center;min-height:44px;padding:0 .35rem}
+@media (max-width:720px){
+  .cgw-rank a,.ledger-figs a,.ledger .table-cap a{display:inline-flex;align-items:center;min-height:44px}
+  /* judge-18 (round 2): the text links left inside running sentences on the
+     phone ledger ("See the running count.", the stat and card links). Block
+     padding grows the tap area to 44 px without breaking the sentence. */
+  .ledger p a,.ledger .act-card a,.ledger .stat a{padding-block:13px;margin-block:-13px;display:inline-block;line-height:18px}
+}
+
+/* ---- the ledger head (patient-14, contrib-15) ---------------------------- */
+.core-save-top{margin:.6rem 0 0}
+.core-export-help{margin:.1rem 0 .2rem;color:var(--ink-3)}
+
+/* ---- home (patient-8, patient-12, judge-6, contrib-11) ------------------- */
+.core-have{margin:0 0 .6rem;padding:.55rem .9rem;border-radius:var(--r-md);background:var(--brand-soft);color:var(--brand-ink);font-size:.95rem;line-height:1.35;border:1px solid var(--line-2)}
+.core-have a{font-weight:700;color:inherit;text-decoration:underline;text-underline-offset:2px}
+.core-help{margin:.75rem 0 0;font-size:.95rem;color:var(--ink-3)}
+.core-help a,.core-scale a{font-weight:600;color:var(--brand-3)}
+.core-scale{margin:var(--sp-5) 0 var(--sp-3);font-size:.95rem;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:.25rem .35rem;align-items:center}
+@media (max-width:720px){
+  .core-help a,.core-scale a,.core-have a{display:inline-flex;align-items:center;min-height:44px}
+}
+/* patient-12: on a phone the first screen had prices that were not hers and no
+   button. The person's own next move comes first, the example after it. */
+@media (max-width:600px){
+  .hero-live .hl-card{display:flex;flex-direction:column}
+  .hero-live .hl-card>.hl-foot.is-empty{order:3}
+  .hero-live .hl-card>.hl-sample{order:4;margin-top:.75rem}
+}
+
+/* ---- the reader is still reading (access-9) ------------------------------ */
+.lp-reading{margin:.35rem 0 0;color:var(--ink-3);font-style:italic}
+.lp-reading:empty{margin:0}
+.lp-chips[aria-busy="true"] .lp-chip.is-blank{opacity:.75}
+
+/* ---- 400 % zoom: the box you type in stays visible (access-6) ------------ */
+@media (max-width:900px) and (max-height:500px){
+  .hero-live .hl-foot:not(.is-empty){position:static;box-shadow:none}
+  header.site{position:relative}
+}
+
+/* ---- the drawer's "+ Show the source": the plus is not read aloud (access-14) */
+.drawer-more>summary::before{content:"+ " / ""}
+.drawer-more[open]>summary::before{content:"\2013  " / ""}
+
+/* ---- the box has a focus you can see at 200 % (access-15) ---------------- */
+textarea:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 0 0 4px color-mix(in srgb,var(--accent) 45%,transparent)}
+
+/* ---- a heading that took focus on arrival shows no ring to a mouse (access-2) */
+main h1[tabindex="-1"]:focus{outline:none}
+/* POLISH judge2-4: Chromium calls script focus on a fresh page "visible", so the
+   global :focus-visible ring (globals.css) and this outline both showed to a
+   mouse user. The ring now waits for the keyboard mark Shell sets on <html>. */
+main h1[tabindex="-1"]:focus-visible{outline:none;box-shadow:none}
+html[data-kbd] main h1[tabindex="-1"]:focus-visible{outline:2px solid var(--brand-3);outline-offset:4px}
+
+/* ---- FLOW round 2: the phone ledger's first screen (patient2-9) ---------- */
+@media (max-width:720px){
+  .ledger-figs .core-allcited{display:block;flex-basis:100%;grid-column:1/-1;line-height:1.35;font-size:.95rem}
+  .ledger-figs .core-allcited>span{display:inline;font-size:.95rem;line-height:1.35;font-weight:600;color:var(--ink-2);letter-spacing:0;text-transform:none}
+  .ledger-figs .core-allcited>span:first-child::after{content:" "}
+  .ledger-figs .core-allcited>span:empty{display:none}
+}
+/* FLOW4 flow4-11 (the core.css half; fix-flow4 took the months band, b3f3d839b4):
+   on a phone "Every visit and test carries a published federal figure" moves
+   into the (i) beside the line count (TotalReveal allCited), so the first ledger
+   line comes up the height of the sentence and its band sooner. Above 720 px
+   the sentence stays where it was and the (i) does not repeat it. A band left
+   with nothing to show is not drawn at all (its rule and padding go with it). */
+.core-allcited-fp{display:none}
+@media (max-width:720px){
+  .ledger-top>.ledger-figs>.core-allcited.core-allcited{display:none}
+  .core-allcited-fp{display:block}
+  .ledger-figs:not(:has(> :not(.core-allcited))){display:none}
+  /* and the space between the total's card and the table tightens to match */
+  .ledger-top.ledger-top{margin-bottom:.5rem;padding-bottom:.6rem}
+  .table-card>.table-cap.table-cap{padding-top:.5rem}
+}
+@media (max-width:479.98px){
+  /* the months band is hidden here too (Ledger.module.css .phoneDup) */
+  .ledger-figs:not(:has(> :not(.core-allcited):not([class*="phoneDup"]))){display:none}
+}
+
+/* patient2-6: the reader's cue in the sticky So far bar */
+.core-bar-reading{display:block;margin-top:.15rem;font-style:italic;color:var(--ink-3);font-weight:400}
+
+/* critic-16: on a phone the three step pictures were three 152 px boxes */
+@media (max-width:560px){ .how-img{height:7rem} }
+
+/* judge panel #6: the length of the search beside the total */
+.core-searched{margin:.1rem 0 .35rem;font-family:var(--font-d);font-weight:700;font-size:1.15rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.sheet-searched{margin:.15rem 0 0;font-weight:700;font-size:1rem}
+
+/* judge panel #9 */
+.core-child-basis{margin:.35rem 0 0;color:var(--ink-2);max-width:60ch}
+/* patient2-9: the parent's note folds to one line; More opens the rest */
+.core-child-fold>summary{display:flex;align-items:center;gap:.5rem;min-height:44px;cursor:pointer;list-style:none}
+.core-child-fold>summary::-webkit-details-marker{display:none}
+.core-more{color:var(--accent-ink);font-weight:600;text-decoration:underline;text-underline-offset:2px;white-space:nowrap}
+.core-child-fold[open] .core-more{display:none}
+.core-child-fold>p{margin:.1rem 0 .35rem}
+/* patient2-9: on a phone the counts read as one line each, and the table's caption
+   keeps only its instruction (the "kept in this browser" note is under the table too) */
+@media (max-width:720px){
+  .ledger-top>.ledger-figs{grid-template-columns:1fr;margin-top:.5rem;padding-top:.6rem;gap:.3rem}
+  .ledger-top>.ledger-figs>*{display:block}
+  .ledger-top>.ledger-figs>*>*{display:inline;margin-right:.35rem}
+  .core-cap-keep{display:none}
+}
+
+/* patient2-10 */
+.core-return-note{flex-basis:100%;margin:.15rem 0 0;color:var(--ink-3);text-align:left;white-space:normal;max-width:22ch}
+@media (max-width:720px){.core-return-note{max-width:none}}
+
+/* ---- POLISH judge2-3: a dollar figure is one word on every phone --------
+   JUDGE-2 #3 saw "$1,089.0 / 8" (Where the cost sits), "$1,089. / 08" (the
+   /journey line) and a "b-l-a-n-k" chip at 320 and 390. The cause is the
+   large-text rule `.card{overflow-wrap:anywhere}` (globals.css, max-width:900px):
+   it lets a flex or grid item shrink to one character. Every amount is now one
+   unbreakable word, and the LABEL beside it wraps instead. */
+.money,.bar-v,.j-amt,.chip b,.hl-total b,.mb-total,.big-num,.mid-num,
+.ledger-table td.r strong,.ledger-table td.r b,.blank{white-space:nowrap;overflow-wrap:normal;word-break:normal;font-variant-numeric:tabular-nums}
+.chip b,.j-amt,.bar-v,.blank{flex:0 0 auto}
+.bar-l{min-width:0}
+@media (max-width:560px){
+  /* the label column takes what is left; the amount column is as wide as the amount */
+  .bar-row{grid-template-columns:minmax(0,1fr) auto}
+}
+@media (max-width:720px){
+  /* the phone ledger card (its layout is the JUDGE-4 #9 block at the end of
+     this file): the labels never wrap, and neither do the thumbs */
+  .ledger-table td.r::before{flex:0 0 auto;white-space:nowrap}
+  .ledger-table .thumbs{flex-wrap:wrap}
+  .ledger-table .thumb{white-space:nowrap;overflow-wrap:normal}
+}
+@media (max-width:640px){
+  /* /journey: the count, the amount and Remove wrap as whole pieces; the
+     unit picker never pushes the page sideways (WebKit sizes a select to its
+     longest option) */
+  .j-side{flex-wrap:wrap;row-gap:.5rem;min-width:0}
+  .j-map{width:100%}
+}
+
+/* ---- POLISH judge2-13: a blank line reads in three short pieces ---------- */
+.unpriced li.up-row{display:block}
+.up-head{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem .75rem}
+.up-head .li-name{margin:0;font-size:1.05rem}
+.up-lead{margin:.35rem 0 .6rem;font-size:1rem;line-height:1.5;color:var(--ink-2);max-width:60ch}
+.up-act{margin:0 0 .5rem}
+.up-why>summary{cursor:pointer;min-height:44px;display:inline-flex;align-items:center;color:var(--ink-3);font-size:.95rem;font-weight:600}
+.up-why>summary:focus-visible{outline:2px solid var(--brand-3);outline-offset:2px}
+.up-why .li-sub{max-width:60ch;margin:.25rem 0 .5rem}
+.up-why>summary{list-style:none;color:var(--brand-ink,var(--ink-2))}
+.up-why>summary::-webkit-details-marker{display:none}
+.up-why>summary::before{content:"+" / "";display:inline-block;width:1.1em;font-weight:700;text-decoration:none}
+.up-why[open]>summary::before{content:"\2013" / ""}
+
+/* ---- POLISH critic-r2 new-1: the unit picker never widens a step card -----
+   WebKit lets a native select's longest option ("No federal figure matched:
+   choose one or leave unpriced", full CMS names) spill into its parents'
+   scroll width: a filled /journey measured 546 px on a 390 phone. Clipped at
+   every width; the column it sits in may shrink. */
+.j-map{max-width:min(34rem,100%);min-width:0;overflow:hidden;text-overflow:ellipsis}
+.journey li,.j-main{min-width:0}
+
+/* ---- POLISH critic-r2 new-10: "Or add one thing at a time" names wrap ------
+   A care name is never cut with an ellipsis; it wraps (two lines for the
+   longest CMS names at 20rem). */
+.chip span{white-space:normal;overflow:visible;text-overflow:clip;text-align:left;line-height:1.3}
+
+/* ---- POLISH critic-r2 new-12: no dead column beside Where the cost sits ----
+   At desktop the cost card stays in view while "Take it somewhere" scrolls
+   past it, instead of ending 280 px early above blank space. */
+@media (min-width:861px){
+  .ledger .two-col>.card:first-child{position:sticky;top:5.5rem}
+}
+
+/* flow3-3: a button that is done ("Added") keeps focus, so it is aria-disabled, never disabled */
+.btn[aria-disabled="true"]{opacity:.6;cursor:default}
+.btn[aria-disabled="true"]:hover{transform:none}
+
+/* flow3-17: her own words beside the length of the search, lighter than the figure */
+.core-searched-from{font-weight:400;font-size:.88em;color:var(--ink-2)}
+
+/* ---- JUDGE-4 #9: the phone ledger card, one row for the numbers ----------
+   Measured on the example ledger at 390: 9 lines made a 9,661 px page, every
+   card 435 to 497 px. Two causes: Times took a row of its own above Figure and
+   Line total, and product.css gives every cell .85rem 1.25rem of padding and a
+   rule under it, which globals.css's card ("td{border:0;padding:0}") meant to
+   remove. The card is now a wrapping row: the name and the thumbs take the
+   width, and Times, Figure and Line total sit side by side, each as wide as
+   its content. Where the three do not fit (a narrow phone, a long amount) the
+   next one moves to a line of its own, whole: a cell never shrinks below its
+   amount, and the amount never breaks (white-space:nowrap above). */
+@media (max-width:720px){
+  .ledger-table tr:not(.grp){display:flex;flex-wrap:wrap;align-items:flex-start;gap:.5rem .6rem}
+  .ledger-table tr:not(.grp) > td{flex:1 1 100%;min-width:0;padding:0;border-bottom:0}
+  .ledger-table tr:not(.grp) > td.r{flex:0 1 auto;min-width:auto}
+  .ledger-table tr:not(.grp) > td.r:has(.loc-range),
+  .ledger-table tr:not(.grp) > td.r:has(.core-return-note),
+  .ledger-table tr:not(.grp) > td.paid-cell{flex:1 1 100%}
+  .ledger-table tr:not(.grp) > td:first-child{margin-bottom:0}
+  .ledger-table tr:not(.grp) > td.verdict{margin-top:.25rem}
+}
+/* Under 384 px the three do not fit beside each other (stepper 118 px, the
+   widest example amount 83 px, measured): Times takes its own row, the label
+   beside the stepper and Remove (above them where the three do not fit, at
+   320), and Figure and Line total share the next one, half each. */
+@media (max-width:383px){
+  .ledger-table tr:not(.grp) > td.r{flex:1 1 0}
+  .ledger-table tr:not(.grp) > td.r:has(.core-times){flex:1 1 100%;flex-direction:row;flex-wrap:wrap;align-items:center;gap:0 .75rem}
+  .core-times{display:inline-flex;flex-wrap:nowrap;align-items:center;justify-content:flex-start;gap:.25rem .5rem}
+  .core-times .core-remove{padding:0 .4rem}
+}
+/* JUDGE-5 #10: Right and Wrong share a line with Remove. From 384 px the
+   stepper, Figure and Line total share a line and Remove sat under the
+   stepper on a line of its own, with Right and Wrong on the next (the example
+   ledger at 390: 8,479 px). Remove now sits at the card's bottom left, beside
+   the thumbs, which are always the card's last cell, so it stays beside them
+   however the cells above wrap. The thumbs cell keeps Remove's width free on
+   its left (the card padding is 1rem 1.1rem, product.css). Focus order is unchanged: the stepper, Remove, Right, Wrong.
+   Under 384 Remove is beside the stepper and there is no room beside it for
+   the thumbs (195 px), so that layout is unchanged. */
+@media (min-width:384px) and (max-width:720px){
+  .ledger-table tr:not(.grp):has(> td.verdict){position:relative}
+  .ledger-table tr:not(.grp):has(> td.verdict) .core-times .core-remove{position:absolute;left:1.1rem;bottom:1rem;width:3.75rem;padding:0}
+  .ledger-table tr:not(.grp) > td.verdict{min-height:44px;padding-left:4.35rem}
+  /* while "What did you actually pay?" is open the form takes the full width
+     and Remove goes back under the stepper */
+  .ledger-table tr:not(.grp):has(> td.verdict .paid-form) .core-times .core-remove{position:static}
+  .ledger-table tr:not(.grp) > td.verdict:has(.paid-form){padding-left:0}
+}

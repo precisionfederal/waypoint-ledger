@@ -27,7 +27,8 @@
    ========================================================================== */
 
 import { TABLE, rulesFor } from './table';
-import type { PriceItem } from './types';
+import type { JourneyEntry, PriceItem } from './types';
+import { MAX_WORKDAYS } from './workdays-said';
 
 export const WORKDAY_ROW_ID = 'bls2026q2-median-weekly-earnings';
 export const CARE_ROW_ID = 'bls2025-caregiver-replacement-wages';
@@ -57,7 +58,7 @@ export function money(n: number, showCents = true): string {
 const clamp = (n: number, max: number): number =>
   !Number.isFinite(n) || n <= 0 ? 0 : Math.min(Math.floor(n), max);
 
-export const MAX = { workdays: 3650, careHours: 20000, trips: 3650, dismissed: 500 } as const;
+export const MAX = { workdays: MAX_WORKDAYS, careHours: 20000, trips: 3650, dismissed: 500 } as const;
 
 export interface BurdenCounts {
   workdays: number;
@@ -202,7 +203,7 @@ export function priceCareHours(hoursIn: number, method: CareMethodId = 'home-hea
     arithmetic: rate === null || hours === 0 ? null
       : `${money(rate)} an hour × ${hours} ${hours === 1 ? 'hour' : 'hours'} = ${money(value ?? 0)} · ${chosen.label.toLowerCase()}`,
     method: `${chosen.question} The wage is the published BLS median for that occupation, times the hours you entered.`,
-    limit: 'BLS publishes the wage, and separately the hours, and has never published their product — it says putting a money value on unpaid household work is outside the scope of its work. So this is arithmetic over two federal inputs, shown as arithmetic, and never a federal statistic. It is also a wage, not a price: a family hiring through an agency pays more, and BLS does not publish that rate.',
+    limit: 'BLS publishes the wage, and separately the hours, and has never published their product. It says putting a money value on unpaid household work is outside the scope of its work. So this is arithmetic over two federal inputs, shown as arithmetic, and never a federal statistic. It is also a wage, not a price: a family hiring through an agency pays more, and BLS does not publish that rate.',
     source: { priceId: CARE_ROW_ID, title: row?.sourceTitle ?? null, url: row?.sourceUrl ?? null, year: row?.year ?? null, describes: row?.population ?? null },
     alternatives: opts.filter((m) => m.id !== chosen.id && m.hourlyUsd !== null).map((m) => ({
       id: m.id, label: m.label, valueUsd: cents((m.hourlyUsd as number) * hours), note: m.question,
@@ -229,7 +230,7 @@ export function countTrips(tripsIn: number): BurdenCard {
     limit: 'Miles, parking, fuel, a bus fare and a day of someone else driving are all real, and they differ so much by person that a single national figure would describe almost nobody.',
     source: { priceId: null, title: null, url: null, year: null, describes: null },
     alternatives: [],
-    noFigureReason: 'No published federal figure prices a trip to care, so this column stays blank rather than get filled with an estimate. The table does carry the federal mileage rate — GSA, $0.76 a mile from 1 July 2026 — which reimburses federal travellers for a mile driven on official business. It is an input you can apply to your own miles, it is not a medical price, and nothing here adds it for you.',
+    noFigureReason: 'No published federal figure prices a trip to care, so this column stays blank rather than get filled with an estimate. The table does carry the federal mileage rate (GSA, $0.76 a mile from 1 July 2026), which reimburses federal travellers for a mile driven on official business. It is an input you can apply to your own miles, it is not a medical price, and nothing here adds it for you.',
   };
 }
 
@@ -297,10 +298,80 @@ export function loadBurdens(): BurdenCounts {
   } catch { return { ...EMPTY_BURDENS }; }
 }
 
+/** Sent on window each time the counts are saved, so the ledger's own count follows the cards. */
+export const BURDENS_EVENT = 'waypoint-ledger:burdens';
+
 export function saveBurdens(c: BurdenCounts): void {
   if (typeof localStorage === 'undefined') return;
   try {
     if (burdensEntered(c) === 0 && c.ownWeeklyPayUsd === null) localStorage.removeItem(BURDENS_KEY);
     else localStorage.setItem(BURDENS_KEY, JSON.stringify(c));
   } catch { /* a browser with storage disabled still works, it just forgets */ }
+  try { window.dispatchEvent(new Event(BURDENS_EVENT)); } catch { /* no window: nothing listens */ }
+}
+
+/* ==========================================================================
+   JUDGE-7 #4: A COST THE CARD PRICES IS NOT ALSO "LEFT BLANK".
+   "I missed 30 days of work" filled the workdays card ($7,506.00 at the
+   published median), and the same ledger still listed "Days of work you
+   missed" under "Real costs with no defensible federal figure" and counted it
+   under "Without a federal figure". While a card holds a count AND a figure
+   (days at the median or her own pay; hours at a chosen rate), its named cost
+   leaves that list and that count. A card with a count and no figure (her own
+   pay chosen and not typed) keeps the cost named, as blank. The ledger and the
+   sheet both take the list from here.
+   ========================================================================== */
+/** The named, unpriced cost each card can price. */
+export const CARD_PRICES: Readonly<Record<string, BurdenKind>> = { 'lost-work': 'workdays', 'caregiver-time': 'care-hours' };
+
+/** The named costs still with no figure, once the cards that price them have. */
+export function stillUnpriced(hits: readonly string[], c: BurdenCounts): string[] {
+  const priced = new Set(burdenCards(c).filter((k) => k.count > 0 && k.valueUsd !== null).map((k) => k.kind));
+  return hits.filter((id) => !(CARD_PRICES[id] && priced.has(CARD_PRICES[id])));
+}
+
+/* ==========================================================================
+   🔴 "I MISSED 3 WEEKS OF WORK" REACHES THE WORKDAYS CARD (round 2, c1).
+   The sentence landed on "Days of work you missed" and the workdays counter
+   stayed at 0. The days a person said (lib/mapper.ts workdaysSaid: weeks are
+   five workdays, the same five this file divides weekly pay by) are kept in
+   this browser and fill the card ONLY while it is still 0: a number the person
+   typed on the card is never overwritten. The card says where the number came
+   from, and it can be changed like any other count.
+   ========================================================================== */
+/* The key, the type and the read and write live in lib/workdays-said.ts, which
+   lib/store.tsx imports on every page without pulling this file into first load. */
+export { WORKDAYS_SAID_KEY, readWorkdaysSaid, noteWorkdaysSaid, type WorkdaysSaid } from './workdays-said';
+import { readWorkdaysSaid, type WorkdaysSaid } from './workdays-said';
+
+/** The days said, summed and clamped. */
+export const workdaysFromWords = (list: readonly WorkdaysSaid[]): number =>
+  Math.min(MAX.workdays, list.reduce((a, w) => a + w.days, 0));
+
+/** The saved counts, with the workdays card filled from her words when it is still 0. */
+export function loadBurdensWithWords(): BurdenCounts {
+  const c = loadBurdens();
+  if (c.workdays > 0) return c;
+  const days = workdaysFromWords(readWorkdaysSaid());
+  if (!days) return c;
+  const filled = { ...c, workdays: days };
+  saveBurdens(filled);
+  return filled;
+}
+
+/* ==========================================================================
+   🔴 flow3-5: SHE SAID THE NUMBER ONCE. "told it was anxiety by 3 diffrent
+   doctors" became a ledger line counted three times, never priced, while the
+   "Times you were told it was nothing" card opened at 0 and asked her again.
+   The count the ledger already read from her words (lines in the dismissed
+   gap category, their times) fills that card the way her missed days fill the
+   workdays card: only while the card is still 0, saying where the number came
+   from, changeable like any count, and never sent until she presses Add.
+   ========================================================================== */
+export interface DismissalSaid { raw: string; n: number }
+export function dismissalsFromEntries(entries: readonly JourneyEntry[]): { said: DismissalSaid[]; total: number } {
+  const said = entries
+    .filter((e) => e.gapCategory === DISMISSED_CATEGORY && !e.item && e.times > 0)
+    .map((e) => ({ raw: e.raw.trim(), n: Math.floor(e.times) }));
+  return { said, total: Math.min(MAX.dismissed, said.reduce((a, d) => a + d.n, 0)) };
 }

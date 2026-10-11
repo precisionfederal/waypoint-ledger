@@ -1,0 +1,58 @@
+/* The register's explanations as shapes (VISUAL-4b register). Tokens only. */
+
+.lead { margin: 0 0 .7rem; max-width: 66ch; font-size: 1rem; line-height: 1.5; color: var(--ink); font-weight: 500; }
+
+/* labelled single lines: the label in a column of its own, a hairline between facts */
+.lines { margin: .35rem 0 .9rem; padding: 0; max-width: 54rem; border-top: 1px solid var(--line-2); }
+.line { display: grid; grid-template-columns: 10rem minmax(0, 1fr); gap: .1rem 1.1rem; padding: .55rem 0; border-bottom: 1px solid var(--line-2); }
+.line dt { margin: 0; font-size: .9375rem; line-height: 1.5; font-weight: 600; color: var(--ink); }
+.line dd { margin: 0; font-size: .9375rem; line-height: 1.5; color: var(--ink-2); min-width: 0; overflow-wrap: anywhere; }
+.line dd a { font-weight: 600; }
+/* every block measures the column it sits in, not the window: the same lines
+   read in a full-width fold, a half-width card and the hero's narrow column */
+.cq { container-type: inline-size; min-width: 0; }
+@container (max-width: 34rem) {
+  .line { grid-template-columns: 1fr; gap: .1rem; padding: .55rem 0; }
+}
+/* inline: the label opens the line, for a narrow card */
+.inline { border-top: 0; margin: .25rem 0 0; }
+.inline .line { display: block; padding: .4rem 0; }
+.inline .line:last-child { border-bottom: 0; padding-bottom: 0; }
+.inline dt, .inline dd { display: inline; }
+.inline dt::after { content: ':'; margin-right: .3rem; }
+
+/* a step strip: left to right with an arrow between, top to bottom on a phone */
+.steps { list-style: none; margin: .5rem 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(var(--n, 3), minmax(0, 1fr)); gap: 1rem; max-width: 60rem; }
+.step { position: relative; display: flex; gap: .75rem; align-items: flex-start; padding: .85rem 1rem .9rem; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-md); box-shadow: var(--sh-1); min-width: 0; }
+.step + .step::before { content: ''; position: absolute; left: -.72rem; top: 50%; width: .45rem; height: .45rem; border-top: 1.5px solid var(--ink-3); border-right: 1.5px solid var(--ink-3); transform: translateY(-50%) rotate(45deg); }
+.num { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: .9375rem; }
+.num svg { width: 20px; height: 20px; }
+.stepText { display: flex; flex-direction: column; gap: .1rem; min-width: 0; }
+.stepText b { font-size: .9375rem; line-height: 1.4; color: var(--ink); font-weight: 600; }
+.stepText > span { font-size: .9375rem; line-height: 1.45; color: var(--ink-2); }
+@container (max-width: 40rem) {
+  .steps { grid-template-columns: 1fr; gap: .9rem; }
+  .step { align-items: center; padding: .7rem .9rem; }
+  .step + .step::before { left: 1.95rem; top: -.68rem; transform: rotate(135deg); }
+}
+
+/* what a file records, beside what it leaves out */
+.contrast { list-style: none; margin: .5rem 0 1rem; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; max-width: 54rem; }
+.contrast li { display: flex; gap: .75rem; align-items: flex-start; padding: .85rem 1rem; border-radius: var(--r-md); min-width: 0; }
+.contrast li > span:last-child { display: flex; flex-direction: column; gap: .15rem; min-width: 0; }
+.contrast b { font-size: .9375rem; color: var(--ink); font-weight: 600; }
+.contrast li > span:last-child > span { font-size: .9375rem; line-height: 1.45; color: var(--ink-2); }
+.cIn { background: var(--surface); border: 1px solid var(--line-2); box-shadow: var(--sh-1); }
+.cOut { background: transparent; border: 1.5px dashed var(--line); }
+.cIc { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 2.25rem; height: 2.25rem; border-radius: 50%; background: var(--accent-soft); color: var(--accent-ink); }
+.cOut .cIc { background: var(--ground-2); color: var(--ink-3); }
+@media (max-width: 600px) { .contrast { grid-template-columns: 1fr; } }
+
+/* what the method never does */
+.nevers { list-style: none; margin: .4rem 0 .9rem; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.nevers li { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .85rem .3rem .6rem; border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface); color: var(--ink-2); font-size: .9375rem; line-height: 1.4; }
+.nevers svg { flex: none; color: var(--accent-ink); }
+
+/* an inline link inside a line keeps its place in the sentence; on a phone its
+   hit area grows to a thumb, as the register's running-text links already do */
+@media (max-width: 720px) { .line dd a:not([class]) { padding-block: .8rem; } }

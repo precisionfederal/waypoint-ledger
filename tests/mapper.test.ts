@@ -10,9 +10,12 @@ import { describe, it, expect } from 'vitest';
 import {
   parseJourney, splitJourney, extractCount, mapUtterance, suggestions, SYMPTOM_REASON,
   gapSignalFor, gapPrefill, NOT_RECEIVED_REASON, DENIED_REASON, DURATION_REASON, DISMISSAL_REASON,
-  protectionsFor, clinicianMentions, NO_SECOND_VISIT_REASON,
-  type GapCategory,
+  protectionsFor, clinicianMentions, NO_SECOND_VISIT_REASON, NOT_YOURS_OR_NOT_YET_REASON,
+  NCS_COUNT_REASON, type GapCategory,
+  SUPPLEMENT_REASON, EQUIPMENT_REASON, LOST_WORK_REASON, INSURANCE_REASON, COURSE_REASON, NO_MATCH_REASON,
+  readOnPurpose, lostWorkPhrase,
 } from '../lib/mapper';
+import { mergeEntries, mergeToast } from '../lib/store';
 import gapData from '../data/invisible-events.json';
 import { SELECTABLE, TABLE, unknownSynonymIds } from '../lib/table';
 import { search } from '../lib/search';
@@ -37,21 +40,23 @@ const SENTENCES: [string, (string | null)[], number[]][] = [
   ['I saw a specialist once', ['cms-99204'], [1]],
   ['a couple of trips to the emergency room', ['cms-ed-99284-complete'], [2]],
   ['physical therapy 12 sessions', ['cms-pt-exercise-15'], [12]],
-  ['labs, then an EKG, then a CT scan', ['cms-lab-cbc', 'cms-test-ecg', 'cms-img-ct-chest-nc'], [1, 1, 1]],
+  // R4 2026-09-30 (fedexpert FX-08): a bare MRI or CT names no body part and stays unpriced by name; it was a guessed brain or chest scan.
+  ['labs, then an EKG, then a CT scan', ['cms-lab-cbc', 'cms-test-ecg', null], [1, 1, 1]],
+  ['labs, then an EKG, then a CT scan of my chest', ['cms-lab-cbc', 'cms-test-ecg', 'cms-img-ct-chest-nc'], [1, 1, 1]],
   ['x3 chest x-ray', ['cms-img-cxr'], [3]],
   ['the ER three times', ['cms-ed-99284-complete'], [3]],
 
   // 🔴 R1 bug: a duration ate the count and the line priced 10x low
-  ['I spent four years in circles: my family doctor ten times', [null, 'cms-99214'], [1, 10]],
+  ['I spent four years in circles: my family doctor ten times', [null, 'cms-99213'], [1, 10]],
   // 🔴 R1 bug: six months of PT read as two sessions
   ['physical therapy twice a week for six months', ['cms-pt-exercise-15'], [52]],
   ['weekly for six months of physical therapy', ['cms-pt-exercise-15'], [26]],
-  ['I saw my doctor every month for two years', ['cms-99214'], [24]],
+  ['I saw my doctor every month for two years', ['cms-99213'], [24]],
   ['PT twice a week for 12 weeks', ['cms-pt-exercise-15'], [24]],
   ['six months of weekly therapy', ['cms-mh-therapy-45'], [26]],
   ['quarterly bloodwork', ['cms-lab-cbc'], [4]],
   ['quarterly bloodwork for two years', ['cms-lab-cbc'], [8]],
-  ['a dozen appointments with my doctor', ['cms-99214'], [12]],
+  ['a dozen appointments with my doctor', ['cms-99213'], [12]],
   ['four or five visits to the ER', ['cms-ed-99284-complete'], [4]],
 
   // 🔴 R1 bug: the second unit of care vanished in silence
@@ -60,18 +65,21 @@ const SENTENCES: [string, (string | null)[], number[]][] = [
     ['cms-99204', 'cms-img-echo', 'cms-test-holter'], [1, 1, 1]],
   ['they scanned my heart and did bloodwork', ['cms-img-echo', 'cms-lab-cbc'], [1, 1]],
   ['blood work and an EKG', ['cms-lab-cbc', 'cms-test-ecg'], [1, 1]],
-  ['sleep study and an EEG', ['cms-test-sleep-study', 'cms-test-eeg'], [1, 1]],
+  ['sleep study and an EEG', ['cms-test-sleep-study', 'cms-test-eeg-awake-drowsy'], [1, 1]], // flow3-8: the EEG clause names no sleep
   ['endoscopy and a colonoscopy', ['cms-proc-egd-biopsy', 'cms-proc-colonoscopy'], [1, 1]],
-  ['urgent care twice and a CT scan', ['cms-99203', 'cms-img-ct-chest-nc'], [2, 1]],
+  ['urgent care twice and a CT scan', ['cms-99203', null], [2, 1]],
+  ['urgent care twice and a chest CT', ['cms-99203', 'cms-img-ct-chest-nc'], [2, 1]],
   ['saw a psychiatrist who said it was anxiety', ['cms-mh-psych-eval', null], [1, 1]],
   // one unit of care that happens to contain a joining word stays one line
-  ['MRI with and without contrast', ['cms-img-mri-brain-both'], [1]],
+  ['MRI with and without contrast', [null], [1]],
+  ['brain MRI with and without contrast', ['cms-img-mri-brain-both'], [1]],
   ['CT of my abdomen and pelvis', ['cms-img-ct-abd-pelvis-c'], [1]],
 
   // 🔴 R1 bug: a count word poisoned the match and offered a nonsense row
   ['two rheumatologists', ['cms-99204'], [2]],
-  ['three MRIs', ['cms-img-mri-brain-nc'], [3]],
-  ['two cardiologists and three MRIs', ['cms-99204', 'cms-img-mri-brain-nc'], [2, 3]],
+  ['three MRIs', [null], [3]],
+  ['three MRIs of my brain', ['cms-img-mri-brain-nc'], [3]],
+  ['two cardiologists and three MRIs of my brain', ['cms-99204', 'cms-img-mri-brain-nc'], [2, 3]],
 
   // 🔴 R1 bug: the most common first stop in any illness matched nothing
   ['urgent care', ['cms-99203'], [1]],
@@ -83,7 +91,8 @@ const SENTENCES: [string, (string | null)[], number[]][] = [
   ['telehealth appointment', ['cms-99213'], [1]],
   ['second opinion with a specialist', ['cms-99204'], [1]],
   ['referral visit', ['cms-99204'], [1]],
-  ['nerve test', ['cms-test-emg'], [1]],
+  // R4b (main session, NEVER INVENT SPECIFICITY): a nerve test with no number of nerves is the conduction study, unpriced by name.
+  ['nerve test', [null], [1]],
   ['tilt table test', ['cms-test-tilt-table'], [1]],
   ['sleep study', ['cms-test-sleep-study'], [1]],
 
@@ -139,7 +148,9 @@ describe('a symptom is not a unit of care', () => {
     });
   }
   it('still prices the care a symptom led to', () => {
-    expect(mapUtterance('MRI for brain fog', SELECTABLE).item?.id).toBe('cms-img-mri-brain-both');
+    // flow3-8: no contrast said, so the plain brain MRI (70551), marked worth a check
+    expect(mapUtterance('MRI for brain fog', SELECTABLE).item?.id).toBe('cms-img-mri-brain-nc');
+    expect(mapUtterance('MRI for brain fog', SELECTABLE).confidence).toBe('low');
     expect(mapUtterance('went to the emergency room with chest pain', SELECTABLE).item?.id).toBe('cms-ed-99284-complete');
   });
   it('reports an ordinary miss with the ordinary reason, not the symptom one', () => {
@@ -261,7 +272,9 @@ describe('the extra plain-language synonyms', () => {
     expect(clashes).toEqual([]);
   });
 
-  it('every added phrase maps back to its own row', () => {
+  // 30s: this walks every added phrase through the whole catalog, and the
+  // matcher now reads each candidate both ways round.
+  it('every added phrase maps back to its own row', { timeout: 30_000 }, () => {
     const misses: string[] = [];
     for (const [id, list] of Object.entries(syn)) {
       for (const p of list) {
@@ -443,7 +456,7 @@ describe('a length of time is not a unit of care', () => {
       ['six months of weekly therapy', 'cms-mh-therapy-45', 26],
       ['physical therapy twice a week for six months', 'cms-pt-exercise-15', 52],
       ['PT twice a week for 12 weeks', 'cms-pt-exercise-15', 24],
-      ['I saw my doctor every month for two years', 'cms-99214', 24],
+      ['I saw my doctor every month for two years', 'cms-99213', 24],
       ['quarterly bloodwork for two years', 'cms-lab-cbc', 8],
     ];
     for (const [story, id, n] of keep) {
@@ -455,7 +468,7 @@ describe('a length of time is not a unit of care', () => {
 
   it('a duration inside a longer story is counted where it belongs', () => {
     const segs = parseJourney('I spent four years in circles: my family doctor ten times', SELECTABLE);
-    expect(segs.map((x) => x.result.item?.id ?? null)).toEqual([null, 'cms-99214']);
+    expect(segs.map((x) => x.result.item?.id ?? null)).toEqual([null, 'cms-99213']);
     expect(segs[0].result.gapCategory).toBe('time-searching');
     expect(segs[0].result.months).toBe(48);
     expect(segs[1].result.gapCategory).toBeNull();
@@ -473,7 +486,8 @@ describe('being told it was nothing is counted beside the visit, not instead of 
     // Reproduced live: this priced one 99214 at $136 with no flag and counted
     // no dismissal, while the product asked the same question two pages later.
     const s = seg1('My GP kept telling me it was anxiety for three years');
-    expect(s.result.item?.id).toBe('cms-99214');
+    // R4 (brainfog BF-14): "my GP" is the regular doctor, the demo's own 99213 row.
+    expect(s.result.item?.id).toBe('cms-99213');
     expect(s.result.gapCategory).toBe('dismissed');
   });
 
@@ -583,7 +597,8 @@ describe('the gap guard never invents anything', () => {
   it('leaves a phrase that merely mentions a payer alone', () => {
     // "with and without contrast" contains a joining word and the word without.
     expect(gapSignalFor('MRI with and without contrast')).toBeNull();
-    expect(seg1('MRI with and without contrast').result.item?.id).toBe('cms-img-mri-brain-both');
+    // R4: the body part is what prices it (fedexpert FX-08).
+    expect(seg1('brain MRI with and without contrast').result.item?.id).toBe('cms-img-mri-brain-both');
   });
 });
 
@@ -639,19 +654,24 @@ describe('nothing the person typed is silently removed', () => {
     parseJourney(story, SELECTABLE).reduce((a, s) => a + (s.result.item?.valueUsd ?? 0) * s.times, 0);
 
   it('(a) a clinician and a procedure in one clause are both rows, never the test alone', () => {
-    const story = 'a rheumatologist ordered a nerve test';
+    const story = 'a rheumatologist ordered an EMG';
     // BEFORE: ['cms-test-emg'] alone, $99.87. AFTER: the visit leads, as it did in life.
     expect(ids(story)).toEqual(['cms-99204', 'cms-test-emg']);
     expect(times(story)).toEqual([1, 1]);
     expect(totalOf(story)).toBeCloseTo(priceOf('cms-99204') + priceOf('cms-test-emg'), 2);
+    // R4b: "a nerve test" names the conduction study with no number of nerves. It is
+    // still a row of its own beside the visit, unpriced by name, never swallowed by it.
+    const nerve = parseJourney('a rheumatologist ordered a nerve test', SELECTABLE);
+    expect(nerve.map((x) => x.result.item?.id ?? null)).toEqual(['cms-99204', null]);
+    expect(nerve[1].result.reason).toBe(NCS_COUNT_REASON);
   });
 
   it('(a) a referral chain is three rows: the PCP visit, the specialist visit and the scan', () => {
-    const story = 'my primary care doctor sent me to a neurologist who did an MRI';
-    // BEFORE: ['cms-99214', 'cms-img-mri-brain-nc'], $331.01 — the neurologist was dropped.
-    expect(ids(story)).toEqual(['cms-99214', 'cms-99204', 'cms-img-mri-brain-nc']);
+    const story = 'my primary care doctor sent me to a neurologist who did an MRI of my brain';
+    // BEFORE: ['cms-99214', 'cms-img-mri-brain-nc'], $331.01 — the neurologist was dropped. Round 2 judge-7: the plain primary-care visit is 99213, the level the words support.
+    expect(ids(story)).toEqual(['cms-99213', 'cms-99204', 'cms-img-mri-brain-nc']);
     expect(totalOf(story)).toBeCloseTo(
-      priceOf('cms-99214') + priceOf('cms-99204') + priceOf('cms-img-mri-brain-nc'), 2,
+      priceOf('cms-99213') + priceOf('cms-99204') + priceOf('cms-img-mri-brain-nc'), 2,
     );
   });
 
@@ -692,7 +712,7 @@ describe('nothing the person typed is silently removed', () => {
   });
 
   it('(c) weeks become months at 4.33 to the month, to one decimal', () => {
-    const segs = parseJourney('I waited six weeks for an MRI', SELECTABLE);
+    const segs = parseJourney('I waited six weeks for an MRI of my brain', SELECTABLE);
     const span = segs.find((x) => x.result.gapCategory === 'time-searching');
     expect(span?.result.months).toBe(1.4);
     expect(segs.some((x) => x.result.item?.id === 'cms-img-mri-brain-nc')).toBe(true);
@@ -714,7 +734,7 @@ describe('nothing the person typed is silently removed', () => {
     const segs = parseJourney(story, SELECTABLE);
     expect(segs.map((x) => x.result.item?.id ?? null)).toEqual(['cms-99204', null]);
     expect(segs[1].raw).toBe('rheumatologist');
-    expect(segs[1].result.reason).toBe(`rheumatologist — ${NO_SECOND_VISIT_REASON}`);
+    expect(segs[1].result.reason).toBe(`rheumatologist: ${NO_SECOND_VISIT_REASON}`);
     // Blank means blank: a named chip never carries a figure.
     expect(segs[1].result.item).toBeNull();
   });
@@ -752,5 +772,232 @@ describe('nothing the person typed is silently removed', () => {
     // 3 phrases read, 2 carrying a published figure — never "2 of 2".
     expect([segs.length, priced]).toEqual([3, 2]);
     expect(segs.every((x) => x.raw.trim().length > 0)).toBe(true);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   THE FOUR FAMILIES OF WRONG UNIT, 2026-09-10.
+
+   With gpt-5.5 as the reader, all 50 false positives left on the 209-sentence
+   eval (data/test-fixtures/READER-EVAL.md) were RULES answers — the model added
+   none, because it may only fill a phrase the rules left blank. Every sentence
+   below is quoted verbatim from that file. A wrong unit here is not a style
+   problem: it prints a published federal figure for care that never happened.
+   -------------------------------------------------------------------------- */
+const setOf = (story: string) => [...new Set(parseJourney(story, SELECTABLE).map((s) => s.result.item?.id).filter(Boolean))].sort();
+
+describe('1 — care that never happened, is planned, or was someone else\'s is never priced', () => {
+  const NOTHING: [string, string][] = [
+    ['my doctor suggested physical therapy and I never went', 'the refusal is in the other half of the sentence'],
+    ['they never ran the Lyme test even though I asked', 'a refusal said as a verb, not as one of the fixed phrases'],
+    ['no one ever ordered an EMG for me', 'nobody ever + a verb'],
+    ['I read online that a tilt table test might explain it', 'read about, not had'],
+    ['I want to ask about an EEG at my next appointment', 'still to come'],
+    ['the mammogram is booked for next month', 'booked, not had'],
+    ['my sister had an MRI and hers showed something', 'not this person'],
+  ];
+  for (const [story, why] of NOTHING) {
+    it(`prices nothing in "${story}" (${why})`, () => {
+      expect(setOf(story)).toEqual([]);
+    });
+  }
+
+  it('says why, in the person\'s terms, rather than going silent', () => {
+    const planned = parseJourney('the mammogram is booked for next month', SELECTABLE);
+    expect(planned[0].result.reason).toBe(NOT_YOURS_OR_NOT_YET_REASON);
+    // a refusal is still a counted gap, because the person did need the care
+    const refused = parseJourney('no one ever ordered an EMG for me', SELECTABLE);
+    expect(refused[0].result.gapCategory).toBe('care-not-sought');
+  });
+
+  it('still prices the care in a sentence that turns', () => {
+    expect(setOf('I put it off for a year and finally had the brain MRI')).toContain('cms-img-mri-brain-nc');
+  });
+});
+
+describe('2 — whole words, and the whole term', () => {
+  const CASES: [string, string[]][] = [
+    ['the magnesium came back low', ['cms-lab-magnesium']],
+    ['they dipped my urine and then looked at it under the microscope', ['cms-lab-urinalysis']],
+    ['they numbed my throat, put the scope down and pinched off a piece of tissue', ['cms-proc-egd-biopsy']],
+    ['a picture of my lungs with the flat plate against my back', ['cms-img-cxr']],
+    ['a nuclear stress test with the injection and the pictures', ['cms-img-nuclear-stress']],
+    ['the test for damage to the heart muscle came back normal', ['cms-lab-troponin']],
+    ['a bone density scan of my hips and spine', ['cms-img-dexa']],
+    ['sleap study at the hospital', ['cms-test-sleep-study']],
+    ['two hours in the waiting room before anybody called my name', []],
+    ['the hospital sent a second bill just for using their clinic room', ['cms-g0463-hospital-clinic-fee']],
+    ['family therapy with my husband in the room', ['cms-mh-family-therapy']],
+    ['they scanned my head in the tunnel with no dye at all', ['cms-img-mri-brain-nc']],
+    ['I was frightened it really was all in my head', []],
+    ['the brain fog got so bad I forgot my own address', []],
+    ['an hour with a psychologist doing memory and attention puzzles', ['cms-test-neuropsych-1h']],
+    ['a first hour with a physical therapist who measured everything I could do', ['cms-pt-eval-low']],
+    ['an hour long session with my therapist', ['cms-mh-therapy-60']],
+    ['thirty minutes with my therapist', ['cms-mh-therapy-30']],
+    ['physcial therapy for my neck twice a week', ['cms-pt-exercise-15']],
+    ['I filled in the little questionnaire about my mood in the waiting room', ['cms-96127']],
+  ];
+  for (const [story, expected] of CASES) {
+    it(`"${story}" → ${expected.join(', ') || 'nothing'}`, () => {
+      expect(setOf(story)).toEqual([...expected].sort());
+    });
+  }
+});
+
+describe('3 — the row whose full term the clause names wins', () => {
+  const CASES: [string, string[]][] = [
+    ['the urine sample I gave went off to the lab to be grown', ['cms-lab-urine-culture']],
+    ['a second confirming Lyme test after the first one', ['cms-lab-lyme-confirm']],
+    ['the high sensitivity version of the inflammation test', ['cms-lab-hscrp']],
+    ['a home sleep test with a belt round my chest and a probe on my finger', ['cms-test-home-sleep-full']],
+    ['the breathing test again after they gave me the inhaler', ['cms-test-spirometry-bronchodilator']],
+    ['an echo done through my throat with the probe', ['cms-img-tee']],
+    ['a colonoscopy where they took out a polyp', ['cms-proc-colonoscopy-polyp']],
+    ['a scan of my lower back inside the tunnel machine', ['cms-img-mri-lumbar-nc']],
+    ['they scanned my belly with the jelly and the wand', ['cms-img-us-abdomen']],
+  ];
+  for (const [story, expected] of CASES) {
+    it(`"${story}" → ${expected.join(', ')}`, () => {
+      expect(setOf(story)).toEqual([...expected].sort());
+    });
+  }
+
+  it('and the plainest row still wins when the person named no qualifier', () => {
+    expect(setOf('a colonoscopy')).toEqual(['cms-proc-colonoscopy']);
+    expect(setOf('an upper endoscopy with a biopsy')).toEqual(['cms-proc-egd-biopsy']);
+    expect(setOf('a CT of the belly with dye')).toEqual(['cms-img-ct-abd-pelvis-c']);
+  });
+
+  it('one test named twice is one test, not two figures', () => {
+    // "high sensitivity version" + the residual "inflammation test" are the same draw
+    expect(setOf('the high sensitivity version of the inflammation test')).toEqual(['cms-lab-hscrp']);
+    // and a result is never a second unit of care
+    expect(setOf('the magnesium came back low')).toEqual(['cms-lab-magnesium']);
+  });
+});
+
+describe('4 — a visit does not swallow the tests it ordered', () => {
+  it('"my pcp ordered an a1c and lipids" prices the visit AND both labs', () => {
+    // R4 (brainfog BF-14): "my pcp" is the regular doctor, 99213, like the demo.
+    expect(setOf('my pcp ordered an a1c and lipids')).toEqual(['cms-99213', 'cms-lab-a1c', 'cms-lab-lipid-panel'].sort());
+  });
+
+  it('a one-word test left over from a visit is still a test', () => {
+    expect(setOf('my pcp ordered a1c')).toEqual(['cms-99213', 'cms-lab-a1c'].sort());
+    expect(setOf('the neurologist ordered an MRI of my brain')).toEqual(['cms-99204', 'cms-img-mri-brain-nc'].sort());
+  });
+
+  it('and the clinician is still counted where the sentence names only tests', () => {
+    expect(setOf('three years, eleven doctors, and the only tests were a CBC and a metabolic panel'))
+      .toEqual(['cms-lab-cbc', 'cms-lab-cmp']);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   FLOW patient walk, 2026-09-30: a woman with long COVID typing on a phone.
+   Each rule below came from a sentence she typed and what it printed.
+   -------------------------------------------------------------------------- */
+describe('FLOW patient: supplements are bought, not tested', () => {
+  it('"I take magnesium and vitamin D supplements" prices no blood test, and says why', () => {
+    const segs = parseJourney('I take magnesium and vitamin D supplements', SELECTABLE);
+    expect(segs.map((s) => s.result.item)).toEqual([null, null]);
+    for (const s of segs) expect(s.result.reason).toBe(SUPPLEMENT_REASON);
+    expect(readOnPurpose(SUPPLEMENT_REASON)).toBe(true); // never sent to the AI reader
+  });
+  it('a level that was tested still prices', () => {
+    expect(ids('they checked my vitamin D level')).toEqual(['cms-lab-vitamin-d']);
+    expect(ids('the magnesium came back low')).toEqual(['cms-lab-magnesium']);
+    expect(ids('a vitamin D test')).toEqual(['cms-lab-vitamin-d']);
+  });
+  it('a camera pill is a capsule endoscopy, not a supplement', () => {
+    expect(ids('a camera pill for my small bowel')).toEqual(['cms-test-capsule-endoscopy']);
+  });
+});
+
+describe('FLOW patient: counts she said are the counts she gets', () => {
+  it('"3 neurologist visits" is three visits: one new, two return (CMS new vs established)', () => {
+    const segs = parseJourney('3 neurologist visits', SELECTABLE);
+    expect(segs.map((s) => [s.result.item?.id, s.times])).toEqual([['cms-99204', 1], ['cms-99214', 2]]);
+    expect(segs[1].countNote).toContain('established patient, CPT 99214');
+  });
+  it('the number may sit two words from its unit', () => {
+    expect(extractCount('5 PT sessions').times).toBe(5);
+    expect(extractCount('two MRI scans').times).toBe(2);
+    expect(extractCount('6 weeks PT sessions').times).toBe(1); // a span is never a count
+  });
+  it('"2 more neurologist visits" and "saw the cardiologist again" are return visits', () => {
+    expect(parseJourney('2 more neurologist visits', SELECTABLE).map((s) => [s.result.item?.id, s.times])).toEqual([['cms-99214', 2]]);
+    expect(ids('saw the cardiologist again')).toEqual(['cms-99214']);
+  });
+  it('several different specialists are each a first visit', () => {
+    expect(parseJourney('two rheumatologists', SELECTABLE).map((s) => [s.result.item?.id, s.times])).toEqual([['cms-99204', 2]]);
+    expect(parseJourney('four different specialists', SELECTABLE).map((s) => [s.result.item?.id, s.times])).toEqual([['cms-99204', 4]]);
+  });
+  it('"lots of doctor visits" is counted once and the line asks how many', () => {
+    const s = parseJourney('lots of doctor visits over two years', SELECTABLE)[0];
+    expect(s.times).toBe(1);
+    expect(s.countNote).toMatch(/you said “lots”, which is not a number/);
+  });
+});
+
+describe('FLOW patient: typed tired, on a phone', () => {
+  it('"saw my primry dr like 5 tims" and "blood wrk" price', () => {
+    const segs = parseJourney('saw my primry dr like 5 tims then blood wrk', SELECTABLE);
+    expect(segs[0].result.item?.id).toMatch(/^cms-9921[34]$/);
+    expect(segs[0].times).toBe(5);
+    expect(segs[1].result.item?.id).toBe('cms-lab-cbc');
+  });
+  it('"b12 levles" and "thryoid test" price', () => {
+    expect(ids('b12 levles')).toEqual(['cms-lab-b12']);
+    expect(ids('thryoid test')).toEqual(['cms-lab-tsh']);
+  });
+  it('a real word one letter from a care word is left alone', () => {
+    expect(mapUtterance('an infection', SELECTABLE).item?.id ?? '').not.toMatch(/inject/);
+    expect(mapUtterance('the emergence of symptoms', SELECTABLE).item?.id ?? null).not.toBe('cms-ed-99284-complete');
+  });
+  it('an unknown phrase says it is unpriced, then what to do', () => {
+    expect(NO_MATCH_REASON).toMatch(/^not in the federal price table, so it stays unpriced\. Check the spelling/);
+  });
+});
+
+describe('FLOW patient: "I never got better" is how it went, not care she went without', () => {
+  it('is not counted as care not received', () => {
+    const s = parseJourney('I never got better.', SELECTABLE)[0];
+    expect(s.result.item).toBeNull();
+    expect(s.result.gapCategory).toBeNull();
+    expect(s.result.reason).toBe(COURSE_REASON);
+    expect(gapSignalFor('I never got better')).toBeNull();
+  });
+  it('a real refusal is still counted', () => {
+    expect(gapSignalFor('I never got the MRI')?.category).toBe('care-not-sought');
+    expect(gapSignalFor('never got an appointment')?.category).toBe('care-not-sought');
+  });
+});
+
+describe('FLOW patient: her largest costs are named for what they are', () => {
+  it('lost work, equipment and lost insurance each carry their own reason and no figure', () => {
+    const segs = parseJourney('I lost my job as a teacher and my health insurance with it, bought a wheelchair, compression socks', SELECTABLE);
+    expect(segs.every((s) => s.result.item === null)).toBe(true);
+    expect(segs.map((s) => s.result.reason)).toEqual([LOST_WORK_REASON, INSURANCE_REASON, EQUIPMENT_REASON, EQUIPMENT_REASON]);
+    expect(segs[1].result.gapCategory).toBe('life-lost');
+    expect(lostWorkPhrase('I lost my job as a teacher')).toBe(true);
+    expect(lostWorkPhrase('the meds stopped helping')).toBe(false);
+  });
+});
+
+describe('FLOW patient: adding again joins the line already there', () => {
+  const it99 = TABLE.find((t) => t.id === 'cms-img-mri-brain-nc')!;
+  const line = (raw: string, times: number, paid?: number) => ({ key: raw, raw, item: it99, times, ...(paid ? { paid } : {}) });
+  it('same unit, later batch: one line, the count raised, both sets of words kept', () => {
+    const r = mergeEntries([line('an MRI of my brain', 1)], [line('another brain MRI', 1)]);
+    expect(r.entries).toHaveLength(1);
+    expect(r.entries[0].times).toBe(2);
+    expect(r.entries[0].raw).toBe('an MRI of my brain; another brain MRI');
+    expect(mergeToast(r.merged)).toMatch(/added 1 to MRI of the brain/);
+  });
+  it('lines in one batch, and a line with a paid amount, are never joined', () => {
+    expect(mergeEntries([], [line('a', 1), line('b', 1)]).entries).toHaveLength(2);
+    expect(mergeEntries([line('a', 1, 300)], [line('b', 1)]).entries).toHaveLength(2);
   });
 });

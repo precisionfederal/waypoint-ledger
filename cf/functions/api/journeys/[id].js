@@ -1,4 +1,4 @@
-/* GET /api/journeys/{slug} — read a shared journey.
+/* GET /api/journeys/{slug} — read a shared journey (by id only for its owner).
    PUT /api/journeys/{id} — only the session that owns it.
    DELETE /api/journeys/{slug} — the session that owns it, OR the delete code
      handed back once when it was saved. The second door is the point: most
@@ -30,8 +30,8 @@ const GONE = 'No journey with that link. A link that was never saved, one whose 
 
 /** An expired anonymous save is removed the moment anyone asks for it, so the
  *  row does not outlive the promise on the button. */
-async function readLive(env, key) {
-  const r = await one(env, 'SELECT * FROM journeys WHERE share_slug=?1 OR id=?1', key);
+async function readLive(env, key, bySlugOnly = false) {
+  const r = await one(env, bySlugOnly ? 'SELECT * FROM journeys WHERE share_slug=?1' : 'SELECT * FROM journeys WHERE share_slug=?1 OR id=?1', key);
   if (!r) return null;
   if (r.expires_at && r.expires_at <= now()) {
     try { await run(env, 'DELETE FROM journeys WHERE id=?1', r.id); } catch { /* it stops opening either way */ }
@@ -40,8 +40,19 @@ async function readLive(env, key) {
   return r;
 }
 
-export async function onRequestGet({ params, env }) {
-  const r = await readLive(env, params.id);
+/* R1-auth I1 (2026-09-30): a journey is READ by its share slug, the one handle
+   the page hands out. The row id used to open it too, a second and wider read
+   handle than the link. The id still opens it for the account that owns it (the
+   account page renames by slug, and falls back to the id only for its own
+   rows), and PUT and DELETE keep taking either, since both already check who
+   is asking. */
+export async function onRequestGet({ params, request, env }) {
+  let r = await readLive(env, params.id, true);
+  if (!r) {
+    const user = await userOf(env, request).catch(() => null);
+    const mine = user ? await readLive(env, params.id) : null;
+    r = mine && mine.user_id === user.id ? mine : null;
+  }
   if (!r) return bad(GONE, 404);
   return json(shape(r));
 }

@@ -76,9 +76,9 @@ export function drawShareCard(canvas: HTMLCanvasElement, d: ShareCardData): void
   g.fillText(usd(d.totalUsd), M, 410);
   g.fillStyle = C.ink2; g.font = B(500, 32);
   g.fillText(
-    `${d.stepCount} ${d.stepCount === 1 ? 'appointment' : 'appointments'}, ` +
+    `${d.stepCount} ${d.stepCount === 1 ? 'visit or test' : 'visits and tests'}, ` +
     `${d.distinctCount} different ${d.distinctCount === 1 ? 'kind' : 'kinds'}` +
-    (d.blankCount ? ` · ${d.blankCount} left blank, never guessed` : ''),
+    (d.blankCount ? ` · ${d.blankCount} without a federal figure, never guessed` : ''),
     M, 462);
 
   let y = 490;                        // the flowing cursor starts under the total
@@ -110,7 +110,7 @@ export function drawShareCard(canvas: HTMLCanvasElement, d: ShareCardData): void
     const who = ya.population ?? 'an adult reporting long COVID';
     const src = ya.source ?? `${ya.year} Medical Expenditure Panel Survey`;
     g.font = B(500, 25);
-    const lines = wrapLines(g, `${usd(ya.low)} to ${usd(ya.high)} is the published excess for the single year ahead for ${who} — ${src}, 95% interval. It already contains the visits above, so it is never added to them.`, W - 56);
+    const lines = wrapLines(g, `Published separately: for ${who}, a year with it cost about ${usd(ya.point)} more in ${ya.year} (95% interval ${usd(ya.low)} to ${usd(ya.high)}), ${src}. An average over many people, never compared with or added to the total above.`, W - 56);
     const h = 66 + lines.length * 34 + 22;
     g.fillStyle = C.apart; roundRect(g, M, y, W, h, 24); g.fill();
     g.fillStyle = C.apartInk; g.font = D(800, 22);
@@ -127,9 +127,12 @@ export function drawShareCard(canvas: HTMLCanvasElement, d: ShareCardData): void
      it drops the least load-bearing line rather than spilling into the footer.
      Nothing here is ever set smaller to make it fit. */
   const CONTENT_BOTTOM = CARD_H - FOOT_H - 24;
-  const headline = 'The care you needed and never got produces $0 in federal data.';
+  /* round 2: the same claim the home page makes, in its words. JUDGE-7 #7c
+     (FINAL-1011): no dollar sign at all for care with no row, not even "Not $0",
+     because a card read in a feed at a glance reads "$0". */
+  const headline = 'Care you needed and did not get leaves no row in any federal cost file. It is counted, never priced.';
   const second = d.blankCount
-    ? `${d.blankCount} ${d.blankCount === 1 ? 'line has' : 'lines have'} no published federal figure — shown blank, never guessed.`
+    ? `${d.blankCount} ${d.blankCount === 1 ? 'line has' : 'lines have'} no published federal figure: shown blank, never guessed.`
     : 'Every line links to the published federal row it came from.';
   g.font = D(700, 38);
   const hLines = wrapLines(g, headline, W - 40);

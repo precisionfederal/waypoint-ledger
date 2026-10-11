@@ -23,13 +23,59 @@
 #   bash scripts/export-public-repo.sh              # export + tarball
 #   DEST=/tmp/wl bash scripts/export-public-repo.sh # somewhere else
 #   VERIFY=1 bash scripts/export-public-repo.sh     # also npm ci && npm test in the copy
+#   TARBALL=/tmp/wl.tar.gz DEST=/tmp/wl bash ...    # a scratch run that leaves public/ alone
+#
+# 🔴 THE DENY-LIST. Private strings (a personal phone number, home paths, internal
+#    folder names, account ids) must never be written into this tree, not even as
+#    a scan pattern: the tree IS the public copy. They live one regex per line in
+#    a file outside every exported tree:
+#        ~/.config/precision-federal/export-deny.txt   (mode 600; PF_EXPORT_DENY overrides)
+#    No deny-list, no export (exit 2). A match anywhere in the copy, the file names
+#    or the tarball refuses the export (exit 2) and prints only the file, the line
+#    number and the deny-list line number, never the text that matched.
 # ==========================================================================
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="${DEST:-$(cd "$ROOT/.." && pwd)/waypoint-public}"
-TARBALL="$ROOT/public/waypoint-ledger-source.tar.gz"
+TARBALL="${TARBALL:-$ROOT/public/waypoint-ledger-source.tar.gz}"
+DENY="${PF_EXPORT_DENY:-$HOME/.config/precision-federal/export-deny.txt}"
 
 say() { printf '%s\n' "$*"; }
+refuse() { printf 'REFUSED: %s\n' "$*" >&2; }
+
+# deny_scan <dir>: every deny-list rule against every file's bytes (text and
+# binary) and every file name under <dir>. Prints locations only. Returns 2 on a hit.
+deny_scan() {
+  local dir="$1" n=0 hit=0 pat files names f lines st
+  while IFS= read -r pat || [ -n "$pat" ]; do
+    n=$((n+1))
+    case "$pat" in ''|'#'*) continue ;; esac
+    if printf '' | grep -qiE -e "$pat" 2>/dev/null; [ "$?" -ge 2 ]; then
+      refuse "deny-list line $n is not a valid extended regex ($DENY)"; hit=1; continue
+    fi
+    st=0
+    files="$(cd "$dir" && grep -rlaiE --exclude-dir=.git --exclude-dir=node_modules -e "$pat" . 2>/dev/null)" || st=$?
+    if [ -n "$files" ]; then
+      while IFS= read -r f; do
+        lines="$(cd "$dir" && { grep -naiE -e "$pat" "$f" 2>/dev/null | LC_ALL=C cut -d: -f1 | head -20 | tr '\n' ','; } || true)"
+        refuse "${f#./}:${lines%,} matches deny-list line $n"; hit=1
+      done <<< "$files"
+    fi
+    names="$(cd "$dir" && { find . \( -name .git -o -name node_modules \) -prune -o -print | grep -iE -e "$pat" || true; })"
+    if [ -n "$names" ]; then
+      while IFS= read -r f; do refuse "the file name ${f#./} matches deny-list line $n"; hit=1; done <<< "$names"
+    fi
+  done < "$DENY"
+  [ "$hit" = 0 ] || return 2
+}
+
+# The deny-list must exist, be non-empty, and live outside the tree we export.
+if [ ! -s "$DENY" ] || [ ! -r "$DENY" ]; then
+  refuse "the deny-list $DENY is missing or empty. Nothing is exported without it."; exit 2
+fi
+case "$(cd "$(dirname "$DENY")" && pwd)/" in
+  "$ROOT"/*) refuse "the deny-list $DENY sits inside the exported tree; keep it outside."; exit 2 ;;
+esac
 
 say "export-public-repo"
 say "  from  $ROOT"
@@ -43,12 +89,22 @@ rsync -a \
   --exclude '.git' \
   --exclude 'node_modules' \
   --exclude '.next' \
+  --exclude '.next-*' \
+  --exclude '/undefined' \
+  --exclude '/l-row.mjs' \
   --exclude 'shots' \
   --exclude 'shots2' \
   --exclude 'WORK-ORDERS' \
   --exclude '.wrangler' \
   --exclude 'cf/.dev.vars' \
   --exclude 'cf/.dev.vars.*' \
+  --exclude '.dev.vars' \
+  --exclude '.dev.vars.*' \
+  --exclude '.env' \
+  --exclude '.env.*' \
+  --exclude '*.key' \
+  --exclude '*.pem' \
+  --exclude '*.p12' \
   --exclude 'cf/out' \
   --exclude 'cf/out-*' \
   --exclude 'cf/.stage-*' \
@@ -114,8 +170,8 @@ filling it with the nearest number.
 **No model, average or interpolation produces a dollar figure anywhere in this codebase.** If you keep one
 thing when you adapt this, keep that.
 
-Live: <https://waypoint-ledger.pages.dev> · How to adapt it: <https://waypoint-ledger.pages.dev/adopt> ·
-The API: <https://waypoint-ledger.pages.dev/developers>
+Live: <https://waypointledger.org> · How to adapt it: <https://waypointledger.org/adopt> ·
+The API: <https://waypointledger.org/developers>
 
 ---
 
@@ -222,17 +278,55 @@ members of the public said, published with their N and with small cells suppress
 anyone owes or paid.
 MD
 
+# ------------------------------------------ a line that names this machine
+# The reader evaluation notes where its full rows were written on the machine
+# that ran it. The path means nothing to anyone else, so the copy says so.
+python3 - "$DEST/data/test-fixtures/READER-EVAL.md" <<'SCRUB'
+import os, re, sys
+p = sys.argv[1]
+if os.path.exists(p):
+    s = open(p, encoding="utf-8").read()
+    s = re.sub(r"^(Full rows, including every flag with its phrase:) \S+$",
+               r"\1 kept with the evaluation run; rerun scripts/eval-models.mjs to regenerate them.",
+               s, flags=re.M)
+    open(p, "w", encoding="utf-8").write(s)
+SCRUB
+
+# ------------------------------------------------------------ the deny-list
+# Last, after every rewrite above, so what is scanned is exactly what ships.
+say "scanning the copy against the deny-list"
+if ! deny_scan "$DEST"; then
+  refuse "private strings are in the export (locations above). Nothing was packed."
+  rm -rf "$DEST"; rm -f "$TARBALL"; exit 2
+fi
+say "  clean"
+
 # ------------------------------------------------------------------- tarball
+# No owner names, no extended attributes, no macOS metadata: the archive carries
+# the files and nothing about the machine that packed them.
 say "packing $TARBALL"
-mkdir -p "$ROOT/public"
-tar -czf "$TARBALL" -C "$(dirname "$DEST")" "$(basename "$DEST")"
+mkdir -p "$(dirname "$TARBALL")"
+COPYFILE_DISABLE=1 tar --no-xattrs --no-mac-metadata --uid 0 --gid 0 --uname '' --gname '' \
+  -czf "$TARBALL" -C "$(dirname "$DEST")" "$(basename "$DEST")"
+
+# The archive itself, headers included, gets the same test.
+n=0
+while IFS= read -r pat || [ -n "$pat" ]; do
+  n=$((n+1)); case "$pat" in ''|'#'*) continue ;; esac
+  # -c, not -q: grep reads the whole stream, so gzip is never cut off by SIGPIPE
+  # (under pipefail a cut-off gzip would turn a match into a silent pass).
+  if [ "$(gzip -dc "$TARBALL" | grep -caiE -e "$pat" || true)" != "0" ]; then
+    refuse "the tarball matches deny-list line $n. It was deleted."
+    rm -f "$TARBALL"; rm -rf "$DEST"; exit 2
+  fi
+done < "$DENY"
 
 FILES="$(find "$DEST" -type f | wc -l | tr -d ' ')"
 SIZE="$(du -sh "$DEST" | cut -f1 | tr -d ' ')"
 TSIZE="$(du -h "$TARBALL" | cut -f1 | tr -d ' ')"
 say ""
 say "exported $FILES files ($SIZE) to $DEST"
-say "tarball  $TSIZE at public/waypoint-ledger-source.tar.gz  (served at /waypoint-ledger-source.tar.gz)"
+say "tarball  $TSIZE at $TARBALL  (public/waypoint-ledger-source.tar.gz is served at /waypoint-ledger-source.tar.gz)"
 say "nothing was pushed anywhere."
 
 if [ "${VERIFY:-0}" = "1" ]; then

@@ -24,9 +24,12 @@ Exits non-zero on any FAIL.
 import csv, json, os, re, sys, hashlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_SRC = ("/private/tmp/claude-501/-Users-bo-Documents-100M-Lifetime-Revenue-Precision-"
-               "Federal-Proposal-Builder/5a45513e-1a30-4734-8f49-694b18a231f1/scratchpad/price-table")
-SRC = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_SRC
+# The CMS source files live outside the repository: pass their directory as the
+# first argument or set WL_RVU_SRC (it holds rvu26c/ and clab/).
+SRC = sys.argv[1] if len(sys.argv) > 1 else os.environ.get('WL_RVU_SRC')
+if not SRC:
+    sys.exit('verify_additions: set WL_RVU_SRC (or pass the directory as the first argument) '
+             'to the folder that holds rvu26c/ and clab/')
 RVU_CSV  = os.path.join(SRC, 'rvu26c', 'PPRRVU2026_Jul_nonQPP.csv')
 CLAB_CSV = os.path.join(SRC, 'clab',  'PUF_CLFS_CY2026_Q3V1.csv')
 ADDITIONS_FILES = [os.path.join(HERE, 'prices-additions-2026-09-08.json'),
@@ -63,6 +66,56 @@ def load_rvu(path):
             continue
     return out
 
+def load_rvu_lines(path):
+    """{hcpcs: {modifier: line}} — the modifier lines as well as the unmodified one.
+
+    R6 finding F3: a person who says "at the hospital" is shown a hospital figure, and
+    that figure has two shapes in this file. For an office visit it is the FACILITY
+    TOTAL on the unmodified line; for a scan or a tracing, which is billed in two
+    halves (PCTC 1), it is the modifier 26 line, because in a hospital the clinician
+    bills only the reading. Both are read here, never typed."""
+    rows = list(csv.reader(open(path, encoding='latin-1')))
+    hi = next(i for i, r in enumerate(rows) if r and r[0].strip() == 'HCPCS')
+    out = {}
+    for r in rows[hi + 1:]:
+        if len(r) < 27:
+            continue
+        try:
+            rec = dict(status=r[3].strip(), total_nf=float(r[11]), total_fac=float(r[12]),
+                       pctc=r[13].strip(), cf=float(r[25]))
+        except ValueError:
+            continue
+        out.setdefault(r[0].strip(), {}).setdefault(r[1].strip(), rec)
+    return out
+
+
+def check_facility(it, code, lines, fails, where):
+    """Re-derive the hospital-setting figure on this row, if it carries one."""
+    alt = it.get('alternates') or {}
+    have = alt.get('facility_setting_physician_payment_usd')
+    if not isinstance(have, (int, float)):
+        return 0
+    comp = str(alt.get('facility_setting_component') or '')
+    mod = '26' if comp.startswith('modifier 26') else ''
+    line = (lines.get(code) or {}).get(mod)
+    if line is None:
+        fails.append('%s: %s has no %s line in the RVU file for its hospital figure'
+                     % (it['id'], code, 'modifier 26' if mod else 'unmodified')); return 1
+    exp = round(line['total_fac'] * line['cf'], 2)
+    if abs(exp - float(have)) >= 0.005:
+        fails.append('%s: hospital figure %.2f, file gives %.2f (%.2f facility RVU x %.4f on the %s line)'
+                     % (it['id'], have, exp, line['total_fac'], line['cf'],
+                        'modifier 26' if mod else 'unmodified')); return 1
+    if not mod and line['pctc'] == '1':
+        fails.append('%s: %s is billed in two halves (PCTC 1); its hospital figure must come from '
+                     'the modifier 26 line' % (it['id'], code)); return 1
+    stated = alt.get('facility_setting_total_rvu')
+    if stated is not None and abs(float(stated) - line['total_fac']) > 0.005:
+        fails.append('%s: the row prints %s facility RVUs; the file line carries %.2f'
+                     % (it['id'], stated, line['total_fac'])); return 1
+    return 0
+
+
 def load_clab(path):
     out = {}
     for r in csv.reader(open(path, encoding='latin-1')):
@@ -76,6 +129,7 @@ def main():
             print('FATAL missing file: %s' % p); return 2
 
     rvu, clab = load_rvu(RVU_CSV), load_clab(CLAB_CSV)
+    rvu_lines = load_rvu_lines(RVU_CSV)
     fails = []
     checked = 0
     seen_ids, seen_codes = {}, {}
@@ -105,7 +159,7 @@ def main():
             else:
                 print('SHA256 OK  %s  %s' % (label, got))
         checked += len(data['items'])
-        run_rows(data, rvu, clab, fails, seen_ids, seen_codes, os.path.basename(additions))
+        run_rows(data, rvu, clab, fails, seen_ids, seen_codes, os.path.basename(additions), rvu_lines)
 
     print('\n%d rows checked across %d files' % (checked, len(ADDITIONS_FILES)))
     if fails:
@@ -117,9 +171,13 @@ def main():
     return 0
 
 
-def run_rows(data, rvu, clab, fails, seen_ids, seen_codes, where):
+def run_rows(data, rvu, clab, fails, seen_ids, seen_codes, where, rvu_lines=None):
+    facility_checked = facility_bad = 0
     for it in data['items']:
         rid, code = it['id'], hcpcs_of(it)
+        if rvu_lines is not None and (it.get('alternates') or {}).get('facility_setting_physician_payment_usd') is not None:
+            facility_checked += 1
+            facility_bad += check_facility(it, code, rvu_lines, fails, where)
         # No id and no code may be claimed twice, here or by the other additions file:
         # two rows for one code is two prices for one unit of care.
         if rid in seen_ids:
@@ -166,6 +224,9 @@ def run_rows(data, rvu, clab, fails, seen_ids, seen_codes, where):
                   % ('PASS' if ok else 'FAIL', rid, code, rate, val))
         else:
             fails.append('%s: unexpected confidence %r' % (rid, it['confidence']))
+    if facility_checked:
+        print('%-4s %d hospital-setting figures re-derived from the FACILITY RVU columns'
+              % ('PASS' if not facility_bad else 'FAIL', facility_checked))
 
 if __name__ == '__main__':
     sys.exit(main())

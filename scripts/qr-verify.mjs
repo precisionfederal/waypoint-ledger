@@ -60,7 +60,7 @@ json.dump(out, sys.stdout)
 /* Byte-mode capacity, ISO/IEC 18004 Table 7, versions 1-7. */
 const CAP = { L: [0, 17, 32, 53, 78, 106, 134, 154], M: [0, 14, 26, 42, 62, 84, 106, 122],
               Q: [0, 11, 20, 32, 46, 60, 74, 86], H: [0, 7, 14, 24, 34, 44, 58, 64] };
-const TARGET = 'https://waypoint-ledger.pages.dev/survey?c=register';
+const TARGET = 'https://waypointledger.org/survey?c=register';
 const rnd = (n) => { let s = ''; for (let i = 0; i < n; i++) s += 'abcdefghijklmnopqrstuvwxyz'[Math.floor(Math.random() * 26)]; return s; };
 
 const cases = [];

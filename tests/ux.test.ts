@@ -33,7 +33,7 @@ describe('the odyssey — the line a person actually repeats', () => {
     ]);
     const line = odysseyLine({ months: g.months, appointments: 7, cats: g.cats });
     expect(line).toMatch(/^4 years of searching/);
-    expect(line).toContain('7 appointments');
+    expect(line).toContain('7 visits and tests');
   });
 
   it('prints no band when the only clause would restate the appointment card above it', () => {
@@ -43,7 +43,7 @@ describe('the odyssey — the line a person actually repeats', () => {
 
   it('drops every clause whose count is zero rather than printing a zero', () => {
     const line = odysseyLine({ months: 18, appointments: 3, cats: [] });
-    expect(line).toContain('3 appointments');
+    expect(line).toContain('3 visits and tests');
     expect(line).not.toMatch(/\b0 /);
   });
 
@@ -61,7 +61,10 @@ describe('the odyssey — the line a person actually repeats', () => {
   it('closes with the claim only when something was counted and never priced', () => {
     const g = gapSummary([gapEntry('a', 'six months of waiting', 'time-searching', 6)]);
     expect(odysseyLine({ months: g.months, appointments: 2, cats: g.cats }))
-      .toBe('6 months of searching · 2 appointments · none of that produces a row in federal data');
+      .toBe('6 months of searching · 2 visits and tests · only the visits and tests have a price in a federal cost file');
+    /* desktop F17: the closing clause is true of what it follows */
+    expect(odysseyLine({ months: g.months, appointments: 0, cats: g.cats }))
+      .toBe('6 months of searching · none of it has a price in a federal cost file');
   });
 
   it('never contains a dollar figure: this is counting, not pricing', () => {
@@ -118,7 +121,7 @@ const BASE: ShareCardData = {
   bars: [{ label: 'Office visits', total: 900 }, { label: 'Imaging', total: 700 }, { label: 'Labs', total: 449 }],
   url: 'https://waypoint-ledger.pages.dev/ledger#abc', tableVersion: '2026-09-08.1-verified',
   story: ['4 years of searching', '27 appointments', '1 time you were denied'],
-  footnote: 'The same visit code costs $98 more in a hospital clinic than in a doctor’s office — CMS, CY2026.',
+  footnote: 'The same visit code costs $98 more in a hospital clinic than in a doctor’s office (CMS, CY2026).',
   yearAhead: { low: 1619, high: 6578, point: 4098, year: 2022, population: 'an adult reporting long COVID', source: '2022 Medical Expenditure Panel Survey' },
 };
 
@@ -146,7 +149,7 @@ describe('the card that leaves the site', () => {
     const all = texts.map((t) => t.text).join(' ');
     expect(all).toContain('SHOWN APART · NEVER ADDED');
     expect(all).toContain('$1,619 to $6,578');
-    expect(all).toMatch(/never added to them/);
+    expect(all).toMatch(/never compared with or added to the total above/);   // round 2 judge2-1
   });
 
   it('ends with somewhere to go', () => {
@@ -194,7 +197,11 @@ describe('the card that leaves the site', () => {
 describe('the sheet labels the figure it printed', () => {
   const PAGE = readFileSync(new URL('../app/sheet/page.tsx', import.meta.url), 'utf8');
   it('reads the label from the fit, never from the row it substituted', () => {
-    expect(PAGE).toMatch(/function figureLabel/);
+    /* Merge round 5: figureLabel moved to components/sheet/sheet-size.ts so the
+       ledger counts the same kinds the sheet prints; the page imports it. */
+    const SIZE = readFileSync(new URL('../components/sheet/sheet-size.ts', import.meta.url), 'utf8');
+    expect(SIZE).toMatch(/function figureLabel\(it: PriceItem, fit: Fit\)/);
+    expect(PAGE).toMatch(/import \{ figureLabel \} from '@\/components\/sheet\/sheet-size'/);
     expect(PAGE).toMatch(/figureLabel\(it, fit\)/);
     expect(PAGE).not.toMatch(/it\.basis\.replace\(\/_\/g, ' '\), \$\{it\.year\}/);
   });

@@ -1,0 +1,13 @@
+/* /signal (VISUAL data, 2026-09-30 night): the moved notice in the shared inner-page
+   hero: words left with the H1 token, the register's picture right at 527 px. */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 527px); gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; min-height: 40vh; }
+.heroCopy { min-width: 0; }
+.heroCopy h1 { font-size: var(--hero-h1); line-height: 1.1; letter-spacing: -.025em; margin: .2rem 0 .8rem; }
+.heroCopy :global(.sub) { margin: 0; font-size: 1.125rem; }
+.heroCopy :global(.sub) a { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; }
+.heroArt { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 525; border-radius: var(--r-lg);
+  -webkit-mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%); mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%); }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: .25rem; min-height: 0; }
+  .heroArt { order: -1; max-height: 11rem; aspect-ratio: auto; object-fit: cover; object-position: 50% 55%; margin-bottom: .5rem; }
+}

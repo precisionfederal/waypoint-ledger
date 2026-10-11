@@ -6,7 +6,7 @@ Everything below is a command that has been run on this machine. Run them from
 | | |
 |---|---|
 | live site | https://waypoint-ledger.pages.dev |
-| system of record | Cloudflare D1 `waypoint-ledger`, id `3c6cf7a7-e060-48fd-9e1f-646eb89ad461` |
+| system of record | Cloudflare D1 `waypoint-ledger` (its id is in `cf/wrangler.toml`) |
 | backups | `~/Library/Application Support/precision-federal/waypoint-backups/` (30 days, 05:05 daily) |
 | health of the whole thing | `npm run uptime` |
 | alarm file every session reads | `~/.claude/pf-state/WAYPOINT-DOWN.md` |
@@ -41,6 +41,9 @@ Cloudflare Pages rolls back **from the dashboard only** — there is no wrangler
 command and no documented API, so `rollback.sh` prints the exact page, the exact
 menu item and the deployment id, and exits 2 rather than pretending. Four clicks:
 Deployments → All deployments → ⋯ on the row → *Rollback to this deployment*.
+The dashboard link needs the account id, which is not published with the source:
+set `CF_ACCOUNT_ID`, or keep it in the local ids file outside the repository
+(`WL_IDS_FILE` names another path). `--check` and the list need neither.
 
 Then prove it:
 
@@ -83,8 +86,8 @@ Restoring **onto the live database** is deliberately not a script. It is:
 
 ## A secret leaked
 
-`ADMIN_TOKEN` and `INTERVIEW_KEY` live in `~/.config/precision-federal/waypoint-admin.env`
-(mode 600) and `cf/.dev.vars`. Neither is ever printed, committed, or served.
+`ADMIN_TOKEN` and `INTERVIEW_KEY` live in a local env file outside the repository
+(mode 600) and in `cf/.dev.vars`. Neither is ever printed, committed, or served.
 
 ```
 cd cf
@@ -92,7 +95,7 @@ npx wrangler pages secret put ADMIN_TOKEN --project-name waypoint-ledger
 npx wrangler pages secret list --project-name waypoint-ledger
 ```
 
-Update the same value in `~/.config/precision-federal/waypoint-admin.env` and
+Update the same value in that local env file and
 `cf/.dev.vars`, then prove the old token is dead:
 
 ```

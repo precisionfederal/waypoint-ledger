@@ -41,7 +41,7 @@ describe('the sample is never mistaken for the person’s own answer', () => {
   });
 
   it('labels it as an example and not as their numbers', () => {
-    expect(PAGE).toContain('Not your numbers yet &mdash; an example, priced from the table as this page loads');
+    expect(PAGE).toContain('Not your numbers yet: three lines of the full example, priced as this page loads');
   });
 
   it('tints the inset with the ground token, so it reads as inset and not as a new brand', () => {
@@ -59,7 +59,11 @@ describe('the zero band keeps the fact and drops the headline numeral', () => {
   });
 
   it('leads with the sentence, which says what the data does, not what a person is worth', () => {
-    expect(PAGE).toContain('Every visit you needed and could not get produces no row in any federal file. Not $0 &mdash; no row at all.');
+    /* R6 sense F7: "no row in any federal file" is false — NHIS and MEPS's own
+       access-to-care questions do count it — and the true version is stronger.
+       The $0 fact stays; the overclaim is gone. */
+    expect(PAGE).toContain('leaves no row in any federal <b>cost</b> file. Not $0: no row at all.');
+    expect(PAGE).toContain('none of them attaches a dollar to it, and none of them is yours');
   });
 });
 

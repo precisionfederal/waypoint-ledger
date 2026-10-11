@@ -42,7 +42,7 @@ export async function onRequestPost({ request, env }) {
   let email = row.email;
   if (!email) {
     email = normaliseEmail(body.email);
-    if (!email) return bad(`Add an email address to sign in with, up to ${EMAIL_MAX} characters. It is used for nothing else — there is no mail from this site.`);
+    if (!email) return bad(`Add an email address to sign in with, up to ${EMAIL_MAX} characters. It is used for nothing else. There is no mail from this site.`);
     let taken;
     try { taken = await one(env, 'SELECT id FROM users WHERE email=?1', email); } catch { taken = null; }
     if (taken && taken.id !== row.id) return bad('There is already an account for that address.', 409);

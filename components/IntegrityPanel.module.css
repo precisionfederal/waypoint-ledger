@@ -1,0 +1,31 @@
+/* The heads of the register, one card per chain (PAGES R1, 2026-09-30 night).
+   Tokens only, so light and dark both hold. */
+.heads{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.85rem}
+@media (max-width:720px){.heads{grid-template-columns:minmax(0,1fr)}}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1rem 1.15rem;display:flex;flex-direction:column;gap:.6rem;min-width:0}
+.card p{margin:0}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem}
+.name{font-weight:700;color:var(--ink);font-size:1rem;line-height:1.35;min-width:0}
+.what{display:block;font-weight:400;color:var(--ink-3);font-size:.9375rem}
+.entries{flex:none;text-align:right;color:var(--ink-3);font-size:.9375rem;line-height:1.2}
+.entries b{display:block;font-family:var(--font-b);font-size:1.6rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.note{font-size:.875rem;color:var(--warn-ink)}
+.facts{margin:0;display:grid;gap:.3rem;font-size:.875rem;line-height:1.45}
+.facts>div{display:grid;grid-template-columns:4.5rem minmax(0,1fr);gap:.5rem}
+.facts dt{color:var(--ink-3)}
+.facts dd{margin:0;color:var(--ink-2);overflow-wrap:anywhere}
+.facts code{font-family:var(--font-m);font-size:.8125rem;background:var(--ground-2);color:var(--ink);padding:.05rem .35rem;border-radius:6px}
+.status{display:flex;align-items:center;gap:.4rem;margin-top:auto!important;padding-top:.6rem;border-top:1px solid var(--line-2);font-size:.9375rem;font-weight:600}
+.ok{color:var(--good-ink)}
+.bad{color:var(--flag-ink)}
+.neutral{color:var(--ink-3);font-weight:400}
+.status svg{flex:none}
+.foot{margin-top:.85rem!important}
+@media (max-width:720px){.foot a{display:inline-block;padding:.75rem 0}}
+/* VISUAL tech follow-up (2026-09-30 night): the head cards tighter on phones */
+@media (max-width:640px){
+  .heads{gap:.55rem}
+  .card{padding:.8rem .85rem;gap:.45rem}
+  .entries b{font-size:1.4rem}
+  .status{padding-top:.45rem}
+}

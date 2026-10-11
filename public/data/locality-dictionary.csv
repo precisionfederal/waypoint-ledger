@@ -15,10 +15,10 @@ locality-prices.csv,pe_gpci,number,Practice expense geographic practice cost ind
 locality-prices.csv,mp_gpci,number,Malpractice geographic practice cost index for this locality.
 locality-prices.csv,conversion_factor,number,"The CY2026 non-qualifying-APM conversion factor, in dollars per RVU."
 locality-prices.csv,allowed_usd,number,"The Medicare allowed amount for this code in this locality. DERIVED by the formula in the formula column, never estimated."
-locality-prices.csv,national_usd,number,The same code with every index set to 1.000 — the national figure on the price table.
+locality-prices.csv,national_usd,number,The same code with every index set to 1.000: the national figure on the price table.
 locality-prices.csv,pct_of_national,number,"allowed_usd as a percentage of national_usd, to one decimal. Arithmetic on the two columns beside it."
 locality-prices.csv,formula,text,"CMS's own formula, written out, so the row can be recomputed without this file."
-locality-prices.csv,basis,text,"allowed — a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays."
+locality-prices.csv,basis,text,"allowed: a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays."
 locality-prices.csv,year,text,The calendar year of the fee schedule.
 locality-prices.csv,population,text,Who the figure describes: Medicare Part B fee-for-service beneficiaries. For anyone else it is a reference price.
 locality-prices.csv,locality_audit_status,text,"REPRODUCED means two independent runs recomputed this exact figure from the RVUs and GPCIs in the columns to the left: this generator, and data/verify_price_table.py reading the CMS files itself."

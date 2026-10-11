@@ -92,18 +92,23 @@ describe('the admin door', () => {
     }
   });
 
+  /* R6 edge #4 (2026-09-09) moved this number, not the rule: a demo room, a
+     conference wifi and a NAT are ONE hashed IP, so DEFAULT_WRITE:20 meant the
+     21st thumbs-down in a room of 33 people failed. /api/corrections now has a
+     room-sized ceiling of 300 an hour and the per-figure FIGURE_CAP (3/hour,
+     8/day, per figure) is what actually stops one machine moving a count. The
+     throttle itself still has to exist, and this is where that is proved. */
   it('still throttles a public write at its own limit', async () => {
     const env = envWith();
+    const hit = async () => (await onRequest({
+      request: req('/api/corrections', { method: 'POST', headers: { 'content-length': '120' } }),
+      env,
+      next: async () => new Response('{"ok":true}', { status: 200 }),
+    })).status;
     let last = 200;
-    for (let i = 0; i < 25; i++) {
-      const r = await onRequest({
-        request: req('/api/corrections', { method: 'POST', headers: { 'content-length': '120' } }),
-        env,
-        next: async () => new Response('{"ok":true}', { status: 200 }),
-      });
-      last = r.status;
-    }
-    expect(last).toBe(429);
+    for (let i = 0; i < 300; i++) last = await hit();
+    expect(last, 'the 300 a room is allowed all go through').toBe(200);
+    expect(await hit(), 'the 301st from one network does not').toBe(429);
   });
 
   it('never puts an address in the bucket key', async () => {

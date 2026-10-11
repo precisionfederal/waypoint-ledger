@@ -67,6 +67,39 @@ export interface PriceItem {
   /** Set only where CMS publishes relative value units for the code and pays
    *  nothing for it. 'N' is the file's own non-covered indicator. */
   pfsStatus?: string;
+
+  /* ---- THE SETTING. R6 finding F3: a person who says "at the hospital" was shown
+     the freestanding-office price while the hospital figures sat unread in the same
+     row. These four carry them onto the screen. Every one is read or re-derived by
+     data/verify_price_table.py from the file on disk; none is ever typed. */
+
+  /** What Medicare pays the CLINICIAN for this code in a facility — the FACILITY
+   *  TOTAL on the code's line, or the modifier 26 line where the service is billed
+   *  in two halves. Absent where the fee schedule pays the same in both settings. */
+  facilityUsd?: number;
+  /** Which line of the fee schedule that figure came from, in the file's own words. */
+  facilityComponent?: string;
+  /** The arithmetic and what it means, for the drawer. */
+  facilityNote?: string;
+  /** What the HOSPITAL bills on its own account for this service, CMS OPPS
+   *  Addendum B. It is a second bill, never added into the itemized total here. */
+  hospitalFeeUsd?: number;
+  /** The OPPS file that figure was read in. */
+  hospitalFeeSource?: string;
+  /** Medicare's published minimum beneficiary copay on that hospital fee. */
+  hospitalCopayUsd?: number;
+
+  /** 🔴 R6 finding F5: a code CMS pays once in a 12-month period. The count the
+   *  person typed is kept and shown; only the priced count is capped at this. */
+  maxPerYear?: number;
+  /** Why the cap is there — CMS's own long descriptor for the code. */
+  maxPerYearBasis?: string;
+
+  /** Where this row's own figure IS the sum of two published rates, the two
+   *  halves, so the export can say so instead of letting a machine read the
+   *  total as a professional fee (R6 finding F10). */
+  componentHospitalFeeUsd?: number;
+  componentPhysicianFeeUsd?: number;
 }
 
 export interface JourneyEntry {
@@ -84,6 +117,11 @@ export interface JourneyEntry {
   source?: 'rules' | 'model';
   /** The AI reader's one-line reason, when it read the phrase. Never a price. */
   modelWhy?: string | null;
+  /** What the person says they actually paid for this line: their own number,
+   *  typed on this device, never added to a federal total (lib/paid.ts). */
+  paid?: number | null;
+  /** True when `paid` is for one of the times on the line, not all of them. */
+  paidEach?: boolean | null;
 }
 
 export interface PricedLine {

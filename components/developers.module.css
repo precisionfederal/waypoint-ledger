@@ -1,0 +1,47 @@
+/* /developers only (PAGES R2, 2026-09-30). DESIGN R1 tokens only. Kept apart from
+   devpages.module.css so /adopt does not carry these class names in its route JavaScript. */
+
+/* a section's one-line lead may use the column it sits in (doubled class: it outranks .h2sub) */
+.sub.sub{max-width:none}
+
+/* ---- a short list of what to notice, as three compact tiles ---- */
+.notice{list-style:none;margin:.75rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15rem,100%),1fr));gap:.6rem}
+.notice li{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.7rem .85rem;font-size:.9375rem;line-height:1.45;color:var(--ink-2);min-width:0}
+.notice li code{overflow-wrap:anywhere}
+.noticeH{margin:1rem 0 0;font-weight:600;color:var(--ink)}
+
+/* ---- the FHIR card's three caveat lines ---- */
+.cavs{display:grid;gap:0;margin:.5rem 0 0}
+
+/* ---- what you can take: a dense three-up list of downloads ---- */
+.take{list-style:none;margin:1rem 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(24rem,100%),1fr));gap:.4rem .6rem}
+.take li{display:flex;align-items:center;flex-wrap:wrap;gap:0 .9rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.15rem .85rem;min-width:0;min-height:52px}
+.take li>span{flex:1 1 11rem;font-weight:600;color:var(--ink);font-size:.9375rem;line-height:1.35;padding:.35rem 0}
+.take li>div{display:flex;flex-wrap:wrap;gap:0 .9rem;font-size:.9375rem}
+.take a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+
+/* ---- the rules: five short cards, three across ---- */
+.rules{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr));gap:.75rem}
+.rules li{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1rem 1.1rem;min-width:0}
+.rules h3{font-size:1.0625rem;line-height:1.3;margin:0 0 .35rem}
+.rules p{margin:0;font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+
+/* ---- the agency section: the validator record on top, two cards under it ---- */
+.agency{display:flex;flex-direction:column;gap:.75rem}
+.agency>*{margin:0;min-width:0}
+/* VISUAL tech (2026-09-30 night): the validator's result as a small report, the zero errors in green */
+.result{display:grid;grid-template-columns:auto repeat(3,minmax(0,1fr));gap:.6rem;align-items:stretch;margin:.85rem 0;padding:.6rem;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--line-2)}
+.result>strong{align-self:center;padding:0 .5rem;color:var(--ink)}
+.resultN{display:flex;flex-direction:column;justify-content:center;gap:.1rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.55rem .85rem;font-size:.9375rem;color:var(--ink-2);min-width:0}
+.resultN b{font-family:var(--font-b);font-size:1.75rem;line-height:1.1;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.resultOk{background:var(--good-soft);border-color:transparent}
+.resultOk b{color:var(--good-ink)}
+@media (max-width:560px){.result{grid-template-columns:repeat(3,minmax(0,1fr))}.result>strong{grid-column:1 / -1;padding:.1rem .3rem}.resultN b{font-size:1.4rem}}
+.stepNo{display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font-weight:700;font-size:.9375rem;flex:none}
+.agencyH{display:flex;align-items:center;gap:.6rem;margin:0 0 .5rem;font-size:1.0625rem;line-height:1.3}
+/* FLOW adopter-15: the first call is one tap from the hero, a GET a browser opens. */
+.tryIt{margin:.35rem 0 0;font-size:1rem;line-height:1.5;color:var(--ink-2)}
+.tryIt a{padding:10px 0;font-weight:600;overflow-wrap:anywhere} /* inline padding: a 44 px hit area that does not open the line */
+
+/* VISUAL tech follow-up (2026-09-30 night): the validator report tighter on phones */
+@media (max-width:560px){.result{gap:.4rem;padding:.45rem;margin:.6rem 0}.resultN{padding:.4rem .6rem}.resultN b{font-size:1.3rem}}

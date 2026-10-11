@@ -24,13 +24,19 @@ const at = (hay: string, needle: string) => {
 
 describe('UX-2 fix 6 — one noun for one number, one button per action', () => {
   it('the stat above the bar uses the same noun the bar uses', () => {
-    expect(ledger).toContain("lbl: 'Appointments'");
+    /* FLOW patient-14 (core): the count moved from its own stat card into the
+       total's line ("5 priced lines · 6 visits and tests"); the noun is unchanged. */
+    expect(readFileSync('components/TotalReveal.tsx', 'utf8')).toContain("'visits and tests'");
+    expect(ledger).toContain('visits={appointments}');
+    expect(ledger).toContain("'visits and tests'");
     /* the old noun survives only in the comment that records why it went */
     expect(ledger).not.toContain("lbl: 'Steps in your journey'");
   });
 
-  it('the sub-line under the stat is unchanged', () => {
-    expect(ledger).toContain("sub: `${st.entries.length} distinct`");
+  it('the sub-line counts lines that are care, the same lines the stat counts (desktop F17)', () => {
+    /* round 4 (R3 brainfog BF-16): no second "distinct" count under the stat */
+    expect(ledger).not.toContain('distinct`');
+    expect(ledger).toContain('const careEntries = st.entries.filter((e) => e.item);');
   });
 
   it('the sticky bar stands down while the card it duplicates is in the viewport', () => {
@@ -44,7 +50,7 @@ describe('UX-2 fix 6 — one noun for one number, one button per action', () => 
 
 describe('UX-2 fix 10 — the strongest fact is not displayed as a zero', () => {
   it('a ledger with nothing missing reads as a statement, not a numeral', () => {
-    expect(ledger).toContain("? { lbl: 'carries a published federal figure', val: 'Every line', sub: null }");
+    expect(ledger).toContain("? { lbl: 'carries a published federal figure', val: 'Every visit and test', sub: null, line: true }");   // patient2-9: folds to one line on a phone
   });
 
   it('the count comes straight back the moment something IS missing', () => {
@@ -52,38 +58,27 @@ describe('UX-2 fix 10 — the strongest fact is not displayed as a zero', () => 
   });
 });
 
-describe('UX-2 fix 9 — the page keeps the promise the stepper makes', () => {
-  it('step 3 is a band with the heading the fix names', () => {
-    expect(ledger).toContain('<h2 id="step3">Step 3 — count what never happened</h2>');
+describe('UX-2 fix 9, superseded in round 2 (desktop F16) — one surface for care that did not happen', () => {
+  const band = readFileSync('components/CareGoneWithout.tsx', 'utf8');
+  it('the Step 3 band that repeated the band under the total is gone', () => {
+    expect(ledger).not.toContain('id="step3"');
+    expect(ledger).not.toContain('Report the gap');
+    expect(ledger).not.toContain('produces no row in any federal file');
   });
-
-  it('the sentence it carries is the one the card carried, unchanged', () => {
-    expect(ledger).toContain(
-      'The care you needed and did not get produces no row in any federal file. Tell us how often, and rank which cost hurt most.',
-    );
+  it('its route to /gap lives in the band under the total', () => {
+    expect(band).toContain('<Link href="/gap">Count the rest of what went uncounted</Link>');
   });
-
-  it('the band sits after the ledger table and before the unpriced list', () => {
-    const table = at(ledger, '<section className="card table-card">');
-    const band = at(ledger, 'aria-labelledby="step3"');
-    const unpriced = at(ledger, '{st.unpricedHits.length > 0 && (');
-    expect(band).toBeGreaterThan(table);
-    expect(band).toBeLessThan(unpriced);
-  });
-
   it('the promoted action is not also offered in the tray at the foot', () => {
     expect(ledger).not.toContain('Count what no dataset counted');
-    /* the per-line "Count it" link inside the table is a different action on a
-       different row and stays; what must not exist twice is the step-3 call. */
-    expect(ledger.match(/Report the gap/g) ?? []).toHaveLength(1);
     expect(ledger).not.toContain('<article className="act-card"><span className="act-ic"><Icon.Shield />');
   });
 });
 
+
 describe('UX-2 fix 13 — the export is labelled what the file actually is', () => {
   it('the control says FHIR R4 and says what that means on hover', () => {
     expect(ledger).toContain('FHIR R4');
-    expect(ledger).toContain('title="HL7 FHIR R4 Bundle — the format the rest of health IT reads"');
+    expect(ledger).toContain('title="HL7 FHIR R4 Bundle, the format the rest of health IT reads"');
   });
 
   it('the label is only ever attached to the export lib/fhir.ts really emits', () => {
@@ -101,7 +96,7 @@ describe('UX-2 fix 14 — the drawer answers "show me the source" in one glance'
     const figure = at(drawer, '${ds.block} ${ds.figure}');
     const link = at(drawer, 'Open the source and check this number');
     const alternate = at(drawer, '<p className={ds.eyebrow}>The other published measure</p>');
-    const fileTable = at(drawer, 'The CY2024 claims file behind the charge figures —');
+    const fileTable = at(drawer, '<b>Other published measure</b> <span>· CY2024 claims file (a different file, not the source of');
     expect(link).toBeGreaterThan(figure);
     expect(link).toBeLessThan(alternate);
     expect(link).toBeLessThan(fileTable);

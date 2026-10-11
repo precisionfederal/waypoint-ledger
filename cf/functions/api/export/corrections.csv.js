@@ -8,11 +8,12 @@
    ========================================================================== */
 import { bad } from '../_http.js';
 import { correctionRows } from '../corrections.js';
+import { withTeamTestFlags } from '../_annotations.js';
 import { correctionsDefectCsv } from './_defect-report.js';
 
 export async function onRequestGet({ request, env }) {
   let rows;
-  try { rows = await correctionRows(env); }
+  try { rows = await withTeamTestFlags(env, 'corrections', await correctionRows(env)); }
   catch { return bad('The export could not be read right now.', 503); }
   const site = request ? new URL(request.url).origin : '';
   const asOf = new Date().toISOString().slice(0, 10);

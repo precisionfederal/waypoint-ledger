@@ -45,12 +45,13 @@ const VALID = {
 };
 
 describe('the instrument itself', () => {
-  it('is five burdens, four deciders, six context questions and ten interview questions', () => {
+  it('is five burdens, four deciders, nine context questions and ten interview questions', () => {
     expect(BURDENS).toHaveLength(5);
     expect(new Set(BURDEN_IDS).size).toBe(5);
     expect(DECIDERS).toHaveLength(4);
     expect(new Set(DECIDER_IDS).size).toBe(4);
-    expect(CONTEXT_KEYS).toEqual(['age', 'sex', 'insurance', 'region', 'state', 'stage']);
+    // The three 2026-10-01.1 fields are appended, so every earlier CSV column keeps its position.
+    expect(CONTEXT_KEYS).toEqual(['age', 'sex', 'insurance', 'region', 'state', 'stage', 'respondent', 'onset_age', 'diagnosis_age']);
     expect(INTERVIEW_QUESTIONS).toHaveLength(10);
     expect(SURVEY_VERSION).toMatch(/^\d{4}-\d{2}-\d{2}\./);
   });
@@ -147,8 +148,31 @@ describe('aggregateSurvey — counts, with the N, and nothing else', () => {
     expect(a.channels).toEqual({ demo: 1, reddit: 1 });
     expect(a.lead).toEqual({ time: 1, oop: 1 });
     expect(a.clinicians.n).toBe(2);
-    expect(a.coverage.age['30–44']).toBe(2);
+    /* 2026-10-01: two answers is under the small-cell rule, so the age band is
+       not named; the two are counted in the one withheld line instead. */
+    expect(a.coverage.age['30–44']).toBeUndefined();
+    expect(a.coverage.age['fewer than 11, not shown']).toBe(2);
     expect(a.method).toMatch(/no imputation, no extrapolation/i);
+    expect(a.method).toMatch(/fewer than 11, not shown/);
+  });
+
+  it('publishes a self-description only at 11 answers or more, on the server, and never names a withheld value', () => {
+    const eleven = Array.from({ length: 11 }, () => rec({ ...VALID, context: { age: '30–44', state: 'Iowa' } }));
+    const one = rec({ ...VALID, context: { age: '18–29', state: 'Georgia', sex: 'Male' } });
+    const a = agg([...eleven, one]) as unknown as { n: number; coverage: Record<string, Record<string, number>>; coverageWithheld: Record<string, { cells: number; responses: number; min: number }>; firstAt: string; firstOn: string; lastAt: string };
+    expect(a.coverage.age).toEqual({ '30–44': 11, 'fewer than 11, not shown': 1 });
+    expect(a.coverage.state).toEqual({ Iowa: 11, 'fewer than 11, not shown': 1 });
+    expect(a.coverage.sex).toEqual({ 'not stated': 11, 'fewer than 11, not shown': 1 });
+    expect(a.coverageWithheld.state).toEqual({ cells: 1, responses: 1, min: 11 });
+    const text = JSON.stringify(a);
+    expect(text).not.toContain('Georgia');
+    expect(text).not.toContain('18–29');
+    // every breakdown still adds up to N in public
+    for (const k of Object.keys(a.coverage)) expect(Object.values(a.coverage[k]).reduce((x, y) => x + y, 0)).toBe(a.n);
+    // dates are the day, never the time
+    expect(a.firstOn).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+    expect(a.firstAt).toBe(a.firstOn + 'T00:00:00');
+    expect(a.lastAt).toMatch(/T00:00:00$/);
   });
 
   it('holds the free sentence back — the aggregate reports only how many were written', () => {

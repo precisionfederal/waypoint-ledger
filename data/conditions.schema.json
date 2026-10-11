@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://waypoint-ledger.pages.dev/data/conditions.schema.json",
+  "title": "Waypoint Ledger condition entry",
+  "description": "One object in data/conditions.json. Adding a condition is adding one object that passes this schema and data/verify_conditions.py; no code changes. Every field is required: a blank is written as null with a written reason beside it, never left out. No year-ahead dollar figure lives here: price_row_id points at a row already in data/prices.json. A figure that is not a year for one person (how many people have it, what a reported case cost, what it costs the country) goes in published_figures, with two sources and the exact sentence from each, and is never added to anyone's ledger.",
+  "type": "object",
+  "$defs": {
+    "nullableText": { "type": ["string", "null"] },
+    "longText": { "type": "string", "minLength": 20 },
+    "https": { "type": "string", "pattern": "^https://" },
+    "source": {
+      "type": "object",
+      "required": ["publisher", "title", "url", "quote", "read_on"],
+      "additionalProperties": false,
+      "properties": {
+        "publisher": { "type": "string", "minLength": 2 },
+        "title": { "type": "string", "minLength": 5 },
+        "url": { "$ref": "#/$defs/https" },
+        "quote": { "type": "string", "minLength": 10, "description": "The sentence or table cell exactly as the source prints it; data/verify_conditions.py finds it in the fetched page." },
+        "read_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" }
+      }
+    },
+    "publishedFigure": {
+      "type": "object",
+      "required": ["id", "kind", "headline", "measures", "population", "year", "is_government_publication",
+                   "publisher_note", "value_usd", "median_usd", "dollars_year", "compare_with_journey", "sources"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+        "kind": { "enum": ["per_case_cost", "prevalence", "national_cost", "incidence"] },
+        "headline": { "type": "string", "minLength": 3 },
+        "measures": { "$ref": "#/$defs/longText" },
+        "population": { "type": "string", "minLength": 5 },
+        "year": { "type": "string", "minLength": 4 },
+        "is_government_publication": { "type": "boolean" },
+        "publisher_note": { "$ref": "#/$defs/longText" },
+        "value_usd": { "type": ["number", "null"], "minimum": 0 },
+        "median_usd": { "type": ["number", "null"], "minimum": 0 },
+        "dollars_year": { "type": ["integer", "null"], "minimum": 1990, "maximum": 2100 },
+        "compare_with_journey": { "type": "boolean" },
+        "differs_from_journey": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 20 },
+          "description": "Plain sentences on why this figure and a journey the tool prices are not the same number. Required when compare_with_journey is true." },
+        "sources": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/source" } }
+      },
+      "allOf": [
+        { "if": { "properties": { "compare_with_journey": { "const": true } } },
+          "then": { "required": ["differs_from_journey"], "properties": { "kind": { "const": "per_case_cost" } } } },
+        { "if": { "properties": { "kind": { "enum": ["per_case_cost"] } } },
+          "then": { "properties": { "value_usd": { "type": "number" }, "dollars_year": { "type": "integer" } } } },
+        { "if": { "properties": { "kind": { "enum": ["prevalence", "incidence"] } } },
+          "then": { "properties": { "value_usd": { "type": "null" }, "median_usd": { "type": "null" }, "compare_with_journey": { "const": false } } } }
+      ]
+    }
+  },
+  "required": [
+    "id", "label", "also_called",
+    "icd10cm", "icd10cm_title", "icd10cm_billable",
+    "price_row_id", "figure_kind",
+    "note", "definition_caveat",
+    "sex_note", "sex_note_source", "sex_note_source_url",
+    "published_figures", "example_journey", "picker"
+  ],
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]+$" },
+    "label": { "type": "string", "minLength": 3 },
+    "also_called": { "type": "array", "items": { "type": "string", "minLength": 2 } },
+
+    "icd10cm": { "type": ["string", "null"], "pattern": "^[A-Z][0-9][0-9A-Z](\\.[0-9A-Z]{1,4})?$" },
+    "icd10cm_title": { "$ref": "#/$defs/nullableText" },
+    "icd10cm_source": { "$ref": "#/$defs/nullableText" },
+    "icd10cm_billable": { "type": ["boolean", "null"] },
+    "icd10cm_billable_note": { "$ref": "#/$defs/nullableText" },
+    "icd10cm_first_effective": { "type": ["string", "null"], "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "icd10cm_first_effective_evidence": { "$ref": "#/$defs/nullableText" },
+    "icd10cm_blank_reason": { "$ref": "#/$defs/nullableText" },
+
+    "price_row_id": { "type": ["string", "null"] },
+    "figure_kind": { "enum": ["excess", "condition_attributed", null] },
+    "figure_kind_label": { "$ref": "#/$defs/nullableText" },
+    "figure_is_government_publication": { "type": ["boolean", "null"] },
+    "figure_publisher_note": { "$ref": "#/$defs/nullableText" },
+    "figure_analysis_credit": { "$ref": "#/$defs/nullableText" },
+    "figure_face_provenance": { "$ref": "#/$defs/nullableText" },
+    "out_of_pocket_row_id": { "$ref": "#/$defs/nullableText" },
+    "median_blank_reason": { "$ref": "#/$defs/nullableText" },
+
+    "note": { "$ref": "#/$defs/nullableText" },
+    "definition_caveat": { "$ref": "#/$defs/nullableText" },
+
+    "sex_note": { "$ref": "#/$defs/nullableText" },
+    "sex_note_source": { "$ref": "#/$defs/nullableText" },
+    "sex_note_source_url": { "type": ["string", "null"], "pattern": "^https://" },
+    "sex_note_blank_reason": { "$ref": "#/$defs/nullableText" },
+
+    "national_context": { "$ref": "#/$defs/nullableText" },
+    "national_context_source": { "$ref": "#/$defs/nullableText" },
+    "national_context_url": { "type": ["string", "null"], "pattern": "^https://" },
+    "national_context_verified_on": { "$ref": "#/$defs/nullableText" },
+
+    "published_figures": { "type": "array", "items": { "$ref": "#/$defs/publishedFigure" } },
+    "picker": { "enum": ["chip", "list"], "description": "Where the condition sits in the chooser: a chip, or an entry in the 'another condition' list. Presentation only; every condition prices the same way." },
+    "example_journey": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "object", "required": ["sentence", "composed_from"], "additionalProperties": false,
+          "properties": {
+            "sentence": { "type": "string", "minLength": 20 },
+            "composed_from": { "$ref": "#/$defs/longText" } } }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "allOf": [
+    { "description": "A code carries its title, billable flag and source; no code carries a written reason.",
+      "if": { "properties": { "icd10cm": { "type": "string" } } },
+      "then": { "required": ["icd10cm_source", "icd10cm_billable_note", "icd10cm_first_effective", "icd10cm_first_effective_evidence"],
+                "properties": { "icd10cm_title": { "type": "string" }, "icd10cm_billable": { "type": "boolean" } } },
+      "else": { "required": ["icd10cm_blank_reason"], "properties": { "icd10cm_blank_reason": { "type": "string", "minLength": 60 } } } },
+    { "description": "A year-ahead figure names its kind and who published it; an absence names neither.",
+      "if": { "properties": { "price_row_id": { "type": "string" } } },
+      "then": { "required": ["figure_kind_label", "figure_is_government_publication", "figure_publisher_note"],
+                "properties": { "figure_kind": { "enum": ["excess", "condition_attributed"] } } },
+      "else": { "properties": { "figure_kind": { "type": "null" } } } },
+    { "description": "A sentence about sex carries its source; a blank carries its reason.",
+      "if": { "properties": { "sex_note": { "type": "string" } } },
+      "then": { "properties": { "sex_note_source": { "type": "string" }, "sex_note_source_url": { "type": "string" } } },
+      "else": { "required": ["sex_note_blank_reason"],
+                "properties": { "sex_note_source": { "type": "null" }, "sex_note_source_url": { "type": "null" },
+                                "sex_note_blank_reason": { "type": "string", "minLength": 40 } } } }
+  ]
+}

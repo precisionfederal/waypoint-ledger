@@ -56,6 +56,13 @@ export async function onRequestGet({ params, request, env }) {
     return bad(`No published figure has the identifier "${priceId}". GET /api/table lists every row, and every id is in /data/price-table.csv.`, 404);
   }
 
+  /* FLOW adopter-7: "a value we cannot honour is never ignored". Checked before the
+     register is read, so a wrong format costs no query. */
+  const format = new URL(request.url).searchParams.get('format');
+  if (format !== null && format !== 'text') {
+    return bad(`format must be "text" or left out (JSON is the default); "${format.slice(0, 40)}" is not offered.`, 400);
+  }
+
   let counts;
   try { counts = await countsFor(env, priceId); }
   catch { return bad('The register could not be read right now, so the counts for this figure are unavailable. The provenance is unchanged and is in /api/table/' + priceId + '.', 503); }
@@ -75,7 +82,7 @@ export async function onRequestGet({ params, request, env }) {
   };
   const text = citationText(cite, asOf, site);
 
-  const wantsText = url.searchParams.get('format') === 'text'
+  const wantsText = format === 'text'
     || (request.headers.get('accept') || '').includes('text/plain');
   if (wantsText) {
     return new Response(text + '\n', {
@@ -116,7 +123,7 @@ export async function onRequestGet({ params, request, env }) {
     },
     publicSignal: {
       ...counts,
-      sample: 'Self-selected members of the public using a free tool. Counts are reported exactly as entered — no weighting, no imputation, no extrapolation to a population.',
+      sample: 'Self-selected members of the public using a free tool. Counts are reported exactly as entered: no weighting, no imputation, no extrapolation to a population.',
       medianNote: 'publicMedianBelievedUsd is a demand signal about the published figure. It is never used to price a ledger.',
     },
     text,

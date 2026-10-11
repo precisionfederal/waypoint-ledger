@@ -26,6 +26,8 @@
 # Exit 0 up, 1 down. It is READ-ONLY: three GETs, no account, no register row.
 # ==========================================================================
 set -uo pipefail
+# Our own traffic says so, and is counted apart from real use (cf/functions/api/_use.js).
+curl() { command curl -H 'x-waypoint-synthetic: uptime-check' "$@"; }
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ORIGIN="${1:-${UPTIME_ORIGIN:-https://waypoint-ledger.pages.dev}}"

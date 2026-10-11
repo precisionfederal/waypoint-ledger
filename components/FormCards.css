@@ -1,0 +1,275 @@
+/* ==========================================================================
+   PAGES DETAIL (2026-09-30): /survey and /interview as one question per card.
+   Scoped under .fc (both forms add it to their section). No wording changes:
+   every question, option and note is the form's own; only the surfaces move.
+   Tokens only, so light and dark hold.
+   ========================================================================== */
+.fc .wrap.narrow{max-width:48rem;margin-inline:auto}
+/* a hidden alert stays hidden: .match-note sets display, which beat the attribute */
+.fc [hidden]{display:none !important}
+.fc h1{margin-bottom:.6rem}
+.fc>.wrap>.sub{margin:0 0 1rem;color:var(--ink-2)}
+
+/* the progress line: sticky under the header so it is seen while answering */
+.fc-progress{position:sticky;top:4.5rem;z-index:5;display:flex;align-items:center;gap:1rem;
+  margin:0 0 1.25rem;padding:.7rem 1rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.fc-progress-t{margin:0;flex:none;font-size:.9375rem;color:var(--ink-2)}
+.fc-progress-t b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.fc-bar{flex:1 1 auto;height:.5rem;border-radius:var(--r-pill);background:var(--ground-2);overflow:hidden;min-width:4rem}
+.fc-bar span{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .25s ease}
+@media (prefers-reduced-motion:reduce){.fc-bar span{transition:none}}
+
+/* one question per card */
+.fc .q{margin:0 0 1rem;padding:1.25rem 1.35rem 1.35rem;background:var(--surface);border:1px solid var(--line-2);
+  border-radius:var(--r-lg);box-shadow:var(--sh-1);max-width:none}
+.fc fieldset.q>legend{float:left;width:100%;padding:0;margin:0 0 .9rem;font-family:var(--font-b);font-weight:600;
+  font-size:1.0625rem;line-height:1.4;color:var(--ink);max-width:none}
+.fc fieldset.q>legend+*{clear:both}
+.fc .q .field>span:first-child{font-family:var(--font-b);font-weight:600;font-size:1.0625rem;line-height:1.4;max-width:none}
+.fc .q-n{width:1.75rem;height:1.75rem;margin-right:.6rem;vertical-align:.1rem;background:var(--accent-soft);color:var(--accent-ink);
+  font-family:var(--font-b);font-weight:700;font-size:.875rem}
+.fc legend .micro{font-weight:500;color:var(--ink-3)}
+
+/* choices: calm cards, the chosen one in accent */
+.fc .choice{border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface)}
+.fc .choice:hover{border-color:var(--ink-4)}
+.fc .choice.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.fc .choice input{accent-color:var(--accent)}
+
+/* the notes: consent and privacy lines as a calm aside, never a wall */
+.fc .q>.micro,.fc .q-optional>.micro,.fc-note{margin:.85rem 0 0;padding:.65rem .85rem;border-radius:var(--r-md);
+  background:var(--surface-2);font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+.fc-note{margin:0 0 1.25rem}
+.fc .q>.micro:first-of-type{margin-top:.85rem}
+
+/* ranking: the picked list is numbered cards; the pool is cards to tap */
+.fc .rank-picked{gap:.5rem;margin:0 0 .75rem}
+.fc .rank-picked li .rank-chip{width:100%;justify-content:flex-start;border-radius:var(--r-md);background:var(--surface);
+  color:var(--ink);border:1px solid var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.fc .rank-picked li .rank-chip .rank-n{background:var(--accent);color:var(--surface);width:1.75rem;height:1.75rem;
+  display:inline-grid;place-items:center;border-radius:50%;font-weight:700}
+.fc .rank-pool{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,13rem),1fr));gap:.5rem;padding:.9rem;
+  border:1px dashed var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.fc .rank-pool .micro{grid-column:1/-1;margin:0}
+.fc .rank-pool .rank-chip{width:100%;justify-content:flex-start;border-radius:var(--r-md);border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.fc .rank-pool .rank-chip:hover{border-color:var(--accent)}
+.fc .rank-chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* FLOW contrib-8: each placed burden carries a move-up and a move-down arrow,
+   44 px squares, so reordering is one tap per place */
+.fc .rank-picked li{display:flex;gap:.4rem;align-items:stretch}
+.fc .rank-picked li .rank-chip{flex:1 1 auto;min-width:0}
+.fc .rank-move{flex:none;width:44px;min-height:44px;display:inline-grid;place-items:center;padding:0;border:1px solid var(--line);
+  border-radius:var(--r-md);background:var(--surface);color:var(--ink);font:inherit;font-size:1.1rem;font-weight:700;cursor:pointer}
+.fc .rank-move:hover:not(:disabled){border-color:var(--accent);color:var(--accent-ink)}
+.fc .rank-move:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.fc .rank-move:disabled{opacity:.35;cursor:default}
+
+/* FLOW contrib-10: what is still missing sits inside the sticky progress card */
+.fc-progress{flex-wrap:wrap}
+.fc-still{flex:1 0 100%;margin:0;font-size:.9375rem;line-height:1.45;color:var(--flag-ink);font-weight:600}
+/* a question card that takes focus on an early press shows it plainly */
+.fc fieldset.q:focus{outline:none}
+/* clears the sticky header and the sticky progress card when scrolled to (access-5) */
+.fc fieldset.q[data-q]{scroll-margin-top:11rem}
+.fc fieldset.q:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+
+/* FLOW contrib-5 and 7: the restored or saved draft line */
+.fc-restored{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .9rem;margin:0 0 1rem;padding:.55rem .85rem;
+  border-radius:var(--r-md);background:var(--accent-soft);color:var(--ink);font-size:.9375rem}
+.fc-restored .btn{min-height:44px}
+.fc-restored .check{margin:0}
+
+/* FLOW contrib-9: what the register shows from the answer just sent */
+.survey-shows{margin:1.25rem 0;padding:1.1rem 1.35rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg)}
+.survey-shows h2{font-size:1.125rem;margin:0 0 .5rem}
+.survey-shows ul{margin:0 0 .75rem;padding-left:1.2rem;color:var(--ink-2)}
+.survey-shows li{margin:.3rem 0}
+.survey-shows p{margin:0;font-weight:600}
+
+/* the optional block and the interview list */
+.fc .q-optional{padding:0;overflow:hidden}
+.fc .q-optional>summary{padding:1rem 1.35rem;min-height:3.25rem;font-weight:600;color:var(--ink)}
+.fc .q-optional[open]>summary{margin:0;border-bottom:1px solid var(--line-2)}
+.fc .q-optional>*:not(summary){margin-left:1.35rem;margin-right:1.35rem}
+.fc .q-optional>*:last-child{margin-bottom:1.35rem}
+.fc .q-optional>.ctx-grid{margin-top:1rem}
+.fc .int-list{list-style:none;padding:0;margin:0}
+.fc .int-list .q .field{display:flex;flex-direction:column;gap:.75rem}
+.fc textarea{width:100%;min-height:6.5rem}
+/* FLOW contrib-6: a long answer grows its box (JS sets the height; this caps it) */
+.fc .int-list textarea{min-height:7.5rem;max-height:60vh;resize:vertical;overflow-y:auto}
+/* FLOW contrib-13: the answer that is too short to count, said under its box */
+.fc .int-short{margin:.5rem 0 0;font-size:.9375rem;color:var(--warn-ink);font-weight:600}
+
+.fc .step-actions{margin-top:1.5rem;padding:1.1rem 1.35rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg)}
+.fc .step-actions .micro{margin:0}
+.fc .fp-row{margin-top:1rem}
+
+@media (max-width:560px){
+  .fc .q{padding:1rem 1rem 1.1rem}
+  .fc-progress{flex-direction:column;align-items:stretch;gap:.45rem;padding:.6rem .85rem}
+  .fc .q-optional>summary{padding:.9rem 1rem}
+  .fc .q-optional>*:not(summary){margin-left:1rem;margin-right:1rem}
+  .fc .step-actions{padding:1rem}
+}
+
+/* ==========================================================================
+   VISUAL contrib (2026-09-30 night): the contributing pages as the most
+   respected part of the product. Tokens only; light first, dark holds; every
+   motion is off under prefers-reduced-motion.
+   ========================================================================== */
+
+/* the page head: the one inner-page hero (critic-6), the same as /gap and
+   /register: words left, art right at up to 527 px, the same H1 token, the
+   head as wide as their content box (70rem); one column under 860 px with the
+   art above the words. The art's edges fade on all four sides (critic-15), so
+   no box edge shows against the ground in either theme. */
+.fc-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,527px);gap:clamp(1.5rem,3vw,2.5rem);align-items:center;margin:0 0 1.25rem}
+.fc-head-copy{min-width:0}
+/* judge-2 #14: the inner-page hero H1 role, the shared --hero-h1 token in app/globals.css (re-merge). */
+.fc-head-copy h1{font-size:var(--hero-h1);line-height:1.1;letter-spacing:-.025em;max-width:18ch;margin:.2rem 0 .8rem}
+.fc-head-copy>.sub{margin:0;color:var(--ink-2);font-size:1.125rem;line-height:1.55}
+.fc-hero{display:block;width:100%;height:auto;aspect-ratio:1200/525;border-radius:var(--r-lg);
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,transparent 0,#000 9%,#000 91%,transparent 100%),linear-gradient(180deg,transparent 0,#000 9%,#000 84%,transparent 100%);
+  mask-composite:intersect;
+  animation:fc-hero .7s cubic-bezier(.2,.7,.2,1) both}
+@keyframes fc-hero{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (min-width:861px){.fc-head{margin-inline:calc((100% - min(70rem, 100vw - 5rem)) / 2)}}
+@media (max-width:860px){
+  .fc-head{grid-template-columns:1fr;gap:.25rem}
+  .fc-hero{order:-1;max-height:11rem;aspect-ratio:auto;object-fit:cover;object-position:50% 55%;margin-bottom:.5rem}
+  .fc-head-copy h1{max-width:none}
+}
+/* a fieldset is min-content wide by default; the ranking row must be able to shrink (320 px) */
+.fc fieldset.q{min-inline-size:0;min-width:0}
+/* inline links in the form's notes get a 44 px tall hit area without moving a line */
+.fc .q a,.fc .fc-note a,.fc .fp-row a{padding-block:.875rem;margin-block:-.875rem;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+
+/* the progress line as waypoints on a path */
+.fc-wp{position:relative;flex:1 1 auto;min-width:6rem;height:1.75rem}
+.wp-track{position:absolute;inset:0 .55rem}
+.wp-line{position:absolute;left:0;right:0;top:50%;height:3px;margin-top:-1.5px;border-radius:3px;background:var(--ground-2)}
+.wp-line>span{display:block;height:100%;border-radius:inherit;background:var(--accent);transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.wp-dot{position:absolute;top:50%;width:1.05rem;height:1.05rem;margin:-.525rem 0 0 -.525rem;border-radius:50%;
+  background:var(--surface);border:2px solid var(--ink-4);transition:background .3s ease-out,border-color .3s ease-out,box-shadow .3s ease-out}
+.wp-dot.on{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.wp-dot.on::after{content:'';position:absolute;left:50%;top:45%;width:.22rem;height:.42rem;margin:-.26rem 0 0 -.11rem;
+  border:solid var(--on-accent,#fff);border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+/* each question card is a waypoint: its number fills when it is answered */
+.fc .q{padding:1.4rem 1.5rem 1.5rem;transition:border-color .3s ease-out,box-shadow .3s ease-out}
+.fc fieldset.q>legend,.fc .q .field>span:first-child{font-size:1.125rem;line-height:1.45}
+.fc .q-n{transition:background .3s ease-out,color .3s ease-out}
+.fc .q[data-done] .q-n{background:var(--accent);color:var(--on-accent,#fff)}
+.fc .q[data-done]{border-color:color-mix(in srgb,var(--accent) 30%,var(--line-2))}
+
+/* choices: a drawn radio that fills, so the pick reads at a glance */
+.fc .choice{min-height:3rem;transition:border-color .15s,background .15s,box-shadow .15s}
+.fc .choice input[type=radio]{appearance:none;-webkit-appearance:none;width:1.3rem;height:1.3rem;margin:0;flex:none;border-radius:50%;
+  border:2px solid var(--ink-4);background:var(--surface);display:inline-grid;place-items:center;cursor:pointer;transition:border-color .15s}
+.fc .choice input[type=radio]::before{content:'';width:.62rem;height:.62rem;border-radius:50%;background:var(--accent);transform:scale(0);transition:transform .2s cubic-bezier(.2,.7,.2,1)}
+.fc .choice input[type=radio]:checked{border-color:var(--accent)}
+.fc .choice input[type=radio]:checked::before{transform:scale(1)}
+.fc .choice:has(input:focus-visible){outline:2px solid var(--accent-ink);outline-offset:2px}
+.fc .choice.on span{color:var(--ink);font-weight:600}
+
+/* the ranking: a board, the five places above and the burdens to place below */
+.fc .rank-board{display:flex;flex-direction:column;gap:.75rem}
+.fc .rank-order{padding:.75rem;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--line-2)}
+.fc .rank-end{margin:0 0 .5rem;font-size:.9375rem;font-weight:600;color:var(--ink-3)}
+.fc .rank-end:last-child{margin:.5rem 0 0}
+.fc .rank-picked{margin:0}
+.fc .rank-picked li .rank-chip{min-height:3rem;border:1px solid var(--line);background:var(--surface);
+  box-shadow:0 1px 2px rgba(17,28,39,.06),0 6px 14px -8px rgba(17,28,39,.22)}
+.fc .rank-picked li .rank-chip .rank-n{flex:none}
+.fc .rank-slots{list-style:none;margin:.5rem 0 0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.fc .rank-slots li{min-height:3rem;display:flex;align-items:center;padding:0 1rem;border:1.5px dashed var(--line);border-radius:var(--r-md)}
+.fc .rank-slots .rank-n{width:1.75rem;height:1.75rem;display:inline-grid;place-items:center;border-radius:50%;
+  border:1.5px solid var(--line);color:var(--ink-3);font-weight:700;font-variant-numeric:tabular-nums}
+.fc .rank-pool{padding:0;border:0;background:none}
+.fc .rank-pool .rank-chip{min-height:3rem;box-shadow:0 1px 2px rgba(17,28,39,.05);transition:border-color .15s,box-shadow .15s,transform .15s}
+.fc .rank-pool .rank-chip:hover{box-shadow:0 1px 2px rgba(17,28,39,.06),0 8px 18px -10px rgba(17,28,39,.3);transform:translateY(-1px)}
+@media (max-width:640px){.fc .rank-slots li:not(:first-child){display:none}}
+
+/* the thank-you: a moment, not a receipt */
+.fc-done .ty{margin:0 0 1.5rem}
+.ty-head{text-align:center;display:flex;flex-direction:column;align-items:center;padding:clamp(1.5rem,4vw,2.5rem) clamp(1rem,4vw,2.5rem);
+  background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2)}
+.ty-art{width:min(16rem,62%);height:auto;margin:0 0 1rem;animation:ty-art .6s cubic-bezier(.2,.7,.2,1) both}
+.ty-head h1{max-width:24ch;margin:.25rem auto .75rem}
+.ty-head .sub{max-width:38rem;margin:0 auto;color:var(--ink-2)}
+.ty-count{margin:1.5rem 0 0;display:flex;flex-direction:column;align-items:center;gap:.2rem;padding:1rem 1.75rem;border-radius:var(--r-lg);background:var(--accent-soft)}
+.ty-n{font-family:var(--font-d);font-size:clamp(2.75rem,6vw,3.5rem);font-weight:700;line-height:1;letter-spacing:-.02em;color:var(--accent-ink);font-variant-numeric:tabular-nums;text-align:center}
+.ty-lab{font-size:1rem;color:var(--ink);font-weight:600}
+.ty-link{margin-top:.35rem;font-size:.9375rem;font-weight:600;color:var(--accent-ink);min-height:44px;display:inline-flex;align-items:center}
+.ty-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:1rem;align-items:stretch}
+.ty-grid>.micro{grid-column:1/-1;margin:0}
+.ty-grid>.survey-shows,.ty-grid>.survey-next{margin:0;padding:1.25rem 1.4rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.ty-grid h2{font-size:1.125rem;margin:0 0 .5rem}
+.ty-grid .survey-next p{color:var(--ink-2)}
+.fc-done .ty-onward{margin-top:1rem;padding:0;background:none;border:0;display:flex;flex-wrap:wrap;gap:.6rem}
+@keyframes ty-art{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+
+@media (prefers-reduced-motion:reduce){
+  .wp-line>span,.wp-dot,.fc .q,.fc .q-n,.fc .choice,.fc .choice input[type=radio]::before,.fc .rank-pool .rank-chip{transition:none}
+  .fc .rank-pool .rank-chip:hover{transform:none}
+  .ty-art,.fc-hero{animation:none}
+}
+/* badge numerals at the body floor */
+.fc .q-n{width:1.9rem;height:1.9rem;font-size:.9375rem}
+.fc .rank-picked li .rank-chip .rank-n,.fc .rank-slots .rank-n{width:1.9rem;height:1.9rem;font-size:.9375rem}
+
+/* /interview: a calm writing space. Generous type on a soft paper surface that
+   turns white when it is written in; the saved line reads as reassurance. */
+.fc .int-list .q{padding:1.5rem 1.6rem 1.6rem}
+.fc .int-list textarea{font-size:1.0625rem;line-height:1.7;padding:1rem 1.15rem;border:1px solid var(--line);border-radius:var(--r-md);
+  background:var(--surface-2);color:var(--ink);transition:background .2s,border-color .2s,box-shadow .2s}
+.fc .int-list textarea:hover{border-color:var(--ink-4)}
+.fc .int-list textarea:focus{background:var(--surface);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fc .int-list textarea::placeholder{color:var(--ink-3)}
+.fc-draft{background:var(--surface);border:1px solid var(--line-2);box-shadow:var(--sh-1)}
+.fc-draft-t{display:inline-flex;align-items:center;gap:.6rem;min-height:44px}
+.fc-draft-dot{flex:none;width:.7rem;height:.7rem;border-radius:50%;background:var(--ink-4)}
+.fc-draft[data-saved] .fc-draft-dot{background:var(--good);box-shadow:0 0 0 4px var(--good-soft);animation:fc-saved .6s ease-out}
+@keyframes fc-saved{from{box-shadow:0 0 0 0 var(--good-soft)}to{box-shadow:0 0 0 4px var(--good-soft)}}
+.fc-draft .check{flex:1 1 100%}
+@media (prefers-reduced-motion:reduce){.fc .int-list textarea{transition:none}.fc-draft[data-saved] .fc-draft-dot{animation:none}}
+.fc-restored .btn.small{font-size:.9375rem}
+/* access2-1: Clear asks first */
+.fc-confirm{flex:1 1 100%;display:flex;flex-wrap:wrap;align-items:center;gap:.5rem .6rem;padding:.6rem .75rem;border-radius:var(--r-md);
+  background:var(--flag-soft);border:1px solid color-mix(in srgb,var(--flag-ink) 35%,transparent)}
+.fc-confirm-q{flex:1 1 14rem;font-weight:600;color:var(--ink)}
+.fc-confirm .btn{min-height:44px;font-size:.9375rem}
+.fc .fc-danger{background:var(--flag-ink);border-color:var(--flag-ink);color:var(--surface)}
+.fc .fc-danger:hover{background:color-mix(in srgb,var(--flag-ink) 88%,#000);color:var(--surface)}
+/* the burden marks on the ranking cards */
+.fc .rank-ico{flex:none;display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent-ink)}
+.fc .rank-chip{gap:.65rem}
+@media (max-width:640px){.fc .rank-picked .rank-ico{display:none}}
+/* the research panel's completion code (dormant: shown only when the server returns one) */
+.ty-panel{width:100%;max-width:38rem;text-align:left;margin:1.25rem 0 0;padding:1rem 1.2rem;display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1rem;
+  background:var(--surface);border:1px solid var(--accent);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.ty-panel-t{flex:1 1 18rem;margin:0;font-weight:600;color:var(--ink)}
+.ty-panel-code{font-family:var(--font-m);font-size:1.0625rem;padding:.15rem .45rem;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--ink);overflow-wrap:anywhere}
+.ty-panel-copy{min-height:44px}
+.ty-panel-said{flex:1 1 100%;margin:0;font-size:.9375rem;color:var(--ink-2)}
+.ty-panel-said:empty{display:none}
+/* judge-2 #11c: question 6's (i) sits on the label's line, not orphaned below it */
+.fc fieldset.q-sex>legend{width:auto;margin-right:.6rem}
+.fc fieldset.q-sex>legend+.fp{clear:none;margin:.2rem 0 .9rem;padding-top:.15rem}
+.fc fieldset.q-sex>.fp+*{clear:both}
+/* judge-2 #11b: the optional fold carries the same open mark as the other folds (+ shut, en rule open) */
+.fc .q-optional>summary{display:flex;align-items:center;justify-content:space-between;gap:1rem;list-style:none;cursor:pointer}
+.fc .q-optional>summary::-webkit-details-marker{display:none}
+.fc .q-optional>summary::after{content:'+';flex:none;width:2rem;height:2rem;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:50%;
+  background:var(--surface);font-family:var(--font-m);font-size:1.2rem;line-height:1;font-weight:400;color:var(--ink-2)}
+.fc .q-optional[open]>summary::after{content:'\2013'}
+.fc .q-optional>summary:hover::after{color:var(--ink);border-color:var(--ink-4)}
+/* judge-2 #11a: the other questions wait behind one calm button */
+.fc .int-more{margin:0 0 1rem;padding:1.1rem 1.35rem;display:flex;flex-wrap:wrap;align-items:center;gap:.75rem 1.25rem;
+  background:var(--surface-2);border:1.5px dashed var(--line);border-radius:var(--r-lg)}
+.fc .int-more p{flex:1 1 18rem;margin:0;color:var(--ink-2)}
+.fc .int-more .btn{min-height:44px}

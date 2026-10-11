@@ -1,0 +1,53 @@
+/* /privacy, VISUAL-4b: hero, the parent's three answers, the glance cards, fold
+   icon chips and the reveal. Tokens only; the hero art has a dark twin. */
+
+/* ---- hero: Kit PageHero (components/trust). .hero stays only as the anchor
+   the reveal rules below key off; it carries no layout of its own. ---- */
+.hero{position:relative}
+.promiseSub{font-size:1rem;color:var(--ink-2);margin:0 0 1.1rem}
+.points{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.5rem}
+.points li{display:flex;gap:.6rem;align-items:flex-start;color:var(--ink-2);font-size:1rem;line-height:1.45}
+.points svg{color:var(--accent);flex:none;margin-top:.1rem}
+
+/* ---- the three questions a parent asks (FLOW contrib-17) ---- */
+.answers{margin:1.25rem 0 0;padding:clamp(1rem,3vw,1.5rem);background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.h{font-size:1.25rem;margin:0 0 .9rem}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));gap:1rem 1.5rem;margin:0}
+.dl>div{min-width:0}
+.dl dt{display:flex;align-items:center;gap:.55rem;font-weight:700;color:var(--ink);margin:0 0 .4rem}
+.dl dd{margin:0;color:var(--ink-2);font-size:.9375rem;line-height:1.55}
+.dIc{display:inline-flex;width:2rem;height:2rem;flex:none;border-radius:var(--r-sm);align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-ink)}
+.dIc svg{width:18px;height:18px}
+.more{margin:1rem 0 0;font-size:.9375rem;color:var(--ink-2)}
+.more a,.dl a{display:inline-block;padding:.35rem 0}
+@media (max-width:640px){.more a{display:inline-flex;align-items:center;min-height:44px;padding:0}}
+
+/* ---- at a glance ---- */
+.bandH{font-size:clamp(1.35rem,2vw,1.625rem);margin:2.5rem 0 1rem}
+.glance{list-style:none;margin:0 0 .5rem;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+.gCard{display:flex;flex-direction:column;gap:.3rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.1rem 1.2rem 1.2rem;min-width:0}
+.gIc{display:inline-flex;width:2.4rem;height:2.4rem;align-items:center;justify-content:center;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent-ink);margin-bottom:.4rem}
+.gBig{font-family:var(--font-d);font-weight:700;font-size:1.5rem;line-height:1.15;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.gSep{color:var(--ink-4);font-weight:400;margin:0 .1rem}
+.gText{font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+@media (max-width:900px){.glance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.glance{grid-template-columns:1fr;gap:.6rem}.gCard{display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:.85rem;padding:.9rem 1rem}.gIc{grid-row:span 2;margin:0;width:2.2rem;height:2.2rem}.gBig{font-size:1.25rem}}
+
+/* ---- fold heading icon chips ---- */
+.fIc{display:inline-flex;vertical-align:middle;width:2rem;height:2rem;margin:-.2rem .6rem 0 0;border-radius:var(--r-sm);align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-ink)}
+.fIc svg{width:18px;height:18px}
+
+/* ---- reveal, once (components/privacy/PrivacyMotion.tsx sets data-pv) ---- */
+.glance [data-pv="wait"],.hero~:global([data-pv="wait"]){opacity:0;transform:translateY(14px)}
+.glance [data-pv="in"],.hero~:global([data-pv="in"]){opacity:1;transform:none;transition:opacity .5s ease-out,transform .5s ease-out}
+.glance [data-pv="in"]:nth-child(2){transition-delay:60ms}
+.glance [data-pv="in"]:nth-child(3){transition-delay:120ms}
+.glance [data-pv="in"]:nth-child(4){transition-delay:180ms}
+.glance [data-pv="in"]:nth-child(5){transition-delay:240ms}
+.glance [data-pv="in"]:nth-child(6){transition-delay:300ms}
+@media (prefers-reduced-motion:reduce){.glance [data-pv],.hero~:global([data-pv]){opacity:1!important;transform:none!important;transition:none!important}}
+
+/* ---- the generated field tables: reading size everywhere (15 px floor) ---- */
+.of.of{font-size:.9375rem}
+.fTbl.fTbl caption,.fTbl.fTbl thead th{font-size:.9375rem}
+.gloss.gloss{font-size:.9375rem}

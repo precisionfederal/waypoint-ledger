@@ -31,8 +31,9 @@ import urllib.parse, urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PRICES = os.path.join(HERE, 'prices.json')
-DEFAULT_RVU = ("/private/tmp/claude-501/-Users-bo-Documents-100M-Lifetime-Revenue-Precision-"
-               "Federal-Proposal-Builder/5a45513e-1a30-4734-8f49-694b18a231f1/scratchpad/price-table")
+# The CMS RVU files live outside the repository. Point WL_RVU_SRC (or --rvu) at
+# the directory that holds rvu26c/PPRRVU2026_Jul_nonQPP.csv.
+DEFAULT_RVU = os.environ.get('WL_RVU_SRC')
 UA = 'WaypointLedger/1.0 (+https://waypoint-ledger.pages.dev; bo@precisionfederal.com)'
 
 # ---------------------------------------------------------------- agency
@@ -169,6 +170,9 @@ def main():
     ap.add_argument('--no-net', action='store_true',
                     help='skip everything that needs a fetch (LOINC, GSA)')
     a = ap.parse_args()
+    if not a.rvu:
+        sys.exit('annotate_price_table: set WL_RVU_SRC (or pass --rvu) to the directory '
+                 'that holds rvu26c/PPRRVU2026_Jul_nonQPP.csv')
 
     data = json.load(open(PRICES, encoding='utf-8'))
     items = data['items']
@@ -252,7 +256,7 @@ def main():
         else:
             row = {
                 'id': 'gsa2026-pov-mileage-rate',
-                'label': 'INPUT ONLY — the federal mileage rate for driving your own car',
+                'label': 'INPUT ONLY: the federal mileage rate for driving your own car',
                 'plain_language_synonyms': ['mileage', 'driving to appointments', 'gas money',
                                             'miles driven', 'travel to the doctor'],
                 'value_usd': g['rate'],
@@ -268,7 +272,7 @@ def main():
                 'coverage_statement': (
                     '🔴 THIS IS NOT A MEDICAL PRICE AND NOBODY WILL PAY IT TO YOU. It is the rate the '
                     'federal government reimburses its OWN employees, per mile, for driving a personal '
-                    'car on official travel — $%.2f a mile, effective %s. It is in this table for one '
+                    'car on official travel: $%.2f a mile, effective %s. It is in this table for one '
                     'reason: the driving a long diagnostic search costs is real, and the only published '
                     'federal figure that puts a dollar on a mile is this one. If you count your miles '
                     'with it you are borrowing the government\'s own number for its own travel, which is '

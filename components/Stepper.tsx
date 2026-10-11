@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import Link from '@/components/IntentLink';
 const STEPS = [
   { n: 1, label: 'Describe', href: '/journey' },
   { n: 2, label: 'Your ledger', href: '/ledger' },

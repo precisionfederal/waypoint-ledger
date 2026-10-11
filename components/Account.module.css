@@ -1,0 +1,36 @@
+/* /account sign card (FLOW contrib-14). On a phone the two doors are a switch,
+   so the email and password door is one tap away instead of 1.5 screens down.
+   From 641 px up both doors show, one above the other, as before. */
+.switch{display:none}
+@media (max-width:640px){
+  .switch{display:flex;flex-wrap:nowrap;margin:0 0 1rem}
+  .switch button{flex:1;min-height:44px;font-size:.9375rem;padding:.4rem .5rem}
+  .or{display:none}
+  .card[data-door="passkey"] .password{display:none}
+  .card[data-door="password"] .passkey{display:none}
+}
+.passkey,.password{min-width:0}
+
+/* VISUAL contrib (2026-09-30 night): two doors as two clear choices. Each door
+   is its own panel with its own mark; the phone switch is a calm segmented
+   control; the account art sits over the promise. */
+.spot{display:block;width:clamp(12rem,22vw,16rem);height:auto;aspect-ratio:480/210;object-fit:cover;object-position:50% 52%;margin:0 0 .75rem -.6rem;animation:spot-in .6s cubic-bezier(.2,.7,.2,1) both}
+@keyframes spot-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.doorH{display:flex;align-items:center;gap:.65rem}
+.doorIcon{flex:none;width:2.25rem;height:2.25rem;display:inline-grid;place-items:center;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink)}
+.doorIcon svg{width:1.15rem;height:1.15rem}
+.passkey,.password{padding:1.15rem 1.2rem 1.25rem;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface-2)}
+.passkey h2,.password h2{font-size:1.25rem;margin:0 0 .6rem}
+.passkey>p{color:var(--ink-2)}
+.card .switch{padding:4px;gap:4px;border-radius:var(--r-pill);background:var(--ground-2)}
+.card .switch button{border:0;background:transparent;color:var(--ink-2);border-radius:var(--r-pill)}
+.card .switch button:global(.is-on){background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(17,28,39,.08),0 4px 10px -6px rgba(17,28,39,.25)}
+.forget{padding:1.4rem 1.5rem}
+.forget h3{font-size:1.125rem;margin:0 0 .6rem}
+@media (max-width:640px){.passkey,.password{padding:1rem}}
+@media (prefers-reduced-motion:reduce){.spot{animation:none}}
+/* critic-18: the delete-a-save action is the standard secondary button, 44 px,
+   ink on a hairline; the danger colour shows only on hover and focus. */
+.forgetBtn{min-height:44px;font-size:1rem;color:var(--ink);border-color:var(--line)}
+.forgetBtn:hover:not(:disabled),.forgetBtn:focus-visible{color:var(--flag-ink);border-color:var(--flag-ink)}
+.forgetBtn:disabled{opacity:1;color:var(--ink-3);border-color:var(--line);cursor:not-allowed}

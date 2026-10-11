@@ -14,10 +14,15 @@
    ========================================================================== */
 import { json, bad, readJson, str, count, isDryRun, dryOk } from './_http.js';
 import { cachedAggregate, writeProbe } from './_counters.js';
+import { markSender, peopleCount, withSenders } from './_senders.js';
+import { withSendersCounted } from './survey.js';
+import { ALIASES } from '../../../lib/count-fields.js';
 import { all, userOf } from './_db.js';
-import { appendChained } from './_hash.js';
+import { appendChained, sha256Hex } from './_hash.js';
+import { publishCoverage, publicDates, NOT_STATED, SMALL_CELL_MIN } from './_cells.js';
 
-export const CATEGORY_IDS = ['care-not-sought', 'care-denied', 'dismissed', 'wrong-track', 'time-searching', 'life-lost'];
+/* FINAL-1011: 'care-made-worse' (Care that made you worse) appended, so the six older ids keep their places. */
+export const CATEGORY_IDS = ['care-not-sought', 'care-denied', 'dismissed', 'wrong-track', 'time-searching', 'life-lost', 'care-made-worse'];
 const CTX_KEYS = ['ageBand', 'insurance', 'region', 'urbanicity'];
 
 /** Validate a POST body. Returns { record } or { error }. Pure. */
@@ -58,13 +63,39 @@ export function aggregateGap(rows) {
   }
   const gap = Object.entries(totals).map(([id, t]) => ({ category: id, respondentsReporting: t.reports, totalReported: t.sum, meanPerRespondent: +(t.sum / t.reports).toFixed(1) })).sort((a, b) => b.respondentsReporting - a.respondentsReporting);
   const communityWeights = Object.keys(rankAny).map((id) => ({ category: id, rankedFirstBy: rankFirst[id] || 0, rankedAtAllBy: rankAny[id] })).sort((a, b) => b.rankedFirstBy - a.rankedFirstBy);
-  const coverage = {};
-  for (const k of CTX_KEYS) coverage[k] = rows.reduce((m, r) => { const v = (r.context && r.context[k]) || 'not stated'; m[v] = (m[v] || 0) + 1; return m; }, {});
+  /* Age band, insurance, region, urbanicity: who the person is, so the same
+     small-cell rule as the survey, applied here before anything is served. */
+  const raw = {};
+  for (const k of CTX_KEYS) raw[k] = rows.reduce((m, r) => { const v = (r.context && r.context[k]) || NOT_STATED; m[v] = (m[v] || 0) + 1; return m; }, {});
+  const { coverage, withheld: coverageWithheld } = publishCoverage(raw);
   const dates = rows.map((r) => r.receivedAt).sort();
-  return {
-    ok: true, respondents: rows.length, firstAt: dates[0], lastAt: dates[dates.length - 1], gap, communityWeights, coverage,
-    method: 'Counts and rankings are reported exactly as respondents entered them. No imputation, no weighting scheme of our own, no extrapolation to a population. This is a description of the sample that answered, nothing more.',
-  };
+  return publicDates({
+    ok: true, respondents: rows.length, firstAt: dates[0], lastAt: dates[dates.length - 1], gap, communityWeights, coverage, coverageWithheld, smallCellMin: SMALL_CELL_MIN,
+    method: `Counts and rankings are reported exactly as respondents entered them. No imputation, no weighting scheme of our own, no extrapolation to a population. This is a description of the sample that answered, nothing more. Any age band, coverage, region or urbanicity held by fewer than ${SMALL_CELL_MIN} reports is not shown: it is counted in the line "fewer than ${SMALL_CELL_MIN}, not shown" and never named. Dates are published as the day, never the time.`,
+  });
+}
+
+/* FLOW3 flow3-3: ONE PRESS, ONE REPORT. A second press of "Add it to the
+   count" (or a retry after a dropped answer) posted the same report again, and
+   the public gap count went 0 -> 3 from one 3 and one 2 sent twice. The page
+   now sends an idempotency key, a random id kept with the ledger plus the
+   count, and a key seen in the last day is answered "already counted" without
+   a row. The key is kept OUTSIDE the row, hashed, in the same KV the sender
+   index uses, so the published columns and the chain projection are unchanged.
+   Best effort: if KV cannot be read, the report is recorded as before. */
+export const IDEM_TTL = 60 * 60 * 24;
+export function idemOf(b) {
+  const k = b && typeof b.idempotencyKey === 'string' ? b.idempotencyKey.trim() : '';
+  return /^[A-Za-z0-9._:-]{8,80}$/.test(k) ? k : null;
+}
+const idemSlot = async (idem) => 'idem:gap:' + (await sha256Hex('gap ' + idem)).slice(0, 32);
+export async function alreadyCounted(env, idem) {
+  if (!idem || !env || !env.LEDGER) return false;
+  try { return !!(await env.LEDGER.get(await idemSlot(idem))); } catch { return false; }
+}
+export async function noteCounted(env, idem) {
+  if (!idem || !env || !env.LEDGER) return;
+  try { await env.LEDGER.put(await idemSlot(idem), '1', { expirationTtl: IDEM_TTL }); } catch { /* best effort */ }
 }
 
 const parse = (s, fallback) => { try { return s ? JSON.parse(s) : fallback; } catch { return fallback; } };
@@ -93,6 +124,8 @@ export async function onRequestPost({ request, env }) {
   if (v.error) return bad(v.error);
   const r = v.record;
   if (isDryRun(request)) return dryOk('gap', { counts: r.counts, ranking: r.ranking }, await writeProbe(env, 'gap'));
+  const idem = idemOf(body);
+  if (await alreadyCounted(env, idem)) return json({ ok: true, duplicate: true, note: 'Already counted. Nothing was added.' });
   let chain;
   try {
     const who = await userOf(env, request).catch(() => null);
@@ -103,11 +136,21 @@ export async function onRequestPost({ request, env }) {
       table_version: r.tableVersion ?? null, received_at: r.receivedAt,
     }, r);
   } catch { return bad('Could not record the report. Nothing was saved.', 500); }
+  await noteCounted(env, idem);
   await count(env, 'gap');
+  /* R6 edge #3: `respondents` means people, and people are counted here,
+     outside the row. See cf/functions/api/_senders.js. */
+  await markSender(request, env, 'gap');
   return json({ ok: true, integrity: { prevHash: chain.prevHash, rowHash: chain.rowHash, position: chain.position } });
 }
 
 export async function onRequestGet({ env }) {
-  try { return json(await cachedAggregate(env, { kind: 'gap', loadRows: gapRows, aggregate: aggregateGap })); }
+  try {
+    const agg = await cachedAggregate(env, { kind: 'gap', loadRows: gapRows, aggregate: aggregateGap });
+    /* `reports` and `submissions` are how many were sent, `senders` the
+       distinct senders. JUDGE-5 #7: `respondents` is the deprecated alias of
+       reports here as on /api/register (it was senders on this endpoint only). */
+    return json({ ...withSendersCounted(agg, { key: 'senders', people: await peopleCount(env, 'gap'), submissions: agg.respondents ?? 0, noun: 'reports' }), deprecated: ALIASES.gap });
+  }
   catch { return bad('The gap aggregate could not be read right now.', 503); }
 }

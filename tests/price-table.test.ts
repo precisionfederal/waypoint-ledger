@@ -6,10 +6,15 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import prices from '../data/prices.json';
+import additions from '../data/prices-additions-2026-09-09.json';
 import conditions from '../data/conditions.json';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const items = prices.items as Array<Record<string, unknown>>;
+/* 🔴 THE TABLE IS BOTH FILES. lib/table.ts serves prices.json and the 2026-09-09
+   additions as one 274-row table, and until R6 the audit, the published CSV and
+   these tests all read the first file only — so 157 of the rows a person can land
+   on were shipped unaudited and unpublished. */
+const items = [...prices.items, ...additions.items] as Array<Record<string, unknown>>;
 const byId = new Map(items.map((r) => [r.id as string, r]));
 const CF = 33.4009;
 

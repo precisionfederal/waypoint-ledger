@@ -27,7 +27,7 @@ price-table.csv,source_url,url,Where to open it.
 price-table.csv,plain_language_synonyms,text,Semicolon-separated phrases people actually use for this.
 price-table.csv,coverage_statement,text,"Who the figure describes, who it does not, and how it was made. The long one. Read it."
 price-table.csv,pfs_status_indicator,text,Set only where CMS publishes relative value units for the code and pays nothing for it. N = non-covered service; the row carries no figure on purpose.
-price-table.csv,cy2024_submitted_charge_usd,number,"What providers billed on average for this service in CY2024. CHARGE basis — an alternative measure, never an addition to the allowed amount."
+price-table.csv,cy2024_submitted_charge_usd,number,"What providers billed on average for this service in CY2024. CHARGE basis: an alternative measure, never an addition to the allowed amount."
 price-table.csv,cy2024_allowed_usd,number,"What Medicare allowed on average for this service in CY2024, from the same claims row."
 price-table.csv,cy2024_source_file,text,The CMS file both CY2024 figures were read in.
 price-table.csv,cy2024_source_file_sha256,text,SHA-256 of that file as retrieved. The audit re-reads it and fails on a mismatch.

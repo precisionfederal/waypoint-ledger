@@ -30,6 +30,9 @@ WHAT IT CHECKS
      source the row cites — the PDF or the article page, fetched fresh.
   5. Every condition with price_row_id null: no dollar figure appears anywhere
      in its object. An absence must stay an absence.
+  9. Every published_figures entry (a count, a per-case cost, a national cost
+     that is not a year for one person): at least two different sources, and
+     the exact sentence each is quoted as saying found in it, fetched fresh.
   6. Every sex_note: re-read in the federal file it cites, by the URL the row
      itself publishes, and the figures in the sentence found there. A note whose
      source no longer says it is a FAIL, not a note to fix later.
@@ -87,7 +90,7 @@ FIGURE_SOURCES = {
         # the article's own title is thrown away, not parsed.
         sentinel='Long COVID Is Associated with Excess Direct Healthcare Expenditures',
         min_bytes=50000,
-        title='Neba et al., Healthcare (Basel) 2025;13(21):2704 — secondary analysis of MEPS 2022'),
+        title='Neba et al., Healthcare (Basel) 2025;13(21):2704, secondary analysis of MEPS 2022'),
     'meps2022-benchmark-heart-disease': dict(
         key='st562', kind='pdf', min_bytes=100000,
         url='https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf',
@@ -132,7 +135,7 @@ SEX_SOURCES = {
         url=("https://data.cdc.gov/resource/gsea-w83j.json?"
              "$where=`group`='By Sex' AND state='United States' AND time_period='72'"),
         cite='https://data.cdc.gov/National-Center-for-Health-Statistics/Post-COVID-Conditions/gsea-w83j',
-        title='CDC/NCHS Household Pulse Survey — Post-COVID Conditions (gsea-w83j), survey period 72'),
+        title='CDC/NCHS Household Pulse Survey, Post-COVID Conditions (gsea-w83j), survey period 72'),
     'me-cfs': dict(
         key='db488', kind='pdf', min_bytes=100000,
         url='https://www.cdc.gov/nchs/data/databriefs/db488.pdf',
@@ -142,12 +145,22 @@ SEX_SOURCES = {
         key='owh-endometriosis', kind='html', min_bytes=20000, sentinel='endometriosis',
         url='https://womenshealth.gov/a-z-topics/endometriosis',
         cite='https://womenshealth.gov/a-z-topics/endometriosis',
-        title="HHS Office on Women's Health — Endometriosis"),
+        title="HHS Office on Women's Health, Endometriosis"),
     'fibromyalgia': dict(
         key='niams-fibromyalgia', kind='html', min_bytes=10000, sentinel='fibromyalgia',
         url='https://www.niams.nih.gov/health-topics/fibromyalgia',
         cite='https://www.niams.nih.gov/health-topics/fibromyalgia',
-        title='NIH NIAMS — Fibromyalgia'),
+        title='NIH NIAMS, Fibromyalgia'),
+    'lupus': dict(
+        key='cdc-lupus-data', kind='html', min_bytes=20000, sentinel='lupus',
+        url='https://www.cdc.gov/lupus/data-research/index.html',
+        cite='https://www.cdc.gov/lupus/data-research/index.html',
+        title='CDC, People with Lupus'),
+    'migraine': dict(
+        key='nchs-shs-2015-a5', kind='pdf', min_bytes=50000,
+        url='https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NHIS/SHS/2015_SHS_Table_A-5.pdf',
+        cite='https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NHIS/SHS/2015_SHS_Table_A-5.pdf',
+        title='NCHS Summary Health Statistics, NHIS 2015, Table A-5'),
 }
 # What must be found in that source, and what it proves. The long COVID row is
 # JSON, so it is parsed rather than pattern-matched: see sex_pulse_check.
@@ -164,6 +177,15 @@ SEX_CHECKS = {
     'fibromyalgia': [
         (r'Anyone can get fibromyalgia, but more women get it than men',
          'the NIAMS sentence, word for word'),
+    ],
+    'lupus': [
+        (r'9 out of every 10 people with lupus are women', 'the CDC sentence, 9 out of every 10'),
+        (r'184,000 females', 'about 184,000 females'),
+        (r'20,000 males', 'about 20,000 males'),
+    ],
+    'migraine': [
+        (r'Male\s+9\.7\s*\(0\.33\)', 'men 9.7% in Table A-5a'),
+        (r'Female\s+20\.7\s*\(0\.44\)', 'women 20.7% in Table A-5a'),
     ],
 }
 # The blanks that name a page. Fetching it proves the page we cite is the page
@@ -441,7 +463,7 @@ def main():
                     '%s claims first effective %s but is not in the FY%d file' % (code, claim, fy))
             else:
                 add('%s %s first effective' % (cid, code), 'PASS',
-                    'absent from FY%d, present in FY%d — first effective %s' % (fy - 1, fy, claim),
+                    'absent from FY%d, present in FY%d: first effective %s' % (fy - 1, fy, claim),
                     c.get('icd10cm_first_effective_evidence'))
         else:
             oldest = min(ICD_YEARS)
@@ -450,7 +472,7 @@ def main():
                 add('%s %s no date claimed' % (cid, code), 'UNVERIFIED', 'FY%d file not read' % oldest)
             elif key in table:
                 add('%s %s no date claimed' % (cid, code), 'PASS',
-                    'already in the FY%d file, our earliest — claiming no first-effective date is correct' % oldest)
+                    'already in the FY%d file, our earliest: claiming no first-effective date is correct' % oldest)
             else:
                 add('%s %s no date claimed' % (cid, code), 'FAIL',
                     '%s is newer than the FY%d file, so a first-effective date is knowable and should be stated' % (code, oldest))
@@ -459,7 +481,12 @@ def main():
     for c in rows:
         cid, rid = c['id'], c.get('price_row_id')
         if not rid:
-            blob = json.dumps(c)
+            # published_figures are checked below, sentence by sentence, in two
+            # sources each; a national_context is allowed only when the same
+            # figure is carried there as a national_cost with its two sources.
+            has_national = any(f.get('kind') == 'national_cost' for f in c.get('published_figures') or [])
+            skip = {'published_figures'} | ({'national_context'} if has_national else set())
+            blob = json.dumps({k: v for k, v in c.items() if k not in skip})
             money = re.findall(r'\$[0-9][0-9,]*', blob)
             if money:
                 add('%s asserts no figure' % cid, 'FAIL',
@@ -515,6 +542,50 @@ def main():
                                     (' (%s-%s)' % (rng[0], rng[1])) if rng else '',
                                     row.get('year')))
 
+    # ------------------------------------------ 9: published figures, two sources
+    # A figure about a condition that is not a year for one person (a count, a
+    # per-case cost, a national cost) ships only with two sources, and the
+    # sentence each one is quoted as saying must be found in that source, fetched
+    # here. Nothing about it lives in this script: the URL and the sentence are
+    # in conditions.json, so a new condition is verified with no code change.
+    def norm(t):
+        t = htmllib.unescape(t)
+        for a, b in (('\u2019', "'"), ('\u2018', "'"), ('\u201c', '"'), ('\u201d', '"'),
+                     ('\u2013', '-'), ('\u2014', '-'), ('\u2212', '-'), ('\u2022', '.'), ('\u00a0', ' ')):
+            t = t.replace(a, b)
+        return re.sub(r'\s+', ' ', t).strip()
+    for c in rows:
+        for f in c.get('published_figures') or []:
+            srcs = f.get('sources') or []
+            label = '%s %s' % (c['id'], f.get('id'))
+            if len({s_.get('url') for s_ in srcs}) < 2:
+                add(label + ' two sources', 'FAIL', 'a published figure needs two different sources')
+                continue
+            add(label + ' two sources', 'PASS', '%d sources' % len(srcs))
+            for i, s_ in enumerate(srcs):
+                url = s_.get('url') or ''
+                kind = 'pdf' if url.lower().endswith('.pdf') else 'html'
+                spec = dict(key='figures/%s-%d' % (f.get('id'), i + 1), kind=kind, url=url, min_bytes=8000)
+                # PubMed answers a script with a 5 KB challenge page. The same
+                # abstract is served by NCBI E-utilities, so a PubMed link is read
+                # there: the citation stays the page a person opens.
+                pm = re.match(r'https://pubmed\.ncbi\.nlm\.nih\.gov/(\d+)/?$', url)
+                if pm:
+                    spec.update(url='https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=%s'
+                                    '&rettype=abstract&retmode=text' % pm.group(1), min_bytes=500, sentinel=pm.group(1))
+                text, err = spec_text(spec)
+                check = '%s source %d' % (label, i + 1)
+                if text is None:
+                    add(check, 'UNVERIFIED', 'could not read %s' % url, err)
+                    continue
+                q = norm(s_.get('quote') or '')
+                if len(q) < 10:
+                    add(check, 'FAIL', 'no quote to look for')
+                elif q in norm(text):
+                    add(check, 'PASS', 'the quoted sentence is in %s' % url, q[:140])
+                else:
+                    add(check, 'FAIL', 'the quoted sentence is not in %s' % url, q[:140])
+
     # ------------------------------------------------- 6, 7, 8: sex differences
     # The one instruction the program gave every team in writing. A sentence
     # about sex is held to exactly the standard a dollar figure is held to:
@@ -530,7 +601,7 @@ def main():
                     'sex_note is null with no written reason; a silence in the federal data is a finding and must be stated')
             elif src or url:
                 add('%s sex blank' % cid, 'FAIL',
-                    'sex_note is null but the row still carries a source — an absence must stay an absence')
+                    'sex_note is null but the row still carries a source. An absence must stay an absence')
             else:
                 add('%s sex blank' % cid, 'PASS', reason[:150])
             spec = SEX_BLANK_SOURCES.get(cid)
@@ -559,7 +630,7 @@ def main():
         spec = SEX_SOURCES.get(cid)
         if not spec:
             add('%s sex note' % cid, 'FAIL',
-                'a sentence about sex with no source registered in this script — it cannot be re-read, so it cannot ship')
+                'a sentence about sex with no source registered in this script. It cannot be re-read, so it cannot ship')
             continue
         if not src:
             add('%s sex note' % cid, 'FAIL', 'sex_note with no sex_note_source')
@@ -610,7 +681,9 @@ def main():
         priced=sum(1 for c in rows if c.get('price_row_id')),
         checks=len(RESULTS), **{'pass': n('PASS'), 'fail': n('FAIL'), 'unverified': n('UNVERIFIED')},
         icd10cm_years_checked=list(ICD_MUST),
-        sources={k: v for k, v in STATE.items()},
+        # Paths are written relative to the cache directory, never as a home path.
+        sources={k: ({**v, 'path': os.path.relpath(v['path'], CACHE)} if 'path' in v else v)
+                 for k, v in STATE.items()},
         results=RESULTS,
     )
     json.dump(out, open(AUDIT, 'w'), indent=1)

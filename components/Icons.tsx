@@ -1,11 +1,12 @@
 /* Inline icons. One stroke weight, one size, no library. */
 const P = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 export const Icon = {
+  /* The brand mark: a waypoint pin holding three ledger lines ("a path, counted"). Same paths as public/icon.svg. */
   Logo: ({ size = 28 }: { size?: number }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect x="2" y="2" width="28" height="28" rx="8" fill="var(--brand)" />
-      <path d="M9 21 L13 11 L16 18 L19 11 L23 21" {...P} stroke="#fff" strokeWidth="2.4" />
-      <circle cx="16" cy="24" r="1.6" fill="#fff" />
+    <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M32 4C18.745 4 8 14.745 8 28c0 8 6 16 12 22l12 12 12-12c6-6 12-14 12-22C56 14.745 45.255 4 32 4Z" fill="var(--brand)" />
+      <path d="M20 50h24L32 62Z" fill="var(--accent)" />
+      <path d="M20 18h24v5H20zm0 10h20v5H20zm0 10h12v5H20z" fill="#fff" />
     </svg>
   ),
   Plus: () => <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" {...P} /></svg>,

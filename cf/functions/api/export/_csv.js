@@ -11,7 +11,8 @@
    ========================================================================== */
 
 /** A cell that a spreadsheet would execute. Numbers are not formulas. */
-export const isFormulaCell = (s) => /^[=+\-@\t\r]/.test(s) && !/^-?\d+(\.\d+)?$/.test(s);
+import { isFormulaCell } from '../../../../lib/csv-cell.js';
+export { isFormulaCell };
 
 export const csvCell = (v) => {
   const s = v === null || v === undefined ? '' : String(v);

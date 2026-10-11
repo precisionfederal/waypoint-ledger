@@ -17,6 +17,8 @@
 # amount of reading could catch. VERIFY_READ_ONLY=1 skips that block.
 # ==========================================================================
 set -uo pipefail
+# Our own traffic says so, and is counted apart from real use (cf/functions/api/_use.js).
+curl() { command curl -H 'x-waypoint-synthetic: verify-live' "$@"; }
 ORIGIN="${1:-https://waypoint-ledger.pages.dev}"
 ORIGIN="${ORIGIN%/}"
 FAIL=0

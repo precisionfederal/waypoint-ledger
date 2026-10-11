@@ -24,6 +24,8 @@
    number that is a minute old on the one day it matters.
    ========================================================================== */
 
+import { splitTeamTests, teamTestHashes } from './_annotations.js';
+
 /** kind -> the D1 table it is folded from. The kind is what the API calls it;
  *  the table is what the schema calls it. */
 export const AGG_SOURCE = {
@@ -32,6 +34,29 @@ export const AGG_SOURCE = {
   survey: 'survey_responses',
   interviews: 'interviews',
 };
+
+/** The shape of a published aggregate. A fold written by older code is the
+ *  right COUNT of rows in the wrong SHAPE: the folds on production before
+ *  2026-10-01 hold unsuppressed breakdowns (a state with a count of 1), and
+ *  their fingerprint still matches, so without this they would be served
+ *  until the next answer arrived. Change this whenever what an aggregate
+ *  publishes changes; every older fold then reads as a miss and is refolded.
+ *  count-fields (JUDGE-4 #6): the corrections fold now carries
+ *  browserFigurePairs, which an older fold does not hold. */
+export const AGG_SHAPE = 'cells-11.days.team-tests.headline.count-fields.2026-10-01';
+/* FLOW4 flow4-2 (2026-10-01): '.headline' added when the survey aggregate
+   gained `headline` (flow3-4) and the register began reading it. Without the
+   bump every fold already in D1 kept matching and /api/survey kept answering
+   without it. tests/agg-shape.test.ts fingerprints what all four aggregates
+   publish and fails when that changes while this name does not.
+   Merge round 4 (rehearsal, 2026-10-01): FLOW4's '.headline' and JUDGE-4's
+   '.count-fields' bumps landed together, so the name carries both and differs
+   from either parent: a fold written under either one alone is refolded. */
+
+/* A fold is written by the first read after an answer lands, often within a
+   second of it, so its time to the millisecond would publish that answer's
+   time. Published as the day, like every other date on the register. */
+const foldDay = (iso) => (typeof iso === 'string' && /^\d{4}-\d{2}-\d{2}/.test(iso) ? iso.slice(0, 10) + 'T00:00:00' : null);
 
 /** Pure. Is a cached fold exactly the rows that are in the table right now? */
 export function isFresh(cached, fingerprint) {
@@ -48,15 +73,29 @@ export function parsePayload(cached) {
 }
 
 /** The row count and chain head for one table, in one round trip with the
- *  cached row. Returns { cached, fingerprint }. */
+ *  cached row. Returns { cached, fingerprint }.
+ *
+ *  TEAM TESTS (migration 0007). Marking a row changes what is counted without
+ *  moving the chain head or the row count, so the number of marks on the table
+ *  is part of the fingerprint too, read in the same statement and appended to
+ *  the head as "+t<n>". A mark is append-only, so the count of marks only ever
+ *  rises, and a new mark always misses the old fold. On a register whose
+ *  migration has not run yet that statement fails, and the fingerprint is read
+ *  the way it always was (0 marks), so the cache behaves exactly as before. */
+const FP_SQL = (table) => `SELECT (SELECT COUNT(*) FROM ${table}) AS rows, (SELECT head_hash FROM integrity_heads WHERE table_name=?1) AS head`;
+const FP_MARKS_SQL = (table) => `SELECT (SELECT COUNT(*) FROM ${table}) AS rows, (SELECT head_hash FROM integrity_heads WHERE table_name=?1) AS head, (SELECT COUNT(*) FROM annotations WHERE table_name=?1 AND kind='team-test') AS marks`;
 export async function readCache(env, kind, table) {
-  const res = await env.DB.batch([
+  const read = (fpSql) => env.DB.batch([
     env.DB.prepare('SELECT kind, rows_folded, head_hash, payload_json, updated_at FROM agg WHERE kind=?1').bind(kind),
-    env.DB.prepare(`SELECT (SELECT COUNT(*) FROM ${table}) AS rows, (SELECT head_hash FROM integrity_heads WHERE table_name=?1) AS head`).bind(table),
+    env.DB.prepare(fpSql).bind(table),
   ]);
+  let res;
+  try { res = await read(FP_MARKS_SQL(table)); } catch { res = await read(FP_SQL(table)); }
   const cached = (res?.[0]?.results || [])[0] || null;
   const fp = (res?.[1]?.results || [])[0] || null;
-  return { cached, fingerprint: fp ? { rows: Number(fp.rows || 0), head: String(fp.head || '') } : null };
+  if (!fp) return { cached, fingerprint: null };
+  const marks = Number(fp.marks || 0);
+  return { cached, fingerprint: { rows: Number(fp.rows || 0), head: String(fp.head || '') + (marks ? `+t${marks}` : '') } };
 }
 
 /** Replace the fold for one kind. Best effort: a register that cannot cache is
@@ -83,16 +122,23 @@ export async function cachedAggregate(env, { kind, loadRows, aggregate }) {
   try { ({ cached, fingerprint } = await readCache(env, kind, table)); } catch { cached = null; fingerprint = null; }
 
   if (isFresh(cached, fingerprint)) {
-    const payload = parsePayload(cached);
-    if (payload) return { ...payload, fold: { hit: true, rows: Number(cached.rows_folded), foldedAt: cached.updated_at } };
+    const stored = parsePayload(cached);
+    if (stored && stored.aggShape === AGG_SHAPE) {
+      const { aggShape: _s, ...payload } = stored;
+      return { ...payload, fold: { hit: true, rows: Number(cached.rows_folded), foldedAt: foldDay(cached.updated_at) } };
+    }
   }
 
   const rows = await loadRows(env);
-  const payload = aggregate(rows);
+  /* Our own test rows are left out of every count and ranking, and the
+     aggregate says how many were left out. The fold function never sees them,
+     so no published number has a second definition. */
+  const { counted, teamTests } = splitTeamTests(rows, await teamTestHashes(env, table));
+  const payload = { ...aggregate(counted), teamTests };
   const fp = fingerprint || { rows: rows.length, head: '' };
   const stamp = { rows: rows.length, head: fp.head };
-  try { await writeCache(env, kind, stamp, payload); } catch { /* the fold is an optimisation, never a precondition */ }
-  return { ...payload, fold: { hit: false, rows: rows.length, foldedAt: new Date().toISOString() } };
+  try { await writeCache(env, kind, stamp, { ...payload, aggShape: AGG_SHAPE }); } catch { /* the fold is an optimisation, never a precondition */ }
+  return { ...payload, fold: { hit: false, rows: rows.length, foldedAt: foldDay(new Date().toISOString()) } };
 }
 
 /** Prove the resources a write needs are present — the D1 binding, the table,

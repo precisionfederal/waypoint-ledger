@@ -63,8 +63,11 @@ describe('shareCardData — the card carries only units, counts and published fi
 
   it('totals the priced lines and counts the appointments', () => {
     expect(d.totalUsd).toBe((item('cms-99214').valueUsd ?? 0) * 3 + (item('cms-img-echo').valueUsd ?? 0));
-    expect(d.stepCount).toBe(6);
-    expect(d.distinctCount).toBe(3);
+    /* round 2 (c1-5): the card counts what the ledger counts. Visits and tests
+       are the times on lines with a unit of care (3 + 1); the blank line's two
+       times are not a visit or a test; distinct means distinct units of care. */
+    expect(d.stepCount).toBe(4);
+    expect(d.distinctCount).toBe(2);
     expect(d.pricedCount).toBe(2);
   });
 
@@ -82,7 +85,7 @@ describe('shareCardData — the card carries only units, counts and published fi
     /* This fixture has no months and no refused care, so the only clause the
        card may carry is the appointment count. A clause is a count or it is
        not written; nothing here is typed text. */
-    expect(d.story).toEqual(['6 appointments', '2 steps no federal file prices']);
+    expect(d.story).toEqual(['4 visits and tests', '1 line without a federal figure']);
     expect(JSON.stringify(d.story)).not.toContain('a test nobody could name');
   });
 
@@ -117,10 +120,21 @@ describe('shipped assets — the link preview and the type', () => {
     expect(buf.readUInt32BE(20)).toBe(630);
   });
 
-  it('the layout asks for that image as a large summary card', () => {
+  it('the layout asks for the illustrated home card as a large summary card', () => {
     const layout = readFileSync('app/layout.tsx', 'utf8');
     expect(layout).toContain("summary_large_image");
-    expect(layout).toContain('/og.png');
+    expect(layout).toContain('/og/home.png');
+  });
+
+  it('every route card is a 1200x630 PNG under 120 KB, and every route in ROUTE_CARD has one (VISUAL, 2026-09-30)', async () => {
+    const { ROUTE_CARD } = await import('../lib/og');
+    for (const url of Object.values(ROUTE_CARD)) {
+      const buf = readFileSync('public' + url);
+      expect(buf.subarray(0, 8).toString('hex'), url).toBe('89504e470d0a1a0a');
+      expect(buf.readUInt32BE(16), url).toBe(1200);
+      expect(buf.readUInt32BE(20), url).toBe(630);
+      expect(buf.length, url).toBeLessThan(120_000);
+    }
   });
 
   it('no page requests a font from a third party', () => {
@@ -160,14 +174,15 @@ describe('TotalReveal — what the reveal actually renders', () => {
   });
 
   it('states the comparison in the direction the two figures actually sit', async () => {
-    const small = await render({ totalUsd: 900, pricedCount: 3, tableVersion: 'v', yearAhead: YEAR });
-    expect(small).toContain('$1,619 to $6,578');
-    expect(small).toContain('larger than');
-    expect(small).toContain('never added');
-    const big = await render({ totalUsd: 9000, pricedCount: 30, tableVersion: 'v', yearAhead: YEAR });
-    expect(big).toContain('smaller than');
-    const mid = await render({ totalUsd: 3011, pricedCount: 9, tableVersion: 'v', yearAhead: YEAR });
-    expect(mid).toContain('overlaps');
+    /* round 2 judge2-1: the band uses the /conditions form and never sets the
+       ledger beside the population figure ("overlaps", "larger than"). The
+       direction rule still lives in relationTo, tested below. */
+    for (const totalUsd of [900, 3011, 9000]) {
+      const html = await render({ totalUsd, pricedCount: 3, tableVersion: 'v', yearAhead: YEAR });
+      expect(html).toContain('95% interval $1,619 to $6,578');
+      expect(html).toContain('never compared with or added to');
+      expect(html).not.toMatch(/overlaps|larger than|smaller than|single year ahead|range is the answer/);
+    }
   });
 
   it('says nothing about the year ahead when no published row was passed', async () => {
@@ -183,7 +198,7 @@ describe('copy — the product never asserts what a person paid', () => {
   // make. These patterns catch the assertion, not the question.
   const ASSERTIONS = [/you paid \$/i, /you paid \{/i, /is what you paid/i, /what you paid \$/i];
   const files = [
-    'components/JourneyBuilder.tsx', 'components/TotalReveal.tsx', 'components/ShareCard.tsx',
+    'components/JourneyBuilder.tsx', 'components/LivePreview.tsx', 'components/TotalReveal.tsx', 'components/ShareCard.tsx',
     'components/GapPanel.tsx', 'app/page.tsx',
   ];
   for (const f of files) {
@@ -226,9 +241,12 @@ describe('the year-ahead card for a visitor who chose nothing', () => {
   it('offers the published interval instead of a blank when nothing is implied', async () => {
     const html = await invite(null);
     expect(html).toContain('$1,619 to $6,578');
-    expect(html).toContain('Point estimate $4,098');
-    expect(html).toContain('pick your condition to narrow this');
-    expect(html).toContain('Shown apart, never added to the total above');
+    expect(html).toContain('$4,098 more in a year (2022)');   // round 2 judge2-1
+    expect(html).toContain('95% interval $1,619 to $6,578');
+    expect(html).toContain('pick yours to narrow this');
+    /* R6 sense F11: the summary says apart from WHAT and added to WHAT. */
+    expect(html).toContain('never added to the total above');
+    expect(html).toContain('costs on top of ordinary care');
   });
 
   it('lists the other published figures rather than averaging them into one span', async () => {
@@ -243,14 +261,14 @@ describe('the year-ahead card for a visitor who chose nothing', () => {
 
   it('never tells the reader the figure is theirs', async () => {
     for (const html of [await invite(null), await invite('long-covid'), await invite('fibromyalgia')]) {
-      expect(html).toMatch(/if you are looking into|pick your condition/i);
+      expect(html).toMatch(/if that is what you are looking into|pick yours to narrow this/i);
       expect(html).not.toMatch(/you have|your long COVID|what you paid|you spent/i);
     }
   });
 
   it('answers with the implied condition when the person already typed it', async () => {
     const html = await invite('long-covid');
-    expect(html).toContain('if you are looking into long COVID');
+    expect(html).toContain('A year with long COVID (2022), if that is what you are looking into');
     expect(html).toContain('$1,619 to $6,578');
     expect(html).toContain('Who this describes:');
   });
@@ -326,7 +344,7 @@ describe('the money screen defers the survey methods instead of printing them', 
     const html = renderToStaticMarkup(
       React.createElement(TotalComparison, { totalUsd: 2049, yearAhead: y }),
     );
-    expect(html).toContain('For adults 18 and older');
+    expect(html).toContain('for adults 18 and older, a year with it cost about');
     expect(html).not.toContain('#year-ahead-who');
   });
 

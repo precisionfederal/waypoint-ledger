@@ -237,7 +237,7 @@ describe('the total says what it is', () => {
   });
   it('never labels a Medicare stack as what Medicaid pays', () => {
     const l = totalLabels({ coverage: 'medicaid', locality: 'IA-00' });
-    expect(l.primary).toBe('What Medicare would allow for these services in Iowa — a reference, not what Medicaid pays');
+    expect(l.primary).toBe('What Medicare would allow for these services in Iowa: a reference, not what Medicaid pays');
     expect(l.primary).not.toMatch(/published Medicare figures add up to/i);
     expect(l.secondary).toBeNull();
   });

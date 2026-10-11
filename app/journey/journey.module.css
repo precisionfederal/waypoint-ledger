@@ -1,0 +1,8 @@
+/* /journey (VISUAL data, 2026-09-30 night): the inner-page H1 token, nothing more.
+   The box is the page: a hero picture beside the heading wraps the H1 to two lines
+   and drops the box 64 px at 1440, so this page carries no art, and the box starts
+   where it did. */
+.hero { margin: 0; }
+.heroCopy { min-width: 0; }
+.heroCopy h1 { font-size: var(--hero-h1); line-height: 1.1; letter-spacing: -.025em; margin: .2rem 0 .6rem; }
+.heroCopy :global(.sub) { margin: 0; }

@@ -7,7 +7,7 @@ or a person relying on it does.
 
 ## Reporting
 
-Write to **bo@precisionfederal.com**. Machine-readable contact: [`/.well-known/security.txt`](public/.well-known/security.txt).
+Write to us through [https://precisionfederal.com/contact](https://precisionfederal.com/contact). Machine-readable contact: [`/.well-known/security.txt`](public/.well-known/security.txt).
 
 - We answer every report, including the ones that turn out to be nothing.
 - Tell us what you did, what you saw, and what you think it means. A curl line is worth a page of prose.

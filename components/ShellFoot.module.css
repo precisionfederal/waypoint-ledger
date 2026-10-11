@@ -1,0 +1,17 @@
+/* The footer's legal line (PAGES2, polish, 2026-09-30). On a phone its two
+   links, Contact and the source repository, were 18 px tall inline text, the
+   smallest targets on every route. They get 44 px line boxes from padding,
+   never from bigger type. Desktop keeps the one quiet line. */
+@media (max-width: 720px), (pointer: coarse) {
+  .legal { line-height: 1.5; }
+  .hit {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0.25rem;
+    margin: 0 -0.25rem;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+  }
+}

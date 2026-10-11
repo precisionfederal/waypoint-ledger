@@ -1,43 +1,60 @@
-/* POST /api/map — AI reads the story; the table prices it.
+/* POST /api/map — AI reads the phrases the rules could not; the table prices them.
 
    The deterministic rules run first (the same lib/mapper.ts the browser runs).
    Every phrase they left blank — no unit, no gap, no span of time — goes to a
-   model with the catalog's ids and labels, and nothing else. The model may
-   answer only with an id the catalog already holds, or null. The rules'
-   answers are never overridden. No price is sent to the model and no price
-   comes back: the response carries ids, and the table prices them on either
-   side of the wire.
+   model with the catalog's ids and labels. The model may answer only with an
+   id the catalog already holds, or null. The rules' answers are never
+   overridden. No price is sent to the model and no price comes back: the
+   response carries ids, and the table prices them on either side of the wire.
 
-   The model also sees every phrase the rules DID read, with the id they landed
-   on, so it reads the whole story. It may answer {"r":n,"flag":"…"} to say a
-   rules answer looks wrong: that is a report, carried on the wire as `flag`,
-   and it never overrides a unit, a count or a price.
+   WHAT LEAVES FOR THE MODEL, AND NOTHING ELSE (2026-10-01). /privacy, /journey
+   and the demo script say only the phrases the rules could not place go to the
+   model. Until today the request also carried the whole story and every phrase
+   the rules HAD read, so that was not true. Now each unplaced phrase goes out
+   with at most NEIGHBOUR_WORDS words from the phrase just before it and the
+   phrase just after it, which is what a nerve study told in two halves ("they
+   put electrodes on my legs" … "shocked the nerves") needs to be read as one
+   test. Never the rest of the story, never a phrase the rules placed on its
+   own, never a price. See phrasesForModel() below; tests/map-privacy.test.ts
+   holds it to that.
 
-   Providers, in order: OpenAI (OPENAI_API_KEY, the models in OPENAI_MODELS or
-   READER_MODELS, strongest first), Anthropic (ANTHROPIC_API_KEY), then
-   Cloudflare Workers AI (the AI binding). None reachable → the rules'
-   answer, marked `model: null`, so the product never waits on a model.
-   Answers are cached in KV by the story's SHA-256 for a day. */
+   Providers, chosen by which key this deployment holds, not tried in turn:
+   OpenAI (OPENAI_API_KEY; the models in READER_MODELS or OPENAI_MODELS,
+   strongest first, each next one only if the one before it errors), else Anthropic
+   (ANTHROPIC_API_KEY), else Cloudflare Workers AI (the AI binding). Production
+   holds only the OpenAI key; the staging preview holds none and uses Workers
+   AI. If the chosen provider does not answer, the rules' answer ships, marked
+   `model: null`, so the product never waits on a model. Answers are cached in
+   KV by the story's SHA-256 for a day. */
 import { json, bad, readJson, count } from './_http.js';
 import { parseJourney } from '../../../lib/mapper.ts';
+import { stripBidi } from '../../../lib/price-api.ts';
 import { SELECTABLE, TABLE_VERSION } from '../../../lib/table.ts';
-import { catalogFor, candidatesOf, rulesReadOf, SYSTEM_PROMPT, buildUserPrompt, parseModelJson, applyModel, toWire } from '../../../lib/map-model.ts';
+import { catalogFor, candidatesOf, SYSTEM_PROMPT, parseModelJson, applyModel, toWire } from '../../../lib/map-model.ts';
 
 /* Which model reads the story — measured, not assumed. 209 sentences of a patient's own words
-   (data/test-fixtures/map-eval.json) through this exact prompt and these exact guarantees, four
-   models, 2026-09-09 (scripts/eval-models.mjs; table in data/test-fixtures/READER-EVAL.md):
+   (data/test-fixtures/map-eval.json) through the same prompt and the same guarantees for every
+   model (scripts/eval-models.mjs, reasoning effort low).
 
+   2026-09-30, one run, same conditions (winloop/BETA-2026-10-01/R6-luna.md):
+     gpt-5.6-luna   F1 98.4  precision 97.7  recall 99.1  p95 2338 ms  0 wrong units added  0 errors
+     gpt-5.5        F1 98.2  precision 97.7  recall 98.6  p95 3559 ms  0 wrong units added  0 errors
+   A second run in the reverse order held it: luna p95 2793 ms, gpt-5.5 p95 3329 ms.
+
+   2026-09-09, four models (table in data/test-fixtures/READER-EVAL.md, over the rules as they
+   stood that day, so the F1 is lower for every row):
      gpt-5.5        F1 83.8  precision 79.0  recall 89.1  p95 3771 ms  0 wrong units added
      gpt-5.4        F1 83.3  precision 78.6  recall 88.6  p95 2540 ms  1
      gpt-5.4-mini   F1 83.2  precision 78.3  recall 88.6  p95 2407 ms  2
      gpt-5.4-nano   F1 81.5  precision 77.2  recall 86.4  p95 4627 ms  4
 
-   gpt-5.5 is first: the strongest reader on every axis, and the only one that added no unit a
-   careful reader would call wrong, with a p95 well inside the 9 s timeout. gpt-5.4-mini is the
-   fallback — the next strongest, and the fastest — for when the first errors or times out.
-   READER_MODELS (a comma list) overrides both without a code change; READER_EFFORT overrides the
-   reasoning effort, which the same measurement says buys nothing at medium. */
-export const OPENAI_MODELS = ['gpt-5.5', 'gpt-5.4-mini'];
+   gpt-5.6-luna is first: F1 at least as high as gpt-5.5, no wrong unit of its own, and a p95
+   about a second lower, well inside the 9 s timeout. gpt-5.5 is second, the reader it replaced,
+   and gpt-5.4-mini third, the fastest of the 2026-09-09 four; each is tried only if the one
+   before it errors or times out. READER_MODELS (a comma list) overrides all three without a code
+   change; READER_EFFORT overrides the reasoning effort, which the same measurement says buys
+   nothing at medium. */
+export const OPENAI_MODELS = ['gpt-5.6-luna', 'gpt-5.5', 'gpt-5.4-mini'];
 export const modelsFor = (env) => {
   const raw = String(env?.READER_MODELS || '').trim();
   const list = raw ? raw.split(',').map((s) => s.trim()).filter(Boolean) : [];
@@ -52,14 +69,60 @@ export const WORKERS_AI_MODELS = ['@cf/openai/gpt-oss-120b', '@cf/meta/llama-3.3
 const TIMEOUT_MS = 9000;
 const MAX_STORY = 2000;
 const CACHE_TTL = 24 * 3600;
-const PROMPT_VERSION = 'map-6';
+const PROMPT_VERSION = 'map-7-phrases-only';
 /* The cache key carries a hash of the prompt itself, so editing the prompt invalidates the cache
    without anyone remembering to bump a constant. A stale answer read back after a prompt change is
    the quietest way to measure the wrong thing. */
 let promptHashMemo = null;
 async function promptHash() {
-  if (!promptHashMemo) promptHashMemo = (await sha256(SYSTEM_PROMPT)).slice(0, 12);
+  if (!promptHashMemo) promptHashMemo = (await sha256(PHRASE_SYSTEM_PROMPT)).slice(0, 12);
   return promptHashMemo;
+}
+
+/* ==========================================================================
+   THE PHRASES, AND ONLY THE PHRASES.
+   ========================================================================== */
+
+/** How many words of each neighbouring phrase travel with an unplaced one. */
+export const NEIGHBOUR_WORDS = 4;
+
+const words = (s) => String(s || '').trim().split(/\s+/).filter(Boolean);
+
+/** Pure. For each phrase the rules left blank: the phrase, the last few words of
+ *  the phrase before it and the first few words of the phrase after it. That is
+ *  everything about the story that leaves for the model. */
+export function phrasesForModel(segments, candidates, n = NEIGHBOUR_WORDS) {
+  return candidates.map((idx) => {
+    const before = idx > 0 ? words(segments[idx - 1]?.raw).slice(-n).join(' ') : '';
+    const after = idx < segments.length - 1 ? words(segments[idx + 1]?.raw).slice(0, n).join(' ') : '';
+    return { phrase: String(segments[idx]?.raw || ''), before, after };
+  });
+}
+
+/* The system prompt is lib/map-model.ts's, with the two passages that asked for
+   the whole story taken out: "read each phrase in the context of the whole
+   story", and the check of every phrase the rules already read (that list is
+   no longer sent). If the source prompt changes so these no longer match, the
+   reader still runs (the user message carries only the phrases either way, so
+   privacy does not depend on this) and tests/map-privacy.test.ts fails, so
+   the stale instruction is caught before it ships. */
+const WHOLE_STORY = 'Read each phrase in the context of the whole story and choose the catalog unit it describes.';
+const RULES_CHECK = /THEN CHECK THE RULES\.[\s\S]*?Never mention money\./;
+function phrasePrompt(src) {
+  return src
+    .replace(WHOLE_STORY, 'Each phrase comes with at most a few words from the phrases just before and after it, and nothing else of the story. Read the phrase with those words and choose the catalog unit it describes.')
+    .replace(RULES_CHECK, 'Never mention money.');
+}
+export const PHRASE_SYSTEM_PROMPT = phrasePrompt(SYSTEM_PROMPT);
+
+/** The user message: the catalog (ids, labels, synonyms; no prices) and the
+ *  unplaced phrases with their few neighbouring words. Nothing else. */
+export function buildPhrasePrompt(catalog, items) {
+  const cat = catalog.map((c) => `${c.id} | ${c.label}${c.also.length ? ` | also: ${c.also.join(', ')}` : ''}`).join('\n');
+  const ph = items.map((it, i) => `${i}: ${it.phrase}${it.before || it.after ? `   [just before: "${it.before}" · just after: "${it.after}"]` : ''}`).join('\n');
+  return `CATALOG (id | label | also)\n${cat}\n\n` +
+    `PHRASES TO MAP (index: phrase, then the few words just before and after it, for context only; map the phrase, not the context)\n${ph}\n\n` +
+    `Return {"map":[...]} with one {"i":…,"id":…,"why":…} entry per phrase index. Where two phrases are two halves of one appointment, give both the same id.`;
 }
 // The paid path has a ceiling and a kill switch: a global KV counter per hour (READER_HOURLY_CEILING,
 // default 2000 model calls), and the counter is read fail-CLOSED — if KV cannot answer, the model is
@@ -157,15 +220,16 @@ export async function readWithModel(env, story, debug = false) {
   if (!provider) return { ...base, segments: toWire(segments), note: 'no model configured' };
   const gate = await readerAllowed(env);
   if (!gate.ok) return { ...base, segments: toWire(segments), note: gate.why };
-  const alreadyRead = rulesReadOf(segments);
-  const user = buildUserPrompt(catalogFor(SELECTABLE), candidates.map((i) => segments[i].raw), story, alreadyRead);
+  const items = phrasesForModel(segments, candidates);
+  const user = buildPhrasePrompt(catalogFor(SELECTABLE), items);
   try {
-    const { text, model } = await provider(env, SYSTEM_PROMPT, user);
+    const { text, model } = await provider(env, PHRASE_SYSTEM_PROMPT, user);
     const answers = parseModelJson(text);
-    const applied = applyModel(segments, candidates, answers, SELECTABLE, alreadyRead);
-    // `flags` is the model's report on phrases the RULES read. It is carried on the wire and never
-    // overrides anything: the unit, the count and the price on those phrases are the rules' answer.
-    return { tableVersion: TABLE_VERSION, model, filled: applied.filled.length, refused: applied.refused.length, flags: applied.flags, segments: toWire(applied.segments, applied.flags), ...(debug ? { modelText: String(text).slice(0, 1500), asked: candidates.map((i) => segments[i].raw) } : {}) };
+    /* No list of the rules' own reads is sent any more, so there is nothing for
+       an `r` flag to point at: applyModel is given an empty list and ignores
+       them. A flag on an asked phrase (`i`) is still carried, report only. */
+    const applied = applyModel(segments, candidates, answers, SELECTABLE, []);
+    return { tableVersion: TABLE_VERSION, model, filled: applied.filled.length, refused: applied.refused.length, flags: applied.flags, segments: toWire(applied.segments, applied.flags), ...(debug ? { modelText: String(text).slice(0, 1500), asked: items, sent: user.slice(user.indexOf('PHRASES TO MAP')) } : {}) };
   } catch (e) {
     return { ...base, segments: toWire(segments), note: `model unavailable: ${String(e.message || e).slice(0, 80)}` };
   }
@@ -174,11 +238,14 @@ export async function readWithModel(env, story, debug = false) {
 export async function onRequestPost({ request, env }) {
   const { body, error } = await readJson(request);
   if (error) return bad(error);
-  const story = typeof body.story === 'string' ? body.story.trim().slice(0, MAX_STORY) : '';
+  const story = typeof body.story === 'string' ? stripBidi(body.story).trim().slice(0, MAX_STORY) : '';
   if (!story) return bad('POST a JSON body: {"story":"…"}');
   const debug = new URL(request.url).searchParams.get('debug') === '1';
   // The model list is part of the key: switching READER_MODELS must never serve another model's answer.
-  const key = `map:${PROMPT_VERSION}.${await promptHash()}:${TABLE_VERSION}:${modelsFor(env).join('+')}:${await sha256(story)}`;
+  // So is the rules' own read of this story: a cached answer carries the rules' segments, so a change to
+  // the mapper or the synonyms must never be answered with yesterday's read of the same words.
+  const rulesHash = (await sha256(JSON.stringify(toWire(parseJourney(story, SELECTABLE))))).slice(0, 12);
+  const key = `map:${PROMPT_VERSION}.${await promptHash()}:${TABLE_VERSION}:${rulesHash}:${modelsFor(env).join('+')}:${await sha256(story)}`;
   let hit = null;
   try { hit = env.LEDGER ? await env.LEDGER.get(key, 'json') : null; } catch { hit = null; }
   if (hit && hit.model && !debug) { await count(env, 'map'); return json({ ok: true, cached: true, ...hit }); }

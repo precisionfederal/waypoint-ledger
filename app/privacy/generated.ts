@@ -9,11 +9,11 @@ export interface PrivacyField { column: string; gloss: string; kept: string; enc
 export interface PrivacyAccepts { field: string; column: string }
 export interface PrivacyEndpoint { id: string; method: string; path: string; table: string; handler: string; what: string; publicly: string; fields: PrivacyField[]; accepts: PrivacyAccepts[]; notes: string[] }
 
-export const PRIVACY_GENERATED_ON = "2026-09-10";
-export const PRIVACY_MIGRATIONS = ["0001_init.sql","0002_integrity.sql","0003_users.sql","0004_journey_privacy.sql","0006_agg.sql"];
-export const PRIVACY_SCHEMA_FINGERPRINT = "892edf4dbbb8";
-export const PRIVACY_COLUMN_COUNT = 97;
-export const PRIVACY_TABLE_COUNT = 13;
+export const PRIVACY_GENERATED_ON = "2026-10-11";
+export const PRIVACY_MIGRATIONS = ["0001_init.sql","0002_integrity.sql","0003_users.sql","0004_journey_privacy.sql","0006_agg.sql","0007_annotations.sql"];
+export const PRIVACY_SCHEMA_FINGERPRINT = "4ed7c6071383";
+export const PRIVACY_COLUMN_COUNT = 103;
+export const PRIVACY_TABLE_COUNT = 14;
 export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
  {
   "id": "corrections",
@@ -101,7 +101,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "gloss": "The hash of the row before yours. This is what makes the public count tamper-evident.",
     "kept": "only when it applies",
     "encrypted": "no",
-    "published": true,
+    "published": false,
     "exported": false,
     "since": "0002_integrity.sql"
    },
@@ -176,7 +176,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
   "table": "gap_reports",
   "handler": "cf/functions/api/gap.js",
   "what": "You report care you needed and did not get.",
-  "publicly": "The counts and the ranking are public at /api/gap and in the CSV. Your note is not.",
+  "publicly": "The counts and the ranking are public at /api/gap and in the CSV, with the day it arrived but not the time. Your age band, insurance, region and urbanicity are public only as counts at /api/gap, and any value fewer than 11 reports gave is not shown. Your note is not public.",
   "fields": [
    {
     "column": "id",
@@ -216,7 +216,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "context_json",
-    "gloss": "The optional age band, insurance type, region and urbanicity you chose to give. Blank unless you chose them.",
+    "gloss": "The optional age band, insurance type, region and urbanicity you chose to give. Blank unless you chose them. Published only as counts at /api/gap, where any value fewer than 11 reports gave is not shown; never in the CSV.",
     "kept": "only when it applies",
     "encrypted": "no",
     "published": false,
@@ -234,7 +234,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "received_at",
-    "gloss": "When it arrived.",
+    "gloss": "When it arrived. The CSV publishes the day only (received_on), never the time.",
     "kept": "always",
     "encrypted": "no",
     "published": true,
@@ -247,12 +247,12 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "kept": "only when it applies",
     "encrypted": "no",
     "published": true,
-    "exported": false,
+    "exported": true,
     "since": "0002_integrity.sql"
    },
    {
     "column": "row_hash",
-    "gloss": "The hash of the published fields of your row.",
+    "gloss": "The hash of your row as it was written, chained to the row before it. Published in the CSV beside prev_hash so the links can be checked row by row.",
     "kept": "only when it applies",
     "encrypted": "no",
     "published": true,
@@ -295,7 +295,9 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "column": "table_version"
    }
   ],
-  "notes": []
+  "notes": [
+   "received_at: inside the integrity chain as written, and in the CSV only as the day. Published as the day only (received_on): a time to the millisecond beside a row hash lets anyone who guessed the rest of a row confirm the guess."
+  ]
  },
  {
   "id": "survey",
@@ -304,7 +306,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
   "table": "survey_responses",
   "handler": "cf/functions/api/survey.js",
   "what": "You rank which burden weighed most.",
-  "publicly": "The counts are public at /api/survey and in the CSV. Your sentence is not, and a cell too small to be safe is withheld.",
+  "publicly": "Your ranking, your three answers, the clinician count, the channel and the day it arrived are in the CSV, one row per answer, with no time of day and no self-description. What you said about yourself (age band, sex, coverage, region, state, stage, who is answering, the ages at onset and diagnosis) is public only as counts at /api/survey, and any value fewer than 11 answers gave is not shown. Your sentence is never public.",
   "fields": [
    {
     "column": "id",
@@ -362,11 +364,11 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "context_json",
-    "gloss": "The optional age band, coverage, region, state and stage you chose to give. Blank unless you chose them, and a count too small to be safe is withheld from the published table.",
+    "gloss": "What you chose to say about yourself: who is answering, age band, sex, coverage, region, state, stage, and the age bands when it began and when it was diagnosed. Blank unless you chose them. Never in the CSV and never served per answer: published only as counts at /api/survey, where any value fewer than 11 answers gave is not shown.",
     "kept": "only when it applies",
     "encrypted": "no",
-    "published": true,
-    "exported": true,
+    "published": false,
+    "exported": false,
     "since": "0001_init.sql"
    },
    {
@@ -398,7 +400,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "received_at",
-    "gloss": "When it arrived.",
+    "gloss": "When it arrived. The CSV publishes the day only (received_on), never the time.",
     "kept": "always",
     "encrypted": "no",
     "published": true,
@@ -411,12 +413,12 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "kept": "only when it applies",
     "encrypted": "no",
     "published": true,
-    "exported": false,
+    "exported": true,
     "since": "0002_integrity.sql"
    },
    {
     "column": "row_hash",
-    "gloss": "The hash of the published fields of your row.",
+    "gloss": "The hash of your row as it was written, chained to the row before it. Published in the CSV beside prev_hash so the links can be checked row by row.",
     "kept": "only when it applies",
     "encrypted": "no",
     "published": true,
@@ -475,7 +477,10 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "column": "received_at"
    }
   ],
-  "notes": []
+  "notes": [
+   "received_at: inside the integrity chain as written, and in the CSV only as the day. Published as the day only (received_on): a time to the millisecond beside a row hash lets anyone who guessed the rest of a row confirm the guess.",
+   "context_json: inside the integrity chain as written, and in the CSV not at all. Every optional self-description (age band, sex, coverage, region, state, stage, who answered, ages at onset and diagnosis). One row carrying all of them can point at a person, so they are published only as counts at /api/survey, with any value under 11 answers not shown."
+  ]
  },
  {
   "id": "interview",
@@ -515,7 +520,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "answers_enc",
-    "gloss": "Everything you wrote, encrypted at rest with a key kept outside this database. No endpoint serves it and no export contains it.",
+    "gloss": "Everything you wrote, and who is answering if you chose to say, encrypted at rest with a key kept outside this database. Only our team reads it, through a private admin screen; no public endpoint serves it and no export contains it.",
     "kept": "always",
     "encrypted": "encrypted at rest",
     "published": false,
@@ -600,6 +605,10 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
     "column": "answers_enc"
    },
    {
+    "field": "respondent",
+    "column": "answers_enc"
+   },
+   {
     "field": "followUp",
     "column": "follow_up"
    },
@@ -665,7 +674,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "entries_json",
-    "gloss": "The units of care, their counts and the short phrases you typed for each line. This is the one place your own words are kept, and only because you pressed Save.",
+    "gloss": "The units of care, their counts and the short phrases you typed for each line, and what you said you paid for a line if you entered it. This is the one place your own words are kept, and only because you pressed Save.",
     "kept": "always",
     "encrypted": "no",
     "published": false,
@@ -1018,12 +1027,12 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
  },
  {
   "id": "events",
-  "method": "—",
+  "method": "",
   "path": "every request",
   "table": "events",
   "handler": "cf/functions/api/_http.js",
-  "what": "A daily count of how many times each endpoint was called. One number per day, nothing about who.",
-  "publicly": "These totals are not public. They are a daily count with nothing about anyone in them.",
+  "what": "A daily count of how many times each endpoint was called, and of a few actions your browser reports with one word and no body (a ledger opened, a sheet printed, a file exported). One number per day, nothing about who.",
+  "publicly": "The counts of actions are public, by week, on the live register and at /api/use, with our own tests and known bots left out. The other totals are not public. Neither has anything about anyone in it.",
   "fields": [
    {
     "column": "day",
@@ -1036,7 +1045,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "name",
-    "gloss": "Which endpoint was called, by its name: corrections, gap, survey, price.",
+    "gloss": "Which endpoint was called or which action was taken, by its name: corrections, survey, price, use:ledger. A use count from our own tests or a known bot is filed under synthetic: or bot:.",
     "kept": "always",
     "encrypted": "no",
     "published": false,
@@ -1058,7 +1067,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
  },
  {
   "id": "agg",
-  "method": "—",
+  "method": "",
   "path": "every accepted row",
   "table": "agg",
   "handler": "cf/functions/api/_counters.js",
@@ -1146,8 +1155,75 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
   "notes": []
  },
  {
+  "id": "annotations",
+  "method": "POST",
+  "path": "/api/admin/annotations",
+  "table": "annotations",
+  "handler": "cf/functions/api/admin/annotations.js",
+  "what": "We mark an answer we wrote ourselves while testing the form, so it is not counted. Written by us, not by you, and never deleted.",
+  "publicly": "Every mark is public at /api/annotations and in the team_test column of each CSV: which table, the row_hash it marks, the kind and the day. Our note on a mark is not public. The row it marks is not changed.",
+  "fields": [
+   {
+    "column": "id",
+    "gloss": "A random id for one mark.",
+    "kept": "always",
+    "encrypted": "no",
+    "published": false,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   },
+   {
+    "column": "table_name",
+    "gloss": "Which register the marked row is in: corrections, gap reports, survey answers or interviews.",
+    "kept": "always",
+    "encrypted": "no",
+    "published": true,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   },
+   {
+    "column": "row_hash",
+    "gloss": "The published row_hash of the row we marked, so anyone can find it in the CSV. The row itself is not changed.",
+    "kept": "always",
+    "encrypted": "no",
+    "published": true,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   },
+   {
+    "column": "kind",
+    "gloss": "What the mark says. Only one kind exists: team-test, an answer we wrote ourselves while testing the form.",
+    "kept": "always",
+    "encrypted": "no",
+    "published": true,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   },
+   {
+    "column": "note",
+    "gloss": "A short note we write when we mark a row, for our own records. Never public.",
+    "kept": "only when it applies",
+    "encrypted": "no",
+    "published": false,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   },
+   {
+    "column": "at",
+    "gloss": "When we marked the row. Published as the day.",
+    "kept": "always",
+    "encrypted": "no",
+    "published": true,
+    "exported": false,
+    "since": "0007_annotations.sql"
+   }
+  ],
+  "accepts": [],
+  "notes": []
+ },
+ {
   "id": "integrity_heads",
-  "method": "—",
+  "method": "",
   "path": "every accepted row",
   "table": "integrity_heads",
   "handler": "cf/functions/api/_hash.js",
@@ -1165,7 +1241,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "head_hash",
-    "gloss": "The hash of the newest row, which is the number anyone can recompute for themselves from the published CSV.",
+    "gloss": "The hash of the newest row. Anyone can recompute it from corrections.csv, and reach it on survey.csv and gap.csv by following the links row by row.",
     "kept": "always",
     "encrypted": "no",
     "published": true,
@@ -1183,7 +1259,7 @@ export const PRIVACY_ENDPOINTS: PrivacyEndpoint[] = [
    },
    {
     "column": "updated_at",
-    "gloss": "When the head last moved.",
+    "gloss": "When the head last moved. Published as the day only.",
     "kept": "always",
     "encrypted": "no",
     "published": true,

@@ -122,10 +122,24 @@ if [ "$MODE" = "local" ]; then
   # This path exists so the verification below can be exercised against rows.
   # THE DAILY BACKUP IS THE --remote PATH BELOW and it is wrangler's own export.
   local_dump "$ROOT/cf/.wrangler/state-$STATE_NAME" "$FILE" >"$DIR/.$TS.export.log" 2>&1
+  RC=$?
 else
-  ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --remote --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+  # 2026-09-22: the OAuth access token lives 1 h, so the 05:05 run always refreshes it inside
+  # this call, and the D1 export endpoint can answer the just-minted token 401 "Authentication
+  # error [code: 10000]" while /user and /memberships accept it (failed 09-20 and 09-22, passed
+  # 09-21). Reproduced 09-22 19:21: attempt 1 refreshed + 401; attempts 2 and 3, seconds later,
+  # same token, OK 200. The export is read-only, so only that auth answer is retried.
+  for ATTEMPT in 1 2 3; do
+    ( cd "$ROOT/cf" && npx --no-install wrangler d1 export "$PROJECT" --remote --output "$FILE" ) >"$DIR/.$TS.export.log" 2>&1
+    RC=$?
+    if [ "$RC" -eq 0 ] && [ -s "$FILE" ]; then break; fi
+    grep -q 'code: 10000' "$DIR/.$TS.export.log" || break
+    if [ "$ATTEMPT" -lt 3 ]; then
+      say "  retry export attempt $ATTEMPT: Cloudflare answered the just-refreshed OAuth token 401 [code: 10000]; retrying in 10 s"
+      sleep 10
+    fi
+  done
 fi
-RC=$?
 if [ "$RC" -ne 0 ] || [ ! -s "$FILE" ]; then
   fail "wrangler d1 export failed (exit $RC)"
   tail -12 "$DIR/.$TS.export.log" | sed 's/^/      /'

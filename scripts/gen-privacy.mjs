@@ -107,7 +107,7 @@ function loadWritePaths() {
     `export { validateSurvey } from ${p('cf/functions/api/survey.js')};`,
     `export { validateInterview } from ${p('cf/functions/api/interview.js')};`,
     `export { exportRows } from ${p('cf/functions/api/export/[kind].js')};`,
-    `export { PUBLISHED, SURVEY_CTX_KEYS } from ${p('cf/functions/api/_hash.js')};`,
+    `export { PUBLISHED, SURVEY_CTX_KEYS, WITHHELD_FROM_CSV, COARSENED_CSV } from ${p('cf/functions/api/_hash.js')};`,
     `export { validateJourney } from ${p('lib/price-api.ts')};`,
     `export { TABLE, TABLE_VERSION } from ${p('lib/table.ts')};`,
     `export * as DEF from ${p('lib/survey-def.js')};`,
@@ -130,7 +130,8 @@ const LANDS_IN = {
   corrections: { priceId: 'price_id', verdict: 'verdict', believedValueUsd: 'believed_usd', note: 'note', priceTableVersion: 'table_version', journeyId: 'journey_id', submitterId: 'submitter_hash', receivedAt: 'received_at' },
   gap_reports: { counts: 'counts_json', ranking: 'ranking_json', note: 'note', context: 'context_json', tableVersion: 'table_version', receivedAt: 'received_at' },
   survey_responses: { ranking: 'ranking_json', unasked: 'unasked', lead: 'lead', decide: 'decide', clinicians: 'clinicians', context: 'context_json', sentence: 'sentence_enc', channel: 'channel', surveyVersion: 'survey_version', receivedAt: 'received_at' },
-  interviews: { consent: 'consent', name: 'name_enc', answers: 'answers_enc', followUp: 'follow_up', email: 'email_enc', channel: 'channel', receivedAt: 'received_at' },
+  // respondent (who is answering) is stored inside the encrypted answers blob, not in a column of its own.
+  interviews: { consent: 'consent', name: 'name_enc', answers: 'answers_enc', respondent: 'answers_enc', followUp: 'follow_up', email: 'email_enc', channel: 'channel', receivedAt: 'received_at' },
   journeys: { entries: 'entries_json', title: 'title' },
 };
 
@@ -148,6 +149,11 @@ const DEFECT_FROM_AGGREGATE = new Set(['figure_confirmed_right', 'figure_flagged
 /** A CSV header (export/[kind].js) -> its column. */
 function csvColumn(table, header, categoryIds) {
   if (header === 'row_hash') return 'row_hash';
+  if (header === 'prev_hash') return 'prev_hash';
+  // team_test is the annotations table (migration 0007) looked up by this row's row_hash: a mark, not a stored field of the row.
+  if (header === 'team_test') return 'row_hash';
+  // A coarsened copy of a stored column (received_on is received_at cut to the day).
+  if (header === 'received_on') return 'received_at';
   if (/^rank_\d+$/.test(header)) return 'ranking_json';
   if (header.startsWith('ctx_')) return 'context_json';
   if (table === 'gap_reports' && categoryIds.includes(header)) return 'counts_json';
@@ -170,10 +176,10 @@ const ENDPOINTS = [
     publicly: 'The count for each figure is public at /api/corrections and every published field is in the CSV. Your note is not.' },
   { id: 'gap', method: 'POST', path: '/api/gap', table: 'gap_reports', handler: 'cf/functions/api/gap.js', validator: 'gap',
     what: 'You report care you needed and did not get.',
-    publicly: 'The counts and the ranking are public at /api/gap and in the CSV. Your note is not.' },
+    publicly: 'The counts and the ranking are public at /api/gap and in the CSV, with the day it arrived but not the time. Your age band, insurance, region and urbanicity are public only as counts at /api/gap, and any value fewer than 11 reports gave is not shown. Your note is not public.' },
   { id: 'survey', method: 'POST', path: '/api/survey', table: 'survey_responses', handler: 'cf/functions/api/survey.js', validator: 'survey',
     what: 'You rank which burden weighed most.',
-    publicly: 'The counts are public at /api/survey and in the CSV. Your sentence is not, and a cell too small to be safe is withheld.' },
+    publicly: 'Your ranking, your three answers, the clinician count, the channel and the day it arrived are in the CSV, one row per answer, with no time of day and no self-description. What you said about yourself (age band, sex, coverage, region, state, stage, who is answering, the ages at onset and diagnosis) is public only as counts at /api/survey, and any value fewer than 11 answers gave is not shown. Your sentence is never public.' },
   { id: 'interview', method: 'POST', path: '/api/interview', table: 'interviews', handler: 'cf/functions/api/interview.js', validator: 'interview',
     what: 'You write out your own story in the interview form.',
     publicly: 'Only the number of interviews, their dates and how many people chose each consent are public. Nothing you wrote is served by any endpoint or carried by any export.' },
@@ -192,16 +198,19 @@ const ENDPOINTS = [
   { id: 'changes', method: 'POST', path: '/api/admin/changes', table: 'changes', handler: 'cf/functions/api/admin/changes.js',
     what: 'We publish "someone said this, so we changed that" on the register. Written by us, not by you.',
     publicly: 'The date, what was said, what changed and who is credited are shown on /register. Which interview it came from is not.' },
-  { id: 'events', method: '—', path: 'every request', table: 'events', handler: 'cf/functions/api/_http.js',
-    what: 'A daily count of how many times each endpoint was called. One number per day, nothing about who.',
-    publicly: 'These totals are not public. They are a daily count with nothing about anyone in them.' },
-  { id: 'agg', method: '—', path: 'every accepted row', table: 'agg', handler: ['cf/functions/api/_counters.js', 'cf/migrations/0006_agg.sql'],
+  { id: 'events', method: '', path: 'every request', table: 'events', handler: 'cf/functions/api/_http.js',
+    what: 'A daily count of how many times each endpoint was called, and of a few actions your browser reports with one word and no body (a ledger opened, a sheet printed, a file exported). One number per day, nothing about who.',
+    publicly: 'The counts of actions are public, by week, on the live register and at /api/use, with our own tests and known bots left out. The other totals are not public. Neither has anything about anyone in it.' },
+  { id: 'agg', method: '', path: 'every accepted row', table: 'agg', handler: ['cf/functions/api/_counters.js', 'cf/migrations/0006_agg.sql'],
     what: 'Nobody sends this. It is the register\'s own public totals, kept ready so the page reads as fast at a hundred thousand rows as at ten.',
     publicly: 'These are the same counts the register already serves. The table is a cache of them and holds nothing else.' },
   { id: 'canary', method: 'POST', path: '/api/health', table: 'canary', handler: 'cf/functions/api/health.js',
     what: 'Nobody sends this either. We write one row and delete it in the same breath, to prove the database is accepting writes.',
     publicly: 'Nothing here is public, and nothing here comes from anyone using the site.' },
-  { id: 'integrity_heads', method: '—', path: 'every accepted row', table: 'integrity_heads', handler: 'cf/functions/api/_hash.js',
+  { id: 'annotations', method: 'POST', path: '/api/admin/annotations', table: 'annotations', handler: 'cf/functions/api/admin/annotations.js',
+    what: 'We mark an answer we wrote ourselves while testing the form, so it is not counted. Written by us, not by you, and never deleted.',
+    publicly: 'Every mark is public at /api/annotations and in the team_test column of each CSV: which table, the row_hash it marks, the kind and the day. Our note on a mark is not public. The row it marks is not changed.' },
+  { id: 'integrity_heads', method: '', path: 'every accepted row', table: 'integrity_heads', handler: 'cf/functions/api/_hash.js',
     what: 'The head of each tamper-evidence chain, so an outsider can check the register was not edited.',
     publicly: 'Every head is public at /api/integrity. Publishing it is the whole point: it is what an outsider recomputes to check we did not edit the register.' },
 ];
@@ -234,7 +243,7 @@ export async function model(opts = {}) {
     correction: () => M.validateCorrection({ priceId, verdict: 'right', believedValueUsd: 1, note: 'probe', priceTableVersion: 'probe', journeyId: 'probe', submitterId: 'probe' }),
     gap: () => M.validateGap({ counts: { [M.CATEGORY_IDS[0]]: 1 }, ranking: [M.CATEGORY_IDS[0]], note: 'probe', context: { ageBand: 'probe', insurance: 'probe', region: 'probe', urbanicity: 'probe' }, tableVersion: 'probe' }),
     survey: () => M.validateSurvey({ ranking: DEF.BURDEN_IDS, unasked: DEF.BURDEN_IDS[0], lead: DEF.BURDEN_IDS[0], decide: DEF.DECIDER_IDS[0], clinicians: 1, context: ctxProbe, sentence: 'probe', channel: 'probe', surveyVersion: 'probe' }),
-    interview: () => M.validateInterview({ consent: 'quote-by-name', name: 'probe', answers: { q1: 'probe', q2: 'probe', q3: 'probe' }, followUp: true, email: 'probe@example.org', channel: 'probe' }),
+    interview: () => M.validateInterview({ consent: 'quote-by-name', name: 'probe', answers: { q1: 'probe', q2: 'probe', q3: 'probe' }, respondent: M.DEF.INTERVIEW_RESPONDENT_CARER, followUp: true, email: 'probe@example.org', channel: 'probe' }),
     journey: () => ({ record: M.validateJourney({ entries: [{ raw: 'probe', itemId: M.TABLE[0].id, times: 1 }], title: 'probe' }, M.TABLE) }),
   };
 
@@ -271,6 +280,8 @@ export async function model(opts = {}) {
   chained.integrity_heads = new Set(['table_name', 'head_hash', 'row_count', 'updated_at']);
   /* The cached payload IS the public aggregate; the bookkeeping around it is not served. */
   chained.agg = new Set(['payload_json']);
+  /* GET /api/annotations serves every mark (the time as the day). */
+  chained.annotations = new Set(['table_name', 'row_hash', 'kind', 'at']);
 
   const CSV = { corrections: 'corrections', gap_reports: 'gap', survey_responses: 'survey' };
   for (const [table, kind] of Object.entries(CSV)) {
@@ -312,10 +323,24 @@ export async function model(opts = {}) {
     return col.endsWith('_hash') ? 'one-way hash' : 'no';
   };
 
+  /* PUBLIC means served per row to anyone. On a table that has a CSV, that is
+     exactly what the CSV carries: a chained field the CSV leaves out on purpose
+     (the survey's self-description) is not public per row, and says so in a note
+     read off WITHHELD_FROM_CSV in _hash.js, never written here. */
+  const CSV_KIND = { corrections: 'corrections', gap_reports: 'gap', survey_responses: 'survey' };
+  const COLUMN_OF_FIELD = (table, field) => CHAINED_AS[table]?.[field] ?? field;
   const endpoints = ENDPOINTS.map((e) => {
     const cols = tables.get(e.table);
     const source = readFileSync(join(ROOT, e.handler), 'utf8');
     const notes = [];
+    const kind = CSV_KIND[e.table];
+    const withheld = kind ? (M.WITHHELD_FROM_CSV[kind] || {}) : {};
+    for (const [field, why] of Object.entries(withheld)) notes.push(`${COLUMN_OF_FIELD(e.table, field)}: inside the integrity chain as written, and in the CSV ${field === 'received_at' ? 'only as the day' : 'not at all'}. ${why[0].toUpperCase()}${why.slice(1)}`);
+    const publicPerRow = (col) => {
+      if (!(chained[e.table] || new Set()).has(col)) return false;
+      if (!kind) return true;
+      return (exported[e.table] || new Set()).has(col);
+    };
     if (e.table === 'survey_responses') {
       const ctxExported = M.exportRows('survey', []).split('\n')[0].split(',').filter((h) => h.startsWith('ctx_')).map((h) => h.slice(4));
       const outside = ctxExported.filter((k) => !M.SURVEY_CTX_KEYS.includes(k));
@@ -328,7 +353,7 @@ export async function model(opts = {}) {
         gloss: gloss[`${e.table}.${c.column}`],
         kept: c.notNull ? 'always' : 'only when it applies',
         encrypted: encryptionOf(c.column, source, e.table),
-        published: (chained[e.table] || new Set()).has(c.column),
+        published: publicPerRow(c.column),
         exported: (exported[e.table] || new Set()).has(c.column),
         since: c.since,
       })),
@@ -386,7 +411,7 @@ async function main() {
     writeFileSync(OUT, text);
     const columns = Number(text.match(/PRIVACY_COLUMN_COUNT = (\d+)/)[1]);
     const endpoints = (text.match(/"handler":/g) || []).length;
-    console.log(`privacy: app/privacy/generated.ts — ${columns} columns across ${endpoints} endpoints`);
+    console.log(`privacy: app/privacy/generated.ts, ${columns} columns across ${endpoints} endpoints`);
   }
  } catch (err) {
   console.error('gen-privacy: ' + err.message);

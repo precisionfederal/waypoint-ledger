@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_NAME="${OUT_NAME:-out}"
 STAGE="$ROOT/cf/.stage-$OUT_NAME"
-( cd "$ROOT" && node scripts/gen-dictionary.mjs 2>/dev/null && node scripts/gen-price-table.mjs 2>/dev/null && node scripts/gen-locality-table.mjs 2>/dev/null )
+( cd "$ROOT" && node scripts/gen-dictionary.mjs 2>/dev/null && node scripts/gen-price-table.mjs 2>/dev/null && node scripts/gen-locality-table.mjs 2>/dev/null && node scripts/gen-conditions-count.mjs )
 # The /privacy field table is generated from cf/migrations/*.sql, the write-path
 # validators, the integrity projection and the CSV header. NEVER silence this one:
 # a column with no plain-English line in data/column-glossary.json must fail the build,
@@ -18,11 +18,11 @@ STAGE="$ROOT/cf/.stage-$OUT_NAME"
 # (the public export step runs only in the upstream working tree)
 # <<< OPEN-DATA LANE (BUILD-6) <<<
 rm -rf "$STAGE" "$ROOT/cf/$OUT_NAME"; mkdir -p "$STAGE"
-rsync -a --exclude node_modules --exclude .next --exclude cf --exclude shots --exclude shots2 --exclude tests --exclude .wrangler --exclude WORK-ORDERS --exclude 'app/api' --exclude 'data/*.jsonl' "$ROOT/" "$STAGE/"
+rsync -a --exclude node_modules --exclude '.next*' --exclude cf --exclude shots --exclude shots2 --exclude tests --exclude .wrangler --exclude WORK-ORDERS --exclude 'app/api' --exclude 'data/*.jsonl' "$ROOT/" "$STAGE/"
 ln -s "$ROOT/node_modules" "$STAGE/node_modules"
 cat > "$STAGE/next.config.mjs" <<'CFG'
 /** @type {import('next').NextConfig} */
-const nextConfig = { reactStrictMode: true, output: 'export', images: { unoptimized: true } };
+const nextConfig = { reactStrictMode: true, experimental: { cssChunking: 'strict' }, output: 'export', images: { unoptimized: true } };
 export default nextConfig;
 CFG
 ( cd "$STAGE" && npx next build )

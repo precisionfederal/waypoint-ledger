@@ -1,7 +1,7 @@
-/* GET /api/fhir/example — the demo journey, as an HL7 FHIR R4 Bundle.
+/* GET /api/fhir/example: the journey builder's example journey, as an HL7 FHIR R4 Bundle.
 
-   The same sentence the landing page offers as an example, so the first bundle
-   a developer sees is the journey the product actually demonstrates rather than
+   The same sentence the journey builder (/journey) offers in its empty box, so
+   the first bundle a developer sees is a journey the product itself offers rather than
    a happy path written for the docs. ?envelope=1 adds what was left out of it
    and why. */
 import { json, bad, count } from '../_http.js';

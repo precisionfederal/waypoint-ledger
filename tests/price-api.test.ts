@@ -152,8 +152,10 @@ describe('validateJourney — what may be saved and shared', () => {
     expect(e({ entries: [{ itemId: 'nope', times: 1 }] })).toMatch(/No such unit of care/);
     expect(e({ entries: [] })).toMatch(/at least one line/);
     expect(e({})).toMatch(/entries/);
-    expect(e({ entries: [{ itemId: 'cms-99213', times: 0 }] })).toMatch(/1 to 99/);
-    expect(e({ entries: [{ itemId: 'cms-99213', times: 100 }] })).toMatch(/1 to 99/);
+    /* patient2-5: one cap everywhere, the same 365 as the ledger and the share link */
+    expect(e({ entries: [{ itemId: 'cms-99213', times: 0 }] })).toMatch(/1 to 365/);
+    expect(e({ entries: [{ itemId: 'cms-99213', times: 366 }] })).toMatch(/1 to 365/);
+    expect(e({ entries: [{ itemId: 'cms-99213', times: 121 }] })).toBe('');
     expect(e({ entries: [{ times: 1 }] })).toMatch(/itemId or the words/);
     expect(e({ entries: Array.from({ length: MAX_ITEMS + 1 }, () => ({ itemId: 'cms-99213', times: 1 })) })).toMatch(String(MAX_ITEMS));
   });

@@ -42,15 +42,39 @@ async function readCapped(request, max) {
   return new TextDecoder().decode(buf);
 }
 
+/* FLOW adopter-9: "Body must be JSON." told a developer nothing they could act on.
+   The answer now says what was wrong and what a good body looks like, with the
+   parser's own position when it has one. */
+const NOT_JSON = 'The body must be JSON, and this is not valid JSON';
+const JSON_HOW = 'Send one JSON object with content-type: application/json, for example {"story":"saw my doctor twice"} to /api/price. A line break or an unescaped double quote inside a quoted string is the usual cause. GET /api/openapi.json shows every route\'s body.';
+export function notJsonError(request, detail) {
+  const ct = (request.headers.get('content-type') || '').toLowerCase();
+  if (ct.includes('application/x-www-form-urlencoded') || ct.includes('multipart/form-data')) {
+    return `${NOT_JSON}: it was sent as a form (${ct.split(';')[0]}). ${JSON_HOW}`;
+  }
+  return `${NOT_JSON}${detail ? ` (${String(detail).slice(0, 160)})` : ''}. ${JSON_HOW}`;
+}
+
 /** Parse a JSON body with a size cap in BYTES. Returns { body } or { error }. */
 export async function readJson(request) {
   const len = Number(request.headers.get('content-length') || 0);
   if (len > MAX_BODY) return { error: 'Body too large.' };
   let text;
   try { text = await readCapped(request, MAX_BODY); }
-  catch (e) { return { error: e === OVERFLOW ? 'Body too large.' : 'Body must be JSON.' }; }
+  catch (e) { return { error: e === OVERFLOW ? 'Body too large.' : notJsonError(request, null) }; }
   try { const body = JSON.parse(text); return body && typeof body === 'object' ? { body } : { error: 'Body must be a JSON object.' }; }
-  catch { return { error: 'Body must be JSON.' }; }
+  catch (e) { return { error: notJsonError(request, e instanceof Error ? e.message : null) }; }
+}
+
+/** Read a JSON body WITHOUT consuming it (the route still reads the original), under
+ *  the same byte cap. null when there is no body, it is too large, or it is not JSON.
+ *  The middleware uses it to read the survey's channel label (adopter-3). */
+export async function peekJson(request) {
+  try {
+    if (Number(request.headers.get('content-length') || 0) > MAX_BODY) return null;
+    const v = JSON.parse(await readCapped(request.clone(), MAX_BODY));
+    return v && typeof v === 'object' ? v : null;
+  } catch { return null; }
 }
 
 /* --------------------------------------------------------------------------

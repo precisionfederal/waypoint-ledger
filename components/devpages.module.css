@@ -1,0 +1,52 @@
+/* /developers and /adopt, PAGES R2 (2026-09-30). DESIGN R1 tokens only, so light
+   and dark both come from the product's own palette. Scoped to .dp, the class on
+   each page's section, so nothing here reaches another page. */
+
+/* ---- "Show the call": a folded row at the foot of a card ---- */
+.call{margin:1rem -1.35rem -1.25rem;border-top:1px solid var(--line-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+.call>summary{display:flex;align-items:center;gap:.8rem;min-height:56px;padding:.7rem 1.35rem;cursor:pointer;list-style:none;border-radius:0 0 var(--r-lg) var(--r-lg)}
+.call[open]>summary{border-radius:0}
+.call>summary::-webkit-details-marker{display:none}
+.call>summary:hover{background:var(--surface-2)}
+.call>summary:focus-visible{outline:none;box-shadow:inset var(--ring)}
+.callIc{flex:none;display:inline-flex;align-items:center;justify-content:center;width:2.1rem;height:2.1rem;border-radius:var(--r-sm);background:var(--accent-soft);color:var(--accent-ink)}
+.callHead{display:flex;flex-direction:column;gap:.05rem;min-width:0;flex:1}
+.callLbl{font-weight:600;color:var(--ink);font-size:1rem;line-height:1.3}
+.callWhat{font-size:.9375rem;line-height:1.4;color:var(--ink-3)}
+.hide{display:none}
+.call[open] .show{display:none}
+.call[open] .hide{display:inline}
+.callChev{flex:none;width:2rem;height:2rem;border-radius:50%;background:var(--ground);position:relative}
+.callChev::after{content:'';position:absolute;left:50%;top:45%;width:.45rem;height:.45rem;border-right:1.5px solid var(--ink-2);border-bottom:1.5px solid var(--ink-2);transform:translate(-50%,-50%) rotate(45deg);transition:transform .18s ease}
+.call[open] .callChev::after{top:58%;transform:translate(-50%,-50%) rotate(-135deg)}
+@media (prefers-reduced-motion:reduce){.callChev::after{transition:none}}
+.callBody{padding:1rem 1.35rem 1.25rem;border-top:1px solid var(--line-2);background:var(--surface-2);border-radius:0 0 var(--r-lg) var(--r-lg)}
+.callBody>:last-child{margin-bottom:0}
+details.call:last-child{margin-bottom:-1.25rem}
+details.flat,details.flat:last-child{margin:.75rem 0 1rem;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--sh-1)}
+.flat>summary{border-radius:var(--r-lg);padding:.6rem 1rem}
+.flat[open]>summary{border-radius:var(--r-lg) var(--r-lg) 0 0}
+.flat>.callBody{padding:1rem}
+.callBody figure{background:var(--surface)}
+
+/* ---- code wraps inside its card at every width: nothing hides past a scrollbar ---- */
+.dp pre{white-space:break-spaces;overflow-wrap:anywhere;word-break:break-word}
+.dp pre code{white-space:inherit}
+.dp code{overflow-wrap:anywhere}
+
+/* ---- phones: links are 44 px targets ---- */
+@media (max-width:640px){
+  /* an inline link inside a sentence keeps its line, but its tap area grows to 44 px:
+     vertical padding on an inline box widens the hit box without moving a line */
+  .dp p a,.dp li a,.dp td a,.dp th a,.dp dd a{padding-block:.72rem}
+  .callBody{padding:.9rem .75rem 1rem}
+}
+
+/* ---- a grid of folded rows: two across, and the one you open takes the whole width ---- */
+.foldGrid{display:grid;grid-template-columns:minmax(0,1fr);gap:.75rem;margin:0 0 .75rem}
+.foldGrid>details{margin:0}
+@media (min-width:1180px){
+  .foldGrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .foldGrid>details[open]{grid-column:1 / -1}
+  .foldGrid3{grid-template-columns:repeat(3,minmax(0,1fr))}
+}

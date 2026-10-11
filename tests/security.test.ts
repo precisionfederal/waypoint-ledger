@@ -216,11 +216,11 @@ describe('A07: password derivation is what it says it is', () => {
 });
 
 describe('A07: the session cookie', () => {
-  it('is HttpOnly, SameSite=Lax and Secure on https', () => {
+  it('is HttpOnly, SameSite=Strict and Secure on https (R1-auth F1, 2026-09-30: was Lax)', () => {
     const c = sessionCookie('sid-1', new Request('https://waypoint-ledger.pages.dev/api/auth/password/login', { method: 'POST' }));
     expect(c).toMatch(/^wl_session=sid-1;/);
     expect(c).toMatch(/HttpOnly/);
-    expect(c).toMatch(/SameSite=Lax/);
+    expect(c).toMatch(/SameSite=Strict/);
     expect(c).toMatch(/Secure/);
     expect(c).toMatch(/Max-Age=2592000/);
     expect(c).toMatch(/Path=\//);
@@ -403,7 +403,7 @@ describe('security.txt is a valid RFC 9116 file', () => {
   }
 
   it('has the one required field, Contact', () => {
-    expect(fields.get('contact')).toEqual(['mailto:bo@precisionfederal.com']);
+    expect(fields.get('contact')).toEqual(['https://precisionfederal.com/contact']);
   });
 
   it('has exactly one Expires, and it has not passed', () => {
@@ -418,7 +418,7 @@ describe('security.txt is a valid RFC 9116 file', () => {
   it('names its own canonical URI over https', () => {
     const c = fields.get('canonical');
     expect(c).toHaveLength(1);
-    expect(c![0]).toBe('https://waypoint-ledger.pages.dev/.well-known/security.txt');
+    expect(c![0]).toBe('https://waypointledger.org/.well-known/security.txt');
   });
 
   it('carries no field RFC 9116 does not define', () => {
@@ -525,7 +525,7 @@ describe.skipIf(!BASE)('LIVE: response headers', () => {
     const r = await hit('/.well-known/security.txt', { ip: '10.9.0.5' });
     expect(r.status).toBe(200);
     expect(r.headers.get('content-type')).toMatch(/text\/plain/);
-    expect(await r.text()).toMatch(/^Contact: mailto:/m);
+    expect(await r.text()).toMatch(/^Contact: https:\/\/precisionfederal\.com\/contact$/m);
   });
 });
 
@@ -589,7 +589,7 @@ describe.skipIf(!BASE)('LIVE: accounts, sessions and recovery codes', () => {
   const pw = 'correct-horse-battery-staple';
   const mk = () => `sec-${Math.random().toString(36).slice(2, 10)}@example.test`;
 
-  it('sets an HttpOnly SameSite=Lax session cookie and never returns the hash', async () => {
+  it('sets an HttpOnly SameSite=Strict session cookie and never returns the hash', async () => {
     const r = await hit('/api/auth/password/signup', {
       ip: '10.9.3.1', method: 'POST', headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ email: mk(), password: pw }),
@@ -597,7 +597,7 @@ describe.skipIf(!BASE)('LIVE: accounts, sessions and recovery codes', () => {
     expect(r.status).toBe(200);
     const cookie = r.headers.get('set-cookie') || '';
     expect(cookie).toMatch(/HttpOnly/);
-    expect(cookie).toMatch(/SameSite=Lax/);
+    expect(cookie).toMatch(/SameSite=Strict/);
     expect(cookie).toMatch(/Path=\//);
     const text = JSON.stringify(await r.json());
     expect(text).not.toMatch(/pbkdf2/);
@@ -686,10 +686,14 @@ describe.skipIf(!BASE)('LIVE: the rate limiter answers 429, never 500', () => {
   it('trips cleanly on a public write path and says how long to wait', async () => {
     const ip = '10.9.5.7';
     const codes: number[] = [];
+    /* /api/gap?dry=1 tripped at 20 until R6 edge #4 raised gap to 300. The survey
+       takes a human rate since R1-security S-04 (2026-09-30), so it is the write
+       that trips inside 24; the body is refused by the validator, so nothing is
+       written while the bucket fills. */
     for (let i = 0; i < 24; i += 1) {
-      const r = await hit('/api/gap?dry=1', {
+      const r = await hit('/api/survey', {
         ip, method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ counts: { tests: 1 }, ranking: ['money', 'time', 'pain', 'work', 'people'] }),
+        body: JSON.stringify({ ranking: ['not-a-burden'] }),
       });
       codes.push(r.status);
       if (r.status === 429) {

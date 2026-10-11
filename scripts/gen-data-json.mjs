@@ -28,7 +28,7 @@ import { readFileSync, writeFileSync, copyFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
-const SITE = 'https://waypoint-ledger.pages.dev';
+const SITE = 'https://waypointledger.org';
 const CC0 = 'https://creativecommons.org/publicdomain/zero/1.0/';
 const PUBLISHER = { '@type': 'org:Organization', name: 'Precision Delivery Federal LLC' };
 const CONTACT = { '@type': 'vcard:Contact', fn: 'Bo Peng', hasEmail: 'mailto:bo@precisionfederal.com' };
@@ -89,7 +89,7 @@ const catalog = {
       identifier: SITE + '/data/price-table.csv',
       title: 'Waypoint Ledger price table: published U.S. federal figures for units of care',
       description:
-        `${price.rows} rows. Each row is one unit of care — an office visit, a lab, an imaging study — `
+        `${price.rows} rows. Each row is one unit of care (an office visit, a lab, an imaging study) `
         + 'carrying a single published federal dollar figure and, beside it, the file that figure was read '
         + 'from, the year, the basis (allowed amount, payment, charge, out-of-pocket, facility cost), the '
         + 'population the figure describes and the rules that say whether it may be added to another row. '
@@ -121,8 +121,8 @@ const catalog = {
       title: `Medicare allowed amounts for ${loc.codes} services in all ${loc.locality_count} CMS payment localities`,
       description:
         `${loc.rows} figures: ${loc.codes} CPT/HCPCS codes priced for each of the ${loc.locality_count} Medicare `
-        + `payment localities across ${loc.states} states and territories. Every figure is CMS's own formula — `
-        + `${loc.formula} — applied to CMS's own published relative value units and geographic practice cost `
+        + `payment localities across ${loc.states} states and territories. Every figure is CMS's own formula, `
+        + `${loc.formula}, applied to CMS's own published relative value units and geographic practice cost `
         + 'indices, which are printed on the same row together with the SHA-256 of each source file. The '
         + `generator is also the audit: it recomputed all ${loc.audit.figures_checked} figures on `
         + `${loc.audit.ran} and found ${loc.audit.mismatches} mismatches, and exits non-zero on one cent of `
@@ -199,7 +199,7 @@ const catalog = {
       title: 'Waypoint Ledger register: which burden weighed most, ranked by the people carrying it',
       description:
         'Responses to a published instrument that asks a person living with a long-undiagnosed illness to rank '
-        + 'the kinds of burden — money spent, work lost, care never received, time — against each other. The '
+        + 'the kinds of burden (money spent, work lost, care never received, time) against each other. The '
         + 'point is the weighting: any total that combines kinds of burden needs a stated basis, and this is '
         + 'ours, published as a count with its N rather than asserted. Each response carries the channel it '
         + 'came through, so one community’s answers are separable from another’s by anyone reading the file. '
@@ -223,7 +223,7 @@ const catalog = {
       title: 'Waypoint Ledger data dictionary: every published column, and the instrument itself',
       description:
         'What each column in each published file means, in plain words, and the full text of the burden '
-        + 'instrument — every question, every response option, every skip — so a reviewer can read the '
+        + 'instrument (every question, every response option, every skip) so a reviewer can read the '
         + 'questions without running the site or trusting our description of them. Generated from the '
         + 'database schema and the write-path validators, not written by hand: a column with no plain-English '
         + 'line fails the build.',
@@ -256,5 +256,5 @@ for (const f of ['LICENSE', 'NOTICE']) {
 
 const n = catalog.dataset.length;
 const d = catalog.dataset.reduce((a, s) => a + (s.distribution?.length ?? 0), 0);
-console.log(`public/data.json — DCAT-US v1.1 catalog, ${n} datasets, ${d} distributions`);
+console.log(`public/data.json: DCAT-US v1.1 catalog, ${n} datasets, ${d} distributions`);
 console.log('public/LICENSE, public/NOTICE (+ .txt) copied from the tree');

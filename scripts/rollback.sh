@@ -31,9 +31,12 @@ set -uo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 PROJECT="waypoint-ledger"
-ACCOUNT="b16cccaf0099ee0f9751c7e73bd8c7c7"
+# The account id is not published with the source: it comes from CF_ACCOUNT_ID,
+# or from the ids file outside the repository (WL_IDS_FILE overrides its path).
+IDS="${WL_IDS_FILE:-$HOME/.config/precision-federal/waypoint-ids.env}"
+[ -z "${CF_ACCOUNT_ID:-}" ] && [ -r "$IDS" ] && . "$IDS"
+ACCOUNT="${CF_ACCOUNT_ID:-}"
 ORIGIN="${ROLLBACK_ORIGIN:-https://waypoint-ledger.pages.dev}"
-DASH="https://dash.cloudflare.com/$ACCOUNT/pages/view/$PROJECT"
 
 command -v jq >/dev/null 2>&1 || { printf 'rollback: jq is required\n' >&2; exit 2; }
 
@@ -73,6 +76,11 @@ if [ -z "$ROW" ]; then
   printf '          Copy an Id from the list above.\n' >&2
   exit 2
 fi
+if [ -z "$ACCOUNT" ]; then
+  printf 'rollback: set CF_ACCOUNT_ID (or put it in %s); npx wrangler whoami prints it.\n' "$IDS" >&2
+  exit 1
+fi
+DASH="https://dash.cloudflare.com/$ACCOUNT/pages/view/$PROJECT"
 SHA="$(printf '%s' "$ROW" | jq -r '.Source')"
 WHEN="$(printf '%s' "$ROW" | jq -r '.Status')"
 

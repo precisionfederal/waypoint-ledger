@@ -12,11 +12,12 @@
    ========================================================================== */
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/IntentLink';
 import { TABLE_VERSION } from '@/lib/table';
+import { useStore } from '@/lib/store';
 import {
-  BURDENS_KEY, DISMISSED_CATEGORY, EMPTY_BURDENS, MAX,
-  burdenCards, burdensEntered, careMethods, cents, loadBurdens, money, payBases, saveBurdens,
+  DISMISSED_CATEGORY, EMPTY_BURDENS, MAX,
+  burdenCards, burdensEntered, careMethods, cents, dismissalsFromEntries, loadBurdensWithWords, money, payBases, readWorkdaysSaid, saveBurdens, workdaysFromWords,
   type BurdenCard, type BurdenCounts, type CareMethodId, type PayBasisId,
 } from '@/lib/burdens';
 import { Icon } from './Icons';
@@ -27,21 +28,49 @@ const TAP = { width: '2.75rem', height: '2.75rem' } as const;
 /** .chip span ellipsises at 20rem; in a card this narrow the label wraps instead of truncating. */
 const CHIP_TEXT = { whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', maxWidth: 'none' } as const;
 
+/** flow3-3: a random id kept with this ledger, so the server can tell a repeat
+ *  press from a new report. Never a person, never sent anywhere else. */
+export const GAP_KEY_STORE = 'waypoint-ledger.gap-key.v1';
+export function gapSendKey(count: number): string {
+  let id = '';
+  try { id = localStorage.getItem(GAP_KEY_STORE) || ''; } catch { /* private window */ }
+  if (!/^[a-z0-9]{16,40}$/.test(id)) {
+    const b = new Uint8Array(12);
+    crypto.getRandomValues(b);
+    id = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+    try { localStorage.setItem(GAP_KEY_STORE, id); } catch { /* private window: one key per page load */ }
+  }
+  return `${id}:${count}`;
+}
+
 export default function BurdenLedger() {
   const [c, setC] = useState<BurdenCounts>(EMPTY_BURDENS);
   const [ready, setReady] = useState(false);
   const [ownPayText, setOwnPayText] = useState('');
+  /* What the person's own sentences said about missed work (lib/burdens.ts). */
+  const [said, setSaid] = useState<{ raw: string; days: number; note: string }[]>([]);
   const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [sendMsg, setSendMsg] = useState<string | null>(null);
   const sentCount = useRef<number | null>(null);
 
   useEffect(() => {
-    const loaded = loadBurdens();
+    const loaded = loadBurdensWithWords();
     setC(loaded);
+    setSaid(readWorkdaysSaid());
     setOwnPayText(loaded.ownWeeklyPayUsd === null ? '' : String(loaded.ownWeeklyPayUsd));
     setReady(true);
   }, []);
   useEffect(() => { if (ready) saveBurdens(c); }, [c, ready]);
+
+  /* flow3-5: the times she said she was dismissed fill the card while it is 0. */
+  const st = useStore();
+  const told = useMemo(() => dismissalsFromEntries(st.entries), [st.entries]);
+  const toldFilled = useRef(false);
+  useEffect(() => {
+    if (!ready || toldFilled.current || !st.hydrated) return;
+    toldFilled.current = true;
+    if (told.total > 0) setC((p) => (p.dismissed > 0 ? p : { ...p, dismissed: told.total }));
+  }, [ready, st.hydrated, told.total]);
 
   const cards = useMemo(() => burdenCards(c), [c]);
   const entered = burdensEntered(c);
@@ -52,20 +81,26 @@ export default function BurdenLedger() {
     if (k === 'dismissed') { setSendState('idle'); setSendMsg(null); }
   }
 
+  /* flow3-3: one press, one report. Once a number is added the button reads
+     "Added" and does nothing until the number changes; it is never `disabled`,
+     so keyboard focus stays on it. The idempotency key (this ledger's random
+     id plus the count) lets the server drop a repeat (cf/functions/api/gap.js). */
+  const isAdded = sendState === 'sent' && sentCount.current === c.dismissed;
+  const sendBlocked = !c.dismissed || sendState === 'sending' || isAdded;
   async function sendDismissed() {
-    if (!c.dismissed) return;
+    if (sendBlocked) return;
     setSendState('sending'); setSendMsg(null);
     try {
       const r = await fetch('/api/gap', {
         method: 'POST', headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ counts: { [DISMISSED_CATEGORY]: c.dismissed }, tableVersion: TABLE_VERSION }),
+        body: JSON.stringify({ counts: { [DISMISSED_CATEGORY]: c.dismissed }, tableVersion: TABLE_VERSION, idempotencyKey: gapSendKey(c.dismissed) }),
       });
       const d = await r.json().catch(() => ({}));
       if (r.ok && d && d.ok) { sentCount.current = c.dismissed; setSendState('sent'); }
       else { setSendState('error'); setSendMsg(typeof d?.error === 'string' ? d.error : 'The count could not be recorded just now. Nothing was saved, and you can try again.'); }
     } catch {
       setSendState('error');
-      setSendMsg('The count could not be sent — you may be offline. Nothing left this device.');
+      setSendMsg('The count could not be sent. You may be offline. Nothing left this device.');
     }
   }
 
@@ -74,7 +109,7 @@ export default function BurdenLedger() {
       <p className="eyebrow">Beside the money, never inside it</p>
       <h2 id="burdens-h">The costs the claims files never see</h2>
       <p className="micro" style={{ maxWidth: '48rem', fontSize: '1rem' }}>
-        Ranked by the people who carried them at <Link href="/survey">/survey</Link> — we price them apart and never weight them.
+        Ranked by the people who carried them at <Link href="/survey">/survey</Link>. We price them apart and never weight them.
         The money is the ledger above. These are the other four: two have a published federal figure behind them, and two do not, so they stay blank.
       </p>
 
@@ -93,6 +128,16 @@ export default function BurdenLedger() {
               <span className="micro" style={{ margin: 0 }}>{card.unit}</span>
             </div>
 
+            {card.kind === 'workdays' && said.length > 0 && c.workdays === workdaysFromWords(said) && (
+              <p className="micro" style={{ margin: 0, flex: '0 0 auto' }}>
+                Filled from what you typed: {said.map((w) => `“${w.raw}” (${w.note})`).join('; ')}. Change it if that is not right.
+              </p>
+            )}
+            {card.kind === 'dismissed' && told.said.length > 0 && c.dismissed === told.total && (
+              <p className="micro" style={{ margin: 0, flex: '0 0 auto' }}>
+                Filled from what you typed: {told.said.map((d) => `“${d.raw}” (${d.n})`).join('; ')}. Change it if that is not right.
+              </p>
+            )}
             {card.kind === 'workdays' && <PayBasisPicker c={c} onPick={(id) => set('payBasis', id)} ownPayText={ownPayText} onOwnPay={(text) => {
               setOwnPayText(text);
               const n = parseFloat(text);
@@ -104,14 +149,14 @@ export default function BurdenLedger() {
 
             {card.kind === 'dismissed' && (
               <div style={{ marginTop: '.2rem' }}>
-                <button className="btn small primary" type="button" disabled={!c.dismissed || sendState === 'sending'} onClick={() => void sendDismissed()}>
-                  {sendState === 'sending' ? 'Adding…' : 'Add it to the count'}
+                <button className="btn small primary" type="button" aria-disabled={sendBlocked || undefined} aria-busy={sendState === 'sending' || undefined} onClick={() => void sendDismissed()}>
+                  {sendState === 'sending' ? 'Adding…' : isAdded ? <><Icon.Check /> Added</> : 'Add it to the count'}
                 </button>
                 <p className="micro" role="status" aria-live="polite" style={{ margin: '.5rem 0 0' }}>
                   {sendState === 'sent' && sentCount.current !== null
                     ? <span className="sent-ok"><Icon.Check /> {sentCount.current} {sentCount.current === 1 ? 'time' : 'times'} added to the public count.</span>
                     : sendState === 'error' ? <span style={{ color: 'var(--flag-ink)' }}>{sendMsg}</span>
-                      : 'Only the number goes. No name, no journey, no diagnosis, no IP address.'}
+                      : 'Only the number goes, with a random key that stops it being counted twice. No name, no journey, no diagnosis, no IP address.'}
                 </p>
                 <p className="micro" style={{ margin: '.35rem 0 0' }}><Link href="/gap">Report the rest of what went uncounted</Link></p>
               </div>
@@ -122,11 +167,13 @@ export default function BurdenLedger() {
 
       <p className="micro" style={{ marginTop: 'var(--sp-3, 1rem)', maxWidth: '52rem' }}>
         {entered === 0
-          ? 'Nothing here is filled in for you. Enter a count and the arithmetic appears with the federal row it came from.'
+          ? 'Nothing is filled in until you enter a count or name one in your own words. Then the arithmetic appears with the federal row it came from.'
           : entered === 4 ? 'All four filled in. ' : `${entered} of the four filled in. `}
         These figures are never added to the itemized total above, and never added to each other: a missed workday and an hour of
         someone else&rsquo;s time are different quantities, and adding them would be the weighting we say we do not do.
-        What you type here stays in this browser under <code style={mono}>{BURDENS_KEY}</code> and is never sent.
+        {/* flow3-12: no storage key in front of a patient. The one thing that can
+            leave is the told-it-was-nothing count, with its repeat key (flow3-3). */}
+        What you type here stays in this browser. Nothing leaves it unless you press Add it to the count, and then only that number goes, with a random key that stops it being counted twice.
       </p>
 
       {/* The counts are the half of the burden a claims file never holds. They belong on the
@@ -213,7 +260,7 @@ function Figure({ card }: { card: BurdenCard }) {
                 {card.alternatives.map((a) => (
                   <li key={a.id}>
                     <p style={{ ...mono, margin: 0, color: 'var(--ink-2)' }}>{a.arithmetic}</p>
-                    <p className="micro" style={{ margin: 0 }}>{a.label} — {a.note}</p>
+                    <p className="micro" style={{ margin: 0 }}>{a.label}: {a.note}</p>
                   </li>
                 ))}
               </ul>
@@ -238,7 +285,7 @@ function PayBasisPicker({ c, onPick, ownPayText, onOwnPay }: {
             style={c.payBasis === o.id ? { borderColor: 'var(--accent)', background: 'var(--accent-soft)' } : undefined}
             onClick={() => onPick(o.id)}>
             <span style={CHIP_TEXT}>{o.label}</span>
-            <b>{o.weeklyUsd === null ? '—' : `${money(o.weeklyUsd, false)}/wk`}</b>
+            <b>{o.weeklyUsd === null ? '–' : `${money(o.weeklyUsd, false)}/wk`}</b>
           </button>
         ))}
       </div>
@@ -265,7 +312,7 @@ function CareMethodPicker({ value, onPick }: { value: CareMethodId; onPick: (id:
             style={value === o.id ? { borderColor: 'var(--accent)', background: 'var(--accent-soft)' } : undefined}
             onClick={() => onPick(o.id)}>
             <span style={CHIP_TEXT}>{o.label}</span>
-            <b>{o.hourlyUsd === null ? '—' : `${money(o.hourlyUsd)}/hr`}</b>
+            <b>{o.hourlyUsd === null ? '–' : `${money(o.hourlyUsd)}/hr`}</b>
           </button>
         ))}
       </div>

@@ -1,0 +1,271 @@
+/* ==========================================================================
+   VISUAL-4b (2026-09-30): the appointment sheet on screen is a print preview.
+   One paper page on the desk, a teal rule across its head, the total and its
+   two counts as the page's first band, the journey as a strip of numbered
+   stops, the lines as a quiet table with a share bar under each line total,
+   and everything after it set as a document, not as cards. Beside the page,
+   a rail holds the actions and how to use it. Tokens only, so dark reads right;
+   app/sheet/print.css owns paper and keeps every rule here off the page.
+   ========================================================================== */
+
+/* ---- the empty state ---- */
+.sheet-loading{min-height:100vh}
+.sheet-empty-wrap{padding:clamp(2.5rem,7vw,5rem) 0}
+.sheet-empty{max-width:36rem;margin:0 auto;text-align:center;background:var(--surface);border:1px solid var(--line-2);
+  border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:clamp(1.75rem,5vw,3rem) clamp(1.25rem,4vw,2.75rem)}
+/* Re-merge (2026-10-01): VISUAL's empty-sheet spot (480x435) replaces the icon; the
+   width/height attributes hold the box, so nothing shifts when it loads. */
+.sheet-empty-art{display:block;width:min(13rem,60%);height:auto;margin:-.5rem auto .5rem}
+.sheet-empty h1{font-size:clamp(1.6rem,3vw,2rem);margin:.25rem 0 .6rem}
+.sheet-empty .sub{margin:0 auto;max-width:30rem;color:var(--ink-2)}
+.sheet-empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:1.5rem}
+.sheet-empty-actions .btn{min-height:2.75rem}
+
+@media screen{
+  /* ---- the desk: the ground, the rail and the page ---- */
+  section.step.sheet{background:transparent;border:0;box-shadow:none;border-radius:0;padding:clamp(1.25rem,3vw,2.75rem) 0 clamp(2.5rem,5vw,4.5rem)}
+  .sheet-desk{display:grid;gap:1.25rem;align-items:start}
+  .sheet-stage{min-width:0}
+
+  /* ---- the rail: actions, then how to use it ---- */
+  .sheet-rail{display:grid;gap:1rem;min-width:0}
+  .sheet-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.75rem;margin:0}
+  .sheet-tools .eyebrow{margin:0}
+  .st-actions{display:flex;flex-wrap:wrap;gap:.6rem}
+  .st-actions .btn{min-height:2.75rem}
+  .st-back::before{content:"";width:1rem;height:1rem;margin-right:.45rem;background:currentColor;flex:none;
+    -webkit-mask:var(--ic-back) center/contain no-repeat;mask:var(--ic-back) center/contain no-repeat}
+  .sheet-guide{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);
+    padding:1.1rem 1.25rem 1.2rem;display:grid;grid-template-columns:minmax(0,1fr);gap:.2rem 1.5rem}
+  .sg-art{display:block;width:100%;max-width:15rem;height:auto;border-radius:var(--r-md);margin:0 0 .6rem}
+  .sheet-guide h2{font-size:1.125rem;line-height:1.35;margin:0 0 .65rem}
+  .sg-steps{list-style:none;margin:0;padding:0;display:grid;gap:.85rem}
+  .sg-steps li{position:relative;min-height:2.25rem;padding-left:3rem;font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+  .sg-steps b{display:block;color:var(--ink);font-weight:600}
+  .sg-steps li::before{content:"";position:absolute;left:0;top:0;width:2.25rem;height:2.25rem;border-radius:var(--r-md);background:var(--accent-soft)}
+  .sg-steps li::after{content:"";position:absolute;left:.5rem;top:.5rem;width:1.25rem;height:1.25rem;background:var(--accent-ink);
+    -webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+  .sg-1{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 9V3h10v6'/%3E%3Cpath d='M7 18H5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/%3E%3Cpath d='M7 14h10v7H7z'/%3E%3C/svg%3E")}
+  .sg-2{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 5h16v11H10l-5 4v-4H4z'/%3E%3Cpath d='M8 9h8M8 12.5h5'/%3E%3C/svg%3E")}
+  .sg-3{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h9l4 4v14H6z'/%3E%3Cpath d='M14 3v5h5'/%3E%3Cpath d='M9 13l2 2 4-4'/%3E%3C/svg%3E")}
+  .sheet-rail{--ic-back:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 18l-6-6 6-6'/%3E%3C/svg%3E")}
+
+  .sheet-sample{margin:0 0 1rem;padding:.7rem 1rem;border-radius:var(--r-md);background:var(--accent-soft);color:var(--ink-2);font-size:.9375rem}
+  .sheet-sample b{color:var(--ink);font-weight:600}
+  .sheet-sample a{color:var(--accent-ink);font-weight:600}
+
+  /* ---- the page ---- */
+  .sheet-paper{position:relative;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-sm);box-shadow:var(--sh-3);
+    padding:clamp(1.5rem,4.5vw,3.25rem) clamp(1.1rem,4.5vw,3.5rem) clamp(1.5rem,4vw,2.75rem);overflow:hidden}
+  .sheet-paper::before{content:"";position:absolute;inset:0 0 auto;height:5px;background:var(--accent)}
+  .sheet-kicker{display:flex;align-items:center;gap:.5rem;margin:0 0 .5rem;font-size:.9375rem;font-weight:600;color:var(--accent-ink)}
+  .sheet-mark{width:.7rem;height:.7rem;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);flex:none}
+  .sheet-head h1{font-size:clamp(1.75rem,2.2vw + 1rem,2.75rem);line-height:1.12;margin:0 0 .45rem;max-width:none;text-wrap:balance}
+  .sheet-meta{font-size:.9375rem;color:var(--ink-3);margin:0}
+
+  /* the summary band: the total, its two counts, and what it is not */
+  .sheet-total{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:1rem 2rem;align-items:end;
+    margin:1.5rem 0 1rem;padding:1.25rem 1.4rem;background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-md)}
+  .sheet-total .total-label{margin:0 0 .2rem;font-size:.9375rem;color:var(--ink-2)}
+  .sheet-total .total-num{margin:0;font-size:clamp(2.5rem,5vw,3.5rem);line-height:1;color:var(--ink)}
+  .st-counts{display:flex;gap:1.75rem;margin:0}
+  .st-counts>div{display:flex;flex-direction:column-reverse;justify-content:flex-end;gap:.15rem;min-width:0}
+  .st-counts dd{margin:0;font-family:var(--font-d);font-weight:700;font-size:1.75rem;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+  .st-counts dt{font-size:.9375rem;color:var(--ink-2);max-width:12ch;line-height:1.3}
+  .sheet-total-note{grid-column:1/-1;margin:0;padding-top:.85rem;border-top:1px solid var(--line);max-width:none;font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+
+  /* each honesty line is one labelled line */
+  .sheet-fit{margin:0 0 .5rem;padding:.55rem .85rem;border-radius:var(--r-md);background:var(--surface-2);font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+  .sheet-fit strong{color:var(--ink)}
+
+  /* the person's own words: quotes, not bullets */
+  .sheet-words{margin:1.1rem 0;padding:0}
+  .sheet-words h2,.sheet-journey h2{font-family:var(--font-b);font-size:1rem;font-weight:600;letter-spacing:0;color:var(--ink);margin:0 0 .1rem}
+  .sheet-words-note{margin:0 0 .5rem;font-size:.9375rem;color:var(--ink-3)}
+  .sheet-words ul{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem}
+  .sheet-words li{padding:.3rem .8rem;border-radius:var(--r-pill);background:var(--surface-2);border:1px solid var(--line-2);color:var(--ink);font-size:.9375rem}
+  .sheet-words li::before{content:"\201C"}
+  .sheet-words li::after{content:"\201D"}
+
+  /* ---- the journey: numbered stops on one drawn line ---- */
+  .sheet-journey{margin:1.5rem 0 .5rem}
+  .sheet-journey h2{margin-bottom:.8rem}
+  .sj-stops{--sj-n:6;position:relative;list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--sj-n),minmax(0,1fr));gap:1.1rem 1rem}
+  .sj-stops li{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:.3rem;min-width:0;padding:0 .15rem;animation:sj-in .45s ease-out both}
+  /* the line to the next stop in this row: from this dot's edge to the next dot's edge */
+  .sj-stops li::after{content:"";position:absolute;z-index:0;top:15px;left:calc(50% + 20px);width:calc(100% + 1rem - 40px);height:2px;border-radius:2px;
+    background:color-mix(in srgb,var(--accent) 55%,var(--line));transform-origin:left center;animation:sj-draw .5s .25s ease-out both}
+  .sj-stops li.sj-end::after{display:none}
+  .sj-stops li:nth-child(2){animation-delay:.08s}.sj-stops li:nth-child(3){animation-delay:.16s}.sj-stops li:nth-child(4){animation-delay:.24s}
+  .sj-stops li:nth-child(5){animation-delay:.32s}.sj-stops li:nth-child(n+6){animation-delay:.4s}
+  .sj-dot{position:relative;z-index:1;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--accent-soft);border:2px solid var(--accent);
+    color:var(--accent-ink);font-weight:700;font-size:.9375rem;font-variant-numeric:tabular-nums}
+  .sj-open .sj-dot{border-style:dashed;border-color:var(--ink-4);color:var(--ink-3)}
+  .sj-label{font-size:.9375rem;line-height:1.3;color:var(--ink);max-width:100%;overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+  .sj-times{font-size:.9375rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+  @keyframes sj-draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  @keyframes sj-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  /* ---- the lines: a quiet table, a share bar under each line total ---- */
+  .sheet-table{margin-top:1.25rem;border-collapse:separate;border-spacing:0}
+  .sheet-table thead th{background:var(--surface-2);color:var(--ink-2);font-family:var(--font-b);font-weight:600;font-size:.9375rem;
+    padding:.65rem .75rem;border-bottom:1px solid var(--line);vertical-align:bottom;line-height:1.35}
+  .sheet-table thead th:first-child{border-radius:var(--r-md) 0 0 var(--r-md)}
+  .sheet-table thead th:last-child{border-radius:0 var(--r-md) var(--r-md) 0}
+  .sheet-table td{padding:.85rem .75rem;font-size:.9375rem;line-height:1.45;border-bottom:1px solid var(--line-2)}
+  .sheet-table tbody tr:hover td{background:var(--surface-2)}
+  .sheet-table td:first-child{color:var(--ink)}
+  .sheet-table td:nth-child(2){color:var(--ink-2)}
+  .sheet-table td.num{font-variant-numeric:tabular-nums}
+  .sheet-table td:nth-child(5){font-weight:700;color:var(--ink);min-width:7rem}
+  .sheet-table .th-sub{display:block;font-weight:400;color:var(--ink-3)}
+  .sheet-table td:first-child{font-weight:500}
+  .sheet-n{display:inline-grid;place-items:center;width:1.6rem;height:1.6rem;margin:0 .55rem 0 0;border-radius:50%;vertical-align:.05em;
+    background:var(--accent-soft);color:var(--accent-ink);font-size:.9375rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+  .sheet-code{font-family:var(--font-m);font-size:.9375rem;color:var(--ink-3)}
+  .sheet-unit-code{display:block;margin-top:.15rem;white-space:normal}
+  /* the basis is said once, above the table, where it fits on one line; the header keeps it for a screen reader */
+  .sheet-basis{caption-side:top;text-align:left;padding:0 0 .6rem;font-size:.9375rem;color:var(--ink-3)}
+  .sheet-table:has(.sheet-basis) .th-sub{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+  .sheet-table td.num .sheet-code,.sheet-table td.num .sheet-paid-sub{font-family:var(--font-b);font-weight:400;display:inline-block;margin-top:.15rem;line-height:1.4;color:var(--ink-3)}
+  .sheet-table td.num .sheet-verdict{display:inline-block;margin-top:.2rem}
+  .sheet-bar{display:block;height:5px;margin:.45rem 0 0 auto;max-width:7.5rem;border-radius:3px;background:var(--line-2);overflow:hidden}
+  .sheet-bar i{display:block;height:100%;margin-left:auto;border-radius:3px;background:var(--accent);transform-origin:right center;animation:sheet-grow .6s .2s ease-out both}
+  @keyframes sheet-grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+  /* ---- everything after the lines is set as a document, not as cards ---- */
+  .sheet-burdens,.sheet-paid{margin-top:1.75rem;padding-top:1.4rem;border-top:1px solid var(--line)}
+  .sheet-burdens h2,.sheet-paid h2,.sheet-cols h2,.help-exists h2{font-size:1.125rem;margin:0 0 .6rem}
+  .sheet-burdens .sb-grid article{padding:.9rem 1rem;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface-2)}
+  .sheet-gaps ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:.5rem}
+  .sheet-gaps li{padding:.6rem .85rem;border-radius:var(--r-md);background:var(--surface-2)}
+  .sb-note,.sb-math,.sb-src,.sb-why{font-size:.9375rem}
+  .sheet-cols{gap:2rem;margin-top:1.75rem;padding-top:1.4rem;border-top:1px solid var(--line)}
+  .sheet-cols>section{min-width:0}
+  .sheet-cols>section:first-child{align-self:start;padding:1.1rem 1.2rem .5rem;border-radius:var(--r-md);background:var(--accent-soft);
+    box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .sheet-cols>section:first-child .sheet-q li::before{background:var(--surface);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 30%,transparent)}
+  .sheet-q{list-style:none;counter-reset:q;padding:0;margin:0}
+  .sheet-q li{counter-increment:q;display:grid;grid-template-columns:1.85rem minmax(0,1fr);gap:.65rem;align-items:start;margin:0 0 .7rem;color:var(--ink);font-size:1rem;line-height:1.5}
+  .sheet-q li::before{content:counter(q);display:grid;place-items:center;width:1.85rem;height:1.85rem;border-radius:50%;
+    background:var(--accent-soft);color:var(--accent-ink);font-weight:700;font-size:.9375rem}
+  .sheet-src{font-size:.9375rem;padding-left:1.15rem;margin:0;color:var(--ink-2)}
+  .sheet-src li{margin-bottom:.6rem}
+  .sheet-url{font-family:var(--font-b);font-size:.9375rem;color:var(--ink-3);word-break:normal;overflow-wrap:anywhere}
+
+  .help-exists{margin-top:1.75rem;padding-top:1.4rem;border-top:1px solid var(--line)}
+  .help-lede{font-size:.9375rem}
+  .help-list{gap:1.1rem 2rem;align-items:start}
+  .help-list li{display:block;padding:.85rem 0 0;border-top:1px solid var(--line-2)}
+  .help-list p{font-size:.9375rem}
+  .help-list .help-body{line-height:1.5;margin-bottom:.1rem}
+  .help-list .help-url a{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--accent-ink)}
+
+  .sheet-foot{margin-top:1.75rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.9375rem;line-height:1.55;color:var(--ink-3)}
+
+  /* ---- arrival: the page rises once onto the desk ---- */
+  .sheet-paper{animation:sheet-rise .5s ease-out both}
+  @keyframes sheet-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+}
+
+/* the rail sits beside the page on a wide screen, and stays in reach */
+@media screen and (min-width:1100px){
+  .sheet-desk{grid-template-columns:17rem minmax(0,1fr);gap:2.25rem}
+  .sheet-rail{position:sticky;top:5.5rem}
+  .sheet-tools{flex-direction:column;align-items:stretch}
+  .st-actions{display:grid;grid-template-columns:minmax(0,1fr)}
+}
+/* the table on a page wide enough to be one: the person's words and the unit's name share the width.
+   "Times" has a fixed width that holds the word and its padding (at 6-8% it was narrower
+   than the word on a paid sheet and ran into "Published figure"); the rest share what is left. */
+@media screen and (min-width:641px){
+  .sheet-table{table-layout:fixed;width:100%}
+  .sheet-table th{overflow-wrap:break-word;-webkit-hyphens:auto;hyphens:auto}
+  .sheet-table th:nth-child(3){width:5rem;-webkit-hyphens:manual;hyphens:manual}
+  .sheet-table th:nth-child(1){width:25%}
+  .sheet-table th:nth-child(2){width:31%}
+  .sheet-table th:nth-child(4){width:17%}
+  .sheet-table th:nth-child(5){width:16%}
+  .sheet-table td:nth-child(5){min-width:0}
+  /* with the person's own paid column, six share the width */
+  .sheet-table:has(th:nth-child(6)) th:nth-child(1){width:21%}
+  .sheet-table:has(th:nth-child(6)) th:nth-child(2){width:20%}
+  .sheet-table:has(th:nth-child(6)) th:nth-child(4){width:16%}
+  .sheet-table:has(th:nth-child(6)) th:nth-child(5){width:13%}
+  .sheet-table:has(th:nth-child(6)) th:nth-child(6){width:17%}
+  /* a single long word a person typed ("echocardiogram") breaks inside its cell, never into the next */
+  .sheet-table td{overflow-wrap:break-word}
+  .sheet-paid-roll{table-layout:auto}
+  .sheet-paid-roll th{width:auto !important}
+  /* figures that differ in kind carry their label and verdict under the number:
+     that column takes the width the words can spare */
+  .sheet-table:has(td.num .sheet-code) th:nth-child(1){width:19%}
+  .sheet-table:has(td.num .sheet-code) th:nth-child(2){width:25%}
+  .sheet-table:has(td.num .sheet-code) th:nth-child(4){width:29%}
+  .sheet-table:has(td.num .sheet-code) th:nth-child(5){width:15%}
+  .sheet-table:has(td.num .sheet-code):has(th:nth-child(6)) th:nth-child(1){width:14%}
+  .sheet-table:has(td.num .sheet-code):has(th:nth-child(6)) th:nth-child(2){width:19%}
+  .sheet-table:has(td.num .sheet-code):has(th:nth-child(6)) th:nth-child(4){width:24%}
+  .sheet-table:has(td.num .sheet-code):has(th:nth-child(6)) th:nth-child(5){width:12%}
+  .sheet-table:has(td.num .sheet-code):has(th:nth-child(6)) th:nth-child(6){width:19%}
+}
+/* between phone and desk: the guide runs across, its art to the left */
+@media screen and (min-width:700px) and (max-width:1099.98px){
+  .sheet-guide{grid-template-columns:11rem minmax(0,1fr)}
+  .sg-art{grid-row:1/3;margin:0;align-self:center}
+  .sg-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+  .sg-steps li{padding:2.85rem 0 0}
+}
+
+/* Where the table turns into a stack (product.css, 720 px and narrower) the table
+   itself is a block, so its caption would sit in an anonymous table box sized to
+   its longest word: "Published figure: Medicare allowed amount, 2026" went one
+   word per line in a 65 px column. As a block it takes the whole row. */
+@media screen and (max-width:720px){
+  .sheet-basis{display:block;width:100%}
+}
+
+/* on a phone the page comes first and how to use it follows it */
+@media screen and (max-width:699.98px){
+  .sheet-rail{display:contents}
+  .sheet-tools{order:1}
+  .sheet-stage{order:2}
+  .sheet-guide{order:3}
+}
+
+@media screen and (max-width:640px){
+  .sheet-paper{border-radius:var(--r-sm)}
+  .sheet-tools .eyebrow{flex-basis:100%}
+  .st-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}
+  .st-actions .st-back{grid-column:1/-1}
+  .sg-art{max-width:100%;max-height:9rem;object-fit:cover}
+  .sheet-total{grid-template-columns:minmax(0,1fr);padding:1.1rem}
+  .st-counts{gap:1.25rem}
+  .sheet-table thead th{border-radius:0}
+  .sheet-table td{padding:.12rem 0;border-bottom:0}
+  .sheet-table tr{padding:.85rem 0}
+  .sheet-table tbody tr:hover td{background:transparent}
+  .sheet-bar{margin-left:0}
+  .sheet-bar i{margin-left:0;transform-origin:left center}
+  /* the journey turns to run down the page */
+  .sj-stops{grid-template-columns:minmax(0,1fr);gap:.55rem}
+  .sj-stops li::after{display:none}
+  .sj-stops::before{content:"";position:absolute;top:16px;bottom:16px;left:15px;width:2px;border-radius:2px;
+    background:color-mix(in srgb,var(--accent) 55%,var(--line));transform-origin:center top;animation:sj-drop .7s ease-out both}
+  .sj-stops li{flex-direction:row;text-align:left;gap:.75rem;padding:0}
+  .sj-label{flex:1 1 auto}
+  @keyframes sj-drop{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+}
+
+@media screen and (prefers-reduced-motion:reduce){
+  .sheet-paper,.sj-stops::before,.sj-stops li,.sj-stops li::after,.sheet-bar i{animation:none !important}
+}
+
+/* On paper the sheet is the page itself: no card edge, no ground below it. */
+@media print{
+  body{background:#fff}
+  section.step.sheet{border:0 !important;box-shadow:none !important;border-radius:0 !important;background:#fff !important}
+}
+
+/* the rail's art at night is components/ThemedImg (SheetRail), the site's one
+   themed-image switch; the content:url() swap that stood here is retired */

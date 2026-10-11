@@ -1,0 +1,109 @@
+/* /accessibility, drawn (VISUAL tech, 2026-09-30 night). DESIGN R1 tokens. */
+
+/* ---- the glance band: four measured numbers, each with its picture ---- */
+.glance{list-style:none;margin:0 0 2.5rem;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}
+@media (max-width:1023px){.glance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.glance{grid-template-columns:minmax(0,1fr)}}
+.gTile{display:flex;flex-direction:column;gap:.35rem;min-width:0;padding:1.15rem 1.2rem 1.2rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2)}
+.gTile:first-child{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-brand)}
+.gTile:first-child .gText{color:color-mix(in srgb,var(--on-brand) 86%,transparent)}
+.gTile:first-child .gIc{background:color-mix(in srgb,var(--on-brand) 14%,transparent);color:var(--on-brand)}
+.gIc{display:inline-flex;width:2.4rem;height:2.4rem;align-items:center;justify-content:center;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent-ink);margin-bottom:.25rem}
+.gBig{font-family:var(--font-b);font-weight:700;font-size:clamp(2rem,3.2vw,2.6rem);line-height:1.05;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.gText{font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+.gPic{margin-top:auto;padding-top:.6rem}
+.levels{display:flex;gap:.35rem;margin-top:auto;padding-top:.6rem}
+.levels span{padding:.2rem .6rem;border-radius:var(--r-pill);font:700 .875rem var(--font-b);background:color-mix(in srgb,var(--on-brand) 16%,transparent);color:var(--on-brand)}
+.levels span:last-child{background:var(--on-brand);color:var(--brand-fill)}
+.phone{display:flex;align-items:flex-end;gap:.7rem;margin-top:auto;padding-top:.6rem;color:var(--ink-3);font-size:.875rem}
+.phoneF{position:relative;width:2.6rem;height:4.4rem;border:2px solid var(--ink);border-radius:.6rem;padding:.45rem .3rem;display:flex;flex-direction:column;gap:.22rem}
+.phoneF i{display:block;height:.25rem;border-radius:2px;background:var(--accent);opacity:.75}
+.phoneF i:nth-child(2){width:80%}.phoneF i:nth-child(3){width:90%}.phoneF i:nth-child(4){width:60%}
+
+/* ---- a meter: 1 to 21, the rule's mark, the measured fill ---- */
+.meter{display:flex;align-items:center;gap:.75rem;min-width:0}
+.bar{position:relative;flex:1;min-width:4rem;height:10px;border-radius:999px;background:var(--ground-2);margin:1.15rem 0 0}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--good) 45%,transparent),var(--good));transform-origin:left;animation:grow .6s ease-out both}
+.need{position:absolute;top:-1.25rem;bottom:-4px;width:2px;margin-left:-1px;background:var(--ink)}
+.need b{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font:600 .8125rem var(--font-b);color:var(--ink-2);white-space:nowrap;padding-bottom:1px}
+.compact .bar{margin:0}
+.compact .need{top:-4px}
+.compact .need b{display:none}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion: reduce){.fill{animation:none}}
+.sw{flex:none;display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.25rem;border-radius:var(--r-sm);border:1px solid var(--line);font:700 1rem var(--font-b)}
+.swRing{display:block;width:1.3rem;height:.8rem;border-radius:.4rem;background:var(--surface)}
+.swField{display:block;width:1.8rem;height:1.1rem;border-radius:.3rem;border:1.5px solid;background:var(--surface)}
+
+/* ---- the contrast board ---- */
+.board{margin:0 0 1.5rem;padding:1rem 1.15rem .6rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);min-width:0}
+.boardCap{margin:0 0 .5rem;font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+.table{width:100%;border-collapse:collapse;font-size:.9375rem;table-layout:fixed}
+.table thead th:nth-child(1){width:32%}
+.table thead th:nth-child(3){width:6.5rem}
+.table thead th:nth-child(4){width:5.5rem}
+.cell>.meter{flex:1}
+.table th,.table td{padding:.55rem .5rem;border-top:1px solid var(--line-2);text-align:left;vertical-align:middle}
+.table thead th{border-top:0;font-weight:600;color:var(--ink-3);font-size:.875rem;padding-top:.2rem}
+.table tbody th{font-weight:600;color:var(--ink)}
+.cell{display:flex;align-items:center;gap:.75rem}
+.ratio{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right!important}
+.table thead th:nth-child(3){text-align:right}
+.needCol{color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums}
+@media (max-width:640px){
+  .table thead{display:none}
+  .table,.table tbody,.table tr{display:block}
+  .table tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:.15rem .75rem;padding:.6rem 0;border-top:1px solid var(--line-2)}
+  .table th,.table td{border:0;padding:0}
+  .table tbody th{grid-column:1}
+  .table{table-layout:auto}
+  .ratio{grid-column:2;grid-row:1}
+  .table td:nth-child(2){grid-column:1 / -1}
+  .needCol{grid-column:1 / -1}
+  .needCol::before{content:'Asks for '}
+}
+
+/* ---- the scorecard ---- */
+.cards{list-style:none;margin:0 0 2rem;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(20rem,100%),1fr));gap:1rem}
+.score{display:flex;flex-direction:column;gap:.35rem;min-width:0;padding:1.1rem 1.2rem 1.2rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);position:relative;overflow:hidden}
+.score::before{content:'';position:absolute;left:0;right:0;top:0;height:3px;background:var(--good)}
+.open::before{background:var(--warn)}
+.scoreTop{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.2rem}
+.scoreIc{display:inline-flex;width:2.4rem;height:2.4rem;align-items:center;justify-content:center;border-radius:var(--r-md);background:var(--good-soft);color:var(--good-ink)}
+.open .scoreIc{background:var(--warn-soft);color:var(--warn-ink)}
+.status{padding:.2rem .65rem;border-radius:var(--r-pill);font:600 .875rem var(--font-b);background:var(--good-soft);color:var(--good-ink)}
+.open .status{background:var(--warn-soft);color:var(--warn-ink)}
+.fig{display:flex;align-items:baseline;flex-wrap:wrap;gap:.2rem .5rem;margin:.1rem 0 0}
+.fig b{font:700 1.75rem/1.1 var(--font-b);letter-spacing:-.025em;color:var(--ink);font-variant-numeric:tabular-nums}
+.fig span{font-size:.9375rem;color:var(--ink-3)}
+.score h3{margin:.15rem 0 .1rem;font-size:1.0625rem;line-height:1.35}
+.score p{margin:0;font-size:.9375rem;line-height:1.55;color:var(--ink-2)}
+.score .pair{margin-top:auto}
+
+/* ---- before and after, to scale ---- */
+.pair{display:flex;align-items:center;gap:.9rem;flex-wrap:nowrap;padding:.85rem .9rem;margin-top:.75rem;border-radius:var(--r-md);background:var(--surface-2);border:1px solid var(--line-2)}
+.pairItem{display:flex;flex-direction:column;align-items:flex-start;gap:.35rem}
+.pairItem small{font-size:.875rem;color:var(--ink-3)}
+.arrow{color:var(--ink-3);font-size:1.25rem}
+.field{display:block;width:min(7rem,30vw);height:2.4rem;border-radius:var(--r-md);border:1px solid;background:var(--surface)}
+.tgWrap{position:relative;display:flex;align-items:center;justify-content:center;width:22px;height:22px;border:1.5px dashed var(--flag);border-radius:4px}
+.tgBig{width:44px;height:44px;border-color:var(--good)}
+.tgDot{display:block;width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink-3);background:var(--surface)}
+.wide{flex:1;min-width:0}
+.row{display:flex;align-items:center;gap:.65rem;width:100%;max-width:20rem;height:52px;padding:0 .9rem;border:1.5px dashed var(--good);border-radius:var(--r-md);background:var(--surface)}
+.radio{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--ink-3)}
+.rowText{flex:1;height:.45rem;border-radius:4px;background:var(--ground-2)}
+
+/* phones (VISUAL tech follow-up, 2026-09-30 night): the four numbers and the three
+   Sep 30 findings each become one swipeable row, snapping card by card */
+.swipe:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-lg)}
+@media (max-width:640px){
+  .swipe{overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -1rem 2rem;padding:0 1rem .4rem;scroll-padding:0 1rem;scrollbar-width:thin}
+  .swipe>.glance,.swipe>.cardsRow{display:flex;gap:.7rem;margin:0;width:max-content}
+  .swipe>.glance>li,.swipe>.cardsRow>li{flex:0 0 auto;width:min(17rem,78vw);scroll-snap-align:start}
+  .gBig{font-size:1.9rem}
+}
+
+/* the inner-page hero token (vis-data 569aa77fd8): 44 px at 1440, 28 px at 390 */
+.h1.h1{font-size:clamp(1.75rem,2.2vw + 1rem,2.75rem);line-height:1.1;letter-spacing:-.025em;max-width:18ch;margin:.2rem 0 .8rem}
+.themeNote{margin:.25rem 0 1.25rem;font-size:.9375rem;line-height:1.5;color:var(--ink-3);max-width:62ch}

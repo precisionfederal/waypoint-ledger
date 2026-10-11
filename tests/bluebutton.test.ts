@@ -7,22 +7,26 @@
    SHA-256 is pinned below — so these tests cannot quietly start passing
    against a friendlier version of reality.
 
-   The result on that real CMS sample is recorded here honestly: none of the
-   eight codes CMS billed has a row in this price table. That is a finding
-   about the table, not a failure of the mapper, and it is asserted so nobody
-   has to take it on trust. The mapper is proved separately, on a small Bundle
-   hand-built for the purpose and labelled as such.
+   The result on that CMS sample is derived from the table, never hard-coded:
+   as the table grew, seven of the eight codes CMS billed gained a row, five of
+   those rows carry a published figure, and the sample now prices into a ledger
+   (asserted below, line by line, against each row's own source). The mapper is
+   also proved on a small Bundle hand-built for the purpose and labelled as such.
    ========================================================================== */
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join } from 'node:path';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import {
   SANDBOX, SERVICE_CODE_SYSTEMS, normalizeCode, codeIndex, pickRow,
   extractLines, claimCount, nextPageUrl, mapClaims, mapLines, importSummary,
+  refusalOf, CMS_ATTRIBUTION, ENVIRONMENT_LABEL,
   type EobBundle, type ClaimLine,
 } from '../lib/bluebutton';
 import { TABLE } from '../lib/table';
+import { priceJourney, totals, clampTimes } from '../lib/pricing';
 
 const ROOT = join(__dirname, '..');
 const FIXTURE_DIR = join(ROOT, 'data/test-fixtures/bluebutton');
@@ -220,6 +224,76 @@ describe('what the CMS sample actually maps to — derived from the table, never
 });
 
 /* --------------------------------------------------------------------------
+   The CMS sample, priced into a ledger (CMS sandbox, synthetic beneficiaries).
+
+   This is the claim-to-ledger step end to end on the recorded fixture: the
+   mapper's entries go through the same priceJourney/totals the ledger uses.
+   Every figure is the row's own published number times the count that may be
+   priced; nothing else is added, and no claim dollar is read.
+   -------------------------------------------------------------------------- */
+describe('the CMS synthetic sample, priced into a ledger', () => {
+  const r = mapClaims(bundle, TABLE);
+  const lines = priceJourney(r.entries);
+  const t = totals(lines);
+
+  it('makes one ledger line per matched row, each saying it came from Medicare claims', () => {
+    expect(r.entries.length).toBe(r.matched.length);
+    for (const e of r.entries) {
+      expect(e.key).toMatch(/^bb-/);
+      expect(e.raw).toMatch(/from \d+ Medicare claim lines?, /);
+    }
+  });
+
+  it('🔴 every priced line keeps its federal source, year, basis and coverage note', () => {
+    expect(t.pricedCount).toBeGreaterThan(0);
+    for (const l of lines.filter((x) => x.priced)) {
+      const it = l.entry.item!;
+      expect(it.sourceUrl, it.id).toMatch(/^https:\/\/[^/]*\.gov\//);
+      expect(it.sourceTitle.trim().length, it.id).toBeGreaterThan(0);
+      expect(it.year, it.id).toMatch(/^\d{4}/);
+      expect(it.coverage.trim().length, it.id).toBeGreaterThan(0);
+      expect(it.valueUsd, it.id).not.toBeNull();
+    }
+  });
+
+  it('a row with no published figure stays unpriced, never filled in', () => {
+    const blank = lines.filter((l) => l.entry.item && l.entry.item.valueUsd === null);
+    for (const l of blank) {
+      expect(l.priced).toBe(false);
+      expect(l.totalUsd).toBeNull();
+    }
+    expect(t.unpricedCount).toBe(blank.length);
+  });
+
+  it('the total is exactly each published figure times the count that may be priced', () => {
+    let want = 0;
+    for (const l of lines) {
+      const it = l.entry.item;
+      if (!it || it.valueUsd === null) continue;
+      want += it.valueUsd * clampTimes(it, l.entry.times).times;
+    }
+    expect(t.totalUsd).toBeCloseTo(want, 6);
+    expect(t.totalUsd).toBeGreaterThan(0);
+  });
+
+  it('a once-a-year code billed more often is priced once and the rest counted', () => {
+    for (const l of lines) {
+      const it = l.entry.item!;
+      const c = clampTimes(it, l.entry.times);
+      if (it.maxPerYear && l.entry.times > it.maxPerYear) {
+        expect(c.capped).toBe(true);
+        expect(c.said).toBe(l.entry.times);
+      }
+    }
+  });
+
+  it('never mixes bases silently: every basis present is reported', () => {
+    const bases = new Set(lines.filter((l) => l.priced).map((l) => l.entry.item!.basis));
+    expect([...t.basesUsed].sort()).toEqual([...bases].sort());
+  });
+});
+
+/* --------------------------------------------------------------------------
    The positive control.
 
    HAND-BUILT, and nothing in it is presented as data. It exists to prove the
@@ -294,6 +368,8 @@ describe('the matcher, on a bundle built for the purpose', () => {
     expect(e.raw).toContain('2 Medicare claim lines');
     expect(e.raw).toContain('2023-02-01 to 2023-06-14');
     expect(e.key).toBe('bb-cms-99213');
+    expect(e.raw.endsWith(`(${ENVIRONMENT_LABEL})`)).toBe(true);
+    expect(e.raw).not.toContain('—');
   });
 
   it('routes the emergency-room code by the claim it arrived on', () => {
@@ -328,16 +404,17 @@ describe('the matcher, on a bundle built for the purpose', () => {
 });
 
 /* --------------------------------------------------------------------------
-   🔴 THE HARD RULE, MECHANISED.
+   The import on the page: mounted on the ledger, hidden until configured.
 
-   "Blue Button appears on no page until a real sandbox login round-trips."
-   As of this commit CMS has issued no credentials (BB_CLIENT_ID and
-   BB_CLIENT_SECRET do not exist), no sign-in has round-tripped, and so nothing
-   in app/ may name it and ImportClaims may not be mounted. When the round trip
-   is done, this test is the thing to change — deliberately, in the same commit
-   that mounts it.
+   It used to be on no page at all, because no sign-in had round-tripped. It is
+   now mounted on /ledger (CMS sends the person back there), and the switch is
+   the server's: GET /api/bluebutton/status `configured`, which is true only
+   once the sandbox credentials are Pages secrets. Until then the panel renders
+   nothing, not on the static page, not on first paint, not after the status
+   answers. The Standards table and /method still say it stays off, which is
+   true wherever no credentials are set.
    -------------------------------------------------------------------------- */
-describe('the feature is not on any page yet', () => {
+describe('the Medicare import: on the ledger, hidden until configured', () => {
   const files: string[] = [];
   const walk = (dir: string) => {
     for (const name of readdirSync(dir)) {
@@ -347,18 +424,209 @@ describe('the feature is not on any page yet', () => {
     }
   };
   walk(join(ROOT, 'app'));
+  walk(join(ROOT, 'components'));
+  const rel = (f: string) => f.slice(ROOT.length + 1).split('\\').join('/');
 
-  it('no page names Blue Button or the CMS sandbox host', () => {
-    const named = files.filter((f) => /blue ?button|bluebutton\.cms\.gov/i.test(readFileSync(f, 'utf8')));
-    expect(named).toEqual([]);
+  /* The places allowed to name it: the mount, and two descriptions that say it is off. */
+  const NAMES_IT_AS_OFF = ['app/method/page.tsx', 'components/Adopt.tsx'];
+  const OFF = /stays off until CMS issues us credentials/;
+
+  it('is mounted on the ledger page, through its gate, and nowhere else', () => {
+    const gate = files.filter((f) => /<MedicareImport\b/.test(readFileSync(f, 'utf8'))).map(rel);
+    expect(gate).toEqual(['app/ledger/page.tsx']);
+    const panel = files.filter((f) => /<ImportClaims\b/.test(readFileSync(f, 'utf8'))).map(rel);
+    expect(panel).toEqual(['components/MedicareImport.tsx']);
+    // The panel's code is its own chunk, loaded only when configured.
+    expect(readFileSync(join(ROOT, 'components/MedicareImport.tsx'), 'utf8')).toMatch(/lazy\(\(\) => import\('\.\/ImportClaims'\)\)/);
   });
 
-  it('nothing mounts ImportClaims', () => {
-    const mounted = files.filter((f) => /ImportClaims/.test(readFileSync(f, 'utf8')));
-    expect(mounted).toEqual([]);
+  it('only the mount and the two descriptions name Blue Button, and both descriptions say it is off', () => {
+    const named = files
+      .filter((f) => !/components[\\/]ImportClaims\.tsx$/.test(f))
+      .filter((f) => /blue ?button|bluebutton\.cms\.gov/i.test(readFileSync(f, 'utf8')))
+      .map(rel)
+      .sort();
+    expect(named).toEqual(['app/ledger/page.tsx', 'components/MedicareImport.tsx', ...NAMES_IT_AS_OFF].sort());
+    for (const f of NAMES_IT_AS_OFF) expect(readFileSync(join(ROOT, f), 'utf8'), f).toMatch(OFF);
   });
 
-  it('the public API description does not advertise it either', () => {
+  it('the public API description does not advertise it yet', () => {
     expect(/blue ?button/i.test(readFileSync(join(ROOT, 'lib/openapi.ts'), 'utf8'))).toBe(false);
+  });
+
+  const unconfigured = { ok: true, configured: false, connected: false, environment: 'sandbox' };
+  const configured = { ok: true, configured: true, connected: false, environment: 'sandbox' };
+
+  it('🔴 hidden while unconfigured: no markup at all, in every phase', async () => {
+    const { ImportClaimsView } = await import('../components/ImportClaims');
+    expect(renderToStaticMarkup(createElement(ImportClaimsView, { status: null, phase: 'checking' }))).toBe('');
+    expect(renderToStaticMarkup(createElement(ImportClaimsView, { status: unconfigured, phase: 'off' }))).toBe('');
+    for (const phase of ['ready', 'loading', 'loaded', 'error'] as const) {
+      expect(renderToStaticMarkup(createElement(ImportClaimsView, { status: unconfigured, phase })), phase).toBe('');
+    }
+  });
+
+  it('🔴 the mount paints nothing before the status answers (no shift, no words)', async () => {
+    const { default: MedicareImport } = await import('../components/MedicareImport');
+    const { default: ImportClaims } = await import('../components/ImportClaims');
+    const { StoreProvider } = await import('../lib/store');
+    expect(renderToStaticMarkup(createElement(MedicareImport))).toBe('');
+    expect(renderToStaticMarkup(createElement(StoreProvider, null, createElement(ImportClaims)))).toBe('');
+    expect(renderToStaticMarkup(createElement(StoreProvider, null,
+      createElement(ImportClaims, { initialStatus: unconfigured })))).toBe('');
+  });
+
+  it('given a configured status by its gate, the panel shows at once', async () => {
+    const { default: ImportClaims } = await import('../components/ImportClaims');
+    const { StoreProvider } = await import('../lib/store');
+    const html = renderToStaticMarkup(createElement(StoreProvider, null,
+      createElement(ImportClaims, { initialStatus: configured })));
+    expect(html).toContain('Bring in your Medicare record');
+    expect(html).toContain(CMS_ATTRIBUTION.replace('&', '&amp;'));
+  });
+
+  it('shown when configured: the sign-in, the sandbox label and the CMS notice', async () => {
+    const { ImportClaimsView } = await import('../components/ImportClaims');
+    const html = renderToStaticMarkup(createElement(ImportClaimsView, { status: configured, phase: 'ready' }));
+    expect(html).toContain('Bring in your Medicare record');
+    expect(html).toContain(`${ENVIRONMENT_LABEL}.`);
+    expect(html).toContain('href="/api/bluebutton/start"');
+    expect(html).toContain(CMS_ATTRIBUTION.replace('&', '&amp;'));
+    expect(html).not.toContain('—');
+  });
+
+  it('shown when configured and loaded: the CMS sample, labelled, with every figure from the table', async () => {
+    const { ImportClaimsView } = await import('../components/ImportClaims');
+    const r = mapClaims(bundle, TABLE);
+    const html = renderToStaticMarkup(createElement(ImportClaimsView, {
+      status: { ...configured, connected: true }, phase: 'loaded', result: r,
+    }));
+    expect(html).toContain(importSummary(r));
+    expect(html).toContain(`(${ENVIRONMENT_LABEL})`);
+    expect(html).toContain(CMS_ATTRIBUTION.replace('&', '&amp;'));
+    expect(html).toContain(`Add ${r.matched.length} lines to my ledger`);
+    for (const g of r.matched) expect(html).toContain(g.item.code!);
+    expect(html).not.toContain('Sign in at Medicare');
+    expect(html).not.toContain('—');
+  });
+
+  it('a CMS refusal shows a plain sentence and CMS\'s own words, and only on a failed sign-in', async () => {
+    const { ImportClaimsView } = await import('../components/ImportClaims');
+    const refusal = refusalOf('invalid_scope', 'Invalid redirect_uri for this application.')!;
+    const failed = renderToStaticMarkup(createElement(ImportClaimsView, {
+      status: { ...configured, refusal }, phase: 'ready', outcome: { kind: 'failed', why: 'The Medicare sandbox refused the sign-in.' },
+    }));
+    expect(failed).toContain(refusal.plain);
+    expect(failed).toContain('CMS said: “Invalid redirect_uri for this application.”');
+    expect(failed).toContain('(invalid_scope)');
+    const cancelled = renderToStaticMarkup(createElement(ImportClaimsView, {
+      status: { ...configured, refusal }, phase: 'ready', outcome: { kind: 'cancelled', why: null },
+    }));
+    expect(cancelled).not.toContain('CMS said');
+  });
+});
+
+/* --------------------------------------------------------------------------
+   When CMS says no: its reason reaches the person, and nobody else's words do.
+   -------------------------------------------------------------------------- */
+describe('a refused sign-in, in plain words', () => {
+  it('maps each OAuth error code CMS can send to a plain sentence', () => {
+    for (const code of ['invalid_request', 'invalid_client', 'invalid_grant', 'unauthorized_client',
+      'unsupported_grant_type', 'invalid_scope', 'server_error', 'temporarily_unavailable']) {
+      const r = refusalOf(code, null)!;
+      expect(r.code).toBe(code);
+      expect(r.plain).toMatch(/^CMS /);
+      expect(r.plain).not.toMatch(/_/);
+    }
+    expect(refusalOf('something_new', null)!.plain).toBe('CMS refused the sign-in.');
+  });
+
+  it('cleans CMS\'s words: no control characters, no runaway length, no fake code', () => {
+    const r = refusalOf('Bad Code!', 'line one\nline\u0007two   ' + 'x'.repeat(400))!;
+    expect(r.code).toBeNull();
+    expect(r.cmsSaid).not.toMatch(/[\u0000-\u001f]/);
+    expect(r.cmsSaid!.length).toBeLessThanOrEqual(300);
+    expect(r.cmsSaid!.startsWith('line one line two')).toBe(true);
+    expect(refusalOf(null, '   ')).toBeNull();
+    expect(refusalOf(undefined, undefined)).toBeNull();
+  });
+});
+
+describe('the callback and status carry CMS\'s reason, never a stranger\'s', () => {
+  const env = { BB_CLIENT_ID: 'test-client', BB_CLIENT_SECRET: 'test-secret' };
+  const ORIGIN = 'https://bluebutton-night.waypoint-ledger.pages.dev';
+  const pkce = (state: string) => `wl_bb_pkce=${encodeURIComponent(JSON.stringify({ state, verifier: 'v'.repeat(64) }))}`;
+  const call = async (qs: string, cookie?: string) => {
+    const { onRequestGet } = await import('../cf/functions/api/bluebutton/callback.js');
+    const request = new Request(`${ORIGIN}/api/bluebutton/callback?${qs}`, { headers: cookie ? { cookie } : {} });
+    const res: Response = await onRequestGet({ request, env });
+    const loc = new URL(res.headers.get('location')!);
+    const cookies = res.headers.getSetCookie?.() ?? [res.headers.get('set-cookie') ?? ''];
+    return { loc, cookies: cookies.join('\n') };
+  };
+
+  it('a person who says no at CMS is a cancel, not an error', async () => {
+    const { loc, cookies } = await call('error=access_denied&state=s1', pkce('s1'));
+    expect(loc.pathname).toBe('/ledger');
+    expect(loc.searchParams.get('medicare')).toBe('cancelled');
+    expect(cookies).not.toContain('wl_bb_refusal=');
+  });
+
+  it('a CMS error on our own round trip is shown in CMS\'s words, through an HttpOnly cookie, never the URL', async () => {
+    const { loc, cookies } = await call('error=invalid_scope&error_description=Scope%20not%20allowed&state=s2', pkce('s2'));
+    expect(loc.searchParams.get('medicare')).toBe('failed');
+    expect(loc.searchParams.get('why')).toBe('refused');
+    expect(loc.search).not.toContain('Scope');
+    expect(cookies).toMatch(/wl_bb_refusal=[^;]+; Path=\/; HttpOnly; SameSite=Lax; Max-Age=300; Secure/);
+  });
+
+  it('🔴 a crafted link with someone else\'s words shows none of them', async () => {
+    const forged = await call('error=server_error&error_description=Call%201-800-SCAM&state=guess', pkce('real'));
+    expect(forged.loc.searchParams.get('why')).toBe('state-mismatch');
+    expect(forged.cookies).not.toContain('wl_bb_refusal=');
+    const cold = await call('error=server_error&error_description=Call%201-800-SCAM&state=guess');
+    expect(cold.loc.searchParams.get('why')).toBe('expired');
+    expect(cold.cookies).not.toContain('wl_bb_refusal=');
+  });
+
+  it('a refused token exchange carries CMS\'s error and description', async () => {
+    const real = globalThis.fetch;
+    globalThis.fetch = (async () => new Response(
+      JSON.stringify({ error: 'invalid_grant', error_description: 'Mismatching redirect URI.' }),
+      { status: 400, headers: { 'content-type': 'application/json' } },
+    )) as typeof fetch;
+    try {
+      const { loc, cookies } = await call('code=abc&state=s3', pkce('s3'));
+      expect(loc.searchParams.get('why')).toBe('refused');
+      const m = /wl_bb_refusal=([^;]+)/.exec(cookies)!;
+      expect(JSON.parse(decodeURIComponent(m[1]))).toEqual({ e: 'invalid_grant', d: 'Mismatching redirect URI.' });
+
+      const { onRequestGet: status } = await import('../cf/functions/api/bluebutton/status.js');
+      const res: Response = await status({ request: new Request(`${ORIGIN}/api/bluebutton/status`, { headers: { cookie: `wl_bb_refusal=${m[1]}` } }), env });
+      const j = await res.json();
+      expect(j.configured).toBe(true);
+      expect(j.environment).toBe('sandbox');
+      expect(j.refusal).toEqual(refusalOf('invalid_grant', 'Mismatching redirect URI.'));
+      expect(res.headers.get('set-cookie')).toMatch(/^wl_bb_refusal=; .*Max-Age=0/);
+    } finally { globalThis.fetch = real; }
+  });
+
+  it('an unreachable CMS is its own reason, with nothing from CMS to show', async () => {
+    const real = globalThis.fetch;
+    globalThis.fetch = (async () => { throw new TypeError('network'); }) as typeof fetch;
+    try {
+      const { loc, cookies } = await call('code=abc&state=s4', pkce('s4'));
+      expect(loc.searchParams.get('why')).toBe('unreachable');
+      expect(cookies).not.toContain('wl_bb_refusal=');
+    } finally { globalThis.fetch = real; }
+  });
+
+  it('status reports configured false and no refusal without credentials', async () => {
+    const { onRequestGet: status } = await import('../cf/functions/api/bluebutton/status.js');
+    const res: Response = await status({ request: new Request(`${ORIGIN}/api/bluebutton/status`), env: {} });
+    const j = await res.json();
+    expect(j.configured).toBe(false);
+    expect(j.refusal).toBeNull();
+    expect(res.headers.get('set-cookie')).toBeNull();
   });
 });

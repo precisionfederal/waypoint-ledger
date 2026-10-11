@@ -19,7 +19,7 @@
    lib/fit.ts already decided. */
 import { json, bad, readJson, count } from './_http.js';
 import { toFhirBundle } from '../../../lib/fhir.ts';
-import { validateJourney, resolveContext, MAX_STORY } from '../../../lib/price-api.ts';
+import { validateJourney, resolveContext, MAX_STORY, stripBidi } from '../../../lib/price-api.ts';
 import { parseJourney } from '../../../lib/mapper.ts';
 import { fitOf } from '../../../lib/fit.ts';
 import { SELECTABLE, TABLE, TABLE_VERSION } from '../../../lib/table.ts';
@@ -45,7 +45,7 @@ export function buildBundle(body) {
 
   let entries;
   if (typeof body.story === 'string') {
-    const story = body.story.trim();
+    const story = stripBidi(body.story).trim();
     if (!story) return { error: 'The story is empty.' };
     if (story.length > MAX_STORY) return { error: `The story must be ${MAX_STORY} characters or fewer.` };
     entries = entriesFromStory(story);

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import JourneyBuilder from '@/components/JourneyBuilder';
+import s from './journey.module.css';
 export const metadata: Metadata = { title: 'Price my journey' };
 
 /* 🔴 THE BOX IS THE PAGE.
@@ -14,9 +15,13 @@ export default function JourneyPage() {
   return (
     <section className="page">
       <div className="wrap">
-        <p className="eyebrow">Step 1 of 3</p>
-        <h1>Describe it the way you remember it</h1>
-        <p className="sub">Plain language, no codes and no dates. Every phrase becomes a priced, cited line.</p>
+        <header className={s.hero}>
+          <div className={s.heroCopy}>
+            <p className="eyebrow">Step 1 of 3</p>
+            <h1>Describe it the way you remember it</h1>
+            <p className="sub">Plain language, no codes and no dates. Every phrase becomes a priced, cited line.</p>
+          </div>
+        </header>
         <JourneyBuilder />
       </div>
     </section>

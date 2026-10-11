@@ -28,9 +28,10 @@
    ========================================================================== */
 
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
+import Link from '@/components/IntentLink';
 import { useStore } from '@/lib/store';
 import { COVERAGE_LABEL, COVERAGE_OPTIONS, STATES, localityOf, soleLocality, type Coverage } from '@/lib/fit';
+import { PATIENT_OPTIONS, coverageOptionsFor } from '@/lib/patient';
 import type { StateDetection } from '@/lib/state-detect';
 import s from './ContextBar.module.css';
 import ConditionPicker from './ConditionPicker';
@@ -91,6 +92,24 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
      every line, that they are national references. */
   const [open, setOpen] = useState(false);
   const collapsed = !open;
+  /* flow3-19: when the panel opens, its heading takes focus, so a keyboard or
+     screen-reader user is inside what opened rather than on BODY. */
+  const panelHead = useRef<HTMLParagraphElement>(null);
+  /* flow3-19 leftover: Done, Skip and Esc hand focus back to Change, which is where
+     the person was before the panel opened. Only after a close they made. */
+  const changeBtn = useRef<HTMLButtonElement>(null);
+  const backToChange = useRef(false);
+  const close = () => { backToChange.current = true; setOpen(false); };
+  useEffect(() => {
+    if (!open) {
+      if (!backToChange.current) return;
+      backToChange.current = false;
+      const id = requestAnimationFrame(() => changeBtn.current?.focus());
+      return () => cancelAnimationFrame(id);
+    }
+    const id = requestAnimationFrame(() => panelHead.current?.focus());
+    return () => cancelAnimationFrame(id);
+  }, [open]);
 
   function pickState(code: string) {
     theyPicked.current = true;
@@ -128,7 +147,7 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
      It is the same shape as "· Change", so it reads as part of the line. */
   const placeChoice = placeQuestion && !loc && !theyPicked.current ? (
     <span className={s.fitTxt}>
-      You wrote &ldquo;{placeQuestion.phrase}&rdquo; &mdash; which one?
+      You wrote &ldquo;{placeQuestion.phrase}&rdquo;. Which one?
       {placeQuestion.candidates.map((c) => (
         <Fragment key={c.code}>
           {' '}
@@ -152,12 +171,13 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
         )}
         {waitingOnArea && (
           <span className={s.fitTxt} data-read-from={readState!.phrase}>
-            you wrote &ldquo;{readState!.phrase}&rdquo; &mdash; CMS prices {readState!.stateName} in{' '}
+            you wrote &ldquo;{readState!.phrase}&rdquo;. CMS prices {readState!.stateName} in{' '}
             {group?.localities.length ?? 0} areas
           </span>
         )}
         {placeChoice}
         <button
+          ref={changeBtn}
           type="button"
           className={s.fitChange}
           aria-expanded={false}
@@ -174,22 +194,46 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
   const ask = variant === 'ask';
 
   return (
-    <section className={`${s.bar} ${ask ? s.ask : ''} ctx-shell`} aria-labelledby="ctx-h">
+    <section className={`${s.bar} ${ask ? s.ask : ''} ctx-shell`} aria-labelledby="ctx-h"
+      onKeyDown={(e) => { if (e.key === 'Escape' && !e.defaultPrevented) { e.preventDefault(); close(); } }}>
       <div className={s.head}>
-        <p className="eyebrow" id="ctx-h">{ask ? 'Before the number' : 'Who this ledger is for'}</p>
+        <p className="eyebrow" id="ctx-h" ref={panelHead} tabIndex={-1}>{ask ? 'Before the number' : 'Who this ledger is for'}</p>
         <p className={s.note}>
           {ask
-            ? 'Answer these three and every figure on your ledger arrives already labelled for you — whether it describes you, is a reference price, or describes nobody in your situation. All three stay on this device and are sent with nothing.'
+            ? 'Answer these three and every figure on your ledger arrives already labelled for you: whether it describes you, is a reference price, or describes nobody in your situation. All three stay on this device and are sent with nothing.'
             : 'Change any answer and every row below re-labels. They stay on this device; none of them is sent with anything you send.'}
         </p>
-        <button type="button" className={s.change} aria-expanded onClick={() => setOpen(false)}>Done</button>
+        <button type="button" className={s.change} aria-expanded onClick={close}>Done</button>
       </div>
 
       <div className={s.groups}>
-        <div className={s.group} role="group" aria-label="Your coverage">
-          <p className={s.lbl} id="ctx-cov">{ask ? 'Who pays for your care?' : 'Your coverage'}</p>
+        {/* judge panel #9: whose illness it is, read from her words (lib/patient.ts)
+            and hers to change. The ids are the survey's strata. */}
+        <div className={s.group} role="group" aria-label="Whose illness this ledger is about">
+          <p className={s.lbl}>Whose illness is this?</p>
           <div className={s.chips}>
-            {COVERAGE_OPTIONS.map((o) => (
+            {PATIENT_OPTIONS.map((o) => (
+              <button
+                key={o.id}
+                type="button"
+                className={`${s.chip} ${st.patient?.stratum === o.id ? s.on : ''}`}
+                aria-pressed={st.patient?.stratum === o.id}
+                onClick={() => st.setPatient(st.patient?.stratum === o.id ? null : o.id)}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          {st.patient?.from === 'words' && <p className={s.hint}>Read from what you typed. Change it if it is wrong.</p>}
+        </div>
+
+        <div className={s.group} role="group" aria-label="Your coverage">
+          <p className={s.lbl} id="ctx-cov">{st.patient?.stratum === 'caregiver-child' ? (ask ? 'Who pays for the child’s care?' : 'The child’s coverage') : ask ? 'Who pays for your care?' : 'Your coverage'}</p>
+          <div className={s.chips}>
+            {/* judge panel #9: for a child's illness, Medicaid or CHIP comes first.
+                CHIP is offered through Medicaid and separate CHIP programs
+                (Medicaid.gov), so it reads the Medicaid fit. */}
+            {coverageOptionsFor(st.patient).map((o) => (
               <button
                 key={o.key}
                 type="button"
@@ -251,7 +295,7 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
 
       {ask && !answered && (
         <p className={s.skipRow}>
-          <button type="button" className={s.skip} onClick={() => setOpen(false)}>Skip this</button>
+          <button type="button" className={s.skip} onClick={close}>Skip this</button>
           <span className={s.skipNote}>
             You will still get every figure. They will be national Medicare amounts, and each line
             will say so rather than pretend it is yours.

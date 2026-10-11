@@ -1,0 +1,249 @@
+/* /policy only. Every class is prefixed policy- so nothing here can reach
+   another page, and every colour and space is a token, so a redesign of the
+   tokens restyles this page with it. The print block turns the page into a
+   one-to-two page brief. */
+.policy{max-width:62rem}
+.policy-actions{display:flex;flex-wrap:wrap;gap:var(--sp-2,.5rem);margin:0 0 var(--sp-5,2rem)}
+.policy-sec{margin:0 0 var(--sp-6,3rem)}
+.policy-sec h2{font-family:var(--font-d);font-size:clamp(1.25rem,2.4vw,1.55rem);line-height:1.2;margin:0 0 var(--sp-3,1rem)}
+.policy-h3{font-family:var(--font-d);font-size:1.08rem;line-height:1.3;margin:var(--sp-4,1.5rem) 0 var(--sp-2,.5rem)}
+.policy-lede{font-size:1.05rem;color:var(--ink-2);max-width:62ch}
+.policy p{max-width:68ch}
+.policy-tbl{width:100%;border-collapse:collapse;margin:0 0 var(--sp-3,1rem);font-size:.95rem}
+.policy-tbl caption{caption-side:top;text-align:left;font-size:.9rem;color:var(--ink-3);padding:0 0 .4rem}
+.policy-tbl th,.policy-tbl td{text-align:left;vertical-align:top;padding:.5rem .6rem;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+.policy-tbl th{font-size:.82rem;font-weight:700;color:var(--ink-2);border-bottom-color:var(--line-2)}
+.policy-tbl .num{font-family:var(--font-b);font-variant-numeric:tabular-nums;white-space:nowrap}
+.policy-tbl tfoot td{color:var(--ink-3);font-size:.88rem;border-bottom:0}
+.policy-fig{font-family:var(--font-b);font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.policy-dim{color:var(--ink-3);font-size:.9rem}
+.policy-tag{display:inline-block;font-size:.76rem;font-weight:700;line-height:1.3;padding:.1rem .45rem;border-radius:var(--r-pill);border:1px solid var(--line-2);color:var(--ink-2);margin:0 .35rem 0 .35rem;vertical-align:.1em}
+.policy-tag.gov{background:var(--good-soft);color:var(--good-ink);border-color:transparent;margin-left:0}
+.policy-tag.res{background:var(--warn-soft);color:var(--warn-ink);border-color:transparent;margin-left:0}
+.policy-offices{padding-left:1.1rem;margin:0 0 var(--sp-3,1rem)}
+.policy-offices li{margin:0 0 .45rem;max-width:72ch}
+.policy-levers{padding-left:1.3rem;margin:0}
+.policy-levers>li{margin:0 0 var(--sp-5,2rem);max-width:72ch}
+.policy-levers>li>.policy-h3{margin-top:0}
+.policy-levers p{margin:0 0 .45rem}
+.policy-src{list-style:none;padding:0;margin:.4rem 0 0;font-size:.9rem;color:var(--ink-2)}
+.policy-src li{margin:0 0 .35rem;overflow-wrap:anywhere}
+.policy-src-n{font-weight:700}
+.policy-quote{display:block;color:var(--ink-3);margin:.15rem 0 0 .8rem;font-style:italic}
+@media (max-width:640px){
+  .policy-tbl{font-size:.9rem}
+  .policy-tbl th,.policy-tbl td{padding:.45rem .35rem}
+}
+
+@media print{
+  @page{margin:.55in .6in}
+  .page{padding:0}
+  .page .eyebrow{margin:0}
+  .page .page-h1{font-size:15pt;margin:0 0 3pt}
+  .page .page-h1-sub{font-size:9pt;margin:0 0 6pt;color:#000}
+  .policy{max-width:none;font-size:8.6pt;line-height:1.32;color:#000}
+  .policy p{max-width:none;margin:0 0 3pt}
+  .policy .micro{font-size:7.6pt;color:#333}
+  .policy-sec{margin:0 0 8pt}
+  .policy-sec h2{font-size:11pt;margin:0 0 3pt}
+  .policy-h3{font-size:9.2pt;margin:5pt 0 2pt}
+  .policy-lede{font-size:8.6pt;color:#000}
+  .policy-tbl{font-size:8pt;margin:0 0 4pt;page-break-inside:auto}
+  .policy-tbl tr{page-break-inside:avoid}
+  .policy-tbl caption{font-size:8pt;color:#000}
+  .policy-tbl th,.policy-tbl td{padding:1.5pt 4pt;border-bottom:.5pt solid #bbb}
+  .policy-dim{font-size:7.6pt;color:#333}
+  .policy-tag{font-size:6.8pt;padding:0 3pt;border:.5pt solid #777;background:none!important;color:#000!important}
+  .policy-levers{padding-left:12pt}
+  .policy-levers>li{margin:0 0 5pt;page-break-inside:avoid}
+  .policy-levers p{margin:0 0 1.5pt}
+  .policy-src{font-size:7.4pt;margin:1pt 0 0}
+  .policy-src li{margin:0}
+  .policy-quote{display:none}
+  .policy-offices{margin:0 0 3pt;padding-left:12pt}
+  .policy-offices li{margin:0}
+  .policy a{color:#000;text-decoration:none}
+}
+.policy-refs{font-size:.82rem;color:var(--ink-3);white-space:normal;overflow-wrap:anywhere}
+@media print{.policy-refs{font-size:6.8pt}}
+@media print{
+  .policy-levers{columns:2;column-gap:14pt;padding-left:0;list-style-position:inside}
+  .policy-levers>li{break-inside:avoid;margin:0 0 6pt}
+  .policy-offices li{font-size:7.8pt}
+  .policy-tbl .num{white-space:normal}
+  .policy-actions{display:none}
+}
+@media (min-width:900px){.policy-pair{display:grid;grid-template-columns:1.4fr 1fr;gap:var(--sp-4,1.5rem);align-items:start}}
+@media print{
+  @page{margin:.45in .5in}
+  .page .page-h1-sub{display:none}
+  .policy{font-size:7.9pt;line-height:1.25}
+  .policy-lede{font-size:7.9pt}
+  .policy-tbl{font-size:7.3pt}
+  .policy-tbl caption{font-size:7.3pt}
+  .policy-tbl th{font-size:7pt}
+  .policy .micro{font-size:7pt}
+  .policy-pair{display:grid;grid-template-columns:1.4fr 1fr;gap:10pt;align-items:start}
+  .policy-levers>li{break-inside:auto}
+  .policy-levers>li>.policy-h3{break-after:avoid}
+  .policy-sec{margin:0 0 6pt}
+}
+@media print{
+  .policy-levers{list-style:none;counter-reset:lv}
+  .policy-levers>li{counter-increment:lv}
+  .policy-levers>li>.policy-h3::before{content:counter(lv) ". "}
+  .policy-tbl tfoot td{font-size:7pt;padding-top:1pt}
+  .policy-h3{margin:4pt 0 1.5pt}
+}
+@media print{
+  @page{margin:.4in .45in}
+  .policy{font-size:7.6pt;line-height:1.22}
+  .policy-lede{font-size:7.6pt}
+  #p-method{font-size:8.5pt;margin:0 0 1pt}
+}
+.policy-tbl th,.policy-tbl td{overflow-wrap:break-word}
+@media screen and (max-width:640px){
+  .policy-tbl,.policy-tbl tbody,.policy-tbl tfoot,.policy-tbl tr,.policy-tbl td{display:block;width:100%}
+  .policy-tbl caption{display:block}
+  .policy-tbl thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .policy-tbl tr{border-bottom:1px solid var(--line-2);padding:.35rem 0}
+  .policy-tbl td{border-bottom:0;padding:.15rem 0}
+  .policy-tbl td[data-label]::before{content:attr(data-label);display:block;color:var(--ink-3);font-size:.8rem;font-family:var(--font-b);font-weight:400}
+  .policy-tbl .num{white-space:normal}
+}
+.policy-print-only{display:none}
+@media print{.policy-print-only{display:block}}
+@media screen and (max-width:640px){.policy-tbl td.num{display:inline-block;width:50%;vertical-align:top}}
+
+/* ---- PAGES2 (2026-09-30): the figures as cards, the rest folded, phone-safe ---- */
+.policy{max-width:none}
+.policy p{max-width:72ch}
+.policy-lede strong{color:var(--ink)}
+.policy-cards{list-style:none;margin:0 0 var(--sp-3,1rem);padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(17rem,100%),1fr));gap:.75rem;align-items:start}
+.policy-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:.85rem 1rem .9rem;display:flex;flex-direction:column;gap:.55rem;min-width:0}
+.policy-card-h{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.1rem .6rem;line-height:1.3}
+.policy-card-h strong{color:var(--ink);font-family:var(--font-d);font-size:1.02rem}
+.policy-card-fig{display:flex;flex-direction:column;gap:.2rem;border-top:1px solid var(--line-2);padding-top:.5rem}
+.policy-kind{font-family:var(--font-d);font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+.policy-card-fig .policy-fig{font-size:1rem;line-height:1.3}
+.policy-chips{display:flex;flex-wrap:wrap;align-items:center;gap:.35rem;margin-top:.2rem}
+.policy-chips .policy-tag{margin:0}
+.policy-chip{display:inline-flex;align-items:center;min-height:2rem;padding:0 .7rem;border-radius:var(--r-pill);border:1px solid var(--line-2);background:var(--surface-2);color:var(--accent-ink);font-size:.8125rem;font-weight:600;line-height:1.25;text-decoration:none;max-width:100%;overflow-wrap:anywhere}
+.policy-chip:hover{border-color:var(--accent)}
+.policy-chip:focus-visible{outline:none;box-shadow:var(--ring)}
+.policy-names{list-style:none;margin:0 0 .75rem;padding:0;columns:2 16rem;column-gap:1.5rem}
+.policy-names li{break-inside:avoid;padding:.3rem 0;border-bottom:1px solid var(--line-2);color:var(--ink-2);font-size:.9375rem}
+.policy-link{display:inline-flex;align-items:center;min-height:2.25rem;font-weight:600}
+.policy details{margin:0 0 .6rem}
+.policy-levers{list-style:none;padding:0;margin:0}
+.policy-levers>li{margin:0;max-width:none}
+.policy-levers>li details{margin:0 0 .6rem}
+.policy-offices{margin:0}
+.policy-print-table{display:none}
+.policy-sec{margin:0 0 var(--sp-5,2.25rem)}
+@media screen and (max-width:640px){
+  .policy-tbl thead th{position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .policy-tbl tr{display:block}
+  .policy-tbl td[data-label]{display:flex;justify-content:space-between;gap:1rem;align-items:baseline}
+  .policy-tbl td[data-label]::before{display:inline;flex:none;max-width:45%}
+  .policy-tbl td[data-label]>*{text-align:right}
+  .policy-tbl td.num{display:flex;width:100%}
+  .policy-tbl td[colspan]{display:block}
+  .policy-refs{white-space:normal}
+  .policy-refs a,.policy-src a,.policy-chip,.policy-link,.policy a.btn{display:inline-flex;align-items:center;min-height:44px}
+  /* JUDGE-3 #11: a citation link stays inline, so "[" and "]" stay with the words beside them
+     (an inline-flex box left a bare "[" at a line end); the padding keeps a 44 px hit area */
+  .policy-refs a{display:inline;min-height:0;padding:.75rem 0}
+  .policy-src li{margin:0 0 .25rem}
+  .policy-names{columns:1}
+  .policy-card{padding:.75rem .85rem}
+}
+@media print{
+  .policy-print-table{display:table}
+  .policy details{border:0;box-shadow:none;background:none;margin:0}
+  .policy details>summary{display:block;min-height:0;padding:0;list-style:none}
+  .policy details>summary>span:last-child{display:none}
+  .policy details>summary>span>span{display:none}
+  .policy details>summary h3{font-size:9pt;margin:4pt 0 1.5pt}
+  .policy details>div{padding:0;border:0}
+  .policy details>div>:first-child{margin-top:0}
+  .policy-levers>li details>summary h3::before{content:counter(lv) ". "}
+  .policy-names{columns:3;font-size:7pt}
+}
+@media screen and (max-width:640px){
+  .policy-wide{display:none}
+  .policy-cards{gap:.5rem}
+  .policy-card{gap:.35rem;padding:.65rem .8rem .5rem}
+  .policy-card-fig{border-top:0;padding-top:0;gap:.1rem}
+  .policy-card-fig+.policy-card-fig{border-top:1px solid var(--line-2);padding-top:.35rem}
+  .policy-chips{margin-top:0}
+  .policy-chip{padding:0 .6rem}
+}
+.policy-swipe{display:none}
+@media screen and (max-width:640px){
+  .policy-swipe{display:flex;align-items:center;gap:.4rem;margin:0 0 .35rem;font-size:.875rem;font-weight:600;color:var(--ink-3)}
+  .policy-swipe::after{content:'';width:.45rem;height:.45rem;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor;transform:rotate(45deg)}
+  .policy-cards{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:80%;align-items:stretch;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding:0 .25rem;padding:.15rem .15rem .6rem;margin:0 -.15rem var(--sp-3,1rem)}
+  .policy-cards:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-lg)}
+  .policy-card{scroll-snap-align:start}
+}
+.policy-figwrap{display:block;line-height:1.45}
+.policy-figwrap .policy-fig{font-size:1rem}
+@media screen and (max-width:640px){.policy-cards{align-items:start}}
+@media screen and (max-width:640px){
+  .policy-sec{margin-bottom:1.75rem}
+  .policy-sec .micro a,.policy details p a{display:inline-flex;align-items:center;min-height:44px}
+}
+@media print{
+  .policy details>summary h3,.policy details>summary h2{font-size:9pt!important;line-height:1.25!important;margin:4pt 0 1.5pt!important;letter-spacing:0!important}
+  .policy details>summary h2{font-size:10pt!important}
+}
+@media print{
+  .policy details p,.policy details li{max-width:none!important;color:#000}
+  .policy-levers details p{font-size:7.1pt;line-height:1.18;margin:0 0 1pt}
+  .policy-levers .policy-src{font-size:6.9pt}
+  .policy-offices li{font-size:7.2pt;line-height:1.18}
+  .policy-sec{margin:0 0 4pt}
+  .policy-sec h2{margin:0 0 2pt}
+  .policy-tbl th,.policy-tbl td{padding:1pt 3pt}
+}
+@media screen and (max-width:640px){
+  .policy-actions{gap:.25rem;margin:0 0 1.25rem}
+  .policy-sec h2{margin-bottom:.6rem}
+  .policy-lede{font-size:1rem;margin-bottom:.75rem}
+}
+
+/* ==========================================================================
+   VISUAL data (2026-09-30 night): a hero with its picture, cards edged by the
+   kind of figure they carry, a badge for government or research, one line per
+   cost figure from $0 with its median or interval, sentence-case labels.
+   Screen only; the printed brief is unchanged.
+   ========================================================================== */
+@media screen{
+  .policy-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,527px);gap:clamp(1.5rem,3vw,2.5rem);align-items:center;margin:0 0 1rem}
+  .policy-hero-copy{min-width:0}
+  .policy-hero .page-h1{font-size:var(--hero-h1);line-height:1.1;letter-spacing:-.025em;max-width:18ch;margin:.2rem 0 .8rem}
+  .policy-hero .page-h1-sub{font-size:1.0625rem;line-height:1.55;color:var(--ink-2);margin:0}
+  .policy-hero-art{display:block;width:100%;height:auto;aspect-ratio:1200/525;border-radius:var(--r-lg);
+    -webkit-mask-image:radial-gradient(120% 120% at 55% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(120% 120% at 55% 50%,#000 58%,transparent 100%)}
+  .policy-card{position:relative;overflow:hidden;transition:box-shadow .2s}
+  .policy-card:hover{box-shadow:var(--sh-2)}
+  .policy-kind{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0;text-transform:none}
+  .policy-card-fig .policy-fig{font-size:1.15rem}
+  .policy-sec>h2{display:flex;align-items:baseline;gap:.6rem}
+}
+@media screen and (max-width:860px){
+  .policy-hero{grid-template-columns:1fr;gap:.25rem}
+  .policy-hero-art{order:-1;max-height:11rem;aspect-ratio:auto;object-fit:cover;object-position:50% 55%;margin-bottom:.5rem}
+}
+@media print{.policy-hero{display:block}}
+
+/* JUDGE-2 #5: the closed lever names what it holds, in its own words */
+.policy-lever-sum{display:flex;flex-direction:column;gap:.15rem;font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+.policy-lever-sum b{color:var(--ink);font-weight:600}
+@media print{.policy-lever-sum{display:none}}
+/* JUDGE-2 #7: phone cards sit at the top of their row; the row's height follows the cards in view (PolicyCardsFit) */
+@media screen and (max-width:640px){
+  .policy-cards{align-items:start;overflow-y:hidden;transition:height .25s ease-out}
+}
+@media screen and (max-width:640px) and (prefers-reduced-motion:reduce){.policy-cards{transition:none}}

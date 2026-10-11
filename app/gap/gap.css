@@ -1,0 +1,147 @@
+/* /gap (PAGES, 2026-09-30 night; VISUAL data, later that night): the same calm product
+   as the home page and the ledger, now with its picture, a drawing of the gap itself,
+   one icon per kind of uncounted care, and a calm confirmation.
+   Scoped to .gap-page so the shared GapPanel looks the same wherever else it is mounted.
+   Tokens only; dark mode follows. Motion runs once and is off under reduced motion. */
+.gap-page .page-h1-sub{max-width:60ch}
+/* GapPanel brings its own section and wrap; inside this page they add no second gutter */
+.gap-page .step{padding:0}
+.gap-page .step>.wrap{padding:0;max-width:none}
+
+/* ---- the hero: words left, the path right, fading into the page ---- */
+.gap-page .gp-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,527px);gap:clamp(1.5rem,3vw,2.5rem);align-items:center;margin:0 0 .5rem}
+.gap-page .gp-hero-copy{min-width:0}
+.gap-page .gp-hero .page-h1{font-size:var(--hero-h1);line-height:1.1;letter-spacing:-.025em;max-width:18ch;margin:.25rem 0 .9rem}
+.gap-page .gp-hero .page-h1-sub{font-size:1.125rem;line-height:1.55;color:var(--ink-2);margin:0}
+.gap-page .gp-hero-art{display:block;width:100%;height:auto;aspect-ratio:1200/525;object-fit:cover;border-radius:var(--r-lg);
+  -webkit-mask-image:radial-gradient(120% 120% at 60% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(120% 120% at 60% 50%,#000 58%,transparent 100%)}
+@media (max-width:860px){
+  .gap-page .gp-hero{grid-template-columns:1fr;gap:.25rem}
+  .gap-page .gp-hero-art{order:-1;max-height:11rem;aspect-ratio:auto;object-fit:cover;object-position:50% 60%;margin:0 0 .5rem}
+  .gap-page .gp-hero .page-h1{max-width:none}
+}
+
+/* the at-a-glance band reuses the trust Kit's cards; here it sits tighter above the form */
+.gap-page .gap-glance{margin:1.25rem 0 1.5rem}
+.gap-page .gap-glance ul{margin:0}
+@media (max-width:640px){
+  .gap-page .gap-glance ul{grid-template-columns:1fr}
+  .gap-page .gap-glance li{flex-direction:row;flex-wrap:wrap;align-items:center;column-gap:.75rem}
+  .gap-page .gap-glance li>span:last-child{flex-basis:100%}
+}
+
+/* ---- the gap, drawn ---- */
+.gap-page .gp-map{margin:1.5rem 0 1.25rem;padding:1.25rem clamp(1rem,2.5vw,1.75rem) 1.1rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2)}
+.gp-map-art{position:relative;height:150px;margin:1.6rem 0 .25rem}
+.gp-map-svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.gp-map-solid{fill:none;stroke:var(--ink-2);stroke-width:4;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0;transition:stroke-dashoffset .6s cubic-bezier(.2,.7,.2,1)}
+.gp-map-dashed{fill:none;stroke:var(--ink-4);stroke-width:2.5;stroke-linecap:round;stroke-dasharray:2 9;opacity:.75;transition:opacity .5s ease-out .45s}
+.gp-map-edge{position:absolute;top:-1.6rem;bottom:-.25rem;width:0;border-left:1.5px dashed color-mix(in srgb,var(--flag-ink) 55%,transparent)}
+.gp-map-edge>span{position:absolute;top:0;left:.5rem;white-space:nowrap;font-size:.875rem;font-weight:600;color:var(--flag-ink);line-height:1.2}
+.gp-dot{position:absolute;width:16px;height:16px;border-radius:50%;transform:translate(-50%,-50%);transition:opacity .35s ease-out,transform .35s ease-out,background-color .3s,border-color .3s}
+.gp-dot-got{background:var(--ink-2);box-shadow:0 0 0 4px var(--surface)}
+.gp-dot-miss{width:26px;height:26px;background:var(--surface);border:2px dashed var(--ink-4);display:grid;place-items:center}
+.gp-dot-n{font-size:.8125rem;font-weight:700;line-height:1;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.gp-dot-miss.on{background:var(--accent);border:2px solid var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 20%,transparent)}
+.gp-dot-miss.on .gp-dot-n{color:var(--on-accent,#fff)}
+.gp-map.is-sent .gp-dot-miss.on{animation:gp-pulse 1.2s ease-out .2s 1}
+@keyframes gp-pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 45%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+/* the drawing: the solid stretch draws itself, then the markers arrive */
+.gp-map[data-reveal="wait"] .gp-map-solid{stroke-dashoffset:1}
+.gp-map[data-reveal="wait"] .gp-map-dashed{opacity:0}
+.gp-map[data-reveal="wait"] .gp-dot{opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.gp-map[data-reveal="in"] .gp-dot{transition-delay:var(--d,0ms)}
+.gp-map-cap{display:grid;grid-template-columns:minmax(0,38fr) minmax(0,62fr);gap:1rem 1.5rem;margin-top:1rem}
+.gp-map-side{display:flex;flex-direction:column;gap:.15rem;padding-left:1.5rem;position:relative;font-size:.9375rem;line-height:1.5;color:var(--ink-2);min-width:0}
+.gp-map-side>b{font-size:1rem;color:var(--ink)}
+.gp-key{position:absolute;left:0;top:.3rem;width:14px;height:14px;border-radius:50%}
+.gp-key-got{background:var(--ink-2)}
+.gp-key-miss{border:2px dashed var(--ink-4)}
+.gp-map-live{margin-top:.35rem;font-weight:600;color:var(--accent-ink)}
+.gp-map-live:empty{display:none}
+@media (max-width:640px){
+  .gp-map-art{height:120px}
+  .gp-dot-miss{width:22px;height:22px}
+  .gp-dot-n{font-size:.75rem}
+  .gp-map-edge>span{font-size:.8125rem}
+  .gp-map-cap{grid-template-columns:1fr}
+}
+
+/* ---- the six cards ---- */
+.gap-page .gap-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:1rem;margin:1.25rem 0;align-items:stretch}
+.gap-page .gap-card{display:flex;flex-direction:column;gap:.6rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.15rem 1.2rem .5rem;min-width:0;transition:border-color .2s,box-shadow .2s}
+.gap-page .gap-card:hover{box-shadow:var(--sh-2)}
+.gap-page .gap-card.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--sh-2)}
+.gap-page .gp-card-head{display:flex;align-items:flex-start;gap:.75rem}
+.gap-page .gp-card-head{align-items:center;gap:.6rem}
+.gap-page .gp-ic{flex:none;display:grid;place-items:center;width:3rem;height:3rem;border-radius:12px;background:var(--accent-soft);color:var(--accent-ink);transition:background-color .25s,color .25s}
+.gap-page .gp-ic-n{flex:none;min-width:1.6rem;height:1.6rem;padding:0 .25rem;border-radius:var(--r-pill);background:var(--surface);border:1.5px dashed var(--ink-4);color:var(--ink-3);font-size:.875rem;font-weight:700;line-height:1;display:grid;place-items:center;font-variant-numeric:tabular-nums;transition:background-color .25s,border-color .25s,color .25s}
+.gap-page .gap-card.on .gp-ic{background:var(--accent);color:var(--on-accent,#fff)}
+.gap-page .gap-card.on .gp-ic-n{background:var(--accent);border:1.5px solid var(--accent);color:var(--on-accent,#fff)}
+.gap-page .gap-card h3{margin:.2rem 0 0;font-size:1.0625rem;line-height:1.3}
+.gap-page .gap-prompt{margin:0;color:var(--ink-2);font-size:.9375rem;line-height:1.5}
+.gap-page .gap-eg{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:.4rem}
+.gap-page .gap-eg li{padding:.2rem .65rem;border-radius:var(--r-pill);background:var(--ground);border:1px solid var(--line-2);color:var(--ink-2);font-size:.9375rem;line-height:1.45;font-style:italic}
+/* the count: minus, the number, plus, the unit */
+.gap-page .gap-input{display:flex;align-items:center;gap:.4rem;max-width:none;margin-top:auto;padding-top:.4rem}
+.gap-page .gp-num{display:block}
+.gap-page .gap-input input{width:5.5rem;min-height:44px;text-align:center;font-size:1.125rem;font-weight:600;font-variant-numeric:tabular-nums;-moz-appearance:textfield;appearance:textfield}
+.gap-page .gap-input input::-webkit-outer-spin-button,.gap-page .gap-input input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.gap-page .gp-step{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;transition:border-color .15s,background-color .15s}
+.gap-page .gp-step:hover:not(:disabled){border-color:var(--accent);color:var(--accent-ink)}
+.gap-page .gp-step:disabled{color:var(--ink-4);cursor:default;opacity:.55}
+.gap-page .gp-step:focus-visible{outline:none;box-shadow:var(--ring)}
+.gap-page .gp-unit{margin-left:.35rem;color:var(--ink-3);font-size:.9375rem}
+/* "Why no dataset has this": a quiet reveal with a chevron that turns */
+.gap-page .gap-why{margin:.15rem 0 0;border-top:1px solid var(--line-2);interpolate-size:allow-keywords}
+.gap-page .gap-why>summary{display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-height:44px;cursor:pointer;list-style:none;color:var(--accent-ink);font-weight:600;font-size:.9375rem}
+.gap-page .gap-why>summary::-webkit-details-marker{display:none}
+.gap-page .gap-why>summary::after{content:"";flex:none;width:.5rem;height:.5rem;margin-right:.35rem;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform .25s ease-out}
+.gap-page .gap-why[open]>summary::after{transform:translateY(2px) rotate(-135deg)}
+.gap-page .gap-why>summary:focus-visible{outline:none;box-shadow:var(--ring);border-radius:var(--r-sm)}
+.gap-page .gap-why::details-content{block-size:0;overflow:hidden;transition:block-size .3s ease-out,content-visibility .3s allow-discrete}
+.gap-page .gap-why[open]::details-content{block-size:auto}
+.gap-page .gp-why-body{margin:0 0 .75rem;padding:.75rem .9rem;border-radius:var(--r-md);background:var(--ground);border:1px solid var(--line-2)}
+.gap-page .gp-why-body p{margin:0;font-size:.9375rem;line-height:1.55;color:var(--ink-2)}
+.gap-page .step-actions{margin-top:1rem}
+
+/* ---- the confirmation: a calm mark that draws itself, then where the report sits ---- */
+.gap-page .gp-done-head{display:flex;align-items:center;gap:1.1rem;margin:.5rem 0 .75rem}
+.gap-page .gp-done-head h2{margin:0}
+.gap-page .gp-done-head h2:focus{outline:none}
+.gap-page .gp-done-head .eyebrow{margin:0 0 .15rem}
+.gap-page .gp-done-mark{flex:none}
+.gp-done-ring{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5;stroke-dasharray:1;stroke-dashoffset:0;animation:gp-draw .6s cubic-bezier(.2,.7,.2,1) both}
+.gp-done-tick{fill:none;stroke:var(--accent-ink);stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1;stroke-dashoffset:0;animation:gp-draw .45s cubic-bezier(.2,.7,.2,1) .45s both}
+@keyframes gp-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.gap-page .gp-done .gap-back{animation:gp-rise .5s ease-out .5s both}
+@keyframes gp-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.gap-page .gap-bars .gb-fill{transform-origin:left center;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.gap-page .gap-bars[data-reveal="wait"] .gb-fill{transform:scaleX(0)}
+.gap-page .gap-back{padding:1.25rem 1.4rem}
+.gap-page .gap-back-n b{font-size:1.5rem}
+
+@media (prefers-reduced-motion:reduce){
+  .gap-page *,.gap-page *::details-content{animation:none!important;transition:none!important}
+}
+@media print{
+  .gap-page .gp-map[data-reveal] .gp-map-solid{stroke-dashoffset:0;transition:none}
+  .gap-page .gp-map[data-reveal] .gp-map-dashed{opacity:.75;transition:none}
+  .gap-page .gp-map[data-reveal] .gp-dot{opacity:1;transform:translate(-50%,-50%);transition:none}
+  .gap-page .gap-bars[data-reveal] .gb-fill{transform:none;transition:none}
+}
+
+/* critic-10: the phone drawing (three rows) replaces the wide one at 560 px and below */
+.gp-map-sm{display:none}
+.gp-map-edge-sm{position:absolute;left:-.25rem;right:-.25rem;top:36%;height:0;border-top:1.5px dashed color-mix(in srgb,var(--flag-ink) 55%,transparent)}
+.gp-map-edge-sm>span{position:absolute;left:.25rem;top:.3rem;font-size:.875rem;font-weight:600;color:var(--flag-ink);line-height:1.2;background:var(--surface);padding:0 .3rem}
+@media (max-width:560px){
+  .gp-map-lg{display:none}
+  .gp-map-sm{display:block;height:240px;margin:.5rem .25rem .25rem}
+  .gp-map-sm .gp-dot-miss{width:26px;height:26px}
+  .gp-map-sm .gp-dot-n{font-size:.8125rem}
+}
+
+/* critic-21: the button is never grey; it says it is not ready, and the hint says why */
+.gap-page .btn.primary[aria-disabled="true"]{opacity:1;cursor:pointer}
+.gap-page .gp-hint{margin:.5rem 0 0;font-size:.9375rem;font-weight:600;color:var(--accent-ink);min-height:1.4em}

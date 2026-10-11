@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import Link from '@/components/IntentLink';
 import { AccountJourneys } from '@/components/AccountDashboard';
 
 export const metadata: Metadata = {
-  title: 'My saved ledgers · Waypoint Ledger',
+  title: 'My saved ledgers',
   description: 'Every ledger you have saved to your account: open it, rename it or delete it.',
 };
 

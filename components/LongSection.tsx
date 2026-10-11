@@ -49,7 +49,39 @@ export function Aside({ summary, children }: { summary: string; children: ReactN
   );
 }
 
-export function LongLayout({ items, children }: { items: TocItem[]; children: ReactNode }) {
+/* Open whatever holds the target, then bring it into view and keep the hash. */
+function go(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  openFor(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  history.replaceState(null, '', `#${id}`);
+}
+
+/* The contents as a row of pills, for a page to place straight under its hero
+   (JUDGE-2 fix 9): below 1024 px a long page's contents must not wait several
+   screens down, inside the layout. From 1024 px the layout's own rail takes
+   over and this row is not drawn. Pair it with <LongLayout pillsAbove>. */
+export function LongPills({ items }: { items: TocItem[] }) {
+  return (
+    <nav className={s.pills} aria-label="On this page">
+      {/* the count says the row runs on past the screen's edge */}
+      <p className={s.pillsHead}>On this page: {items.length} sections</p>
+      <ul>
+        {items.map((t) => (
+          <li key={t.id}><button type="button" onClick={() => go(t.id)}>{t.text}</button></li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
+export function LongLayout(
+  { items, children, pillsAbove = false }:
+  { items: TocItem[]; children: ReactNode;
+    /** the page draws <LongPills> under its hero: no folded list here, and the rail starts at 1024 px */
+    pillsAbove?: boolean },
+) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -66,14 +98,6 @@ export function LongLayout({ items, children }: { items: TocItem[]; children: Re
     return () => window.removeEventListener('hashchange', fromHash);
   }, []);
 
-  const go = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    openFor(el);
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    history.replaceState(null, '', `#${id}`);
-  };
-
   const list = (
     <ul className={s.railList}>
       {items.map((t) => (
@@ -83,16 +107,18 @@ export function LongLayout({ items, children }: { items: TocItem[]; children: Re
   );
 
   return (
-    <div className={s.layout} ref={root}>
+    <div className={pillsAbove ? `${s.layout} ${s.withPills}` : s.layout} ref={root}>
       <nav className={s.rail} aria-label="On this page">
         <p className={s.railHead}>On this page</p>
         {list}
       </nav>
       <div>
-        <details className={s.mob}>
-          <summary>On this page &mdash; {items.length} sections</summary>
-          {list}
-        </details>
+        {!pillsAbove && (
+          <details className={s.mob}>
+            <summary>On this page: {items.length} sections</summary>
+            {list}
+          </details>
+        )}
         {children}
       </div>
     </div>

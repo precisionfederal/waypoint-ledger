@@ -131,7 +131,9 @@ describe('the words a patient would use reach the new rows', () => {
     const kept: [string, string][] = [
       ['urgent care', 'cms-99203'],
       ['blood draw', 'cms-lab-cbc'],
-      ['nerve conduction study', 'cms-test-emg'],
+      // R4 2026-09-30 (fedexpert FX-02): the conduction half is its own row (95907-95913, by the number of nerves);
+      // the EMG row (95886) is the needle add-on. R4b: a band is chosen only when the number of nerves is said.
+      ['nerve conduction study of four nerves', 'cms-test-ncs-3-4'],
       ['EMG test', 'cms-test-emg'],
       ['chest xray', 'cms-img-cxr'],
       ['PT', 'cms-pt-exercise-15'],
@@ -143,5 +145,7 @@ describe('the words a patient would use reach the new rows', () => {
     for (const [phrase, id] of kept) {
       expect(mapUtterance(phrase, SELECTABLE).item?.id, phrase).toBe(id);
     }
+    // R4b: with no number of nerves, the conduction study is taken by no row, EMG included.
+    expect(mapUtterance('nerve conduction study', SELECTABLE).item).toBeNull();
   });
 });

@@ -65,6 +65,68 @@ export const SANDBOX = {
   scopes: ['patient/ExplanationOfBenefit.rs'],
 } as const;
 
+/** The one environment this code talks to. Every surface that shows imported
+ *  care says so in these words, so synthetic test records are never mistaken
+ *  for anyone's real Medicare history. */
+export const ENVIRONMENT = 'sandbox' as const;
+export const ENVIRONMENT_LABEL = 'CMS sandbox, synthetic beneficiaries';
+
+/** Required by the Blue Button API Terms of Service, "Attribution", verbatim:
+ *  https://bluebutton.cms.gov/terms/ (v3, published 11/1/2022): "All services
+ *  that utilize or access the Blue Button APIs ... must display the following
+ *  notice prominently within the application". Shown wherever the import shows. */
+export const CMS_ATTRIBUTION =
+  'This product uses the Blue Button APIs but is not endorsed or certified by the Centers for Medicare & Medicaid Services or the U.S. Department of Health and Human Services.';
+
+/* --------------------------------------------------------------------------
+   WHEN CMS SAYS NO.
+
+   CMS answers a refused sign-in with an OAuth 2.0 `error` code (RFC 6749,
+   4.1.2.1 and 5.2) and, often, its own `error_description`. The person sees
+   both: a plain sentence for the code, and CMS's own words, quoted.
+
+   🔴 Only words that really came from CMS reach the page (security S-16). The
+   callback stores them in an HttpOnly cookie, and only when CMS sent them
+   itself: in the token response, or on a redirect whose `state` matches the
+   one this browser started with. A crafted link cannot do either.
+   -------------------------------------------------------------------------- */
+const PLAIN_REFUSAL: Record<string, string> = {
+  invalid_request: 'CMS said the sign-in request from this site was incomplete or malformed.',
+  invalid_client: 'CMS did not recognise this site\'s sandbox app, or its secret did not match.',
+  invalid_grant: 'CMS would not accept the sign-in code. It may have expired, been used already, or not match this site\'s address.',
+  unauthorized_client: 'CMS has not allowed this site\'s app to sign people in this way.',
+  unsupported_grant_type: 'CMS does not accept the kind of sign-in this site asked for.',
+  unsupported_response_type: 'CMS does not accept the kind of sign-in this site asked for.',
+  invalid_scope: 'CMS would not give this site the access it asked for.',
+  server_error: 'CMS had a problem on its side and could not finish the sign-in.',
+  temporarily_unavailable: 'CMS is busy or down for maintenance and could not finish the sign-in.',
+};
+const REFUSAL_DEFAULT = 'CMS refused the sign-in.';
+const MAX_CMS_WORDS = 300;
+
+export interface Refusal {
+  /** The OAuth error code CMS sent, or null when it sent none we can read. */
+  code: string | null;
+  /** Our plain sentence for that code. */
+  plain: string;
+  /** CMS's own error_description, cleaned and capped, or null. */
+  cmsSaid: string | null;
+}
+
+/** Clean what CMS sent into something safe to show as text. Returns null when
+ *  CMS sent nothing usable. */
+export function refusalOf(error: unknown, description: unknown): Refusal | null {
+  const code = typeof error === 'string' && /^[a-z_]{1,64}$/.test(error) ? error : null;
+  let said: string | null = null;
+  if (typeof description === 'string') {
+    const clean = description.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (clean) said = clean.length > MAX_CMS_WORDS ? `${clean.slice(0, MAX_CMS_WORDS - 1).trimEnd()}…` : clean;
+  }
+  if (!code && !said) return null;
+  const plain = code && Object.prototype.hasOwnProperty.call(PLAIN_REFUSAL, code) ? PLAIN_REFUSAL[code] : REFUSAL_DEFAULT;
+  return { code, plain, cmsSaid: said };
+}
+
 /** Code systems this module will read a service code out of. Anything else on
  *  a line — notably the data-absent-reason placeholder CMS puts on lines with
  *  no procedure code — is treated as "no code", never as a code. */
@@ -398,7 +460,8 @@ export function toEntry(group: MatchedGroup): JourneyEntry {
     : group.firstServicedOn ?? 'date not given';
   return {
     key: `bb-${group.item.id}`,
-    raw: `${group.item.label} — from ${n} Medicare claim line${n === 1 ? '' : 's'}, ${when}`,
+    raw: `${group.item.label}: from ${n} Medicare claim line${n === 1 ? '' : 's'}, ${when}`
+      + (ENVIRONMENT === 'sandbox' ? ` (${ENVIRONMENT_LABEL})` : ''),
     item: group.item,
     times: Math.max(1, Math.min(365, n)),
   };

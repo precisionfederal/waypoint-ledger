@@ -90,7 +90,9 @@ describe('the wire', () => {
 
 describe('one clause, one line', () => {
   it('absorbs the tail fragment when the model names the unit its neighbour already carries', () => {
-    const segs = parseJourney('they put electrodes on my legs and shocked the nerves', SELECTABLE);
+    // R4: "shocked the nerves" is now read by the rules as the conduction study
+    // (fedexpert FX-02), so the absorb rule is shown on two halves the rules leave blank.
+    const segs = parseJourney('they put electrodes on my legs and did the zappy thing', SELECTABLE);
     const cands = candidatesOf(segs);
     expect(cands.length).toBeGreaterThanOrEqual(2);
     const emg = SELECTABLE.find((i) => /EMG/i.test(i.label))!;

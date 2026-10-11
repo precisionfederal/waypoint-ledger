@@ -15,3 +15,24 @@ migrations_dir = "migrations"
 
 [ai]
 binding = "AI"
+
+# ---------------------------------------------------------------------------
+# PREVIEW (every non-main branch deploy, e.g. --branch beta-night) runs against
+# STAGING data, never production's. Pages bindings do not inherit: once one is
+# set here, every binding the functions use must be set here again (KV, D1, AI).
+# Everything above this block is production and must stay byte-identical.
+# Staging D1 waypoint-ledger-staging and KV waypoint-ledger-staging, created
+# 2026-09-30 for the beta night. Deploy with scripts/deploy-preview.sh.
+# ---------------------------------------------------------------------------
+[[env.preview.kv_namespaces]]
+binding = "LEDGER"
+id = "YOUR_KV_NAMESPACE_ID"        # wrangler kv namespace create LEDGER
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "waypoint-ledger-staging"
+database_id = "YOUR_D1_DATABASE_ID"   # wrangler d1 create waypoint-ledger
+migrations_dir = "migrations"
+
+[env.preview.ai]
+binding = "AI"

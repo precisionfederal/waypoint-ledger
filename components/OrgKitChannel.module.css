@@ -1,0 +1,48 @@
+/* /register/channel (VISUAL data, 2026-09-30 night): the inner-page hero, a lookup
+   card, the count as a stat band, the ranking drawn above its table, and the empty
+   or withheld count with its picture. Tokens only; dark mode follows. */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 527px); gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; margin: 0 0 .5rem; }
+.heroCopy { min-width: 0; }
+.heroCopy h1 { font-size: var(--hero-h1); line-height: 1.1; letter-spacing: -.025em; max-width: 18ch; margin: .2rem 0 .8rem; overflow-wrap: anywhere; }
+.heroCopy :global(.sub) { margin: 0; max-width: 56ch; }
+.heroArt { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 525; border-radius: var(--r-lg);
+  -webkit-mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%); mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%); }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; gap: .25rem; }
+  .heroArt { order: -1; max-height: 11rem; aspect-ratio: auto; object-fit: cover; object-position: 50% 55%; margin-bottom: .5rem; }
+  .heroCopy h1 { max-width: none; }
+}
+@media print { .heroArt, .quietArt { display: none; } }
+
+.lookup.lookup { padding: 1rem 1.1rem; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--sh-2); max-width: 46rem; }
+.lookup :global(.btn) { min-height: 46px; }
+
+.stats.stats { gap: 0; background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--sh-2); overflow: hidden; }
+.stats > div { border: 0 !important; border-radius: 0 !important; box-shadow: inset 1px 0 0 var(--line-2); padding: 1.1rem 1.25rem !important; background: none !important; }
+.stats b { font-family: var(--font-b) !important; font-weight: 700; font-size: clamp(1.6rem, 2.6vw, 2.25rem) !important; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+
+.chart.chart { padding: 1.1rem 1.25rem; margin: .5rem 0 1rem; }
+.bars { list-style: none; margin: 0; padding: 0; display: grid; gap: .75rem; }
+.bars li { display: grid; grid-template-columns: minmax(10rem, 16rem) minmax(0, 1fr) auto; gap: .35rem 1rem; align-items: center; }
+.barName { font-weight: 600; color: var(--ink); }
+.track { display: block; height: .8rem; border-radius: 999px; background: var(--ground-2); overflow: hidden; }
+.track > span { display: block; height: 100%; min-width: 3px; border-radius: inherit; background: var(--ink); transform-origin: left center; transition: transform .65s cubic-bezier(.2, .7, .2, 1); transition-delay: var(--d, 0ms); }
+.bars[data-reveal="wait"] .track > span { transform: scaleX(0); }
+.barVal { font-size: .9375rem; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.barVal b { color: var(--ink); }
+@media (max-width: 640px) {
+  .bars li { grid-template-columns: minmax(0, 1fr) auto; }
+  .barName { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { .track > span { transition: none; } .bars[data-reveal] .track > span { transform: none; } }
+@media print { .bars[data-reveal] .track > span { transform: none; transition: none; } }
+
+.quiet.quiet { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 1.25rem; align-items: center; max-width: 46rem; }
+.quietArt { display: block; width: 8rem; height: auto; }
+.quietBody > :first-child { margin-top: 0; }
+.quietBody > :last-child { margin-bottom: 0; }
+@media (max-width: 560px) { .quiet.quiet { grid-template-columns: minmax(0, 1fr); gap: .5rem; } .quietArt { width: 6rem; } }
+.stats b > span { font-size: inherit !important; color: inherit !important; }
+.stats > div + div b { font-size: clamp(1.15rem, 1.6vw, 1.4rem) !important; letter-spacing: -.015em; }
+.chart + :global(.table-scroll) { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); box-shadow: var(--sh-1); }
+.chart + :global(.table-scroll) th, .chart + :global(.table-scroll) td { text-align: left !important; }

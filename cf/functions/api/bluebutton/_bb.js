@@ -19,9 +19,9 @@
    sandbox advertises it (code_challenge_methods_supported: ["S256"]) and it
    closes the authorization-code interception window at no cost.
    ========================================================================== */
-import { SANDBOX } from '../../../../lib/bluebutton.ts';
+import { SANDBOX, refusalOf } from '../../../../lib/bluebutton.ts';
 
-export { SANDBOX };
+export { SANDBOX, refusalOf };
 
 /** The redirect URI registered with CMS. Derived from the live request so the
  *  same code works on a preview deploy and on `wrangler pages dev`, but the
@@ -31,6 +31,10 @@ export const redirectUri = (request) => new URL('/api/bluebutton/callback', requ
 
 export const PKCE_COOKIE = 'wl_bb_pkce';
 export const TOKEN_COOKIE = 'wl_bb';
+/** CMS's own reason for a refused sign-in, carried from the callback to
+ *  /api/bluebutton/status for five minutes, HttpOnly, and read once. */
+export const REFUSAL_COOKIE = 'wl_bb_refusal';
+export const REFUSAL_SECONDS = 300;
 /** A ceiling of our own on top of whatever CMS says, so a forgotten tab does
  *  not keep a key to someone's claim history alive for a day. */
 export const MAX_TOKEN_SECONDS = 3600;
@@ -76,7 +80,9 @@ export async function challengeFor(verifier) {
 /* Token exchange                                                             */
 /* -------------------------------------------------------------------------- */
 
-/** POST the authorization code. Returns { token, expiresIn } or { error }. */
+/** POST the authorization code. Returns { token, expiresIn }, or { why, refusal }
+ *  where `why` is the short code the callback puts in the URL ('unreachable' or
+ *  'refused') and `refusal` is what CMS itself said (refusalOf), or null. */
 export async function exchangeCode(env, { code, verifier, redirect }) {
   const body = new URLSearchParams({
     grant_type: 'authorization_code',
@@ -100,15 +106,14 @@ export async function exchangeCode(env, { code, verifier, redirect }) {
       body,
     });
   } catch {
-    return { error: 'Could not reach the Medicare sandbox to finish signing in.' };
+    return { why: 'unreachable', refusal: null };
   }
   let data = null;
   try { data = await res.json(); } catch { /* fall through to the status check */ }
   if (!res.ok || !data || typeof data.access_token !== 'string') {
-    // CMS's own error_description is safe to show: it describes the app's
-    // registration, never the person.
-    const detail = data && typeof data.error_description === 'string' ? ` ${data.error_description}` : '';
-    return { error: `The Medicare sandbox refused the sign-in.${detail}`.trim() };
+    // CMS's own error and error_description are safe to show: they describe
+    // the app's registration or the sign-in code, never the person.
+    return { why: 'refused', refusal: refusalOf(data && data.error, data && data.error_description) };
   }
   const expires = Number(data.expires_in);
   return {

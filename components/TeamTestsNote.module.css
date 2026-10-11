@@ -1,0 +1,4 @@
+/* The team-test line on the register: quiet, readable, never a banner. */
+.note { margin: .5rem 0 0; font-size: .9375rem; line-height: 1.5; color: var(--ink-3); max-width: 70ch; }
+.note a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.note a:focus-visible { outline: 2px solid var(--brand-3); outline-offset: 2px; border-radius: 2px; }

@@ -31,6 +31,10 @@ import urllib.request
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 PRICES = os.path.join(HERE, 'prices.json')
+# 🔴 THE TABLE IS ALL OF IT. lib/table.ts serves prices.json AND the 2026-09-09
+# additions as one 274-row table, so an audit of prices.json alone was an audit of
+# 117 of the rows a person can actually land on (R6, the public-table finding).
+ADDITIONS = [os.path.join(HERE, 'prices-additions-2026-09-09.json')]
 AUDIT = os.path.join(HERE, 'AUDIT.json')
 UA = 'WaypointLedger/1.0 (+https://waypoint-ledger.pages.dev; bo@precisionfederal.com)'
 CF = 33.4009  # read from the file, then asserted against this
@@ -46,7 +50,7 @@ SOURCES = {
     'phygeo': dict(url='https://data.cms.gov/sites/default/files/2026-05/'
                        'e534c74b-79b8-4892-8a95-5a17e2dfec9f/MUP_PHY_R26_P05_V10_D24_Geo.csv',
                    kind='csv',
-                   title='CMS, Medicare Physician & Other Practitioners — by Geography and Service, '
+                   title='CMS, Medicare Physician & Other Practitioners - by Geography and Service, '
                          'calendar year 2024'),
     'clfs': dict(url='https://www.cms.gov/files/zip/26clabq3.zip',
                  member='PUF_CLFS_CY2026_Q3V1.csv', kind='csv',
@@ -427,11 +431,26 @@ def hcpcs_of(row):
     return c.split(',')[0].split(' ')[0].strip()
 
 
+def alt_pos(row, key):
+    """The place-of-service row this figure claims to have been read on.
+
+    R6 finding F1: the ER row carried the FACILITY charge under an OFFICE provenance
+    block and the audit passed it, because the audit chose the place of service by a
+    hard-coded rule of its own instead of reading what the row says. The row's own
+    claim is what gets checked now, so a wrong claim fails."""
+    m = re.search(r'Place_Of_Srvc\s*=\s*([A-Z])', str((row.get('alternates') or {}).get('cy2024_source_row') or ''))
+    if m:
+        return m.group(1)
+    return 'F' if (key in FACILITY_ALT_KEYS or row['id'] in FACILITY_ALT_ROWS) else 'O'
+
+
 def check_alternates(row, phygeo, file_sha):
     """Re-read every CY2024 companion figure on this row in the CMS claims file.
 
     A companion figure is a dollar amount on the screen. It is audited exactly like
-    the row's own figure: the file, the row inside it, the field, and the cent."""
+    the row's own figure: the file, the row inside it, the field, and the cent — and
+    the service count, the provider count and the place of service printed beside it
+    must come from that same file row, not from a different one."""
     alt = row.get('alternates') or {}
     keys = [k for k in ALT_CHARGE_KEYS + (ALT_ALLOWED_KEY,) if isinstance(alt.get(k), (int, float))]
     if not keys:
@@ -440,7 +459,7 @@ def check_alternates(row, phygeo, file_sha):
     missing = [f for f in ALT_PROVENANCE if not alt.get(f)]
     out = []
     for k in keys:
-        pos = 'F' if (k in FACILITY_ALT_KEYS or row['id'] in FACILITY_ALT_ROWS) else 'O'
+        pos = alt_pos(row, k)
         field = ALT_MDCR_FIELD if k == ALT_ALLOWED_KEY else 'Avg_Sbmtd_Chrg'
         have = float(alt[k])
         rec = (phygeo or {}).get(code, {}).get(pos)
@@ -453,10 +472,27 @@ def check_alternates(row, phygeo, file_sha):
                             evidence='no National row for %s at place of service %s' % (code, pos)))
             continue
         want = round(float(rec[field]), 2)
+        # the three things printed beside the figure, read on the same row
+        stated_pos = str(alt.get('cy2024_place_of_service') or '')
+        svcs, provs = alt.get('cy2024_total_services'), alt.get('cy2024_rendering_providers')
+        file_svcs, file_provs = float(rec['Tot_Srvcs']), int(float(rec['Tot_Rndrng_Prvdrs']))
+        triple = None
+        if stated_pos and not stated_pos.strip().upper().startswith(pos):
+            triple = ('the row says place of service %r while citing the %s row'
+                      % (stated_pos[:40], pos))
+        elif svcs is not None and abs(float(svcs) - file_svcs) > 0.5:
+            triple = ('the row says %s services; the %s row for %s carries %s'
+                      % (format(int(float(svcs)), ','), pos, code, format(int(file_svcs), ',')))
+        elif provs is not None and int(provs) != file_provs:
+            triple = ('the row says %s rendering providers; the %s row for %s carries %s'
+                      % (format(int(provs), ','), pos, code, format(file_provs, ',')))
         if abs(have - want) > 0.005:
             out.append(dict(key=k, status='FAIL', value_usd=have,
                             evidence='file gives $%.2f for %s (%s, National, POS %s); the row says $%.2f'
                                      % (want, code, field, pos, have)))
+        elif triple:
+            out.append(dict(key=k, status='FAIL', value_usd=have,
+                            evidence='the dollar figure reproduces, but %s' % triple))
         elif missing:
             out.append(dict(key=k, status='FAIL', value_usd=have,
                             evidence='reproduces, but the row names no %s for it' % ', '.join(missing)))
@@ -466,9 +502,109 @@ def check_alternates(row, phygeo, file_sha):
                                      % (str(alt.get('cy2024_source_file_sha256'))[:16], file_sha[:16])))
         else:
             out.append(dict(key=k, status='PASS', value_usd=have,
-                            evidence='%s = $%.2f on the National %s row for %s'
-                                     % (field, want, 'office' if pos == 'O' else 'facility', code)))
+                            evidence='%s = $%.2f on the National %s row for %s, alongside %s services '
+                                     'from %s providers'
+                                     % (field, want, 'office' if pos == 'O' else 'facility', code,
+                                        format(int(file_svcs), ','), format(file_provs, ','))))
     return out
+
+
+def load_rvu_lines():
+    """{hcpcs: {modifier: line}} — the modifier lines as well as the unmodified one.
+
+    A scan or a tracing is two halves: in a hospital the clinician bills only the
+    reading (modifier 26) and the hospital bills the rest under OPPS, so the facility
+    figure for those codes lives on the modifier 26 line, not the global one."""
+    p = fetch('rvu')
+    if not p:
+        return None
+    rows = list(csv.reader(open(p, encoding='latin-1')))
+    hi = next((i for i, r in enumerate(rows) if r and r[0].strip() == 'HCPCS'), None)
+    if hi is None:
+        return None
+    out = {}
+    for r in rows[hi + 1:]:
+        if len(r) < 27:
+            continue
+        try:
+            rec = dict(status=r[3].strip(), total_nf=float(r[11]), total_fac=float(r[12]),
+                       pctc=r[13].strip())
+        except ValueError:
+            continue
+        out.setdefault(r[0].strip(), {}).setdefault(r[1].strip(), rec)
+    return out
+
+
+def check_facility(row, rvu_lines):
+    """R6 finding F3/F12: the figure a person is shown when the care happened in a
+    hospital. It sits on the same file line as the office figure, so it is audited the
+    same way — the RVUs, the conversion factor and the cent. It is never typed."""
+    alt = row.get('alternates') or {}
+    have = alt.get('facility_setting_physician_payment_usd')
+    if not isinstance(have, (int, float)):
+        return []
+    key = 'facility_setting_physician_payment_usd'
+    if rvu_lines is None:
+        return [dict(key=key, status='UNVERIFIED', value_usd=have,
+                     evidence='the RVU file was not read in this run')]
+    code = hcpcs_of(row)
+    comp = str(alt.get('facility_setting_component') or '')
+    mod = '26' if comp.startswith('modifier 26') else ''
+    line = (rvu_lines.get(code) or {}).get(mod)
+    if line is None:
+        return [dict(key=key, status='FAIL', value_usd=have,
+                     evidence='no %s line for %s in the RVU file'
+                              % ('modifier 26' if mod else 'unmodified', code))]
+    rvus = line['total_fac']
+    want = round(rvus * CF, 2)
+    stated = alt.get('facility_setting_total_rvu')
+    label = 'modifier 26' if mod else 'unmodified'
+    if abs(float(have) - want) > 0.005:
+        return [dict(key=key, status='FAIL', value_usd=have,
+                     evidence='%.2f x $%.4f = $%.2f on the %s line for %s; the row says $%.2f'
+                              % (rvus, CF, want, label, code, have))]
+    if stated is not None and abs(float(stated) - rvus) > 0.005:
+        return [dict(key=key, status='FAIL', value_usd=have,
+                     evidence='the row prints %s facility RVUs; the %s line carries %.2f'
+                              % (stated, label, rvus))]
+    if not mod and line['pctc'] == '1':
+        return [dict(key=key, status='FAIL', value_usd=have,
+                     evidence='%s is billed in two halves (PCTC 1); its facility figure must come '
+                              'from the modifier 26 line, not the global one' % code)]
+    return [dict(key=key, status='PASS', value_usd=have,
+                 evidence='%.2f facility total RVUs on the %s line for %s x $%.4f = $%.2f'
+                          % (rvus, label, code, CF, want))]
+
+
+def check_max_per_year(row, phygeo):
+    """R6 finding F5: a once-a-year code may never be multiplied. The frequency rests
+    on CMS's own long descriptor for the code, so the audit reads that descriptor."""
+    if row.get('max_per_year') is None:
+        return []
+    basis = str(row.get('max_per_year_basis') or '')
+    if not basis:
+        return [dict(key='max_per_year', status='FAIL', value_usd=None,
+                     evidence='the row caps the count but names no basis for the cap')]
+    code = hcpcs_of(row)
+    if not code:
+        return [dict(key='max_per_year', status='PASS', value_usd=None, evidence=basis[:120])]
+    if phygeo is None:
+        return [dict(key='max_per_year', status='UNVERIFIED', value_usd=None,
+                     evidence='the claims file was not read in this run')]
+    rec = (phygeo.get(code) or {}).get('O') or (phygeo.get(code) or {}).get('F')
+    desc = (rec or {}).get('HCPCS_Desc', '')
+    if not desc:
+        return [dict(key='max_per_year', status='UNVERIFIED', value_usd=None,
+                     evidence='no National row for %s in the claims file' % code)]
+    if not re.search(r'\bannual', desc, re.I):
+        return [dict(key='max_per_year', status='FAIL', value_usd=None,
+                     evidence='CMS describes %s as %r: nothing in the descriptor says once a year'
+                              % (code, desc[:70]))]
+    if desc not in basis:
+        return [dict(key='max_per_year', status='FAIL', value_usd=None,
+                     evidence='the row quotes a descriptor the file does not carry for %s' % code)]
+    return [dict(key='max_per_year', status='PASS', value_usd=None,
+                 evidence='CMS long descriptor for %s: %r' % (code, desc))]
 
 
 def check_localities(rvu, gpci):
@@ -530,7 +666,7 @@ def check_hcup_ccr(row):
         return 'FAIL', 'all-payer ED cost-to-charge ratio row', \
                'table says %r, file says %r' % (got, want)
     return 'PASS', 'all-payer ED cost-to-charge ratio, 2021', \
-           'N=993 hospitals, min 0.02, max 1.49, mean 0.21, SD 0.14 — read on the summary line'
+           'N=993 hospitals, min 0.02, max 1.49, mean 0.21, SD 0.14. Read on the summary line'
 
 
 def check_pmc(row):
@@ -605,7 +741,7 @@ def check_oews(row):
     if '4,305,810' not in (row.get('population') or '') and emp != 4305810:
         return 'FAIL', 'caregiver replacement wage', 'employment count does not match OEWS'
     return 'PASS', '$17.21 median hourly, Home Health and Personal Care Aides (31-1120)', \
-           'plus 31-1131 $%.2f, 29-1141 $%.2f, 00-0000 $%.2f, employment %s — all read in the OEWS file' \
+           'plus 31-1131 $%.2f, 29-1141 $%.2f, 00-0000 $%.2f, employment %s: all read in the OEWS file' \
            % (o['31-1131']['median'], o['29-1141']['median'], o['00-0000']['median'], f'{emp:,}')
 
 
@@ -622,10 +758,13 @@ def main():
     OFFLINE, CACHE, LOCAL_DIRS = a.offline, a.cache, a.local
 
     data = json.load(open(PRICES, encoding='utf-8'))
-    items = data['items']
+    items = list(data['items'])
+    for extra in ADDITIONS:
+        items += json.load(open(extra, encoding='utf-8'))['items']
     results = []
 
     rvu = load_rvu()
+    rvu_lines = load_rvu_lines()
     clfs = load_clfs()
     opps = load_opps()
     gpci = load_gpci()
@@ -661,9 +800,11 @@ def main():
             claimed = row.get('pfs_status_indicator')
             if not r:
                 status, method, evidence = 'FAIL', 'PFS re-derivation', '%s is not in the file' % code
-            elif claimed:
+            elif claimed and claimed != 'A':
                 # A row that says "CMS publishes units for this code and pays nothing for it".
                 # The claim is the finding, so the audit checks the claim, not a dollar amount.
+                # 'A' is not such a claim — it is provenance on an ordinary paid row (every
+                # 2026-09-09 addition carries it), and those go down the dollar path below.
                 if r['status'] != claimed:
                     status, method, evidence = 'FAIL', 'PFS status indicator', \
                         '%s carries status %r in the file, not the %r this row claims' \
@@ -674,10 +815,14 @@ def main():
                         % (code, r['status'], val)
                 else:
                     status, method = 'PASS', 'PFS status indicator, read in the file'
-                    evidence = ('%s carries status %s — non-covered. CMS publishes %.2f work, %.2f '
+                    evidence = ('%s carries status %s: non-covered. CMS publishes %.2f work, %.2f '
                                 'non-facility practice expense and %.2f malpractice RVUs for it and pays '
                                 'nothing, so this row carries no figure' 
                                 % (code, r['status'], r['work'], r['pe_nf'], r['mp']))
+            elif claimed and r['status'] != claimed:
+                status, method, evidence = 'FAIL', 'PFS status indicator', \
+                    '%s carries status %r in the file, not the %r this row claims' \
+                    % (code, r['status'], claimed)
             elif r['status'] != 'A':
                 status, method, evidence = 'FAIL', 'PFS re-derivation', \
                     '%s carries status %r, not A' % (code, r['status'])
@@ -789,7 +934,7 @@ def main():
             status, method, evidence = check_oews(row)
         else:
             status, method, evidence = 'UNVERIFIED', 'no checker', \
-                'this row has no verification rule — add one before shipping it'
+                'this row has no verification rule. Add one before shipping it'
 
         # ---- extras that ride along
         extras = []
@@ -799,23 +944,30 @@ def main():
                            'evidence': re.sub(r'\s+', ' ', hit)[:160] if hit else 'not found'})
         if any(not e['ok'] for e in extras) and status == 'PASS':
             status = 'FAIL'
-            evidence += ' — but a companion figure did not check out'
+            evidence += ', but a companion figure did not check out'
 
         # ---- every row must carry its provenance, whatever its figure
         missing = [f for f in ('coverage_statement', 'source_title', 'source_url', 'year',
                                'population', 'geography', 'agency') if not row.get(f)]
         if missing:
             status = 'FAIL'
-            evidence = (evidence or '') + ' — missing provenance fields: %s' % ', '.join(missing)
+            evidence = (evidence or '') + '. Missing provenance fields: %s' % ', '.join(missing)
 
         # ---- the CY2024 companion figures on this row, audited like the row itself
         alts = check_alternates(row, phygeo, phygeo_sha)
         if any(a['status'] == 'FAIL' for a in alts) and status == 'PASS':
             status = 'FAIL'
-            evidence = (evidence or '') + ' — but a CY2024 companion figure did not reproduce'
+            evidence = (evidence or '') + ', but a CY2024 companion figure did not reproduce'
+
+        # ---- the hospital-setting figure and the once-a-year cap, audited the same way
+        facs = check_facility(row, rvu_lines)
+        freq = check_max_per_year(row, phygeo)
+        if any(x['status'] == 'FAIL' for x in facs + freq) and status == 'PASS':
+            status = 'FAIL'
+            evidence = (evidence or '') + ', but the hospital-setting figure or the once-a-year cap did not check out'
 
         results.append(dict(id=rid, status=status, value_usd=val, basis=row.get('basis'),
-                            alternates=alts,
+                            alternates=alts, facility=facs, frequency=freq,
                             confidence=row.get('confidence'), agency=row.get('agency_display'),
                             code=row.get('code'), loinc=row.get('loinc'),
                             check=method, evidence=evidence, source_url=row.get('source_url'),
@@ -829,14 +981,19 @@ def main():
     alt_counts = {st: sum(1 for a in alt_rows if a['status'] == st)
                   for st in ('PASS', 'FAIL', 'UNVERIFIED')}
     localities = check_localities(rvu, gpci)
+    fac_rows = [x for r in results for x in r['facility']]
+    freq_rows = [x for r in results for x in r['frequency']]
+    fac_counts = {st: sum(1 for x in fac_rows if x['status'] == st) for st in ('PASS', 'FAIL', 'UNVERIFIED')}
+    freq_counts = {st: sum(1 for x in freq_rows if x['status'] == st) for st in ('PASS', 'FAIL', 'UNVERIFIED')}
 
     # ---- ONE version string, generated here, read everywhere
     today = time.strftime('%Y-%m-%d')
     prev = str(data.get('_version') or '')
     version = prev if prev.startswith(today) and '-verified' not in prev else today + '.1'
-    version_line = ('%d rows · %d reproduce · %d CY2024 companion figures · %s locality figures · '
-                    'audited %s' % (n, counts['PASS'], alt_counts['PASS'],
-                                    format(localities['pass'], ','), today))
+    version_line = ('%d rows · %d reproduce · %d CY2024 companion figures · %d hospital-setting '
+                    'figures · %s locality figures · audited %s'
+                    % (n, counts['PASS'], alt_counts['PASS'], fac_counts['PASS'],
+                       format(localities['pass'], ','), today))
 
     audit = {
         '_what_this_is': 'Every row of the Waypoint Ledger price table, re-derived or re-read from the '
@@ -848,6 +1005,10 @@ def main():
         'rows': n, 'pass': counts['PASS'], 'fail': counts['FAIL'], 'unverified': counts['UNVERIFIED'],
         'alternates': len(alt_rows), 'alternates_pass': alt_counts['PASS'],
         'alternates_fail': alt_counts['FAIL'], 'alternates_unverified': alt_counts['UNVERIFIED'],
+        'facility_figures': len(fac_rows), 'facility_pass': fac_counts['PASS'],
+        'facility_fail': fac_counts['FAIL'], 'facility_unverified': fac_counts['UNVERIFIED'],
+        'per_year_caps': len(freq_rows), 'per_year_pass': freq_counts['PASS'],
+        'per_year_fail': freq_counts['FAIL'], 'per_year_unverified': freq_counts['UNVERIFIED'],
         'localities': localities,
         'version': version, 'version_line': version_line,
         'conversion_factor': CF, 'conversion_factor_note': cf_note,
@@ -859,7 +1020,8 @@ def main():
     # The version string is a RESULT, not a label somebody typed. On a clean run it is
     # written back onto the table so the app, the API, the CSVs and this page cannot
     # disagree about which table they are describing.
-    failed_here = counts['FAIL'] or alt_counts['FAIL'] or localities['fail']
+    failed_here = (counts['FAIL'] or alt_counts['FAIL'] or localities['fail']
+                   or fac_counts['FAIL'] or freq_counts['FAIL'])
     if not failed_here and (data.get('_version') != version or data.get('_audit') != version_line):
         data['_version'] = version
         data['_audit'] = version_line
@@ -879,6 +1041,10 @@ def main():
               % (n, counts['PASS'], counts['FAIL'], counts['UNVERIFIED']))
         print('%d CY2024 companion figures: %d PASS, %d FAIL, %d UNVERIFIED'
               % (len(alt_rows), alt_counts['PASS'], alt_counts['FAIL'], alt_counts['UNVERIFIED']))
+        print('%d hospital-setting figures: %d PASS, %d FAIL, %d UNVERIFIED'
+              % (len(fac_rows), fac_counts['PASS'], fac_counts['FAIL'], fac_counts['UNVERIFIED']))
+        print('%d once-a-year caps: %d PASS, %d FAIL, %d UNVERIFIED'
+              % (len(freq_rows), freq_counts['PASS'], freq_counts['FAIL'], freq_counts['UNVERIFIED']))
         print('%s locality figures on %d rows: %s — %s'
               % (format(localities['figures'], ','), localities['rows'], localities['status'],
                  localities['evidence']))

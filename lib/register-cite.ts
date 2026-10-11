@@ -48,14 +48,14 @@ export function documentOf(sourceTitle: string): string {
 /** The basis codes carry their meaning in lib/types.ts. An agency reader gets both:
  *  the code it can join on, and the sentence the code means. Nothing is added to either. */
 export const BASIS_LABEL: Record<string, string> = {
-  charge: 'charge — what was billed',
-  allowed: 'allowed amount — the negotiated or fee-schedule amount',
-  payment: 'payment — what was actually paid, all sources',
-  out_of_pocket: 'out of pocket — what the person paid themselves',
-  total_expenditure: 'total expenditure — payment from all sources combined',
-  wage: 'wage — earnings, used for valuing time',
+  charge: 'charge: what was billed',
+  allowed: 'allowed amount: the negotiated or fee-schedule amount',
+  payment: 'payment: what was actually paid, all sources',
+  out_of_pocket: 'out of pocket: what the person paid themselves',
+  total_expenditure: 'total expenditure: payment from all sources combined',
+  wage: 'wage: earnings, used for valuing time',
 };
-export const basisLabel = (b: string) => (BASIS_LABEL[b] ? `${b} (${BASIS_LABEL[b].split(' — ')[1]})` : b);
+export const basisLabel = (b: string) => (BASIS_LABEL[b] ? `${b} (${BASIS_LABEL[b].split(': ')[1]})` : b);
 
 export interface CiteRow {
   priceId: string;
@@ -87,7 +87,7 @@ export function citationText(r: CiteRow, asOf: string, siteUrl: string): string 
   const n = r.confirmedRight + r.flaggedWrong;
   const rate = fitRate(r.confirmedRight, r.flaggedWrong);
   return [
-    'PUBLIC CORRECTION REPORT — Waypoint Ledger',
+    'PUBLIC CORRECTION REPORT: Waypoint Ledger',
     '',
     `Published figure: ${r.label}`,
     `Row identifier:   ${r.priceId}${r.code ? `  ·  code ${r.code}` : ''}`,
@@ -99,12 +99,12 @@ export function citationText(r: CiteRow, asOf: string, siteUrl: string): string 
     `Source:           ${r.sourceTitle}`,
     `Source URL:       ${r.sourceUrl}`,
     '',
-    `What the public said about this row: ${n} ${n === 1 ? 'response' : 'responses'} — ${r.confirmedRight} say the figure describes them, ${r.flaggedWrong} say it does not${rate === null ? '' : ` (${rate}% say it fits)`}.`,
+    `What the public said about this row: ${n} ${n === 1 ? 'response' : 'responses'}: ${r.confirmedRight} say the figure describes them, ${r.flaggedWrong} say it does not${rate === null ? '' : ` (${rate}% say it fits)`}.`,
     r.medianBelievedUsd === null
       ? 'Median amount respondents said they actually paid: none reported.'
       : `Median amount respondents said they actually paid: ${money(r.medianBelievedUsd)} (a demand signal about the published figure; never used to price a ledger).`,
     '',
-    'Sample: self-selected members of the public using a free tool. Counts are reported exactly as entered — no weighting, no imputation, no extrapolation to a population.',
+    'Sample: self-selected members of the public using a free tool. Counts are reported exactly as entered: no weighting, no imputation, no extrapolation to a population.',
     `Counted as of: ${asOf}`,
     siteUrl ? `Method and every source: ${siteUrl}/method` : 'Method and every source: /method',
   ].join('\n');

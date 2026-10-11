@@ -38,8 +38,11 @@ describe('a state or territory can find itself', () => {
   });
 
   it('is described in the published data dictionary, with the suppression rule', () => {
-    const row = dictionary().find((r) => r.field === 'ctx_state');
+    // 2026-10-01: the state is published only as a count at /api/survey, never per answer in the CSV.
+    expect(dictionary().find((r) => r.field === 'ctx_state')).toBeUndefined();
+    const row = dictionary().find((r) => r.field === 'coverage.state');
     expect(row).toBeTruthy();
+    expect(row!.file).toBe('/api/survey');
     expect(row!.values).toContain('50 states');
     expect(row!.note).toContain(String(SMALL_CELL_MIN));
     expect(row!.note.toLowerCase()).toContain('withheld');
@@ -193,21 +196,25 @@ const REG = readFileSync(new URL('../components/Register.tsx', import.meta.url),
 describe('a zero count invites, it never prints a 0', () => {
   it('gives each of the four counts its own one-line invitation', () => {
     for (const words of [
-      'No thumbs yet — be the first, on any priced line',
-      'No reports yet — be the first to count uncounted care',
-      'No rankings yet — be the first, in two minutes',
-      'No interviews yet — be the first, in your own time',
+      'No thumbs yet. Be the first, on any priced line',
+      'No reports yet. Be the first to count uncounted care',
+      'No rankings yet. Be the first, in two minutes',
+      'No interviews yet. Be the first, in your own time',
     ]) expect(REG).toContain(words);
     expect(REG.match(/invite=\{\{/g) ?? []).toHaveLength(4);
   });
 
-  it('puts the invitation where the numeral was, and drops the "none yet" sub-line', () => {
+  /* VISUAL critic-14 (2026-09-30 night, coordinator's order): an empty card keeps the
+     rhythm of its neighbours: the 0, then what it counts, then the invitation. It
+     still drops the "none yet" sub-line, which would only repeat the 0. */
+  it('prints the 0, names what it counts, then invites, and drops the "none yet" sub-line', () => {
     const start = REG.indexOf('if (n === 0 && invite)');
     expect(start).toBeGreaterThan(-1);
     const branch = REG.slice(start, REG.indexOf('return (', REG.indexOf('}', REG.indexOf('  }', start))));
-    expect(branch).not.toContain('big-num');
+    expect(branch).toContain('<p className="big-num">0</p>');
     expect(branch).not.toContain('reg-sub');
-    expect(branch).toContain('inviteLine');
+    expect(branch.indexOf('big-lab')).toBeLessThan(branch.indexOf('inviteLine'));
+    expect(branch.indexOf('big-num')).toBeLessThan(branch.indexOf('big-lab'));
   });
 
   it('draws no chart at all while nobody has ranked, and says why in the card', () => {

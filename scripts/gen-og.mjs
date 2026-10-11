@@ -7,10 +7,19 @@
 
    Run:  node scripts/gen-og.mjs
    ========================================================================== */
-import { chromium } from '/Users/bo/.nvm/versions/node/v25.3.0/lib/node_modules/playwright/index.mjs';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+
+// Playwright is not a project dependency. PF_PLAYWRIGHT names its index.mjs;
+// without it the script tries a local `npm install playwright`, then stops plainly.
+let chromium;
+try {
+  ({ chromium } = await import(process.env.PF_PLAYWRIGHT ? pathToFileURL(process.env.PF_PLAYWRIGHT).href : 'playwright'));
+} catch {
+  console.error('gen-og: set PF_PLAYWRIGHT to the path of playwright/index.mjs (or run npm install playwright)');
+  process.exit(2);
+}
 
 const ROOT = path.resolve(fileURLToPath(new URL('..', import.meta.url)));
 const FONTS = path.join(ROOT, 'public', 'fonts');
@@ -26,7 +35,8 @@ body{width:1200px;height:630px;background:#0e2a3a;font-family:'Figtree',sans-ser
 body::after{content:"";position:absolute;inset:auto -10% -55% 40%;height:90%;
   background:radial-gradient(50% 50% at 50% 50%,rgba(34,193,182,.38),transparent 70%)}
 .pad{position:relative;z-index:2;padding:64px 72px;height:100%;display:flex;flex-direction:column;justify-content:space-between}
-.mark{font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;letter-spacing:.14em;color:#22c1b6}
+.mark{display:flex;align-items:center;gap:14px;font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;letter-spacing:.14em;color:#22c1b6}
+.mark svg{width:44px;height:44px}
 h1{font-family:'Bricolage Grotesque';font-weight:700;font-size:72px;line-height:1.04;letter-spacing:-.02em;max-width:16ch}
 .line{font-family:'Bricolage Grotesque';font-weight:700;font-size:27px;color:#22c1b6;margin-top:22px;max-width:30ch}
 .rows{display:flex;gap:14px;margin-top:30px;flex-wrap:wrap}
@@ -38,7 +48,7 @@ h1{font-family:'Bricolage Grotesque';font-weight:700;font-size:72px;line-height:
 .foot span{font-family:'JetBrains Mono';font-size:20px;color:rgba(255,255,255,.6)}
 </style></head><body><div class="pad">
   <div>
-    <p class="mark">WAYPOINT LEDGER</p>
+    <p class="mark"><svg viewBox="0 0 64 64" aria-hidden="true"><path fill="#e9f4f2" d="M32 4C18.745 4 8 14.745 8 28c0 8 6 16 12 22l12 12 12-12c6-6 12-14 12-22C56 14.745 45.255 4 32 4Z"/><path fill="#22c1b6" d="M20 50h24L32 62Z"/><path fill="#0e2a3a" d="M20 18h24v5H20zm0 10h20v5H20zm0 10h12v5H20z"/></svg>WAYPOINT LEDGER</p>
     <h1 style="margin-top:26px">What did your diagnostic search actually cost?</h1>
     <p class="line">The care you needed and never got produces $0 in federal data.</p>
     <div class="rows">
@@ -50,13 +60,13 @@ h1{font-family:'Bricolage Grotesque';font-weight:700;font-size:72px;line-height:
   </div>
   <div class="foot">
     <p>Every figure cited to a published federal file. Never invented.</p>
-    <span>waypoint-ledger.pages.dev</span>
+    <span>waypointledger.org</span>
   </div>
 </div></body></html>`;
 
 const tmp = path.join(ROOT, '.og.tmp.html');
 fs.writeFileSync(tmp, html);
-const browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
+const browser = await chromium.launch({ executablePath: process.env.PF_CHROME || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' });
 const page = await browser.newPage({ viewport: { width: 1200, height: 630 }, deviceScaleFactor: 1 });
 await page.goto(pathToFileURL(tmp).href);
 await page.evaluate(() => document.fonts.ready);
@@ -64,7 +74,7 @@ await page.screenshot({ path: OUT });
 await browser.close();
 fs.unlinkSync(tmp);
 const { width, height } = pngSize(fs.readFileSync(OUT));
-console.log(`wrote ${OUT} — ${width}x${height}, ${fs.statSync(OUT).size} bytes`);
+console.log(`wrote ${OUT}: ${width}x${height}, ${fs.statSync(OUT).size} bytes`);
 if (width !== 1200 || height !== 630) { console.error('WRONG SIZE'); process.exit(1); }
 
 function pngSize(buf) {

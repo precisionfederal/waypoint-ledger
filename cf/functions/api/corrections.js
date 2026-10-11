@@ -12,7 +12,9 @@
    scripts/gen-privacy.mjs.
 
    Three things make the count worth reading (see /integrity):
-     1. `priceId` must be one of the published rows in data/prices.json. A
+     1. `priceId` must be one of the published rows in the price table the ledger
+        prices from (lib/table.ts TABLE: data/prices.json plus the 2026-09-09
+        additions). A
         correction that names no federal figure is not a demand signal.
      2. One thumb per browser per figure per table version. The browser sends a
         random `submitterId` it keeps to itself; the server stores only a
@@ -25,8 +27,8 @@
         who clears storage a hundred times still lands three votes, and a
         household of three is never blocked. The refusal is a 429, which the
         browser's outbox holds and re-sends later, so an honest fourth voter in
-        one house loses nothing. Documented on /integrity, with the denominator
-        (senders, not sends) published on /register.
+        one house loses nothing. Documented on /integrity. Corrections are not
+        counted in senders (JUDGE-4 #5): see aggregateCorrections.
 
    System of record: D1 `corrections`. The validator and the aggregate are pure
    functions so the Node route (next dev) and the tests use the same rules.
@@ -35,7 +37,12 @@ import { json, bad, readJson, str, num, oneOf, count, isDryRun, dryOk } from './
 import { cachedAggregate, writeProbe } from './_counters.js';
 import { all, userOf } from './_db.js';
 import { appendChained, submitterHash, figureBucket, pepperOf } from './_hash.js';
-import prices from '../../../data/prices.json';
+/* ONE DEFINITION OF "A PUBLISHED FIGURE" (2026-10-01). This set used to be read
+   from data/prices.json alone — 117 rows — while the ledger priced from all 274
+   rows of lib/table.ts, so a thumb on any of the 157 rows added on 2026-09-09
+   was refused with "not a published figure". It is now the table itself. */
+import { TABLE } from '../../../lib/table.ts';
+import { ALIASES } from '../../../lib/count-fields.js';
 
 const NOTE_MAX = 600;
 
@@ -68,7 +75,7 @@ export async function chargeFigure(env, bucket) {
 }
 
 /** The published figures. A correction must name one of these and nothing else. */
-export const PRICE_IDS = new Set((prices.items || []).map((i) => i.id));
+export const PRICE_IDS = new Set(TABLE.map((i) => i.id));
 
 /** Validate a POST body. Returns { record } or { error }. Pure. */
 export function validateCorrection(b) {
@@ -96,12 +103,16 @@ export function validateCorrection(b) {
 
 /** The public aggregate. Pure; takes records, not D1 rows. */
 export function aggregateCorrections(rows) {
-  if (!rows.length) return { ok: true, totals: {}, senders: 0, figures: 0, note: 'No corrections recorded yet.' };
+  if (!rows.length) return { ok: true, totals: {}, sends: 0, browserFigurePairs: 0, senders: 0, figures: 0, note: 'No corrections recorded yet.' };
   const totals = {};
-  /* The denominator a statistician asks for first: how many DISTINCT senders,
-     not how many sends. A sender is one browser on one network, never a
-     verified person — /register says so in that many words. Only the count
-     leaves this function; the keys themselves are never published. */
+  /* Distinct submitter keys. JUDGE-4 #5: this is NOT a count of senders in
+     the sense /policy and /register use (one network on one day,
+     _senders.js). submitterHash binds the browser id to ONE figure and table
+     version, so one browser thumbing five figures holds five keys, and the
+     409 on a repeat makes this equal to the corrections that carried a
+     browser id. Published for what it is (browserFigurePairs, JUDGE-4 #6);
+     the pages print no sender count for corrections. Only the count leaves
+     this function; the keys themselves are never published. */
   const senders = new Set(rows.map((r) => r.senderKey).filter(Boolean));
   for (const r of rows) {
     const t = (totals[r.priceId] ||= { right: 0, wrong: 0, believed: [] });
@@ -120,6 +131,8 @@ export function aggregateCorrections(rows) {
   return {
     ok: true, summary,
     sends: rows.length,
+    browserFigurePairs: senders.size,
+    /* Deprecated alias of browserFigurePairs, kept with its value (JUDGE-4 #6). */
     senders: senders.size,
     figures: summary.length,
     firstAt: dates[0], lastAt: dates[dates.length - 1],
@@ -152,10 +165,15 @@ export async function correctionRows(env) {
 
 /** What this figure now stands at — returned to the person who just spoke, so
  *  the ledger can say "you are the Nth person to say this". */
+const TALLY_SQL = "SELECT SUM(CASE WHEN verdict='right' THEN 1 ELSE 0 END) AS r, SUM(CASE WHEN verdict='wrong' THEN 1 ELSE 0 END) AS w, COUNT(*) AS n FROM corrections WHERE price_id=?1";
+/* Our own test thumbs (marked team-test, _annotations.js) are not counted here
+   either, so "you are the Nth" never counts our clicks. Before migration 0007
+   runs there is no annotations table, and the plain count is the right one. */
+const TALLY_SQL_COUNTED = TALLY_SQL + " AND (row_hash IS NULL OR row_hash NOT IN (SELECT row_hash FROM annotations WHERE table_name='corrections' AND kind='team-test'))";
 export async function tallyFor(env, priceId) {
-  const r = await env.DB.prepare(
-    "SELECT SUM(CASE WHEN verdict='right' THEN 1 ELSE 0 END) AS r, SUM(CASE WHEN verdict='wrong' THEN 1 ELSE 0 END) AS w, COUNT(*) AS n FROM corrections WHERE price_id=?1",
-  ).bind(priceId).first();
+  let r;
+  try { r = await env.DB.prepare(TALLY_SQL_COUNTED).bind(priceId).first(); }
+  catch { r = await env.DB.prepare(TALLY_SQL).bind(priceId).first(); }
   return { confirmedRight: Number(r?.r || 0), flaggedWrong: Number(r?.w || 0), n: Number(r?.n || 0) };
 }
 
@@ -207,6 +225,7 @@ export async function onRequestPost({ request, env }) {
 }
 
 export async function onRequestGet({ env }) {
-  try { return json(await cachedAggregate(env, { kind: 'corrections', loadRows: correctionRows, aggregate: aggregateCorrections })); }
+  /* JUDGE-5 #7: the payload names its deprecated alias (senders = browserFigurePairs). */
+  try { return json({ ...(await cachedAggregate(env, { kind: 'corrections', loadRows: correctionRows, aggregate: aggregateCorrections })), deprecated: ALIASES.corrections }); }
   catch { return bad('The corrections aggregate could not be read right now.', 503); }
 }

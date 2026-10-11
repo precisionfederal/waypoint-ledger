@@ -16,8 +16,9 @@ import { describe, it, expect } from 'vitest';
 import {
   chainCoverage, CSV_TABLE as CSV_TABLE_, UNCHAINED_CSV as UNCHAINED_CSV_, RECIPES as RECIPES_,
   PUBLISHED as PUBLISHED_, GENESIS, rowHash, verifyChain,
-  SURVEY_PROJECTIONS, SURVEY_CTX_KEYS, surveyCtxKeysFor, versionAtLeast,
+  SURVEY_PROJECTIONS, SURVEY_CTX_KEYS, surveyCtxKeysFor, versionAtLeast, WITHHELD_FROM_CSV as WITHHELD_FROM_CSV_,
 } from '../cf/functions/api/_hash.js';
+const WITHHELD_FROM_CSV = WITHHELD_FROM_CSV_ as Record<string, Record<string, string>>;
 
 /* The module is JavaScript; these are the shapes this suite indexes by name. */
 const CSV_TABLE = CSV_TABLE_ as Record<string, string>;
@@ -44,25 +45,29 @@ describe('the published CSV and the chain cover the same columns', () => {
     });
   }
 
-  it('the survey context columns each name the field they are hashed as', () => {
+  it('the survey file carries no self-description, and its day column is the chained time, coarsened', () => {
     const cov = chainCoverage('survey', headerOf('survey'), opts);
     const byColumn = Object.fromEntries(cov.covered.map((c) => [c.column, c.field]));
-    expect(byColumn.ctx_state).toBe('context.state');
-    expect(byColumn.ctx_age).toBe('context.age');
+    expect(Object.keys(byColumn).filter((c) => c.startsWith('ctx_'))).toEqual([]);
+    expect(byColumn.received_on).toBe('received_at (the day only)');
     expect(byColumn.rank_3).toBe('ranking');
+    /* What the file leaves out is written down with a reason, never silently dropped. */
+    expect(Object.keys(WITHHELD_FROM_CSV.survey).sort()).toEqual(['context', 'received_at']);
+    expect(Object.keys(WITHHELD_FROM_CSV.gap)).toEqual(['received_at']);
+    for (const why of [...Object.values(WITHHELD_FROM_CSV.survey), ...Object.values(WITHHELD_FROM_CSV.gap)]) expect(String(why).length).toBeGreaterThan(40);
   });
 
-  it('WOULD HAVE CAUGHT THE DEFECT: under the old field set, every field added since is uncovered', () => {
+  it('WOULD HAVE CAUGHT THE DEFECT: a ctx_ column outside the row\'s field set is uncovered', () => {
     const old = SURVEY_PROJECTIONS[SURVEY_PROJECTIONS.length - 1].keys;
     expect(old).not.toContain('state');
-    const cov = chainCoverage('survey', headerOf('survey'), { ...opts, ctxKeys: old });
-    /* The list is derived from the projections rather than written out, so the next
-       widening of the instrument lands in this assertion instead of passing quietly.
-       ctx_state was the original defect; ctx_sex joined it when the instrument began
-       asking sex. */
+    /* The file no longer carries ctx_ columns; the guard is exercised on a header
+       that does, so the rule survives the day someone adds one back. */
+    const withCtx = [...headerOf('survey'), ...SURVEY_CTX_KEYS.map((k) => 'ctx_' + k)];
+    const cov = chainCoverage('survey', withCtx, { ...opts, ctxKeys: old });
     const added = SURVEY_CTX_KEYS.filter((k) => !old.includes(k)).map((k) => 'ctx_' + k);
     expect(added).toContain('ctx_state');
     expect([...cov.uncovered].sort()).toEqual([...added].sort());
+    expect(chainCoverage('survey', withCtx, opts).covered.find((c) => c.column === 'ctx_state')?.field).toBe('context.state');
   });
 
   it('a column nobody described is a failure, not a shrug', () => {
@@ -82,8 +87,10 @@ describe('the published CSV and the chain cover the same columns', () => {
         expect(reason.length).toBeGreaterThan(20);
       }
     }
-    /* gap and survey publish exactly the chained projection: the hash is the only exemption. */
-    for (const kind of ['gap', 'survey']) expect(Object.keys(UNCHAINED_CSV[kind])).toEqual(['row_hash']);
+    /* gap and survey publish the two links and nothing else outside the chain,
+       plus team_test (migration 0007): a mark made after the row was written, so
+       outside the hash by design (FIX-annotations, 2026-10-01). */
+    for (const kind of ['gap', 'survey']) expect(Object.keys(UNCHAINED_CSV[kind]).sort()).toEqual(['prev_hash', 'row_hash', 'team_test']);
   });
 
   it('corrections.csv exempts only columns that describe the FIGURE, and each says so', () => {

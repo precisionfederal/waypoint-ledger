@@ -17,7 +17,7 @@
 .lp-chip .lp-amt{font-family:var(--font-d);font-weight:700;font-variant-numeric:tabular-nums;
   background:var(--surface);border-radius:var(--r-pill);padding:.1rem .55rem;font-size:.88rem;color:var(--ink-2)}
 .lp-chip.is-low{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
-.lp-chip .lp-low{font-size:.8rem;font-weight:700;color:var(--warn-ink);text-transform:uppercase;letter-spacing:.04em}
+.lp-chip .lp-low{font-size:.8rem;font-weight:700;color:var(--warn-ink);text-transform:none;letter-spacing:0;white-space:nowrap;flex:none}
 .lp-chip.is-blank{background:var(--ground-2);border-color:var(--line);border-style:dashed;color:var(--ink-2)}
 .lp-chip.is-blank b{font-family:var(--font-b);font-weight:600}
 .lp-chip.is-blank .lp-amt{background:transparent;color:var(--ink-3);font-family:var(--font-b);font-weight:500;padding-left:0}
@@ -59,8 +59,12 @@
 .hl-card .lbl{margin-bottom:.3rem}
 .hl-eg-lbl{font-size:.88rem;color:var(--ink-3);margin:.1rem 0 .35rem}
 .hl-eg{list-style:none;padding:0;margin:0 0 .6rem;border-top:1px solid var(--line-2)}
-.hl-eg li{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"said amt" "unit amt";
+/* The figures are to the cent, so they are wider. On a phone the said line runs the full width and the
+   figure sits beside the unit; on a wider card the figure sits beside the said line and the unit runs the
+   full width. Either way no line of text wraps more than it did with whole dollars. */
+.hl-eg li{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"said said" "unit amt";
   gap:0 .75rem;padding:.42rem 0;border-bottom:1px solid var(--line-2);align-items:center}
+@media (min-width:720px){.hl-eg li{grid-template-areas:"said amt" "unit unit"}}
 .hl-said{grid-area:said;font-size:.98rem;color:var(--ink)}
 .hl-unit{grid-area:unit;font-size:.82rem;color:var(--ink-3)}
 .hl-eg b{grid-area:amt;font-family:var(--font-d);font-weight:800;font-variant-numeric:tabular-nums;font-size:1.05rem}
@@ -86,7 +90,7 @@
 .gap-back-n{font-size:1.15rem;color:var(--ink);margin:0}
 .gap-back-n b{font-family:var(--font-d);font-weight:800;color:var(--accent-ink)}
 .gap-bars{list-style:none;padding:0;margin:0}
-.gap-bars li{display:grid;grid-template-columns:minmax(7rem,1fr) minmax(4rem,2fr) auto;gap:.75rem;
+.gap-bars li{display:grid;grid-template-columns:minmax(min(100%,7rem),1fr) minmax(4rem,2fr) auto;gap:.75rem;
   align-items:center;padding:.35rem 0;font-size:.95rem}
 .gb-track{background:var(--ground-2);border-radius:var(--r-pill);height:.65rem;overflow:hidden}
 .gb-fill{display:block;height:100%;background:var(--brand-fill);border-radius:var(--r-pill)}
@@ -133,7 +137,7 @@
 /* the publishers: one quiet row at the foot of the steps, not a band of its own */
 /* Six publishers, counted off the table, in a grid so the names line up in
    columns instead of wrapping ragged behind the label. */
-.trust-row.how-pub{display:grid;grid-template-columns:repeat(auto-fit,minmax(14.5rem,1fr));
+.trust-row.how-pub{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14.5rem),1fr));
   gap:.55rem 1.5rem;padding:var(--sp-2) 0 0;margin-top:var(--sp-3);border-top:1px solid var(--line-2)}
 .how-pub .lbl{align-self:center;margin:0}
 .how-pub .trust-pub{font-size:.9375rem}
@@ -221,8 +225,8 @@ header.site .wrap.bar{max-width:82rem}
 .reveal-band{display:grid;grid-template-columns:auto minmax(0,1fr);gap:1rem;align-items:start;
   background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--sun);
   border-radius:var(--r-lg);padding:1.05rem 1.25rem;margin:0 0 var(--sp-4);box-shadow:var(--sh-1)}
-.reveal-band .rb-mark{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:.1em;
-  text-transform:uppercase;color:var(--warn-ink);background:var(--sun-soft);border-radius:var(--r-pill);
+.reveal-band .rb-mark{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:0;
+  text-transform:none;color:var(--warn-ink);background:var(--sun-soft);border-radius:var(--r-pill);
   padding:.3rem .7rem;white-space:nowrap}
 .reveal-band p{margin:0;color:var(--ink-2);font-size:1.05rem;line-height:1.5}
 .reveal-band b{font-family:var(--font-d);font-weight:800;color:var(--ink);
@@ -235,7 +239,7 @@ header.site .wrap.bar{max-width:82rem}
 .ctx-shell::before{content:"";position:absolute;left:0;top:1.15rem;bottom:1.15rem;width:4px;
   border-radius:var(--r-pill);background:var(--accent);z-index:1}
 .ctx-relabel{display:inline-flex;align-items:center;gap:.45rem;font-family:var(--font-d);font-weight:700;
-  font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);
+  font-size:.8125rem;letter-spacing:0;text-transform:none;color:var(--accent-ink);
   background:var(--accent-soft);border-radius:var(--r-pill);padding:.25rem .7rem;
   animation:lp-in .2s ease-out}
 
@@ -245,8 +249,8 @@ header.site .wrap.bar{max-width:82rem}
    glyph and small caps in the verdict's own colour, no fill — and the basis and
    the agency read as text in the sub-line where the provenance belongs. */
 .fit-mark{display:inline-flex;align-items:baseline;gap:.3rem;margin-left:.55rem;
-  font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;white-space:nowrap;vertical-align:baseline}
+  font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:0;
+  text-transform:none;white-space:nowrap;vertical-align:baseline}
 .fit-mark .fm-g{font-size:1em;line-height:1}
 .fm-you{color:var(--good-ink)}
 .fm-ref{color:var(--brand-3)}
@@ -277,8 +281,8 @@ header.site .wrap.bar{max-width:82rem}
 /* ---------- 6. A DRAWN RULE BETWEEN THE MONEY AND THE BURDENS -------------- */
 .apart-rule{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:1rem;
   margin:var(--sp-7) 0 var(--sp-5)}
-.apart-rule span{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:.12em;
-  text-transform:uppercase;color:var(--ink-3);white-space:nowrap}
+.apart-rule span{font-family:var(--font-d);font-size:.8125rem;font-weight:800;letter-spacing:0;
+  text-transform:none;color:var(--ink-3);white-space:nowrap}
 .apart-rule::after{content:"";height:0;border-top:2px dashed var(--line)}
 .burden-block{border-top:0;padding-top:0}
 
@@ -302,7 +306,7 @@ header.site .wrap.bar{max-width:82rem}
   border-radius:var(--r-md);border:1px solid var(--line-2);background:var(--surface-2)}
 .cov-b .cb-g{font-family:var(--font-d);font-weight:800;font-size:1rem;line-height:1.4}
 .cov-b h4{margin:0 0 .2rem;font-family:var(--font-d);font-size:.8125rem;font-weight:800;
-  letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+  letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .cov-b p{margin:0;font-size:.9875rem;line-height:1.55;color:var(--ink-2)}
 .cov-yes{border-color:color-mix(in srgb,var(--good) 35%,transparent)}
 .cov-yes .cb-g,.cov-yes h4{color:var(--good-ink)}
@@ -313,7 +317,7 @@ header.site .wrap.bar{max-width:82rem}
 .cov-how p{margin:0 0 .4rem}
 
 /* ---------- 9. THE REGISTER: an open-data product, not a report ----------- */
-.reg-grid{grid-template-columns:repeat(auto-fit,minmax(13rem,1fr))}
+.reg-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr))}
 .reg-stat{border-left:4px solid var(--accent);display:flex;flex-direction:column;gap:.15rem}
 .reg-stat .big-num{font-size:2.6rem;letter-spacing:-.03em}
 .reg-stat.is-zero{border-left-color:var(--line)}
@@ -325,7 +329,7 @@ header.site .wrap.bar{max-width:82rem}
 .chart svg{display:block;width:100%;height:auto}
 .chart figcaption{margin-top:.6rem;font-size:.9375rem;color:var(--ink-3);line-height:1.5}
 .chart-key{display:flex;flex-wrap:wrap;gap:.4rem 1.25rem;margin:0 0 .75rem;font-size:.8125rem;
-  font-family:var(--font-d);font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  font-family:var(--font-d);font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .chart-key span{display:inline-flex;align-items:center;gap:.45rem}
 .chart-key i{width:.85rem;height:.85rem;border-radius:3px;display:inline-block}
 .k-first{background:var(--brand)}
@@ -343,7 +347,7 @@ header.site .wrap.bar{max-width:82rem}
 .chart-invite p{margin:0;color:var(--ink-2);font-size:1rem}
 
 /* take-the-data: a row of pills was a footer; this is the product */
-.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(15.5rem,1fr));gap:var(--sp-3);margin:var(--sp-4) 0}
+.dl-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,15.5rem),1fr));gap:var(--sp-3);margin:var(--sp-4) 0}
 .dl-card{display:flex;flex-direction:column;gap:.3rem;padding:1rem 1.1rem;border:1px solid var(--line);
   border-radius:var(--r-lg);background:var(--surface);color:var(--ink);text-decoration:none;
   box-shadow:var(--sh-1);transition:transform .15s,box-shadow .2s,border-color .15s;min-height:44px;
@@ -376,7 +380,7 @@ header.site .wrap.bar{max-width:82rem}
   .sheet-table tr{border-bottom:1px solid var(--line);padding:.7rem 0}
   .sheet-table td{border:0;padding:.1rem 0}
   .sheet-table td[data-label]::before{content:attr(data-label) " ";font-family:var(--font-d);
-    font-size:.8125rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-4);
+    font-size:.8125rem;font-weight:700;letter-spacing:0;text-transform:none;color:var(--ink-4);
     margin-right:.4rem}
   .sheet-table td.num{text-align:left}
   .sheet-tools .btn{flex:1 1 auto}
@@ -563,9 +567,9 @@ header.site .wrap.bar{max-width:82rem}
 .page>.wrap>h1+.sub{margin-bottom:var(--sp-3)}
 
 /* the AI reader's mark on a chip — a phrase the rules left blank and the model named from the catalog */
-.lp-chip .lp-ai{font-family:var(--font-m);font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;padding:.1rem .4rem;border-radius:999px;background:var(--brand);color:var(--ground)}
+.lp-chip .lp-ai{font-family:var(--font-m);font-size:.72rem;letter-spacing:0;text-transform:none;padding:.1rem .4rem;border-radius:999px;background:var(--brand);color:var(--ground);white-space:nowrap;flex:none}
 /* the fit mark is a button: it opens the why-block under its line */
-button.fit-mark{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+button.fit-mark{background:none;border:0;padding:0;cursor:pointer;font:inherit;font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:0;text-transform:none}
 button.fit-mark:hover,button.fit-mark[aria-expanded="true"]{text-decoration:underline;text-underline-offset:.2em}
 
 /* ================= UX-2 home ================= */
@@ -601,8 +605,76 @@ button.fit-mark:hover,button.fit-mark[aria-expanded="true"]{text-decoration:unde
    affordance, and it only renders when there is something to scroll. */
 .hero-live .lp-chips{max-height:18rem;overflow-y:auto;overscroll-behavior:contain;
   padding-right:.25rem;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
-@media (max-height:760px){.hero-live .lp-chips{max-height:12rem}}
+/* Beta night 2026-09-30: with the EMG line read, the five chips are 308 px, so
+   18rem cut the fifth at every desktop size and 12rem (any window under 761 px
+   tall, e.g. a 16" MacBook at 125%) showed three. On a desktop the box now takes
+   the room the window leaves under it (24rem is everything above the box plus
+   "So far" and the button), between 12rem and 20rem; under 721 px tall the chips
+   close up (gap and line height only, type size untouched) so all five, "So far"
+   and "Add these 5" fit at 660 px. Measured 1280x660 to 1728x860. Phones: the
+   R2 home block below puts the chips in the page flow. */
+@media (min-width:901px){.hero-live .lp-chips{max-height:clamp(12rem,calc(100vh - 24rem),20rem)}}
+@media (min-width:901px) and (max-height:720px){.hero-live .lp-chips{gap:.25rem}
+  .hero-live .lp-chips .lp-chip{line-height:1.3}}
 /* ================= /UX-2 home ================= */
+
+/* ================= R2 home (beta night 2026-09-30) =================
+   R1 findings F03, F14, F18 (ux-desktop) and UXM-05, UXM-14 (ux-mobile).
+   No type size changes anywhere in this block. */
+
+/* UXM-05: on a phone the page is the scroller. A 192 px box inside it showed
+   two of six chips and trapped the thumb, so the chips now sit in the page
+   flow, every one of them, and "So far" and "Add these N" ride along the
+   bottom of the screen until the card itself scrolls away. */
+@media (max-width:900px){
+  /* the band's clip stays, but as clip, not hidden: a hidden box is a scroll
+     container of its own, and the foot would stick to it instead of the screen */
+  .hero{overflow:hidden;overflow:clip}
+  .hero-live .lp-chips{max-height:none;overflow:visible;padding-right:0}
+  /* flow3-15: the foot spans the card. Its side and bottom margins are the
+     card's own padding (--hl-pad), and max-width:none lifts the phone-width
+     max-width:100% (globals.css), which had held it 35 px short of the right
+     edge at 390, with chip text showing beside it. */
+  .hero-live .hl-foot:not(.is-empty){position:sticky;bottom:0;z-index:2;background:var(--surface);
+    max-width:none;
+    margin:0 calc(-1 * var(--hl-pad,1.1rem)) calc(-1 * var(--hl-pad,1.1rem));
+    padding:.65rem var(--hl-pad,1.1rem) calc(.65rem + env(safe-area-inset-bottom));
+    border-top:1px solid var(--line-2);border-radius:0 0 var(--r-lg) var(--r-lg);
+    box-shadow:0 -10px 18px -14px rgba(14,42,58,.35)}
+}
+/* F03: the scroll case is a tab stop (JourneyBuilder sets tabIndex only while
+   the list overflows), so it gets the site's ring, drawn inside the box. */
+.hero-live .lp-chips:focus-visible{outline:2px solid var(--brand-3);outline-offset:-2px;box-shadow:none;border-radius:var(--r-sm)}
+
+/* F03: with the citation line gone from the typed state (57 px), the box can
+   take that room back: 21rem is now everything above it plus "So far", the
+   button and the card's foot. The ceiling rises so the rules-only reading of
+   the demo sentence (six chips, 426 px, what a visitor sees if the AI reader
+   is busy) also shows whole on a 782 px or taller window. The five-chip live
+   reading fits at every size 90cede1fa measured, as before. */
+@media (min-width:901px){.hero-live .lp-chips{max-height:clamp(12rem,calc(100vh - 21rem),27rem)}}
+
+/* F14: the headline does not jump when the chips replace the example. The
+   grid no longer re-centres the left column on the card's height; the copy is
+   placed where the centred layout put it beside the empty card, and stays. */
+@media (min-width:901px){
+  .hero-grid{align-items:start}
+  .hero-live{align-self:start}
+  .hero-copy{padding-top:var(--hero-copy-top,13.2rem)}
+}
+
+/* F18: on a desktop the box already has the cursor, so the pill that only
+   focuses it is hidden; touch keeps it, because the box is not focused there. */
+@media (min-width:900px) and (pointer:fine){.hl-foot.is-empty .hl-start{display:none}}
+
+/* UXM-14: on a phone the catalogue labels wrap (up to three lines, enough for
+   the complexity level at 320 px) instead of all truncating to the same
+   "Doctor's office visit, established…". */
+@media (max-width:560px){
+  .chips .chip span{white-space:normal;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;
+    max-width:none;text-align:left;line-height:1.3}
+}
+/* ================= /R2 home ================= */
 
 
 /* ========================= UX-2 pages ======================================
@@ -610,5 +682,615 @@ button.fit-mark:hover,button.fit-mark[aria-expanded="true"]{text-decoration:unde
    introduces a colour, a typeface or a smaller size: the sheet's fit mark reuses
    the ledger's own .fit-mark values so one answer has one look in both places.
    ========================================================================== */
-.sheet-verdict{font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:.04em;
-  text-transform:uppercase;color:var(--ink-3)}
+.sheet-verdict{font-family:var(--font-d);font-size:.8125rem;font-weight:700;letter-spacing:0;
+  text-transform:none;color:var(--ink-3)}
+
+
+/* ========================= R6-FIX flow =====================================
+   Three findings from ../winloop/R6/edge.md, styled with the identity already
+   here: no new colour, no new typeface, nothing smaller than the floor. The
+   only lever used is padding.
+   ========================================================================== */
+
+/* edge #11 — "A pasted story is silently cut at 2,000 characters."
+   The counter appears in the last 500 characters, and turns to the warning
+   colour already used for a low-confidence chip when the box is over. */
+.story-count{margin:.35rem 0 0}
+.story-count.over{color:var(--warn-ink)}
+
+/* edge #5 — "Prefer not to say" shows the person somebody else's number.
+   The card keeps its shape and loses its figure. */
+.year-empty{margin:.4rem 0 .8rem;max-width:60ch}
+
+/* edge #13 — Start over is reachable from /ledger. */
+.ledger-foot{margin-top:.85rem;padding-top:.7rem;border-top:1px solid var(--line)}
+
+/* edge #16 — "Thirteen controls on the phone ledger are under 44 px."
+   Every STANDALONE control on the phone gets a 44 px box, grown with padding,
+   never with type size. Links that sit inside a sentence are left as they are:
+   WCAG 2.5.8 exempts a target that is inline in a block of text, and padding
+   one of those would overlap the line above it. */
+@media (max-width:720px){
+  .fit-mark{padding-block:.75rem}
+  button.fit-mark{padding-block:.75rem}
+  button[class*="fitChange"]{min-height:44px;padding-block:.6rem;display:inline-flex;align-items:center}
+  .ledger-foot .link-btn{min-height:44px}
+}
+
+/* >>> LEDGER (round 2) */
+/* Every rule the ledger fixer added tonight lives here, and only here. */
+
+/* F06 — the static page holds a screen of space, so the footer is never in
+   view before the ledger is (CLS 0.586 on arrival). */
+.ledger-loading{min-height:100vh}
+
+/* The band "Care you went without": one strip under the total, its two
+   counters open in place. Tokens only, so it follows the theme. No accent
+   rule bent round the corner (F15). */
+.cgw{margin:var(--sp-3) 0 var(--sp-4);padding:.75rem 1.1rem;background:var(--brand-soft);border:1px solid var(--line);border-radius:var(--r-lg)}
+.cgw-bar{display:flex;align-items:center;justify-content:space-between;gap:.5rem 1rem;flex-wrap:wrap}
+.cgw-head{min-width:0;flex:1 1 26rem}
+.ledger .cgw-h{margin:0;font-family:var(--font-d);font-weight:800;font-size:1.25rem;line-height:1.25;color:var(--brand-ink)}
+.cgw-rank{margin:.15rem 0 0;font-size:1rem;line-height:1.45;font-weight:600;color:var(--ink)}
+.cgw-rank a{white-space:nowrap}
+.ledger .cgw-toggle{flex:0 0 auto;min-height:44px;gap:.4rem}
+.cgw-carried{margin:.4rem 0 0;overflow-wrap:anywhere}
+.cgw-panel{margin-top:var(--sp-3);padding-top:var(--sp-3);border-top:1px solid var(--line)}
+.cgw-panel[hidden]{display:none}
+.cgw-lede{margin:0;max-width:62ch;font-size:1rem;line-height:1.5;color:var(--ink-2)}
+.cgw-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr));gap:var(--sp-4);margin-top:var(--sp-4)}
+.cgw-card{display:flex;flex-direction:column;gap:.55rem;padding:var(--sp-4);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);min-width:0}
+.ledger .cgw-card-h{margin:0;font-size:1.05rem;line-height:1.3;color:var(--ink)}
+.cgw-counter{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.cgw-said{margin:0;padding-left:.6rem;border-left:2px solid var(--line);overflow-wrap:anywhere}
+/* J6 / F15 — the send button is as wide as its words, never a slab. */
+.cgw-foot{display:flex;flex-direction:column;align-items:flex-start;gap:.45rem;margin-top:var(--sp-4)}
+
+/* S3 — a saved link waits for the person's choice. */
+.link-choice{margin:0 0 var(--sp-4)}
+.link-choice .row{gap:.5rem;flex-wrap:wrap;margin-top:.5rem}
+
+/* F20 / F21 — the table's instruction is inset from the card's corner, and its
+   fine print sits beside it; each card's fine print sits beside its label. */
+.table-card>.table-cap{margin:0;padding:var(--sp-3) 1rem 0;flex-wrap:nowrap;align-items:flex-start}
+.table-cap>.micro{margin:0;flex:1 1 0;min-width:0}
+.table-cap>.fp{flex:0 0 auto}
+.table-cap>.fp[open]{flex-basis:auto}
+.card-lbl{margin:0 0 var(--sp-3)}
+.card-lbl>.lbl{margin:0}
+.ledger .two-col{align-items:start}
+
+/* UXM-02 / 03 / 07 — the "What did you actually pay" box: never under the
+   phone bar or the sticky header, 16 px so iOS does not zoom, 44 px tall,
+   and it wraps instead of pushing the table sideways. */
+.ledger .paid-form{scroll-margin-top:5rem}
+.ledger .paid-form label{font-size:.9375rem}
+.ledger .paid-form .row{flex-wrap:wrap}
+.ledger .paid-form input{min-height:44px;font-size:1rem}
+@media (max-width:980px){.ledger .paid-form{scroll-margin-bottom:7.5rem}}
+@media (pointer:coarse){.ledger .paid-form .btn{min-height:44px}}
+
+/* UXM-08 — the drawer's close X is a 44 px circle, never squeezed to an oval. */
+.drawer-head .icon-btn{flex:0 0 auto}
+
+/* F22 — the drawer's two small headings are h3 now; same look as before. */
+.cov-b h3.cov-h{margin:0 0 .2rem;font-family:var(--font-d);font-size:.8125rem;font-weight:800;line-height:1.3;
+  letter-spacing:0;text-transform:none;color:var(--ink-3)}
+.cov-yes h3.cov-h{color:var(--good-ink)}
+.cov-no h3.cov-h{color:var(--flag-ink)}
+
+/* UXM-11 — a phone on its side has 343 px: the header scrolls away on the
+   ledger, the phone bar is one line, and the drawer keeps its X, not a second
+   Close bar. */
+@media (max-height:500px) and (orientation:landscape){
+  body:has(.ledger) header.site{position:relative}
+  .ledger .mobile-bar{padding-top:.35rem;padding-bottom:calc(.35rem + env(safe-area-inset-bottom))}
+  .ledger .mobile-bar .mb-sub{display:none}
+  .ledger .mobile-bar.total-in-view{transform:translateY(110%);visibility:hidden}
+  .drawer-foot{display:none}
+}
+/* <<< LEDGER */
+
+/* >>> CONTENT (round 2) */
+/* /survey thank-you: the written interview invitation (ASKS rank 1). */
+.survey-next{margin-top:var(--sp-5);padding:var(--sp-4) var(--sp-5);border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.survey-next h2{font-size:1.2rem;margin:0 0 var(--sp-2)}
+.survey-next p{margin:0 0 var(--sp-4);color:var(--ink-2);max-width:60ch}
+/* /method: HHS research, and what is not built yet (ASKS ranks 2, 4, 8). */
+.hhs-reports,.not-built{padding-left:1.2rem;margin:0 0 var(--sp-4)}
+.hhs-reports li,.not-built li{margin-bottom:.5rem;overflow-wrap:anywhere}
+.hhs-quote{margin:0 0 var(--sp-4);padding:.6rem 1rem;border-left:3px solid var(--accent);background:var(--accent-soft);border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--ink);font-size:1rem}
+/* /adopt: the standards table reads as sentences, not a data grid. */
+.standards-table th[scope="row"]{white-space:nowrap}
+.standards-table td:nth-child(2){white-space:nowrap}
+@media (max-width:640px){.standards-table th[scope="row"],.standards-table td:nth-child(2){white-space:normal}}
+/* /sheet: help that already exists (ASKS rank 6). */
+.help-exists{margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:1px solid var(--line)}
+.help-exists h2{font-size:1.15rem;margin:0 0 .2rem}
+.help-lede{margin:0 0 .75rem;color:var(--ink-2);font-size:.95rem;max-width:70ch}
+.help-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:.9rem 1.5rem}
+@media (max-width:640px){.help-list{grid-template-columns:1fr}}
+.help-list li{border-top:1px solid var(--line-2);padding-top:.5rem}
+.help-list h3{font-size:1rem;margin:0 0 .2rem}
+.help-list p{margin:0 0 .25rem;font-size:.95rem;color:var(--ink-2)}
+.help-list .help-url{overflow-wrap:anywhere}
+.help-print-note{display:none}
+/* <<< CONTENT */
+
+/* >>> DESIGN R1 (2026-09-30) ================================================
+   One system, applied last. Light and calm for people who are sick and tired:
+   white cards on one cool off-white (--ground), ink navy text, one teal accent
+   used sparingly, one card radius (16 px), hairlines and soft shadows, labels
+   in sentence case at reading size, money in tabular Figtree. Everything above
+   still holds its floors (44 px targets, AA text); this block changes surfaces,
+   type roles and spacing, never a fact or a behaviour.
+   ========================================================================== */
+
+/* ---- type roles: display (Bricolage) for headings only; text (Figtree) for
+   everything a person reads or counts ---- */
+body{background:var(--ground);color:var(--ink);font-size:17px;line-height:1.6}
+h1,h2,h3,h4{color:var(--ink);font-weight:700}
+h1{font-size:clamp(2rem,3.1vw,2.625rem);line-height:1.1;letter-spacing:-.025em}
+h2{font-size:clamp(1.45rem,2.2vw,1.875rem);line-height:1.2;letter-spacing:-.02em}
+h3{font-size:1.125rem;line-height:1.35;letter-spacing:-.01em}
+.eyebrow{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--accent-ink);margin:0 0 .5rem}
+.lbl{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--ink-2)}
+.micro{font-size:.9375rem;line-height:1.5;color:var(--ink-3)}
+.sub{font-size:1.0625rem;color:var(--ink-2)}
+.big-num,.mid-num,.mb-total,.hs-num,.total-num{font-family:var(--font-b);font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.foot-h,.toc-h{font-family:var(--font-b);font-size:.9375rem;font-weight:700;letter-spacing:0;color:var(--ink)}
+.sig-n,.dist-n,.pub-n,.ch-date,.chart-key,.sheet-verdict,.saved-link label{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0}
+.pub-n{background:none;padding:0;color:var(--ink-3)}
+.blank,.conf{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0}
+.dl-fmt{font-family:var(--font-b);font-size:.875rem;letter-spacing:0}
+
+/* ---- buttons: text face, calm, no lift ---- */
+.btn{font-family:var(--font-b);font-weight:600;font-size:1rem;letter-spacing:0;border-width:1px;transition:background .15s,border-color .15s,color .15s}
+.btn:hover{transform:none}
+.btn.primary,.hero .btn.primary,.cta-band .btn.primary{background:var(--brand-fill);color:var(--on-brand);box-shadow:var(--btn-shadow,0 1px 2px rgba(17,28,39,.14))}
+.btn.primary:hover,.hero .btn.primary:hover,.cta-band .btn.primary:hover{background:var(--brand-fill-2)}
+.btn.ghost,.hero .btn.ghost,.gap-pitch .btn.ghost,.hl-card .btn.ghost{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn.ghost:hover,.hero .btn.ghost:hover,.hl-card .btn.ghost:hover{border-color:var(--ink-4);color:var(--ink)}
+.btn.lg{font-size:1.0625rem}
+.link-btn{color:var(--accent-ink)}
+.save-cta a{font-family:var(--font-b);font-weight:600;border-width:1px}
+a{color:var(--brand-3)}
+
+/* ---- cards: one radius, one hairline, one soft shadow ---- */
+.card,.dist,.reg-routes,.pub-block,.sos-card,.toc,.gap-back,.chart,.dl-card,.sheet{border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);background:var(--surface)}
+.reg-routes{background:var(--surface)}
+.notice{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md)}
+
+/* ---- header: white, hairline, the active page underlined in teal ---- */
+header.site{background:var(--head-bg);border-bottom:1px solid var(--head-line);backdrop-filter:saturate(1.2) blur(10px);-webkit-backdrop-filter:saturate(1.2) blur(10px)}
+.brand .name{font-weight:700;letter-spacing:-.015em}
+.topnav a{color:var(--ink-2);font-weight:500;font-size:1rem}
+.topnav a:hover{background:var(--ground);color:var(--ink)}
+.topnav a[aria-current="page"]{color:var(--ink);background:transparent;box-shadow:inset 0 -2px 0 var(--accent)}
+.pill-n{background:var(--accent-soft);color:var(--accent-ink);font-family:var(--font-b);font-size:.8125rem}
+.nav-signin{color:var(--ink-2);font-weight:500;font-size:1rem}
+.nav-signin[aria-current="page"]{background:transparent;color:var(--ink);box-shadow:inset 0 -2px 0 var(--accent)}
+.topnav .nav-group .foot-h{color:var(--ink-3)}
+
+/* ---- footer ---- */
+.site-foot{background:var(--surface);border-top:1px solid var(--line-2);margin-top:0}
+.foot-grid a{color:var(--ink-2)}
+main>.page,main>section:last-child{margin-bottom:0}
+.page{padding-bottom:clamp(3rem,6vw,5rem)}
+
+/* ---- forms ---- */
+textarea,input[type="text"],input[type="number"],input[type="email"],input[type="search"],select{border-width:1px;border-color:#878f9b;border-radius:var(--r-md)} /* 3.26:1 on white, 3.02:1 on --ground: WCAG 1.4.11 needs 3:1 for a field boundary (measured 2026-09-30) */
+textarea:focus,input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent)}
+
+/* ==== HOME ================================================================ */
+.hero{background:var(--ground);color:var(--ink);padding:clamp(2rem,4.2vw,3.75rem) 0 clamp(2.5rem,5vw,4.5rem)}
+.hero::before,.hero::after{display:none}
+.hero .eyebrow{color:var(--accent-ink)}
+.hero h1{color:var(--ink);font-size:clamp(2.4rem,4vw,3.5rem);line-height:1.06;letter-spacing:-.032em;max-width:13ch;margin:0 0 1.1rem}
+.hero-line{font-family:var(--font-b);font-weight:400;font-size:1.25rem;line-height:1.5;color:var(--ink-2);max-width:31ch}
+.hero-grid{grid-template-columns:minmax(0,.88fr) minmax(0,1.12fr);gap:clamp(2rem,5vw,4.5rem)}
+.hero-copy{--hero-copy-top:1.5rem}
+.hero-foot{display:none}
+.hero-points{list-style:none;margin:1.75rem 0 0;padding:0;display:flex;flex-direction:column;gap:.55rem}
+.hero-points li{display:flex;gap:.6rem;align-items:flex-start;color:var(--ink-2);font-size:1rem;line-height:1.45}
+.hero-points svg{color:var(--accent);flex:none;margin-top:.12rem}
+.hero-art-img{display:block;width:100%;max-width:34rem;height:auto;margin-top:2.25rem}
+
+/* the story box: the one loud thing on the page */
+/* --hl-pad is the card's padding, and also how far the phone's sticky "So far" foot
+   reaches out to the card's edges (flow3-15), so the two can never drift apart. */
+.hl-card{--hl-pad:clamp(1.25rem,2.4vw,1.75rem);background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-3);padding:var(--hl-pad);color:var(--ink)}
+.hl-card>.lbl{display:block;font-family:var(--font-d);font-size:1.3rem;font-weight:700;letter-spacing:-.012em;line-height:1.3;color:var(--ink);margin:0 0 .8rem}
+.hl-card textarea{font-size:1.125rem;line-height:1.55;min-height:6.25rem;padding:.85rem 1rem;margin-bottom:.4rem;background:var(--surface)}
+.hl-sample{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-md);padding:1rem 1.1rem .9rem;margin:.9rem 0 1rem}
+.hl-eg-lbl{font-size:.9375rem;color:var(--ink-3);margin:0 0 .35rem}
+.hl-sample .hl-eg,.hl-eg{border-top:0;margin:0}
+.hl-eg li{padding:.65rem 0;border-bottom:1px solid var(--line-2);gap:.1rem 1rem}
+.hl-said{font-size:1rem;font-weight:600;color:var(--ink)}
+.hl-unit{font-size:.9375rem;color:var(--ink-3)}
+.hl-src{font-family:var(--font-b);font-style:normal;font-size:.9375rem;font-weight:600;letter-spacing:0;background:none;padding:0;border-radius:0;color:var(--accent-ink);margin-right:.35rem}
+.hl-src::after{content:"";display:inline-block;width:3px;height:3px;border-radius:50%;background:var(--ink-4);vertical-align:middle;margin-left:.45rem}
+.hl-eg b{font-family:var(--font-b);font-weight:600;font-size:1.0625rem;color:var(--ink)}
+.hl-sample .hl-total{flex-direction:row;justify-content:space-between;align-items:baseline;gap:1rem;margin:.7rem 0 0}
+.hl-total .lbl{font-family:var(--font-b);font-size:.9375rem;font-weight:600;color:var(--ink-2);margin:0}
+.hl-total b{font-family:var(--font-b);font-weight:700;font-size:1.5rem;letter-spacing:-.02em;color:var(--ink);white-space:nowrap}
+.hl-foot{margin-top:1rem;align-items:center}
+.hl-foot:not(.is-empty) .hl-total b{font-size:1.875rem}
+.hl-foot.is-empty{margin-top:0}
+
+/* the sentence, read back as a receipt forming: one line per unit of care */
+.lp-chips{flex-direction:column;flex-wrap:nowrap;gap:0;border-top:1px solid var(--line-2)}
+.lp-chip,.lp-chip.is-low,.lp-chip.is-blank,.lp-chip.is-blank.is-gap{display:flex;flex-wrap:wrap;align-items:baseline;gap:.15rem .6rem;width:100%;
+  background:none;border:0;border-bottom:1px solid var(--line-2);border-radius:0;padding:.7rem .15rem;font-size:1rem;line-height:1.45;color:var(--ink)}
+.lp-chip b{flex:1 1 12rem;min-width:0;font-family:var(--font-b);font-weight:600;color:var(--ink)}
+.lp-chip .lp-x{font-family:var(--font-b);font-size:.9375rem;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.lp-chip .lp-amt{margin-left:auto;background:none;padding:0;border-radius:0;font-family:var(--font-b);font-weight:600;font-size:1.0625rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.lp-chip .lp-low{font-size:.875rem;font-weight:600;color:var(--warn-ink);letter-spacing:0}
+.lp-chip .lp-ai{font-family:var(--font-b);font-size:.8125rem;font-weight:600;letter-spacing:0;background:var(--accent-soft);color:var(--accent-ink);padding:.1rem .5rem;border-radius:var(--r-pill);align-self:center}
+.lp-chip.is-blank b{flex-basis:100%;color:var(--ink-2)}
+.lp-chip.is-blank .lp-amt{margin-left:0;flex-basis:100%;font-weight:400;font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
+.lp-chip.is-blank.is-gap b,.lp-chip.is-blank.is-gap .lp-amt{color:var(--flag-ink)}
+/* FLOW4 flow4-7: the length of the search, counted and never priced, in the neutral style */
+.lp-chip.is-blank.is-span .lp-amt{color:var(--accent-ink);font-weight:600}
+.ledger .lp-ai,td .lp-ai{font-family:var(--font-b);font-size:.8125rem;font-weight:600;letter-spacing:0;background:var(--accent-soft);color:var(--accent-ink);padding:.1rem .5rem;border-radius:var(--r-pill);margin-left:.5rem}
+
+/* the band about care nobody counted: light, one panel, one sentence */
+.gap-pitch,.hero + .gap-pitch{background:var(--surface);color:var(--ink);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2)}
+.gap-pitch h2{color:var(--ink)}
+.gap-pitch .eyebrow{color:var(--accent-ink)}
+.gap-pitch p{color:var(--ink-2)}
+.gap-pitch,.how{padding:clamp(3rem,6vw,5rem) 0}
+.zero-card,.hero + .gap-pitch .zero-card{background:var(--ground);border:0;border-radius:var(--r-lg);padding:clamp(1.5rem,3vw,2.25rem);text-align:left}
+.zero-say{font-family:var(--font-d);font-size:1.25rem;font-weight:600;line-height:1.45;letter-spacing:-.01em;color:var(--ink);max-width:none;margin:0}
+.zero-say b{color:var(--accent-ink);font-weight:700}
+
+/* how it works: three calm cards, each with its picture */
+.how{background:var(--ground)}
+.how-grid{gap:1.25rem;margin-top:1.75rem}
+.how-grid article{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1rem 1rem 1.5rem}
+.how-img{display:block;width:100%;height:11rem;object-fit:contain;background:var(--ground);border-radius:var(--r-md);margin:0 0 1.1rem}
+.how-grid article>:not(img){margin-left:.35rem;margin-right:.35rem}
+.how-n{width:1.75rem;height:1.75rem;background:var(--accent-soft);color:var(--accent-ink);font-family:var(--font-b);font-weight:700;font-size:.9375rem;margin-bottom:.55rem}
+.how-grid p{color:var(--ink-2)}
+.trust-row.how-pub{border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem}
+.trust-pub{font-family:var(--font-b);font-weight:600;color:var(--ink)}
+.trust-pub em{font-family:var(--font-b);font-size:.875rem;color:var(--ink-3)}
+.how .faq>details>summary{font-family:var(--font-d);font-weight:700}
+.faq summary{font-family:var(--font-b);font-weight:600}
+
+/* closing band: white, centred, one button */
+.cta-band{background:var(--surface);color:var(--ink);border-top:1px solid var(--line-2);padding:clamp(2.5rem,5vw,4rem) 0}
+.cta-band h2{color:var(--ink)}
+.cta-band p{color:var(--ink-2);opacity:1}
+
+/* ==== LEDGER ============================================================== */
+.ledger-top{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:2.5rem;align-items:center;
+  background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2);
+  padding:1.35rem 1.75rem 1.2rem;margin:0 0 1rem}
+.ledger-top>*{grid-column:1}
+.ledger-top>.sum-card.main,.sum-card.main{background:var(--surface);color:var(--ink);border:0;box-shadow:none;padding:0;margin:0}
+.ledger-top>.sum-card.main{background:none}
+.sum-card.main::after{display:none}
+.sum-card.main .lbl{color:var(--ink-2);opacity:1;font-family:var(--font-b);font-size:1rem;font-weight:600}
+.sum-card.main .big-num{color:var(--ink);font-size:clamp(2.75rem,4.4vw,3.5rem);letter-spacing:-.035em;line-height:1.05;margin:.2rem 0 .3rem}
+.sum-card.main .micro{color:var(--ink-3);opacity:1}
+.sum-card.main .ver-link{color:var(--ink-3)}
+.sum-card.main .reveal-sub{color:var(--ink-2)}
+.ledger-top>.ledger-figs{grid-column:2;grid-row:1 / span 2;align-self:center;border:0;padding:0;margin:0;gap:2.5rem}
+.reveal-band{border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.reveal-band .rb-mark{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0;background:var(--ground-2);color:var(--ink-2)}
+.cgw{background:var(--surface);border:1px solid var(--line-2);box-shadow:var(--sh-1);padding:.85rem 1.25rem;margin:0 0 1rem}
+.ledger .cgw-h{font-weight:700;font-size:1.125rem;color:var(--ink)}
+.cgw-rank{font-weight:400;color:var(--ink-2)}
+.cgw-card{border-color:var(--line-2)}
+.table-card{border:1px solid var(--line-2);box-shadow:var(--sh-1)}
+.table-card>.table-cap{padding:.9rem 1.25rem 0}
+.ledger-table{font-size:1rem}
+.ledger-table th,.ledger-table td{padding:.85rem 1.25rem;border-bottom:1px solid var(--line-2)}
+.ledger-table thead th{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--ink-3);border-bottom:1px solid var(--line);padding-top:.6rem;padding-bottom:.6rem}
+.ledger-table tr.grp th{background:var(--surface-2);font-family:var(--font-b);font-size:.9375rem;font-weight:600;color:var(--ink-2);padding:.5rem 1.25rem}
+.ledger-table tr.grp th::before{display:none}
+.ledger-table tbody tr:not(.grp):hover{background:var(--surface-2)}
+.li-name{font-family:var(--font-b);font-size:1.0625rem;font-weight:600;color:var(--brand-3);text-decoration:none}
+.li-name:hover{color:var(--brand-3);text-decoration:underline;text-decoration-color:currentColor}
+.li-sub{font-size:.9375rem;color:var(--ink-3)}
+.ledger-table td.total strong{font-family:var(--font-b);font-weight:700;font-size:1.0625rem}
+.ledger-table td.r{color:var(--ink-2)}
+.fit-mark,button.fit-mark{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0}
+.basis{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0;border:0;background:none;padding:0}
+.thumb{font-family:var(--font-b);font-weight:600;font-size:.9375rem;border-color:var(--line);color:var(--ink-2);padding:.4rem .9rem}
+.thumb:hover{border-color:var(--ink-4);color:var(--ink)}
+.paid-form{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);box-shadow:var(--sh-2);padding:.9rem 1rem .8rem}
+.ledger .paid-form label,.paid-form label{font-size:1rem;font-weight:600;color:var(--ink)}
+.nth-back{background:var(--accent-soft);border:0}
+.nth-back b{font-family:var(--font-b)}
+.bar-row .bar-v,.bar-v{font-family:var(--font-b);font-weight:600}
+.bar-fill{background:var(--accent)}
+.bar-track{background:var(--ground-2)}
+.more-block>summary,.more-ways>summary{font-family:var(--font-b);font-weight:600}
+.more-block>summary{font-family:var(--font-d);font-weight:700}
+.card.year{background:var(--surface);border-color:var(--line-2)}
+.act-card{border-color:var(--line-2)}
+.act-card .who{font-family:var(--font-b);letter-spacing:0;font-size:.9375rem}
+.act-ic{background:var(--accent-soft);color:var(--accent-ink)}
+.apart-rule span{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0}
+.ctx-shell::before{display:none}
+.ctx-relabel{font-family:var(--font-b);font-size:.875rem;letter-spacing:0}
+
+/* ==== DRAWER ============================================================== */
+.drawer-backdrop{background:rgba(17,28,39,.34);backdrop-filter:none;-webkit-backdrop-filter:none}
+.drawer{width:min(36rem,100%);box-shadow:-24px 0 64px -28px rgba(17,28,39,.35)}
+.drawer-head{padding:1.4rem 1.5rem 1rem;border-bottom:1px solid var(--line-2)}
+.drawer-head h2{font-size:1.375rem;line-height:1.25;letter-spacing:-.015em}
+.drawer-head .eyebrow{margin-bottom:.3rem}
+.drawer-head .icon-btn{background:var(--surface);border-color:var(--line)}
+.drawer-body{padding:1.25rem 1.5rem 1.5rem;gap:1rem}
+.drawer .fig-num{font-family:var(--font-b);font-weight:700;font-size:2.5rem;letter-spacing:-.03em;color:var(--ink)}
+.drawer .fig-cap{opacity:1;color:var(--ink-2)}
+.drawer .conf{background:var(--ground-2);color:var(--ink-2)}
+.cov-b{background:var(--surface);border:1px solid var(--line-2)}
+.cov-b h3.cov-h,.cov-b h4{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0}
+.cov-b p{font-size:1rem}
+.drawer-more>summary{font-family:var(--font-b);font-weight:600;color:var(--accent-ink);border-color:var(--line-2);padding:.75rem 0}
+.drawer-foot{border-top:1px solid var(--line-2)}
+
+/* ==== REGISTER ============================================================ */
+.register h1{letter-spacing:-.025em}
+.reg-grid{gap:1rem}
+.reg-stat,.reg-stat.is-zero{background:var(--surface);border:1px solid var(--line-2);border-left:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.25rem 1.35rem}
+.reg-stat .big-num{font-size:2.75rem;letter-spacing:-.035em;color:var(--ink)}
+.reg-stat.is-zero .big-num{color:var(--ink-3)}
+.reg-stat .big-lab{font-family:var(--font-b);font-size:1rem;font-weight:600;color:var(--ink)}
+.reg-sub{font-size:.9375rem;color:var(--ink-3)}
+.dist .big-num{font-size:2.25rem}
+.dist-list li{font-size:1rem}
+.sig-h{margin-top:clamp(2.5rem,5vw,3.5rem)}
+.chart-key i{border-radius:4px}
+.dl-card:hover{transform:none;border-color:var(--line)}
+.dl-fmt{color:var(--accent-ink)}
+.pub-full{font-family:var(--font-b)}
+
+/* ==== ROUND-1 FIXES (read off the first screenshots) ==================== */
+/* an icon inside a pill never gives way to its label (the thumbs drew as dots) */
+.thumb svg,.btn svg,.cgw-toggle svg{flex:none}
+/* the fit verdicts are stored upper-case; they read as quiet words */
+.fit-mark,button.fit-mark,.sheet-verdict{text-transform:lowercase}
+/* the example's source and unit read as one line of text */
+.hl-unit{display:block}
+/* the picture fades into the page instead of sitting in a box */
+.hero-art-img{-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 14%,#000 86%,transparent 100%)}
+@media (min-width:901px){.hero{padding-top:2.25rem}.hl-card textarea{min-height:7.4rem}}
+
+/* ==== PHONES ============================================================== */
+@media (max-width:900px){
+  .hero-copy .hero-points{order:5;margin-top:.25rem}
+  .hero-art-img{display:none}
+  .hero h1{max-width:none}
+}
+@media (max-width:720px){
+  h1{font-size:1.85rem;line-height:1.15}
+  h2{font-size:1.45rem}
+  .hero{padding-top:1.5rem}
+  .hero h1{font-size:2.15rem;line-height:1.1}
+  .hero-line{font-size:1.1rem}
+  .hl-card{--hl-pad:1.1rem;padding:var(--hl-pad);box-shadow:var(--sh-2)}
+  .hl-card>.lbl{font-size:1.15rem}
+  .ledger-top{grid-template-columns:1fr;padding:1.15rem 1.15rem 1rem}
+  .ledger-top>.ledger-figs{grid-column:1;grid-row:auto;margin-top:.9rem;padding-top:.9rem;border-top:1px solid var(--line-2);gap:.6rem}
+  .ledger-table tr:not(.grp){padding:1rem 1.1rem}
+  .ledger-table td.r::before{font-family:var(--font-b);font-size:.875rem;font-weight:600;letter-spacing:0;color:var(--ink-3)}
+  .drawer-head{padding:1.1rem 1.1rem .8rem}
+  .drawer-body{padding:1rem 1.1rem 1.25rem}
+}
+@media (max-width:560px){
+  .how-img{height:9.5rem}
+}
+/* phones, read off the first phone screenshots */
+@media (max-width:900px){
+  .hero-grid{gap:.85rem;align-items:stretch}
+  .hero-copy .eyebrow,.hero-copy h1,.hero-copy .hero-line{text-align:left;margin-left:0;margin-right:0}
+  .hero-copy h1{margin-bottom:0}
+  .hero-copy .hero-line{margin-bottom:.4rem}
+}
+@media (max-width:560px){
+  .hl-card textarea{min-height:8.6rem}
+}
+@media (max-width:720px){
+  .ledger-top>.ledger-figs{display:grid;grid-template-columns:1fr 1fr;gap:.75rem 1rem}
+  .ledger-top>.ledger-figs>*{display:flex;flex-direction:column;flex-wrap:nowrap;align-items:flex-start;gap:.1rem}
+  .ledger-top>.ledger-figs>*>*{flex-basis:auto}
+}
+/* ---- stage 2: the ledger reads as a receipt ---- */
+.ledger-top{padding:1.3rem 1.75rem 1.2rem}
+.ledger-top>.ledger-figs>*{min-width:8rem}
+@media (min-width:981px){.ledger-table td:first-child{width:46%}}
+.ledger-table .fit-mark{display:flex;width:max-content;margin:.25rem 0 0;color:var(--ink-3)}
+.ledger-table .fit-mark.fm-you{color:var(--good-ink)}
+.ledger-table .fit-mark.fm-billed{color:var(--warn-ink)}
+.ledger-table .fit-mark.fm-none{color:var(--flag-ink)}
+.ledger-table td.total strong{color:var(--ink)}
+.ledger-table tr.is-unpriced .li-name.plain{color:var(--ink-2);font-weight:600}
+.sos-fold>summary{display:block;font-family:var(--font-b);font-weight:400;color:var(--ink-2)}
+.sos-fold>summary::before{display:inline-block;margin-right:.5rem}
+.sos-fold>summary b{display:inline;color:var(--ink);font-family:var(--font-d);font-weight:700}
+.more-block{border-color:var(--line)}
+.thumb-done{color:var(--good-ink)}
+.drawer-body .btn.primary.full{min-height:3rem}
+/* ---- stage 3: the register and the smallest phones ---- */
+/* an empty count names what it counts first, then invites; the same reading
+   order as a card that holds a number */
+.reg-stat.is-zero .big-lab{order:-1;margin:0 0 .35rem}
+.reg-stat.is-zero{justify-content:flex-start}
+/* on a phone the bar is the mark, Sign in and the menu; the four destinations,
+   the one the button pointed at included, are in the menu */
+@media (max-width:560px){header.site .nav-cta{display:none}}
+@media (max-width:380px){.hl-card textarea{min-height:10.6rem}}
+/* ---- "So far" and "Add these N" stay on the first screen at every laptop
+   size the demo smoke measures (1280x800, 1382x688, 1440x900, 1571x782,
+   1728x860): the chip list takes what the window leaves under the box and
+   scrolls inside the card past that. The box grows with the sentence. ---- */
+@media (min-width:901px){
+  .hero{padding-top:1.5rem}
+  .hl-card textarea{min-height:6.25rem;field-sizing:content;max-height:9.5rem}
+  .hero-live .lp-chips{max-height:clamp(10rem,calc(100vh - 25.5rem),27rem)}
+}
+@media (min-width:901px) and (max-height:760px){
+  .hero-live .lp-chip{padding:.45rem .15rem}
+  .hl-card{padding:1.1rem 1.5rem}
+  .hl-card>.lbl{margin-bottom:.5rem}
+}
+@media (min-width:901px) and (max-height:760px){
+  .page{padding-top:1.1rem}
+  .ledger-top{padding:1rem 1.5rem .95rem}
+  .sum-card.main .big-num{font-size:2.75rem}
+}
+/* <<< DESIGN R1 */
+
+/* >>> PAID VIEW (round 5) — what the person paid, beside the federal figure.
+   Every rule here applies only to markup that exists when a line carries a paid
+   amount (or the closed-by-default form), so a ledger without one is unchanged. */
+.ledger-table th.paid-col{white-space:nowrap}
+.ledger-table td.paid-cell{white-space:normal;min-width:9.5rem;max-width:13rem}
+.ledger-table td.paid-cell strong{display:block;font-variant-numeric:tabular-nums}
+.ledger-table .paid-sub{display:block;font-size:.875rem;color:var(--ink-3);line-height:1.35;margin-top:.15rem}
+.ledger-table .paid-sub.paid-over{color:var(--flag-ink)}
+.ledger-table .paid-none{color:var(--ink-4)}
+.paid-add{min-height:44px;min-width:44px;text-align:left}
+.ledger-table td.paid-cell .paid-add{display:block;margin-left:auto;text-align:right}
+.paid-strip b{color:var(--ink)}
+.paid-strip a{white-space:nowrap}
+.paid-card{margin-top:var(--sp-4)}
+.paid-card-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);flex-wrap:wrap}
+.paid-tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-3);margin:var(--sp-3) 0}
+.paid-tile{display:flex;flex-direction:column;gap:.15rem;padding:var(--sp-3);border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.paid-v{font-family:var(--font-m);font-size:1.5rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.paid-v.paid-over{color:var(--flag-ink)}
+.paid-l{font-weight:600;color:var(--ink-2);font-size:.9375rem}
+.paid-s{font-size:.875rem;color:var(--ink-3)}
+.paid-roll{width:100%;border-collapse:collapse;font-size:.97rem}
+.paid-roll caption{text-align:left;font-family:var(--font-d);font-weight:700;color:var(--ink-2);padding:0 0 .4rem}
+.paid-roll th,.paid-roll td{padding:.6rem .75rem;border-bottom:1px solid var(--line-2);text-align:left;vertical-align:top}
+.paid-roll thead th{font-family:var(--font-d);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.paid-roll .r{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.paid-roll tbody th small{display:block;font-weight:400;color:var(--ink-3);font-size:.875rem}
+.paid-roll tfoot th,.paid-roll tfoot td{font-weight:700;border-bottom:0}
+.paid-dlg .paid-dlg-body{display:flex;flex-direction:column;gap:var(--sp-3);padding:1rem 1.25rem 1.25rem;overflow-y:auto}
+.paid-dlg-lead{margin:0;color:var(--ink-2);font-size:.9375rem}
+.paid-dlg-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-3)}
+.paid-dlg-list li{padding:.75rem;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2)}
+.paid-dlg-list li.is-bad{border-color:var(--flag-ink)}
+.paid-dlg-name{display:block;font-weight:600;margin-bottom:.4rem;font-size:.9375rem}
+.paid-dlg-name span{font-weight:400;color:var(--ink-3)}
+.paid-dlg-name small{display:block;font-weight:400;color:var(--ink-3);font-size:.875rem;overflow-wrap:anywhere}
+.paid-dlg-row{flex-wrap:wrap;align-items:center;gap:.5rem}
+.paid-dlg-row input{min-height:44px;font-size:1rem;width:9rem;max-width:100%}
+.paid-dlg-row select{min-height:44px;font-size:1rem;max-width:100%}
+.paid-err{margin:.35rem 0 0;color:var(--flag-ink);font-size:.9375rem}
+.paid-dlg-actions{gap:.5rem;flex-wrap:wrap}
+.paid-dlg-actions .btn{min-height:44px}
+.ledger-foot{flex-wrap:wrap;gap:.5rem 1rem}
+@media (max-width:980px){
+  .ledger-table td.paid-cell{grid-column:1/-1;max-width:none;min-width:0}
+  .ledger-table td.paid-cell .paid-add{margin-left:0;text-align:left}
+}
+@media (max-width:640px){
+  .paid-tiles{grid-template-columns:1fr}
+  .paid-roll thead{display:none}
+  .paid-roll,.paid-roll tbody,.paid-roll tfoot,.paid-roll tr,.paid-roll caption{display:block}
+  .paid-roll tr{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.25rem .5rem;padding:.6rem 0;border-bottom:1px solid var(--line-2)}
+  .paid-roll th,.paid-roll td{border:0;padding:0}
+  .paid-roll tr > th{grid-column:1/-1}
+  .paid-roll td.r{display:flex;flex-direction:column;text-align:left;white-space:normal}
+  .paid-roll td.r::before{content:attr(data-label);font-family:var(--font-d);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-4);font-weight:700}
+}
+.sheet-paid{margin-top:var(--sp-5);padding-top:var(--sp-4);border-top:1px solid var(--line)}
+.sheet-paid h2{font-size:1.15rem;margin:0 0 .4rem}
+.sheet-paid-total{margin:0 0 .6rem}
+.sheet-paid-sub{font-size:.875rem;color:var(--ink-3)}
+@media print{
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(1),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(1){width:26%}
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(2),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(2){width:24%}
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(3),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(3){width:7%}
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(4),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(4){width:13%}
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(5),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(5){width:12%}
+  .sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) th:nth-child(6),.sheet:has(.sheet-paid) .sheet-table:not(.sheet-paid-roll) td:nth-child(6){width:18%}
+  .sheet-table.sheet-paid-roll th:nth-child(1),.sheet-table.sheet-paid-roll td:nth-child(1){width:40%}
+  .sheet-table.sheet-paid-roll th:nth-child(n+2),.sheet-table.sheet-paid-roll td:nth-child(n+2){width:20%}
+  .sheet-paid{break-inside:avoid}
+  .sheet-paid-sub{font-size:11pt;color:#000}
+}
+/* <<< PAID VIEW */
+
+/* vis-art critic-2 (merge rehearsal): the night step pictures are transparent, so in dark
+   they sit on the card itself instead of a light ground box. */
+:root[data-theme="dark"] .how-img{background:transparent}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .how-img{background:transparent}}
+/* >>> THEME DARK (2026-09-30 night) ==========================================
+   The night theme's component layer. It applies only when the person chose dark
+   (components/ThemeToggle.tsx sets data-theme="dark"); light is never touched,
+   and print never sees any of it (@media screen), so a printed page is light.
+   The tokens live in app/globals.css; this block fixes the few places that
+   paint a colour of their own: the white header, white text on the teal fill
+   (the dark primary is teal with ink text), the light toast, the field edge,
+   and the home art, which has a night version drawn for the dark ground.
+   ========================================================================== */
+@media screen{
+:root[data-theme="dark"] .topnav a:hover{background:var(--surface-2)}
+/* the primary button: teal, ink text, a quiet glow (the focus ring still wins via --btn-shadow) */
+:root[data-theme="dark"] .btn.primary,:root[data-theme="dark"] .hero .btn.primary,:root[data-theme="dark"] .cta-band .btn.primary{box-shadow:var(--btn-shadow,var(--glow))}
+:root[data-theme="dark"] .btn.primary:hover,:root[data-theme="dark"] .hero .btn.primary:hover,:root[data-theme="dark"] .cta-band .btn.primary:hover{box-shadow:var(--btn-shadow,0 0 0 1px rgba(95,216,203,.4),0 10px 28px -10px rgba(95,216,203,.62))}
+:root[data-theme="dark"] .tabs button.is-on,:root[data-theme="dark"] .rank-chip.on,
+:root[data-theme="dark"] .stepper li.is-current .st-n{color:var(--on-brand)}
+:root[data-theme="dark"] .rank-chip.on .rank-n{background:var(--on-brand);color:var(--brand-fill)}
+/* a field edge that clears 3:1 (WCAG 1.4.11) on every dark tier, measured: #77899c is 3.25:1 on --surface-3, 3.96 on --surface-2,
+   4.54 on --surface, 5.27 on --ground-2, 5.55 on --ground (tests/dark-field-edge.test.ts recomputes these) */
+:root[data-theme="dark"] textarea,:root[data-theme="dark"] input[type="text"],:root[data-theme="dark"] input[type="number"],:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="password"],:root[data-theme="dark"] input[type="date"],:root[data-theme="dark"] input[type="search"],:root[data-theme="dark"] input[type="url"],
+:root[data-theme="dark"] select{border-color:#77899c}
+:root[data-theme="dark"] textarea:focus,:root[data-theme="dark"] input:focus,:root[data-theme="dark"] select:focus{border-color:var(--accent)}
+/* the toast was ink on ground, which turns into a white slab at night */
+:root[data-theme="dark"] .toast{background:var(--surface-3);color:var(--ink);border:1px solid var(--line);box-shadow:var(--sh-3)}
+:root[data-theme="dark"] .toast.ok .toast-ic{color:var(--good-ink)}
+:root[data-theme="dark"] .toast.warn .toast-ic{color:var(--warn-ink)}
+:root[data-theme="dark"] .toast.info .toast-ic{color:var(--accent-ink)}
+:root[data-theme="dark"] .drawer-backdrop{background:rgba(2,7,12,.62)}
+:root[data-theme="dark"] .drawer{box-shadow:var(--edge),-24px 0 64px -20px rgba(0,0,0,.8)}
+:root[data-theme="dark"] .mobile-bar{box-shadow:var(--edge),0 -12px 28px -18px rgba(0,0,0,.8)}
+:root[data-theme="dark"] ::selection{background:var(--accent-soft);color:var(--ink)}
+/* the home art at night is app/page.tsx's ThemedImg (vis-art fae55efb53), one
+   mechanism for every themed picture; 4b's content:url() swap
+   (public/img/v2/4b-theme-*-dark.webp) was retired at the merge. */
+/* the drawer's code badge is ink on surface in light (a navy chip); inverted at
+   night it would be the one white chip in the drawer */
+:root[data-theme="dark"] [class*="LineDrawer_codeBadge"]{background:var(--surface-3);color:var(--ink);border-color:var(--line)}
+/* /integrity: the chain's head card is an ink slab in light; at night an ink slab
+   is a white slab, so it becomes the accent tier instead */
+:root[data-theme="dark"] .ix-link.is-head{background:var(--accent-soft);border-color:var(--accent)}
+:root[data-theme="dark"] .ix-link.is-head .ix-link-k,:root[data-theme="dark"] .ix-link.is-head .ix-link-v{color:var(--ink)}
+:root[data-theme="dark"] .ix-link.is-head .ix-link-s{color:var(--ink-2)}
+}
+/* <<< THEME DARK */
+
+/* >>> PHONE LEDGER, FIRST LINE (merge round 4, 2026-10-01)
+   The phone bar repeats the total, so while the total's own card is on screen
+   it steps aside (Ledger.tsx already tracks that card, UXM-11; until now only a
+   phone on its side used it), and it comes back once the card scrolls away.
+   At 390x664 the bar (594-664) sat over the first ledger row (653); hiding it
+   was not enough on its own, since that row's name ended at 724. The space
+   above the table tightens on a phone so the name ends above 664. */
+@media (max-width:980px){
+  .ledger .mobile-bar{transition:transform .2s ease,visibility .2s}
+  .ledger .mobile-bar.total-in-view{transform:translateY(110%);visibility:hidden}
+}
+@media (max-width:479.98px){
+  section.page:has(.ledger){padding-top:1rem}
+  .ledger .ledger-top.ledger-top{padding-top:.875rem}
+  .ledger .sum-card .core-searched{font-size:1rem}
+  .ledger .table-card>.table-cap.table-cap{padding-top:0}
+  .ledger .table-card.table-card{padding-top:.5rem}
+  .ledger .ledger-top>.ledger-figs.ledger-figs{margin-top:.25rem;padding-top:.375rem}
+  .ledger .ledger-table tr.grp>th{padding-top:.375rem;padding-bottom:.375rem}
+  .ledger .ledger-table tbody>tr:not(.grp){padding-top:.75rem}
+  section.page:has(.ledger) p.sub{margin-bottom:.5rem}
+}
+/* <<< PHONE LEDGER, FIRST LINE */

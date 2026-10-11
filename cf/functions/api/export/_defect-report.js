@@ -100,7 +100,9 @@ export function provenanceOf(priceId) {
  *  denominator in the file is the denominator of the file. */
 function tallies(rows) {
   const t = new Map();
+  /* our own test rows (team_test true) are in the file, not in the counts */
   for (const r of rows) {
+    if (r.teamTest) continue;
     const e = t.get(r.priceId) || { right: 0, wrong: 0 };
     if (r.verdict === 'wrong') e.wrong++; else e.right++;
     t.set(r.priceId, e);
@@ -152,6 +154,7 @@ export function defectRows(rows, opts = {}) {
       figure_responses: c.right + c.wrong,
       figure_fit_rate_pct: fitRate(c.right, c.wrong) ?? '',
       table_version: r.priceTableVersion || '',
+      team_test: r.teamTest ? 'true' : 'false',
       row_hash: r.rowHash || '',
       citation_url: `${site}/api/citation/${encodeURIComponent(r.priceId)}`,
       counted_as_of: asOf,
@@ -166,9 +169,9 @@ export function defectRows(rows, opts = {}) {
 /** The one line above the header, so a file that has left our site still says
  *  which table it describes and when that table last reproduced. */
 export function defectComment(asOf) {
-  return `Waypoint Ledger — public corrections to published federal figures. Price table ${TABLE_VERSION}; `
+  return `Waypoint Ledger: public corrections to published federal figures. Price table ${TABLE_VERSION}; `
     + `${AUDIT_LINE || 'audit line unavailable'}. Counted as of ${asOf}. `
-    + 'Self-selected members of the public using a free tool; counts are reported exactly as entered — '
+    + 'Self-selected members of the public using a free tool; counts are reported exactly as entered: '
     + 'no weighting, no imputation, no extrapolation to a population. believed_usd is a demand signal '
     + 'about the published figure and is never a price. Column meanings: /api/export/corrections.json.';
 }
@@ -204,7 +207,7 @@ export function correctionsDefectJson(rows, opts = {}) {
     countedAsOf: asOf,
     csvUrl: site ? `${site}/api/export/corrections.csv` : '/api/export/corrections.csv',
     methodUrl: site ? `${site}/method` : '/method',
-    sample: 'Self-selected members of the public using a free tool. Counts are reported exactly as entered — '
+    sample: 'Self-selected members of the public using a free tool. Counts are reported exactly as entered: '
       + 'no weighting, no imputation, no extrapolation to a population.',
     columns: DEFECT_COLUMNS.map(([name, type, note]) => ({ name, type, note })),
     n: out.length,

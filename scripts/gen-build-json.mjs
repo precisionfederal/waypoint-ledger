@@ -29,6 +29,9 @@ const commit = git('rev-parse', 'HEAD');
    work, and a stamp that is always dirty tells nobody anything. */
 const dirty = Boolean(git('status', '--porcelain', '--', ROOT));
 const prices = readJson('data/prices.json');
+/* The additions file is half the table (R6): build.json said 117 published figures
+   while the app mapped against 274, so the stamp under-counted the product by 57%. */
+const additions = readJson('data/prices-additions-2026-09-09.json');
 const pkg = readJson('package.json');
 
 /* One definition of the survey version: the instrument's own file. */
@@ -44,7 +47,8 @@ const build = {
   dirty,
   builtAt: new Date().toISOString(),
   tableVersion: prices._version || 'unknown',
-  publishedFigures: Array.isArray(prices.items) ? prices.items.length : 0,
+  publishedFigures: (Array.isArray(prices.items) ? prices.items.length : 0)
+                  + (Array.isArray(additions.items) ? additions.items.length : 0),
   surveyVersion: surveyVersion || 'unknown',
   appVersion: pkg.version || '0.0.0',
 };

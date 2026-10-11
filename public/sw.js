@@ -7,10 +7,18 @@
 
    Nothing personal is ever cached: /api/admin, /api/me and /api/auth are
    passed straight to the network and their responses are never stored.
-   Bump VERSION to retire every old cache on the next activate.
+   VERSION is the build's own stamp: app/layout.tsx registers this worker as
+   /sw.js?v=<shortCommit>-<builtAt>, read from public/build.json, so every build
+   is a new worker URL, the browser installs it, and activate retires every
+   cache an older build left behind. The literal is only the fallback for a
+   registration that carries no stamp.
    ========================================================================== */
 
-const VERSION = 'wl-2026-09-09-2';
+const STAMP = (() => {
+  try { return (new URL(self.location.href).searchParams.get('v') || '').replace(/[^a-z0-9-]/gi, '').slice(0, 40); }
+  catch { return ''; }
+})();
+const VERSION = `wl-${STAMP || '2026-09-30-r2'}`;
 const SHELL = `${VERSION}:shell`;
 const STATIC = `${VERSION}:static`;
 const API = `${VERSION}:api`;

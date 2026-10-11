@@ -173,8 +173,16 @@ export async function setName(displayName: string | null): Promise<MeUser> {
 }
 
 /** Erase the account, its passkeys, its sessions and its saved ledgers. */
-export async function eraseAccount(): Promise<void> {
-  try { await api('/api/me', { method: 'DELETE' }); } finally { setHint(false); }
+/** What DELETE /api/me says it removed, counted before the rows went
+ *  (cf/functions/api/me.js ownedCounts). A count the server could not read is
+ *  null, never zero. Corrections are not deleted: their link to the account is cut. */
+export interface ErasedCounts { journeys: number | null; passkeys: number | null; corrections: number | null }
+export async function eraseAccount(): Promise<ErasedCounts | null> {
+  try {
+    const r = await api<{ removed?: Partial<ErasedCounts> }>('/api/me', { method: 'DELETE' });
+    const n = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+    return r.removed ? { journeys: n(r.removed.journeys), passkeys: n(r.removed.passkeys), corrections: n(r.removed.corrections) } : null;
+  } finally { setHint(false); }
 }
 
 export async function myJourneys(): Promise<SavedJourney[]> {

@@ -22,6 +22,7 @@ import medicaidLinks from '@/data/medicaid-fee-schedules.json';
 import gapCats from '@/data/invisible-events.json';
 import type { PriceItem } from './types';
 import { rulesFor } from './table';
+import { privateRangeHospitals } from './private-rate-lines';
 
 /* ---------- what the person told us ---------- */
 
@@ -328,7 +329,57 @@ const isAllPayerPop = (i: PriceItem) => /civilian noninstitutionalized|all payer
  * 🔴 The whole fit rule, in one function, from the row's own fields.
  * Nothing here computes a dollar amount; it chooses between published ones.
  */
-export function fitOf(item: PriceItem, ctx: Ctx): Fit {
+/* ==========================================================================
+   flow3-20: A PARENT ANSWERING FOR A CHILD READS ABOUT THE CHILD.
+   The same sentences, with the person they describe changed from "you" to the
+   child. Exact pairs, never a blanket swap: "you told us", "your total", "your
+   bill" and "will tell you" are the parent, who typed the story, keeps the ledger
+   and pays the bill, so they stay. tests/flow3-drawer-child.test.ts walks every
+   row and coverage and fails on any other "you" left in a child's fit.
+   ========================================================================== */
+const FOR_THE_CHILD: [string, string][] = [
+  ['This Medicare figure does not describe what Medicaid pays for you.', 'This Medicare figure does not describe what Medicaid pays for the child.'],
+  ['No published federal figure describes you here', 'No published federal figure describes the child here'],
+  ['Reference price, not your rate', 'Reference price, not the child’s rate'],
+  ['a ceiling, not your rate', 'a ceiling, not the child’s rate'],
+  ['With no insurance you are billed the provider’s charge', 'With no insurance the child’s care is billed at the provider’s charge'],
+  ['It describes the population you are part of', 'It describes the population the child is part of'],
+  ['You are on Medicare and you told us ', 'The child is on Medicare and you told us '],
+  ['You are on Medicare. This row', 'The child is on Medicare. This row'],
+  ['so it is not adjusted for where you live.', 'so it is not adjusted for where the child lives.'],
+  ['You are on Medicare, and this is the amount Medicare allows for this service. Choose where you live and it becomes your locality’s figure.',
+    'The child is on Medicare, and this is the amount Medicare allows for this service. Choose where the child lives and it becomes that locality’s figure.'],
+  ['Say what coverage you have and this line will tell you whether that describes you.', 'Say what coverage the child has and this line will tell you whether that describes the child.'],
+  ['Neither one is your rate.', 'Neither one is the child’s rate.'],
+  ['It is not what you would be billed.', 'It is not what the child’s care would be billed.'],
+  ['describes these services for you', 'describes these services for the child'],
+  ['does not describe your coverage', 'does not describe the child’s coverage'],
+];
+/** The blank figure's caption: the drawer, the ledger cell and the map all say it this way. */
+export const blankCaption = (forChild = false) =>
+  `No published federal figure describes ${forChild ? 'the child' : 'you'} here`;
+/** A verdict in the reader's words: "DESCRIBES THE CHILD" when a parent answers for a child. */
+export const verdictWords = (v: string, forChild = false) => (forChild ? v.replace(/\bYOU\b/, 'THE CHILD') : v);
+export function aboutTheChild(text: string): string {
+  return FOR_THE_CHILD.reduce((t, [a, b]) => t.split(a).join(b), text);
+}
+function fitForChild(f: Fit): Fit {
+  const r = f.reference;
+  return {
+    ...f,
+    why: aboutTheChild(f.why),
+    figureNote: f.figureNote && aboutTheChild(f.figureNote),
+    reference: r && { ...r, floorLabel: aboutTheChild(r.floorLabel), ceilingLabel: r.ceilingLabel && aboutTheChild(r.ceilingLabel) },
+  };
+}
+
+/** The fit, in the words of whoever is reading: forChild when a parent answers for a child. */
+export function fitOf(item: PriceItem, ctx: Ctx, forChild = false): Fit {
+  const f = fitAsSaid(item, ctx);
+  return forChild ? fitForChild(f) : f;
+}
+
+function fitAsSaid(item: PriceItem, ctx: Ctx): Fit {
   const cov = ctx.coverage;
   const loc = localityOf(ctx.locality);
   const localityUsd = loc ? localityFigure(item.id, loc.key) : null;
@@ -355,7 +406,7 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
     floorLabel,
     ceilingUsd: charge,
     ceilingLabel: charge !== null
-      ? 'Average charge providers submitted for the same service, CY2024 — a ceiling, not your rate'
+      ? 'Average charge providers submitted for the same service, CY2024: a ceiling, not your rate'
       : null,
   });
 
@@ -363,7 +414,7 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
   if (isAllPayerPop(item) && !isMedicarePop(item)) {
     return base(
       'DESCRIBES YOU',
-      `This is an average across ${lowerFirst(item.population)} — everyone with any kind of coverage, and people with none. `
+      `This is an average across ${lowerFirst(item.population)}: everyone with any kind of coverage, and people with none. `
       + 'It describes the population you are part of, not the price any one plan pays.',
     );
   }
@@ -372,7 +423,8 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
     switch (cov) {
       case 'medicare':
         return base('DESCRIBES YOU',
-          loc ? `You are on Medicare and you told us ${loc.displayName}. This is the amount Medicare allows there for this service.`
+          loc && which === 'locality' ? `You are on Medicare and you told us ${loc.displayName}. This is the amount Medicare allows there for this service.`
+            : loc ? `You are on Medicare. This row has one national figure and none for ${loc.displayName}, so it is not adjusted for where you live.`
               : 'You are on Medicare, and this is the amount Medicare allows for this service. Choose where you live and it becomes your locality’s figure.');
       case 'employer':
       case 'marketplace':
@@ -386,10 +438,24 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
            published figures that bracket a private price — the Medicare allowed
            amount below it and the CY2024 average submitted charge above it — so a
            person on employer coverage is told what is known and what is not. */
-        return base('REFERENCE PRICE',
-          `${cov === 'employer' ? 'Employer plans' : 'Marketplace plans'} negotiate their own prices with each hospital and practice, and no federal file publishes them. `
-          + 'This is the federal reference figure for the same service, not your bill — private plans normally pay more than Medicare, '
-          + 'and the average charge below is what the same service is billed at before any plan negotiates it down.');
+        /* 2026-09-30 (payer lane): what IS published. Hospitals must post the rates
+           they negotiated with each plan (45 CFR 180). Where the files we read give
+           rates from two or more hospitals for this line's code, the sentence says so
+           and names the count; the rates themselves sit beside the figure as their
+           own labelled range (components/PrivateRange.tsx), never in its place and
+           never in a total. The figure on the card stays the Medicare reference. */
+        {
+          /* the count only: the rates load with the line's drawer (lib/private-rate-lines.ts) */
+          const hosp = privateRangeHospitals(item);
+          const pr = hosp > 0;
+          return base('REFERENCE PRICE',
+            `${cov === 'employer' ? 'Employer plans' : 'Marketplace plans'} negotiate their own prices with each hospital and practice, and no federal file publishes them. `
+            + (pr
+              ? `Hospitals must post the rates they negotiated, under the federal price transparency rule (45 CFR 180), and ${hosp} hospitals' files list commercial rates for this service; they are shown beside this figure as hospital-published rates, never added to your total. `
+              : '')
+            + 'This is the federal reference figure for the same service, not your bill. Private plans normally pay more than Medicare, '
+            + 'and the average charge below is what the same service is billed at before any plan negotiates it down.');
+        }
       case 'medicaid':
         return {
           verdict: 'NOT DESCRIBED',
@@ -398,7 +464,7 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
           figureNote: 'No published federal figure describes you here',
           which: 'none',
           offerGap: true,
-          reference: bracket('Reference price, not your rate — what Medicare allows for the same service'),
+          reference: bracket('Reference price, not your rate: what Medicare allows for the same service'),
         };
       case 'uninsured':
         if (charge !== null) {
@@ -419,7 +485,7 @@ export function fitOf(item: PriceItem, ctx: Ctx): Fit {
           figureNote: 'No published federal figure describes you here',
           which: 'none',
           offerGap: true,
-          reference: bracket('Reference price, not your rate — the Medicare allowed amount for the same service'),
+          reference: bracket('Reference price, not your rate: the Medicare allowed amount for the same service'),
         };
       default:
         return base('REFERENCE PRICE',
@@ -455,7 +521,7 @@ export function totalLabels(ctx: Ctx): TotalLabels {
        total on this page can only ever be the Medicare reference. Saying so is
        the whole point: the heading must not claim to be what Medicaid pays. */
     return {
-      primary: `What Medicare would allow for these services${where} — a reference, not what Medicaid pays`,
+      primary: `What Medicare would allow for these services${where}: a reference, not what Medicaid pays`,
       secondary: null,
     };
   }
@@ -558,7 +624,12 @@ export interface NoFigureCopy {
 
 /** The words that stand where the total would have been. About the data, never
  *  about the person, and each one ends in something to do. */
-export function noFigureCopy(ctx: Ctx, lines: number): NoFigureCopy {
+export function noFigureCopy(ctx: Ctx, lines: number, forChild = false): NoFigureCopy {
+  const c = noFigureCopyAsSaid(ctx, lines);
+  return forChild ? { ...c, headline: aboutTheChild(c.headline), body: aboutTheChild(c.body) } : c;
+}
+
+function noFigureCopyAsSaid(ctx: Ctx, lines: number): NoFigureCopy {
   const n = `${lines} ${lines === 1 ? 'line' : 'lines'}`;
   if (ctx.coverage === 'medicaid') {
     return {
@@ -657,4 +728,52 @@ function titleCase(s: string): string {
 
 function lowerFirst(s: string): string {
   return s ? s.charAt(0).toLowerCase() + s.slice(1) : s;
+}
+
+/* ==========================================================================
+   R6 finding F2 — COUNT THE DATA, NOT THE VIEW.
+
+   The ledger printed "0 of these 8 lines carry a figure CMS publishes for Iowa"
+   thirty pixels under "$1,253 — what the published Medicare figures add up to in
+   Iowa", a subtotal only reachable THROUGH those Iowa figures. The count was
+   counting the lines whose currently-shown basis happened to be 'locality', and
+   under Uninsured every line switches to 'charge', so the answer was always zero.
+
+   What a reader wants to know is what CMS publishes for their place. That is a
+   property of the row, not of the view, so it is counted off the row — and the
+   denominator is the PRICED lines, because an unpriceable line has no figure of
+   any kind to carry.
+   ========================================================================== */
+export interface LocalityLineNote {
+  /** priced lines whose table row carries a figure for this locality */
+  withLocality: number;
+  /** priced lines — the honest denominator */
+  priced: number;
+  sentence: string;
+}
+
+export function localityLineNote(
+  entries: { item: PriceItem | null }[],
+  opts: { placeName: string; showingCharges?: boolean; subtotalLabel?: string | null },
+): LocalityLineNote | null {
+  const priced = entries.filter((e) => e.item && e.item.valueUsd !== null);
+  if (!priced.length) return null;
+  const withLocality = priced.filter((e) => hasLocalityFigures(e.item!.id)).length;
+  const rest = priced.length - withLocality;
+  const n = priced.length;
+  const place = opts.placeName;
+  const tail = rest === 0
+    ? ''
+    : ` The other ${rest} ${rest === 1 ? 'is' : 'are'} priced from a national rate, and each says why on its own line.`;
+  if (withLocality === 0) {
+    return { withLocality, priced: n,
+      sentence: `None of these ${n} priced lines carries a figure CMS publishes for ${place}. `
+              + `Every one uses a national rate, and each says why on its own line.` };
+  }
+  const built = opts.showingCharges && opts.subtotalLabel
+    ? `: they are what the ${opts.subtotalLabel} beside the total is built from.`
+    : '.';
+  return { withLocality, priced: n,
+    sentence: `${withLocality} of these ${n} priced lines ${opts.showingCharges ? 'also ' : ''}`
+            + `carry a figure CMS publishes for ${place}${built}${tail}` };
 }

@@ -90,7 +90,7 @@ describe('/data.json is a DCAT-US v1.1 catalog', () => {
   it('declares the schema version data.gov harvests on, and points at the schema', () => {
     expect(CATALOG.conformsTo).toBe('https://project-open-data.cio.gov/v1.1/schema');
     expect(CATALOG['@type']).toBe('dcat:Catalog');
-    expect(CATALOG['@id']).toBe('https://waypoint-ledger.pages.dev/data.json');
+    expect(CATALOG['@id']).toBe('https://waypointledger.org/data.json');
     expect(CATALOG.describedBy).toBe('https://project-open-data.cio.gov/v1.1/schema/catalog.json');
   });
 
@@ -116,7 +116,7 @@ describe('/data.json is a DCAT-US v1.1 catalog', () => {
 });
 
 describe('🔴 every URL in the catalog is a thing that exists', () => {
-  const site = 'https://waypoint-ledger.pages.dev';
+  const site = 'https://waypointledger.org';
   const distributions: any[] = CATALOG.dataset.flatMap((d: any) => d.distribution ?? []);
 
   /** A catalog URL is either a file under public/ or a Pages Function that

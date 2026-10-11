@@ -15,12 +15,15 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import prices from '../data/prices.json';
+import additions from '../data/prices-additions-2026-09-09.json';
 import unpriceable from '../data/unpriceable.json';
 import invisible from '../data/invisible-events.json';
 import { countTrips } from '../lib/burdens';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const items = prices.items as Array<Record<string, any>>;
+/* 🔴 The audit covers the table the app serves — prices.json AND the 2026-09-09
+   additions (R6): 274 rows, not the 117 in the first file alone. */
+const items = [...prices.items, ...additions.items] as Array<Record<string, any>>;
 const audit = JSON.parse(readFileSync(root + 'data/AUDIT.json', 'utf8')) as {
   rows: number; pass: number; fail: number; unverified: number;
   alternates: number; alternates_pass: number; alternates_fail: number; alternates_unverified: number;
@@ -87,9 +90,19 @@ describe('a figure is priced in the schedule that publishes it', () => {
       const n = Number(/(\d{5})/.exec(String(i.code ?? ''))?.[1]);
       if (!n) continue;
       const fam = familyOf(String(i.source_title ?? ''));
-      const isLabCode = n >= 80000 && n <= 89999;
+      /* 88000–88399 is anatomic pathology — a physician's own service, which CMS
+         pays under the PFS, not the clinical lab schedule. It carries an 8-series
+         code and is not a "lab test" in the CLFS sense (cms-path-tissue-exam,
+         CPT 88305). Everything else in the 8-series is. */
+      const isLabCode = n >= 80000 && n <= 89999 && !(n >= 88000 && n <= 88399);
       if (isLabCode && fam === 'PFS') wrong.push(`${i.id} is a lab code priced on the PFS`);
-      if (!isLabCode && fam === 'CLFS') wrong.push(`${i.id} is not a lab code but is priced on the CLFS`);
+      /* CPT 36415, drawing the blood, is a specimen-collection fee CMS publishes ON
+         the clinical lab schedule — data/verify_additions.py reads its rate straight
+         out of PUF_CLFS_CY2026_Q3V1.csv. It is the one non-8-series code that
+         belongs there. */
+      if (!isLabCode && fam === 'CLFS' && n !== 36415) {
+        wrong.push(`${i.id} is not a lab code but is priced on the CLFS`);
+      }
     }
     expect(wrong).toEqual([]);
   });

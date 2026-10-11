@@ -1,6 +1,6 @@
 {
-  "_README": "Two hundred and nine sentences a real patient might type, and the units of care a careful reader would say each one names. Used by scripts/eval-mapper.mjs (rules alone vs rules plus the AI reader, end to end through POST /api/map) and by scripts/eval-models.mjs (one model against another on the same corpus). Nothing here is a real person: every sentence was written for this file from the catalog's own labels and plain_language_synonyms, and there is no PHI in it. `expect` is a SET of catalog ids from data/prices.json - the metric ignores counts and order, because segmentation differs between readers and the question is which units were found. An empty `expect` is a sentence that must produce NO priced unit at all: a wait, a symptom, a feeling, care that was refused or denied or skipped, care someone else had, or care only wondered about. `kind` groups the sentences so precision can be read per category: control, lay, count, wait, not-received, symptom, mixed, typo, place, hypothetical, someone-else, demo.",
-  "_written_by": "Cases 1-30: BUILD-8 measurement lane, 2026-09-09. Cases 31-185 and 186-209: READER-2 lane, 2026-09-09, written by hand from data/prices.json labels and data/synonyms.json - no model wrote a sentence or an expectation. The expectations are one careful reader's judgment, not an external gold standard; that limit is stated wherever the numbers are quoted.",
+  "_README": "Three hundred and thirty-five sentences a real patient (or, for the 60 of kind \"judge\", a challenge judge trying it) might type, and the units of care a careful reader would say each one names. Used by scripts/eval-mapper.mjs (rules alone vs rules plus the AI reader, end to end through POST /api/map) and by scripts/eval-models.mjs (one model against another on the same corpus). Nothing here is a real person: every sentence was written for this file from the catalog's own labels and plain_language_synonyms, and there is no PHI in it. `expect` is a SET of catalog ids from data/prices.json - the metric ignores counts and order, because segmentation differs between readers and the question is which units were found. An empty `expect` is a sentence that must produce NO priced unit at all: a wait, a symptom, a feeling, care that was refused or denied or skipped, care someone else had, or care only wondered about. `kind` groups the sentences so precision can be read per category: control, lay, count, wait, not-received, symptom, mixed, typo, place, hypothetical, someone-else, demo.",
+  "_written_by": "Cases 1-30: BUILD-8 measurement lane, 2026-09-09. Cases 31-185 and 186-209: READER-2 lane, 2026-09-09, written by hand from data/prices.json labels and data/synonyms.json - no model wrote a sentence or an expectation. The expectations are one careful reader's judgment, not an external gold standard; that limit is stated wherever the numbers are quoted. Cases 306-335: FINAL-1011 reader lane, 2026-10-11, written by hand the same way (no model wrote a sentence or an expectation).",
   "_version": "map-eval-3",
   "_catalog_checked_against": "data/prices.json + data/prices-additions-2026-09-09.json (251 selectable rows on 2026-09-09); every id in every `expect` is checked to exist and be selectable by scripts/eval-models.mjs, which exits 2 on an orphan.",
   "cases": [
@@ -1219,10 +1219,10 @@
       "kind": "mixed",
       "story": "my primary care visit, a thyroid test, and a referral I never used",
       "expect": [
-        "cms-99214",
+        "cms-99213",
         "cms-lab-tsh"
       ],
-      "note": "two units and an unused referral"
+      "note": "two units and an unused referral; the plain primary-care visit is 99213, the level the words support (FLOW judge-7, patient2-8)"
     },
     {
       "id": 142,
@@ -1333,10 +1333,9 @@
       "story": "the neurologist ordered nerve conduction studies and an MRI of my lower back",
       "expect": [
         "cms-99204",
-        "cms-test-emg",
         "cms-img-mri-lumbar-nc"
       ],
-      "note": "visit and two studies"
+      "note": "visit and two studies. Since 2026-09-30 R4b (main session, NEVER INVENT SPECIFICITY): the nerve conduction studies name no number of nerves, and CMS prices them by that number (95907-95913), so that line is unpriced by name and expects no unit."
     },
     {
       "id": 153,
@@ -1643,7 +1642,7 @@
         "cms-test-emg",
         "cms-ed-99284-complete"
       ],
-      "note": "THE DEMO SENTENCE, verbatim from shots2/demo-path.mjs. Five units; the fragment \"shocked the nerves\" must be absorbed into the EMG, not priced twice."
+      "note": "THE DEMO SENTENCE, verbatim from shots2/demo-path.mjs. Five units, six chips, since 2026-09-30 R4b (main session, NEVER INVENT SPECIFICITY): \"they put electrodes on my legs\" is the needle EMG add-on (95886, read by the AI reader); \"shocked the nerves\" is the nerve conduction study, read by the rules and unpriced by name because no number of nerves was said (95907-95913 are priced by that number), so it expects no unit. R4 had expected cms-test-ncs-3-4 there; withdrawn."
     },
     {
       "id": 186,
@@ -1856,6 +1855,1063 @@
       "story": "the mammogram is booked for next month",
       "expect": [],
       "note": "care in the future is not care received"
+    },
+    {
+      "id": 210,
+      "kind": "judge",
+      "story": "I saw 8 different doctors over 7 years before anyone figured out it was POTS",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: generic 'doctors' names no visit level; the span is time searching and POTS a name"
+    },
+    {
+      "id": 211,
+      "kind": "judge",
+      "story": "three ER visits for chest pain",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: count before the noun"
+    },
+    {
+      "id": 212,
+      "kind": "judge",
+      "story": "8 physical therapy visits for my back",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: count before a two-word unit"
+    },
+    {
+      "id": 213,
+      "kind": "judge",
+      "story": "my rheumatologist ordered an ANA and a sed rate",
+      "expect": [
+        "cms-99204",
+        "cms-lab-ana",
+        "cms-lab-esr"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: clinician plus two labs"
+    },
+    {
+      "id": 214,
+      "kind": "judge",
+      "story": "I have Lyme disease",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a diagnosis statement is not a test"
+    },
+    {
+      "id": 215,
+      "kind": "judge",
+      "story": "they said POTS",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a named diagnosis, said by someone"
+    },
+    {
+      "id": 216,
+      "kind": "judge",
+      "story": "got sick at 12, diagnosed at 19",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: an age span: time searching"
+    },
+    {
+      "id": 217,
+      "kind": "judge",
+      "story": "4 expensive brain MRIs",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: count with an adjective"
+    },
+    {
+      "id": 218,
+      "kind": "judge",
+      "story": "two cardiology appointments and an echo",
+      "expect": [
+        "cms-99204",
+        "cms-99214",
+        "cms-img-echo"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: specialty said as an adjective: first visit new, the second a return"
+    },
+    {
+      "id": 219,
+      "kind": "judge",
+      "story": "they did a sleep study",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: plain test"
+    },
+    {
+      "id": 220,
+      "kind": "judge",
+      "story": "saw my primary care doctor 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: plain primary care is 99213 (judge-7)"
+    },
+    {
+      "id": 221,
+      "kind": "judge",
+      "story": "a colonoscopy and an upper endoscopy with a biopsy",
+      "expect": [
+        "cms-proc-colonoscopy",
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: two scopes, the biopsy said"
+    },
+    {
+      "id": 222,
+      "kind": "judge",
+      "story": "a tilt table test at the cardiologist",
+      "expect": [
+        "cms-test-tilt-table",
+        "cms-99204"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: test plus the visit it happened at"
+    },
+    {
+      "id": 223,
+      "kind": "judge",
+      "story": "over a decade of tests",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a decade is a span"
+    },
+    {
+      "id": 224,
+      "kind": "judge",
+      "story": "spent two and a half years looking for an answer",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a half-year span, kept whole"
+    },
+    {
+      "id": 225,
+      "kind": "judge",
+      "story": "between 2019 and 2023 I saw a neurologist 3 times",
+      "expect": [
+        "cms-99204",
+        "cms-99214"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: year range beside care"
+    },
+    {
+      "id": 226,
+      "kind": "judge",
+      "story": "my daughter's pediatrician 6 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a child's regular doctor"
+    },
+    {
+      "id": 227,
+      "kind": "judge",
+      "story": "a CT of my abdomen and pelvis with contrast",
+      "expect": [
+        "cms-img-ct-abd-pelvis-c"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: protected 'and'"
+    },
+    {
+      "id": 228,
+      "kind": "judge",
+      "story": "blood tests every 3 months for 2 years",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: frequency times duration"
+    },
+    {
+      "id": 229,
+      "kind": "judge",
+      "story": "I was told it was stress",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a dismissal, counted, never priced"
+    },
+    {
+      "id": 230,
+      "kind": "judge",
+      "story": "the ER twice and an EKG",
+      "expect": [
+        "cms-ed-99284-complete",
+        "cms-test-ecg"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: ER count and an ECG"
+    },
+    {
+      "id": 231,
+      "kind": "judge",
+      "story": "they checked my thyroid",
+      "expect": [
+        "cms-lab-tsh"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: thyroid check is a TSH"
+    },
+    {
+      "id": 232,
+      "kind": "judge",
+      "story": "a B12 test and a vitamin D level",
+      "expect": [
+        "cms-lab-b12",
+        "cms-lab-vitamin-d"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: two labs"
+    },
+    {
+      "id": 233,
+      "kind": "judge",
+      "story": "a nerve conduction study on 4 nerves",
+      "expect": [
+        "cms-test-ncs-3-4"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: nerve count said"
+    },
+    {
+      "id": 234,
+      "kind": "judge",
+      "story": "an EMG on my legs",
+      "expect": [
+        "cms-test-emg"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: EMG"
+    },
+    {
+      "id": 235,
+      "kind": "judge",
+      "story": "a chest x-ray",
+      "expect": [
+        "cms-img-cxr"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: plain imaging"
+    },
+    {
+      "id": 236,
+      "kind": "judge",
+      "story": "an allergist visit about the hives",
+      "expect": [
+        "cms-99204"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: a specialist named once"
+    },
+    {
+      "id": 237,
+      "kind": "judge",
+      "story": "symptoms started in 2016",
+      "expect": [],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: an onset year: time searching"
+    },
+    {
+      "id": 238,
+      "kind": "judge",
+      "story": "10 awful physical therapy sessions",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: count with an adjective"
+    },
+    {
+      "id": 239,
+      "kind": "judge",
+      "story": "from 2015 to 2022 I kept going back to my regular doctor",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "judge panel #5 (2026-10-01), typed the way a judge would: year range beside care"
+    },
+    {
+      "id": 240,
+      "kind": "wait",
+      "story": "it took months to find out what was wrong",
+      "expect": [],
+      "note": "FLOW4 flow4-1 (2026-10-01): 'took' and 'out' carried 2 of the 3 words of 'took out a polyp' and priced a $500 colonoscopy"
+    },
+    {
+      "id": 241,
+      "kind": "lay",
+      "story": "they took me out of work for 3 weeks",
+      "expect": [],
+      "note": "FLOW4 flow4-1: lost work, never a procedure"
+    },
+    {
+      "id": 242,
+      "kind": "lay",
+      "story": "took out a loan to pay for it",
+      "expect": [],
+      "note": "FLOW4 flow4-1: a loan, never a procedure"
+    },
+    {
+      "id": 243,
+      "kind": "wait",
+      "story": "took a while to figure out",
+      "expect": [],
+      "note": "FLOW4 flow4-1: a wait, never a procedure"
+    },
+    {
+      "id": 244,
+      "kind": "lay",
+      "story": "a colonoscopy where they took out a polyp",
+      "expect": [
+        "cms-proc-colonoscopy-polyp"
+      ],
+      "note": "FLOW4 flow4-1: the real polyp removal still prices"
+    },
+    {
+      "id": 245,
+      "kind": "symptom",
+      "story": "had dizzy spells for 4 years",
+      "expect": [],
+      "note": "FLOW4 flow4-3 (2026-10-01): 4 years searching, said as the illness; no unit of care"
+    },
+    {
+      "id": 246,
+      "kind": "symptom",
+      "story": "sick for 4 years",
+      "expect": [],
+      "note": "FLOW4 flow4-3: 4 years searching; no unit of care"
+    },
+    {
+      "id": 247,
+      "kind": "symptom",
+      "story": "dizzy for 4 years",
+      "expect": [],
+      "note": "FLOW4 flow4-3: 4 years searching; no unit of care"
+    },
+    {
+      "id": 248,
+      "kind": "symptom",
+      "story": "had migraines for 4 years",
+      "expect": [],
+      "note": "FLOW4 flow4-3: 4 years searching; no unit of care"
+    },
+    {
+      "id": 249,
+      "kind": "symptom",
+      "story": "I was sick for 4 years before anyone listened",
+      "expect": [],
+      "note": "FLOW4 flow4-3: 4 years searching; no unit of care"
+    },
+    {
+      "id": 250,
+      "kind": "wait",
+      "story": "took me 3 years to find out it was lupus",
+      "expect": [],
+      "note": "FLOW4 flow4-1 and flow4-3: 36 months searching, never a colonoscopy"
+    },
+    {
+      "id": 251,
+      "kind": "mixed",
+      "story": "took me 3 years to find out it was lupus. my GP kept saying stress, maybe 8 visits. saw a rheumatologist twice, tons of bloodwork, an ultrasound of my belly, a colonoscopy, and two trips to the ER for chest pain",
+      "expect": [
+        "cms-99213",
+        "cms-99204",
+        "cms-99214",
+        "cms-lab-cbc",
+        "cms-img-us-abdomen",
+        "cms-proc-colonoscopy",
+        "cms-ed-99284-complete"
+      ],
+      "note": "FLOW4 judge walk, typed at 1440: one colonoscopy (the one she named), never a polyp removal for 'took me 3 years to find out'"
+    },
+    {
+      "id": 252,
+      "kind": "count",
+      "story": "my GP kept saying stress, maybe 8 visits.",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "FLOW4 flow4-4 (2026-10-01): the count after the comma is the GP's, x8 (the eval ignores counts; tests/flow4-count-after-comma.test.ts pins it)"
+    },
+    {
+      "id": 253,
+      "kind": "count",
+      "story": "my GP kept saying stress, about 8 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "FLOW4 flow4-4: x8 on the GP line, no unpriced 'about 8 times' line"
+    },
+    {
+      "id": 254,
+      "kind": "symptom",
+      "story": "it was lupus",
+      "expect": [],
+      "note": "FLOW4 flow4-6 (2026-10-01): a diagnosis said plainly, never 'check the spelling'"
+    },
+    {
+      "id": 255,
+      "kind": "symptom",
+      "story": "they found lupus",
+      "expect": [],
+      "note": "FLOW4 flow4-6: a diagnosis"
+    },
+    {
+      "id": 256,
+      "kind": "symptom",
+      "story": "it was celiac",
+      "expect": [],
+      "note": "FLOW4 flow4-6: a diagnosis"
+    },
+    {
+      "id": 257,
+      "kind": "lay",
+      "story": "it was a colonoscopy that found the crohns",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "FLOW4 flow4-6: the care beside the diagnosis still prices"
+    },
+    {
+      "id": 258,
+      "kind": "someone-else",
+      "story": "my wife had seizures for a year. she saw her regular doctor 4 times, a neurologist, and 2 EEGs",
+      "expect": [
+        "cms-99213",
+        "cms-99204",
+        "cms-test-eeg-awake-drowsy"
+      ],
+      "note": "FLOW4 flow4-10 (2026-10-01): a spouse's story is the search; the year is counted, the first line is never 'did not happen to you'"
+    },
+    {
+      "id": 259,
+      "kind": "someone-else",
+      "story": "my husband was sick for 2 years",
+      "expect": [],
+      "note": "FLOW4 flow4-10: 2 years searching; no unit of care"
+    },
+    {
+      "id": 260,
+      "kind": "lay",
+      "story": "they took blood 3 times",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "FLOW4 flow4-15 (2026-10-01): 'took blood' is 'drew blood'; 'took' alone never carries a match (flow4-1)"
+    },
+    {
+      "id": 261,
+      "kind": "wait",
+      "story": "it took 6 years to get a diagnosis",
+      "expect": [],
+      "note": "FLOW5 flow5-4 (2026-10-01): one line, 72 months searching, no 'check the spelling' line"
+    },
+    {
+      "id": 262,
+      "kind": "wait",
+      "story": "it took months to find out what was wrong",
+      "expect": [],
+      "note": "FLOW5 flow5-4: a span of unknown length, counted with no months"
+    },
+    {
+      "id": 263,
+      "kind": "lay",
+      "story": "had a colonoscopy where they found nothing",
+      "expect": [
+        "cms-proc-colonoscopy"
+      ],
+      "note": "FLOW5 flow5-4: 'they found nothing' is the result, never a line of its own"
+    },
+    {
+      "id": 264,
+      "kind": "count",
+      "story": "the doctor saw me 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 265,
+      "kind": "count",
+      "story": "she saw her doctor 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 266,
+      "kind": "count",
+      "story": "her doctor saw her 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 267,
+      "kind": "count",
+      "story": "saw my doctor 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 268,
+      "kind": "count",
+      "story": "saw the doctor 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 269,
+      "kind": "count",
+      "story": "went to the doctor 5 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-5 #4 (2026-10-01): the regular doctor x5, however it is said (the eval ignores counts; tests/flow5-doctor-saw-me.test.ts pins x5)"
+    },
+    {
+      "id": 270,
+      "kind": "wait",
+      "story": "it took months to find out",
+      "expect": [],
+      "note": "JUDGE-5 #5 (2026-10-01): one line of time spent searching (months null when no number is said), never 'check the spelling'"
+    },
+    {
+      "id": 271,
+      "kind": "wait",
+      "story": "it took years to find out",
+      "expect": [],
+      "note": "JUDGE-5 #5 (2026-10-01): one line of time spent searching (months null when no number is said), never 'check the spelling'"
+    },
+    {
+      "id": 272,
+      "kind": "wait",
+      "story": "it took 2 years to find out",
+      "expect": [],
+      "note": "JUDGE-5 #5 (2026-10-01): one line of time spent searching (months null when no number is said), never 'check the spelling'"
+    },
+    {
+      "id": 273,
+      "kind": "wait",
+      "story": "took months before anyone listened",
+      "expect": [],
+      "note": "JUDGE-5 #5 (2026-10-01): one line of time spent searching (months null when no number is said), never 'check the spelling'"
+    },
+    {
+      "id": 274,
+      "kind": "someone-else",
+      "story": "my mom took me to the pediatrician 6 times",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-6 #3 (2026-10-01): 'took me' is the writer's own care, x6"
+    },
+    {
+      "id": 275,
+      "kind": "someone-else",
+      "story": "my wife saw a neurologist twice",
+      "expect": [
+        "cms-99204",
+        "cms-99214"
+      ],
+      "note": "JUDGE-6 #3: a story whose only patient is the wife is her ledger"
+    },
+    {
+      "id": 276,
+      "kind": "someone-else",
+      "story": "my husband had a sleep study and an EEG",
+      "expect": [
+        "cms-test-sleep-study",
+        "cms-test-eeg-awake-drowsy"
+      ],
+      "note": "JUDGE-6 #3: one story, one patient: both or neither"
+    },
+    {
+      "id": 277,
+      "kind": "lay",
+      "story": "he had a sleep study",
+      "expect": [
+        "cms-test-sleep-study"
+      ],
+      "note": "JUDGE-6 #3"
+    },
+    {
+      "id": 278,
+      "kind": "mixed",
+      "story": "ER visit by ambulance, admitted overnight",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "JUDGE-6 #5 (2026-10-01): the ER prices; the overnight stay says it is a hospital stay, never 'check the spelling'"
+    },
+    {
+      "id": 279,
+      "kind": "lay",
+      "story": "admitted to the hospital for 3 days",
+      "expect": [],
+      "note": "JUDGE-6 #5: a hospital stay, unpriced with its own reason"
+    },
+    {
+      "id": 280,
+      "kind": "lay",
+      "story": "he was admitted for two nights",
+      "expect": [],
+      "note": "JUDGE-6 #5: a hospital stay"
+    },
+    {
+      "id": 281,
+      "kind": "symptom",
+      "story": "I've been sick since I was 12, I'm 34 now",
+      "expect": [],
+      "note": "JUDGE-6 #5: 22 years searching"
+    },
+    {
+      "id": 282,
+      "kind": "symptom",
+      "story": "ive been sick for 7 yrs",
+      "expect": [],
+      "note": "JUDGE-6 #5: 'yrs' is years: 84 months searching"
+    },
+    {
+      "id": 283,
+      "kind": "lay",
+      "story": "a couple of ultrasounds",
+      "expect": [],
+      "note": "JUDGE-6 #5: an ultrasound with no part says to name the part, never 'no test named'"
+    },
+    {
+      "id": 284,
+      "kind": "count",
+      "story": "2 mri's of my brain",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "JUDGE-6 #7 (2026-10-01): the apostrophe plural counts x2, as '2 MRIs' does"
+    },
+    {
+      "id": 285,
+      "kind": "count",
+      "story": "2 MRIs of my brain",
+      "expect": [
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "JUDGE-6 #7: the plain plural, x2"
+    },
+    {
+      "id": 286,
+      "kind": "count",
+      "story": "3 CTs of my head",
+      "expect": [
+        "cms-img-ct-head-nc"
+      ],
+      "note": "JUDGE-6 #7: a three-letter acronym plural prices and counts x3"
+    },
+    {
+      "id": 287,
+      "kind": "count",
+      "story": "two ekg's",
+      "expect": [
+        "cms-test-ecg"
+      ],
+      "note": "JUDGE-6 #7: apostrophe plural of an alias (ekg to ecg), x2"
+    },
+    {
+      "id": 288,
+      "kind": "count",
+      "story": "physical therapy for 6 weeks, 2x a week",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "JUDGE-6 #9 (2026-10-01): span then rate reads x12, the same as rate then span"
+    },
+    {
+      "id": 289,
+      "kind": "count",
+      "story": "physical therapy 2x a week for 6 weeks",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "JUDGE-6 #9: rate then span, x12"
+    },
+    {
+      "id": 290,
+      "kind": "count",
+      "story": "my mom took me to the pediatrician over and over",
+      "expect": [
+        "cms-99213"
+      ],
+      "note": "JUDGE-6 #9: 'over and over' is a repeat with no number, counted once with an ask, never a chip"
+    },
+    {
+      "id": 291,
+      "kind": "someone-else",
+      "story": "He was in the hospital for 5 days after a fall",
+      "expect": [],
+      "note": "JUDGE-7 #3 (2026-10-01): a hospital stay is counted, never priced as Transitional care 99495"
+    },
+    {
+      "id": 292,
+      "kind": "lay",
+      "story": "spent 3 nights in the ICU",
+      "expect": [],
+      "note": "JUDGE-7 #3: an ICU stay is a hospital stay, unpriced with its own reason"
+    },
+    {
+      "id": 293,
+      "kind": "lay",
+      "story": "dialysis",
+      "expect": [],
+      "note": "JUDGE-7 #7 (2026-10-01): spelled right, so never 'check the spelling'; the table holds no dialysis row"
+    },
+    {
+      "id": 294,
+      "kind": "lay",
+      "story": "a heart cath",
+      "expect": [],
+      "note": "JUDGE-7 #7: spelled right; no cardiac catheterization row in the table"
+    },
+    {
+      "id": 295,
+      "kind": "lay",
+      "story": "a HIDA scan",
+      "expect": [],
+      "note": "JUDGE-7 #7: spelled right; no HIDA row"
+    },
+    {
+      "id": 296,
+      "kind": "not-received",
+      "story": "I missed about 30 days of work.",
+      "expect": [],
+      "note": "JUDGE-7 #7: missed work is the lost-work reason, never a spelling question"
+    },
+    {
+      "id": 297,
+      "kind": "lay",
+      "story": "thyroid labs",
+      "expect": [
+        "cms-lab-tsh"
+      ],
+      "note": "JUDGE-7 #9 (2026-10-01): a named analyte is its own row, never the generic CBC"
+    },
+    {
+      "id": 298,
+      "kind": "lay",
+      "story": "a ton of labs (ANA, CBC, sed rate).",
+      "expect": [
+        "cms-lab-ana",
+        "cms-lab-cbc",
+        "cms-lab-esr"
+      ],
+      "note": "JUDGE-7 #9: the ANA is the ANA, never a second CBC"
+    },
+    {
+      "id": 299,
+      "kind": "someone-else",
+      "story": "My dad is 78.",
+      "expect": [],
+      "note": "JUDGE-7 #5 (2026-10-01): an adult relative's age is an age, never a cost row"
+    },
+    {
+      "id": 300,
+      "kind": "someone-else",
+      "story": "my mom is 70",
+      "expect": [],
+      "note": "JUDGE-7 #5: an age"
+    },
+    {
+      "id": 301,
+      "kind": "someone-else",
+      "story": "my grandma is 88",
+      "expect": [],
+      "note": "JUDGE-7 #5: an age"
+    },
+    {
+      "id": 302,
+      "kind": "count",
+      "story": "She is 12. She saw a pediatrician 4 times and had bloodwork twice.",
+      "expect": [
+        "cms-99213",
+        "cms-lab-cbc"
+      ],
+      "note": "JUDGE-7 #6: a child's story, the age read as an age"
+    },
+    {
+      "id": 303,
+      "kind": "count",
+      "story": "Saw rheumatology 4x, neurology 2x, GI 3x",
+      "expect": [
+        "cms-99204",
+        "cms-99214"
+      ],
+      "note": "JUDGE-7 #8 (2026-10-01): a specialty said for the visit is that specialist's first visit and return visits"
+    },
+    {
+      "id": 304,
+      "kind": "count",
+      "story": "saw 6 doctors",
+      "expect": [],
+      "note": "JUDGE-7 #8: a count of doctors with no kind named is counted, unpriced, never a spelling question"
+    },
+    {
+      "id": 305,
+      "kind": "count",
+      "story": "Dr. visits: 12. Labs: 8. MRIs: 2.",
+      "expect": [
+        "cms-99213",
+        "cms-lab-cbc"
+      ],
+      "note": "JUDGE-7 #8 (2026-10-01): a 'label: number' list is the label times the number; MRIs with no part stay unpriced, counted 2"
+    },
+    {
+      "id": 306,
+      "kind": "judge",
+      "story": "I had 8 physical therapy visits for my back",
+      "expect": [
+        "cms-pt-exercise-15"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: count with two words between the number and the noun, x8"
+    },
+    {
+      "id": 307,
+      "kind": "judge",
+      "story": "went to the ER three times in one month",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: worded count, x3"
+    },
+    {
+      "id": 308,
+      "kind": "judge",
+      "story": "they ran two more blood tests and still found nothing",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: 'more' between the number and the noun, x2; 'blood tests' names no single test, so the catalog's most common one; 'found nothing' is a result"
+    },
+    {
+      "id": 309,
+      "kind": "judge",
+      "story": "5 follow-up appointments with my neurologist",
+      "expect": [
+        "cms-99214"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a hyphenated word between number and noun, x5; follow-ups with a specialist are return visits (established, 99214), never a sixth new-patient visit"
+    },
+    {
+      "id": 310,
+      "kind": "judge",
+      "story": "I have Lyme disease",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a diagnosis is a name, never a test"
+    },
+    {
+      "id": 311,
+      "kind": "judge",
+      "story": "they said it was POTS",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: who said it is not a visit; the clause is the name of a condition"
+    },
+    {
+      "id": 312,
+      "kind": "judge",
+      "story": "finally got a diagnosis of endometriosis after 9 years",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a name and nine years of searching, never priced"
+    },
+    {
+      "id": 313,
+      "kind": "judge",
+      "story": "diagnosed with lupus in 2023",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a name and when the answer came"
+    },
+    {
+      "id": 314,
+      "kind": "judge",
+      "story": "I had a Lyme test and it came back negative",
+      "expect": [
+        "cms-lab-lyme-screen"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: the test stays the test; the result is not a second test"
+    },
+    {
+      "id": 315,
+      "kind": "judge",
+      "story": "got sick at 12 and wasnt diagnosed until 19",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: two ages are seven years of searching, never priced"
+    },
+    {
+      "id": 316,
+      "kind": "judge",
+      "story": "sick since 2022 and nobody knows why",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a span to today, never priced"
+    },
+    {
+      "id": 317,
+      "kind": "judge",
+      "story": "it took four years to get answers",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a span, never priced"
+    },
+    {
+      "id": 318,
+      "kind": "judge",
+      "story": "4 differnt specialists and 2 MRIs of my brain",
+      "expect": [
+        "cms-99204",
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a typo in the adjective; four different specialists are four first visits"
+    },
+    {
+      "id": 319,
+      "kind": "judge",
+      "story": "my gp sent me to a rhuematologist who ordered an ANA",
+      "expect": [
+        "cms-99213",
+        "cms-99204",
+        "cms-lab-ana"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a misspelled specialist; the referring visit, the specialist visit and the test"
+    },
+    {
+      "id": 320,
+      "kind": "judge",
+      "story": "6 urgent care visits before anyone took me seriously",
+      "expect": [
+        "cms-99203"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: count before the noun phrase; the dismissal is not care"
+    },
+    {
+      "id": 321,
+      "kind": "judge",
+      "story": "my insurance denied the tilt table test twice",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: care refused, never priced"
+    },
+    {
+      "id": 322,
+      "kind": "judge",
+      "story": "my mom had a colonoscopy last year and I had an upper endoscopy",
+      "expect": [
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: the writer names care of their own, so the mother's colonoscopy is someone else's; the catalog's own plain_language_synonyms put 'upper endoscopy' on the biopsy row"
+    },
+    {
+      "id": 323,
+      "kind": "judge",
+      "story": "I was exhausted all the time and my joints hurt",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: symptoms only"
+    },
+    {
+      "id": 324,
+      "kind": "judge",
+      "story": "saw an endocrinologist twice and had a thyroid ultrasound",
+      "expect": [
+        "cms-99204",
+        "cms-99214",
+        "cms-img-us-thyroid"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: one specialist twice is a new and a return visit"
+    },
+    {
+      "id": 325,
+      "kind": "judge",
+      "story": "three echocardiograms over two years",
+      "expect": [
+        "cms-img-echo"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: count x3; the span is how long, never a count"
+    },
+    {
+      "id": 326,
+      "kind": "judge",
+      "story": "the neurologist did an EEG and an MRI of my brain",
+      "expect": [
+        "cms-99204",
+        "cms-test-eeg-awake-drowsy",
+        "cms-img-mri-brain-nc"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: the clinician named is a visit, and each test is a test"
+    },
+    {
+      "id": 327,
+      "kind": "judge",
+      "story": "they told me it was anxiety and sent me home from the ER",
+      "expect": [
+        "cms-ed-99284-complete"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a dismissal (counted, never priced) and the ER visit it happened at"
+    },
+    {
+      "id": 328,
+      "kind": "judge",
+      "story": "I've been to the gastroenterologist 3 times and had an endoscopy",
+      "expect": [
+        "cms-99204",
+        "cms-99214",
+        "cms-proc-egd-biopsy"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: one specialist three times; the catalog's synonyms put a plain 'endoscopy' on the biopsy row"
+    },
+    {
+      "id": 329,
+      "kind": "judge",
+      "story": "I went from doctor to doctor for 5 years",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: the search itself, five years, never priced"
+    },
+    {
+      "id": 330,
+      "kind": "judge",
+      "story": "two sleep studies and a cpap titration",
+      "expect": [
+        "cms-test-sleep-study",
+        "cms-test-sleep-cpap"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: count x2 and a second study"
+    },
+    {
+      "id": 331,
+      "kind": "judge",
+      "story": "I never got the MRI because I couldnt afford it",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: care not received"
+    },
+    {
+      "id": 332,
+      "kind": "judge",
+      "story": "insurance wouldnt cover the sleep study so I never did it",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: care refused and not received"
+    },
+    {
+      "id": 333,
+      "kind": "judge",
+      "story": "my daughter saw a pediatric neurologist 4 times",
+      "expect": [
+        "cms-99204",
+        "cms-99214"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a parent typing a child's search; one specialist four times"
+    },
+    {
+      "id": 334,
+      "kind": "judge",
+      "story": "they think it might be MS, waiting on a spinal tap",
+      "expect": [],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: a suspected name and care still to come"
+    },
+    {
+      "id": 335,
+      "kind": "judge",
+      "story": "blood work every 3 months for 2 years",
+      "expect": [
+        "cms-lab-cbc"
+      ],
+      "note": "FINAL-1011 reader (2026-10-11), typed the way a judge would: rate times span, x8"
     }
   ]
 }

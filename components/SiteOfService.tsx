@@ -62,7 +62,7 @@ export default function SiteOfService() {
         <p className="eyebrow">Something you can act on</p>
         <h2>
           The same visit code costs {usd(gap, true)} more in a hospital clinic than in a doctor&rsquo;s
-          office &mdash; in {office.year}.
+          office, in {office.year}.
         </h2>
         <p className="sub">
           Not our analysis, and not two different visits. One code, CPT 99213, priced by CMS twice
@@ -113,8 +113,8 @@ export default function SiteOfService() {
             <p className="sos-src">
               CMS Physician Fee Schedule (CY{office.year}) and CMS Hospital Outpatient PPS Addendum B
               (January&nbsp;{office.year}). The doctor&rsquo;s share falls to {usd(facilityPay, true)} in the
-              hospital setting &mdash; {facilityRvu} facility RVUs &times; the same conversion factor
-              &mdash; because the practice-expense half of the payment moves to the hospital, which
+              hospital setting ({facilityRvu} facility RVUs &times; the same conversion factor)
+              because the practice-expense half of the payment moves to the hospital, which
               then bills {usd(hospitalFee.valueUsd, true)} of its own.
             </p>
           </article>
@@ -123,7 +123,7 @@ export default function SiteOfService() {
             <h3>What to do with that</h3>
             <p className="sos-body">
               Ask whether your specialist has an office-based location as well as a hospital clinic,
-              and ask whether the clinic is <em>provider-based</em> &mdash; that is the word that turns
+              and ask whether the clinic is <em>provider-based</em>. That is the word that turns
               one visit into two bills. For someone being sent from specialist to specialist over
               months, this is the largest single lever over what the search costs, and most people have
               never been told it exists.
@@ -144,8 +144,8 @@ export default function SiteOfService() {
 
         <details className="sos-caveat">
           <summary>Where every figure here comes from, and who it does not describe</summary>
-          <p><strong>{office.label}</strong> — {office.coverage}</p>
-          <p><strong>{hospitalFee.label}</strong> — {hospitalFee.coverage}</p>
+          <p><strong>{office.label}</strong>: {office.coverage}</p>
+          <p><strong>{hospitalFee.label}</strong>: {hospitalFee.coverage}</p>
           <p>
             <strong>The hospital-setting physician payment.</strong>{' '}
             {String(rulesFor(OFFICE_ID).alternates?._facility_setting_note ?? '')}
@@ -161,12 +161,12 @@ export default function SiteOfService() {
             </p>
           )}
           <p>
-            {office.sourceTitle} —{' '}
+            {office.sourceTitle}:{' '}
             <a href={office.sourceUrl} target="_blank" rel="noopener noreferrer">
               open the file and check it yourself
             </a>
             {' · '}
-            {hospitalFee.sourceTitle} —{' '}
+            {hospitalFee.sourceTitle}:{' '}
             <a href={hospitalFee.sourceUrl} target="_blank" rel="noopener noreferrer">
               open Addendum B
             </a>

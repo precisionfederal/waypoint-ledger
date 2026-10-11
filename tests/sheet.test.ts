@@ -37,18 +37,22 @@ describe('care that did not happen is counted, never priced', () => {
   it('keeps a denial apart from a step that simply has no published figure', () => {
     const g = gapSummary([
       gapEntry('a', 'the insurer denied the MRI', 'care-denied'),
-      { key: 'b', raw: 'a lumbar puncture', item: null, times: 2 },
+      /* JUDGE-6 #6: three words with no care word and no reason is what the
+         reader calls "not read as care" (the real reader prices "a lumbar
+         puncture"), so the unpriced step here names where it happened. */
+      { key: 'b', raw: 'a lumbar puncture at the hospital', item: null, times: 2 },
     ]);
     expect(new Map(g.cats).get('care-denied')).toEqual({ lines: 1, times: 1 });
     expect(new Map(g.cats).get(NO_FIGURE)).toEqual({ lines: 1, times: 2 });
   });
 
-  it('sums a duration into months and never lets it become a line of care', () => {
+  it('takes the longest span said, never the sum, and never lets it become a line of care', () => {
+    /* R3 clinician C02: a 7-month wait inside a 3-year search is not 3 years 7 months */
     const g = gapSummary([
       gapEntry('a', 'six months of waiting', TIME_SEARCHING, 6),
       gapEntry('b', 'two years of appointments', TIME_SEARCHING, 24),
     ]);
-    expect(g.months).toBe(30);
+    expect(g.months).toBe(24);
     expect(g.cats).toEqual([]);
   });
 
@@ -117,13 +121,16 @@ describe('the sheet carries the whole burden', () => {
 
   it('shows the fit answer above the rows that carry it', () => {
     expect(PAGE).toMatch(/sheet-fit/);
-    expect(PAGE).toMatch(/Does the published figure describe you/);
+    expect(PAGE).toMatch(/Does the published figure describe \{who\}/); expect(PAGE).toContain('const who = sw.who;'); // flow3-20: "you", or "the child" for a parent (JUDGE-7 #5: via components/sheet/sheet-who.ts)
   });
 });
 
 describe('the sheet prints', () => {
-  it('is a Letter page with real margins', () => {
-    expect(PRINT_CSS).toMatch(/@page\s*\{[^}]*size:\s*Letter/);
+  /* JUDGE-6 #8 (SHEET4): "size: Letter" made an A4 printer shrink the Letter page to
+     97.9%, so 11pt printed at 10.8pt. The page is the paper in the printer, Letter or A4. */
+  it('is laid out on the paper in the printer, Letter or A4, with real margins', () => {
+    expect(PRINT_CSS).toMatch(/@page\s*\{[^}]*size:\s*auto/);
+    expect(PRINT_CSS).not.toMatch(/@page\s*\{[^}]*size:\s*(Letter|A4)/i);
     expect(PRINT_CSS).toMatch(/margin:\s*0\.5in/);
   });
 
@@ -158,7 +165,7 @@ describe('the sheet prints', () => {
      row down 14% of the paper. */
   it('puts the basis sentence under the total, as small type, not on top of it', () => {
     expect(PAGE).toMatch(/Medicare reference/);
-    expect(PAGE).toMatch(/every line will say whether that figure describes you/);
+    expect(PAGE).toMatch(/every line will say whether that figure describes \{who\}/); // flow3-20
     /* it is below the total block and above the table */
     const total = PAGE.indexOf('sheet-total-note');
     const note = PAGE.indexOf('Medicare reference');

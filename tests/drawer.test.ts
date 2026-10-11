@@ -42,7 +42,8 @@ const decode = (s: string) => s
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
   .replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&#x2F;/g, '/');
 /** What a person would read off the rendered drawer, whitespace collapsed. */
-const text = decode(html.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').trim();
+/* A tag boundary is not a space a reader sees: "$37.12</b>: 4.8" reads "$37.12: 4.8". */
+const text = decode(html.replace(/<[^>]+>/g, ' ')).replace(/\s+/g, ' ').replace(/ ([:,.;])/g, '$1').trim();
 const lower = text.toLowerCase();
 
 const before = readFileSync('tests/fixtures/drawer-before.txt', 'utf8');
@@ -91,6 +92,7 @@ describe('UX-3 — the rebuild removed nothing', () => {
     for (const fact of facts) {
       const { urls, rest } = stripUrls(fact);
       for (const u of urls) if (!html.includes(u)) missing.push(`url ${u}`);
+      if (rest === 'Who this number does and does not describe') continue; // renamed 2026-09-10, block kept
       if (rest.length > 1 && !lower.includes(rest.toLowerCase())) missing.push(rest);
     }
     expect(missing, `dropped by the rebuild:\n${missing.join('\n')}`).toEqual([]);
@@ -116,10 +118,14 @@ describe('UX-3 — the seven blocks, in order', () => {
     ['1 header', 'Complete blood count'],
     ['2 figure', 'fig-num'],
     ['3 open the source', 'Open the source and check this number'],
-    ['4 what it is', 'What it is'],
-    ['5 where it comes from', 'Where it comes from'],
-    ['6 who it describes', 'Who this number does and does not describe'],
-    ['7 the other measure', 'The other published measure'],
+    // Bo 2026-09-10 ("is my grandma going to read all this fine print?"):
+    // who-it-is-about now comes right after the button; the codes, the file,
+    // the math and the other measure sit behind one "Show the source" line.
+    ['4 who it is about', 'Who this number is about'],
+    ['5 the fold', 'Show the source, the codes and the math'],
+    ['6 what it is', 'What it is'],
+    ['7 where it comes from', 'Where it comes from'],
+    ['8 the other measure', 'The other published measure'],
   ] as const;
 
   it('every block is present', () => {

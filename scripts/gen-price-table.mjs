@@ -18,6 +18,15 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 
 const read = (p) => JSON.parse(readFileSync(new URL(`../${p}`, import.meta.url), 'utf8'));
 const prices = read('data/prices.json');
+/* 🔴 THE PUBLISHED TABLE IS THE WHOLE TABLE.
+   lib/table.ts serves data/prices.json AND data/prices-additions-2026-09-09.json as
+   one 274-row table — that is what the app maps against and what a person lands on —
+   while this publisher wrote out the first file only. So the open-data file a reuser
+   downloaded held 117 rows and 157 of the units of care in the product were not in
+   it (R6). prices.json comes first here for the same reason it does in lib/table.ts:
+   a row an existing id owns stays with it. */
+const additions = read('data/prices-additions-2026-09-09.json');
+const ITEMS = [...prices.items, ...additions.items];
 const audit = existsSync(new URL('../data/AUDIT.json', import.meta.url)) ? read('data/AUDIT.json') : null;
 const auditById = new Map((audit?.results ?? []).map((r) => [r.id, r]));
 
@@ -61,7 +70,7 @@ const COLUMNS = [
   ['plain_language_synonyms', 'text', 'Semicolon-separated phrases people actually use for this.'],
   ['coverage_statement', 'text', 'Who the figure describes, who it does not, and how it was made. The long one. Read it.'],
   ['pfs_status_indicator', 'text', 'Set only where CMS publishes relative value units for the code and pays nothing for it. N = non-covered service; the row carries no figure on purpose.'],
-  ['cy2024_submitted_charge_usd', 'number', 'What providers billed on average for this service in CY2024. CHARGE basis — an alternative measure, never an addition to the allowed amount.'],
+  ['cy2024_submitted_charge_usd', 'number', 'What providers billed on average for this service in CY2024. CHARGE basis: an alternative measure, never an addition to the allowed amount.'],
   ['cy2024_allowed_usd', 'number', 'What Medicare allowed on average for this service in CY2024, from the same claims row.'],
   ['cy2024_source_file', 'text', 'The CMS file both CY2024 figures were read in.'],
   ['cy2024_source_file_sha256', 'text', 'SHA-256 of that file as retrieved. The audit re-reads it and fails on a mismatch.'],
@@ -108,18 +117,18 @@ const row = (r) => {
 
 const LICENSE =
   'The federal figures in this table are U.S. Government works and are in the public domain. '
-  + 'Our additions — the plain-language labels, the synonyms, the coverage statements, the combination '
-  + 'rules and this arrangement — are dedicated to the public domain by Precision Federal LLC under '
+  + 'Our additions (the plain-language labels, the synonyms, the coverage statements, the combination '
+  + 'rules and this arrangement) are dedicated to the public domain by Precision Federal LLC under '
   + 'CC0 1.0. Take it, fork it, correct it. Attribution is welcome and not required.';
 const HOW_TO_CITE =
   `Waypoint Ledger price table, version ${prices._version}, Precision Federal LLC, `
-  + 'https://waypoint-ledger.pages.dev/data/price-table.csv. Every row carries the federal source it '
+  + 'https://waypointledger.org/data/price-table.csv. Every row carries the federal source it '
   + 'came from; cite that source for the figure and this table for the arrangement.';
 
 mkdirSync(new URL('../public/data/', import.meta.url), { recursive: true });
 
 writeFileSync(new URL('../public/data/price-table.csv', import.meta.url),
-  csv(COLUMNS.map((c) => c[0]), prices.items.map(row)));
+  csv(COLUMNS.map((c) => c[0]), ITEMS.map(row)));
 
 writeFileSync(new URL('../public/data/price-dictionary.csv', import.meta.url),
   csv(['file', 'field', 'type', 'note'],
@@ -128,7 +137,12 @@ writeFileSync(new URL('../public/data/price-dictionary.csv', import.meta.url),
 writeFileSync(new URL('../public/data/price-table.json', import.meta.url), JSON.stringify({
   table_version: prices._version,
   generated: new Date().toISOString().slice(0, 10),
-  rows: prices.items.length,
+  rows: ITEMS.length,
+  source_data_files: [
+    { file: 'data/prices.json', rows: prices.items.length, assembled: prices._assembled ?? null },
+    { file: 'data/prices-additions-2026-09-09.json', rows: additions.items.length,
+      assembled: additions._assembled ?? null, source_files: additions._source_files ?? null },
+  ],
   license: LICENSE,
   how_to_cite: HOW_TO_CITE,
   readme: prices._README,
@@ -144,8 +158,8 @@ writeFileSync(new URL('../public/data/price-table.json', import.meta.url), JSON.
         localities: audit.localities, version_line: audit.version_line,
         sources: audit.sources }
     : null,
-  items: prices.items.map((r) => ({ ...r, audit: auditById.get(r.id) ?? null })),
+  items: ITEMS.map((r) => ({ ...r, audit: auditById.get(r.id) ?? null })),
 }, null, 1) + '\n');
 
-console.log(`price table: ${prices.items.length} rows -> public/data/price-table.{csv,json} + price-dictionary.csv`
+console.log(`price table: ${ITEMS.length} rows -> public/data/price-table.{csv,json} + price-dictionary.csv`
   + (audit ? ` (audit ${audit.pass}/${audit.rows} PASS)` : ' (no audit found)'));

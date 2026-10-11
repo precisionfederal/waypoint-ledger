@@ -46,7 +46,9 @@ describe('OpenAPI 3.1 — structure', () => {
 
   it('publishes a licence a lawyer can act on, not a sentence', () => {
     const lic = OPENAPI.info.license as { name: string; url?: string; identifier?: string };
-    expect(lic.identifier).toBe('CC0-1.0');
+    // FLOW adopter-5: Apache-2.0 for the code, as LICENSE.txt; the data's CC0 is stated in info.description, as NOTICE.txt
+    expect(lic.identifier).toBe('Apache-2.0');
+    expect(String(OPENAPI.info.description)).toContain('CC0 1.0');
     expect(lic.url).toMatch(/^https:\/\//);
   });
 

@@ -1,0 +1,45 @@
+/* /adopt only (PAGES R2, 2026-09-30). DESIGN R1 tokens only. */
+
+/* ---- adopt: the six files, three across ---- */
+.files{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(19rem,100%),1fr));gap:.75rem}
+.files li{display:flex;flex-direction:column;gap:.3rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.8rem .95rem .4rem;min-width:0}
+.files li>code{font-size:.875rem;font-weight:600;color:var(--ink);overflow-wrap:anywhere}
+.files li>p{margin:0;font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+.files a{display:inline-flex;align-items:center;min-height:44px}
+.cmds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(16rem,100%),1fr));gap:.75rem}
+.cmds>div{min-width:0}
+.cmds p{margin:0;font-size:.9375rem;line-height:1.5;color:var(--ink-2)}
+
+/* VISUAL-4b (2026-09-30): the rule card (the hero is the Kit PageHero, under the page's own top padding like every inner page) */
+.rule{margin:clamp(2.5rem,5vw,3.5rem) 0 0;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);scroll-margin-top:6rem} /* VIS-CRITIC-R2 new-11: hairline, no 4 px rail */
+.files li{transition:border-color .2s}
+.files li:hover{border-color:var(--accent)}
+.files li>code{display:flex;align-items:center;gap:.5rem}
+.files li>code::before{content:"";flex:none;width:1.25rem;height:1.25rem;background:var(--accent-ink);-webkit-mask:var(--file-ic) center/contain no-repeat;mask:var(--file-ic) center/contain no-repeat}
+.files{--file-ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z'/%3E%3Cpath d='M14 3.5v5h5M9 13h6M9 16.5h4'/%3E%3C/svg%3E")}
+
+/* VISUAL-4b adopt2 (JUDGE-3 fix 15): the standards table gains a "Next step" column.
+   From 641 px each row is a three-column grid: the standard with its Today pill under it,
+   what that means here, and the next step on a tinted ground. The header stacks
+   "Standard" over "Today" to match. Under 641 px the trust .tbl card layout applies and
+   "Next step" is the labelled last line of each card; an empty cell (a lane still to
+   fill it) is hidden there. */
+.next{color:var(--ink-2)}
+@media (min-width:641px){
+  .stdNext,.stdNext thead,.stdNext tbody{display:block}
+  .stdNext tr{display:grid;grid-template-columns:13rem minmax(0,1.1fr) minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"a c d" "b c d";border-bottom:1px solid var(--line-2)}
+  .stdNext thead tr{background:var(--surface-2)}
+  .stdNext tr>th,.stdNext tr>td{border-bottom-width:0}
+  .stdNext thead tr th{background:none}
+  .stdNext tr>:nth-child(1){grid-area:a}
+  .stdNext tr>:nth-child(2){grid-area:b;padding-top:0}
+  .stdNext tr>:nth-child(3){grid-area:c}
+  .stdNext tr>:nth-child(4){grid-area:d}
+  .stdNext tbody th[scope="row"]{white-space:normal}
+  .stdNext tbody td.next{background:var(--surface-2);border-left:2px solid var(--accent)}
+}
+@media (max-width:640px){
+  .stdNext td.next[data-label]{margin-top:.35rem;border-top:1px dashed var(--line-2);padding-top:.6rem}
+  .stdNext td.next[data-label]::before{color:var(--accent-ink)}
+  .stdNext td.next[data-label]:empty{display:none}
+}

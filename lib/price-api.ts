@@ -14,8 +14,9 @@
    ========================================================================== */
 
 import type { JourneyEntry, PriceItem } from './types';
-import { extractCount, mapUtterance, parseJourney } from './mapper';
+import { extractCount, lostWorkPhrase, mapUtterance, parseJourney } from './mapper';
 import { basisWarning, priceJourney, totals } from './pricing';
+import { cleanPaid, PAID_MAX } from './paid';
 /* 🔴 The same fit module the browser runs. The API and the screen must answer
    the same question with the same code, or the reuse surface is a smaller
    product than the one we demonstrate. */
@@ -33,6 +34,15 @@ export const PRICE_METHOD =
 export const MAX_STORY = 2000;
 export const MAX_ITEMS = 60;
 export const MAX_TIMES = 365;
+
+/* R1-security S-15 (2026-09-30): a story or a saved line holding a right-to-left
+   override came back through segments[].raw and into shared ledger titles, where
+   it shows reversed text on someone else's screen. The directional controls
+   (LRE, RLE, PDF, LRO, RLO, LRI, RLI, FSI, PDI, LRM, RLM, ALM) carry no meaning
+   in a description of care, so they are removed before anything reads the words.
+   Letters of any script, Arabic and Hebrew included, are untouched. */
+const BIDI_CONTROLS = /[\u202A-\u202E\u2066-\u2069\u200E\u200F\u061C]/g;
+export const stripBidi = (s: string): string => s.replace(BIDI_CONTROLS, '');
 
 /** Real costs the table deliberately refuses to price (data/unpriceable.json). */
 export interface UnpriceableItem {
@@ -312,7 +322,11 @@ export interface PriceResponse {
 /** A phrase that names a real cost we refuse to price. Same test the app uses. */
 export function unpriceableFor(text: string, list: UnpriceableItem[]): UnpriceableItem | undefined {
   const t = text.toLowerCase();
-  return list.find((u) => [u.label, ...u.synonyms].some((s) => t.includes(s.toLowerCase().slice(0, 12))));
+  const hit = list.find((u) => [u.label, ...u.synonyms].some((s) => t.includes(s.toLowerCase().slice(0, 12))));
+  if (hit) return hit;
+  /* "I lost my job as a teacher" (FLOW patient-7): the mapper's own reading of
+     lost work, so the line lands where its chip says it is counted. */
+  return lostWorkPhrase(text) ? list.find((u) => u.id === 'lost-work') : undefined;
 }
 
 function clampTimes(v: unknown): number {
@@ -433,7 +447,7 @@ export function priceRequest(
   let key = 0;
 
   if (hasStory) {
-    const story = (b.story as string).trim();
+    const story = stripBidi(b.story as string).trim();
     if (!story) return { error: 'The story is empty.' };
     if (story.length > MAX_STORY) return { error: `The story must be ${MAX_STORY} characters or fewer.` };
     for (const seg of parseJourney(story, table)) {
@@ -460,7 +474,7 @@ export function priceRequest(
         return { error: `times must be a whole number from 1 to ${MAX_TIMES}.` };
       }
       const times = clampTimes(it.times ?? 1);
-      const said = typeof it.raw === 'string' && it.raw.trim() ? it.raw.trim().slice(0, 200) : '';
+      const said = typeof it.raw === 'string' && stripBidi(it.raw).trim() ? stripBidi(it.raw).trim().slice(0, 200) : '';
       if (typeof it.itemId === 'string' && it.itemId) {
         const item = table.find((t) => t.id === it.itemId);
         if (!item) return { error: `No such unit of care: "${it.itemId}". GET /api/table lists every id.` };
@@ -531,7 +545,9 @@ export function priceRequest(
 }
 
 /** Validate a journey to be stored/shared. Same shape the browser saves. */
-export interface JourneyEntryInput { raw: string; itemId: string | null; times: number }
+/** `paid` (and `paidEach`): what the person says they paid for the line, their
+ *  own number, only ever sent inside a journey they chose to save (lib/paid.ts). */
+export interface JourneyEntryInput { raw: string; itemId: string | null; times: number; paid?: number; paidEach?: true }
 export function validateJourney(body: unknown, table: PriceItem[]): { error: string } | { entries: JourneyEntryInput[]; title: string | null } {
   if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Body must be a JSON object.' };
   const b = body as Record<string, unknown>;
@@ -542,7 +558,7 @@ export function validateJourney(body: unknown, table: PriceItem[]): { error: str
   for (const raw of b.entries) {
     if (!raw || typeof raw !== 'object') return { error: 'Each entry must be an object.' };
     const e = raw as Record<string, unknown>;
-    const said = typeof e.raw === 'string' ? e.raw.trim().slice(0, 200) : '';
+    const said = typeof e.raw === 'string' ? stripBidi(e.raw).trim().slice(0, 200) : '';
     let itemId: string | null = null;
     if (e.itemId !== null && e.itemId !== undefined && e.itemId !== '') {
       if (typeof e.itemId !== 'string' || !table.some((t) => t.id === e.itemId)) return { error: `No such unit of care: "${String(e.itemId)}". GET /api/table lists every id.` };
@@ -550,9 +566,15 @@ export function validateJourney(body: unknown, table: PriceItem[]): { error: str
     }
     if (!itemId && !said) return { error: 'Each entry needs an itemId or the words the person typed.' };
     const n = Number(e.times ?? 1);
-    if (!Number.isInteger(n) || n < 1 || n > 99) return { error: 'times must be a whole number from 1 to 99.' };
-    entries.push({ raw: said, itemId, times: n });
+    if (!Number.isInteger(n) || n < 1 || n > 365) return { error: 'times must be a whole number from 1 to 365.' };   // patient2-5: the same cap as the ledger, the share link and POST /api/price
+    let paid: { paid?: number; paidEach?: true } = {};
+    if (e.paid !== undefined && e.paid !== null) {
+      const usd = cleanPaid(e.paid);
+      if (usd === null || typeof e.paid !== 'number') return { error: `paid must be an amount in dollars from 0 to ${PAID_MAX.toLocaleString('en-US')}.` };
+      paid = e.paidEach === true && n > 1 ? { paid: usd, paidEach: true } : { paid: usd };
+    }
+    entries.push({ raw: said, itemId, times: n, ...paid });
   }
-  const title = typeof b.title === 'string' && b.title.trim() ? b.title.trim().slice(0, 120) : null;
+  const title = typeof b.title === 'string' && stripBidi(b.title).trim() ? stripBidi(b.title).trim().slice(0, 120) : null;
   return { entries, title };
 }

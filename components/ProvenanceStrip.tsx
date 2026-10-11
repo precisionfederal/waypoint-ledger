@@ -20,7 +20,7 @@
    ========================================================================== */
 'use client';
 
-import Link from 'next/link';
+import Link from '@/components/IntentLink';
 import { agencyOf, agencyTally } from '@/lib/fit';
 import { TABLE } from '@/lib/table';
 import type { PriceItem } from '@/lib/types';

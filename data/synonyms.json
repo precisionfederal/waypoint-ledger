@@ -1,6 +1,6 @@
 {
   "_README": "Extra plain-language synonyms for rows that ALREADY EXIST in data/prices.json. Merged into the table by lib/table.ts. This file never carries a price, a source or a new row: it changes only which published row a person's own words land on. Every key is checked against data/prices.json by tests/mapper.test.ts, and no phrase may belong to two rows.",
-  "_version": "2026-09-09b",
+  "_version": "2026-09-30r4b",
   "_rules": [
     "A phrase goes here only if the row it points at is the unit of care a person means by it.",
     "No phrase may appear under two ids: an ambiguous word (a bare 'scan', a bare 'test') is left out rather than guessed.",
@@ -15,7 +15,9 @@
     "cms-lab-venipuncture": "The needle stick has its own published rate on the clinical laboratory fee schedule, separate from every test run on the sample. A person who had four tests drawn at one visit paid for four tests and one venipuncture, which is why it is its own row rather than folded into the blood count.",
     "cms-test-home-sleep-basic": "A home sleep apnea test and an overnight study in a sleep lab are different services with different published rates, so \"home sleep test\" is bound to the home study rather than to the lab one.",
     "cms-speech-therapy": "Speech therapy is a therapy service under CPT 92507, not psychotherapy; without this line the phrase landed on the counselling row because both carry the word therapy.",
-    "cms-img-mammo-screen": "A bare \"mammogram\" is bound to the screening study, which is the one most people mean. The phrases naming a lump or a callback are bound to the diagnostic row instead."
+    "cms-img-mammo-screen": "A bare \"mammogram\" is bound to the screening study, which is the one most people mean. The phrases naming a lump or a callback are bound to the diagnostic row instead.",
+    "cms-test-ncs-3-4": "'Shocked the nerves', 'zapped my nerves', 'nerve conduction study' and 'nerve test' name the conduction half of an EMG/NCS appointment, which CMS prices under 95907-95913 by the number of nerves tested. A person rarely knows that number, so these phrases are bound to no row here: lib/mapper.ts reads them and leaves the line unpriced by name, and prices the band (1-2, 3-4, ... 13 or more) only when the person says how many nerves. The needle half is the EMG row (95886), which CMS lists as an add-on (global ZZZ) paid only with a conduction code.",
+    "cms-lab-ana": "Blood work 'for lupus' is the autoimmune screen, the ANA, which is the first lupus test ordered; a blood count does not test for lupus."
   },
   "synonyms": {
     "cms-99213": [
@@ -31,9 +33,14 @@
       "telemedicine visit",
       "phone visit with my doctor",
       "nurse practitioner follow up",
-      "brief follow up appointment"
-    ],
-    "cms-99214": [
+      "brief follow up appointment",
+      "my regular doctor",
+      "went to my regular doctor",
+      "went to see my regular doctor",
+      "visit with my regular doctor",
+      "went to my doctor",
+      "follow up visit",
+      "follow-up visit",
       "doctor's appointment",
       "appointment with my doctor",
       "saw my internist",
@@ -47,6 +54,7 @@
       "office visit with my primary",
       "medical appointment"
     ],
+    "cms-99214": [],
     "cms-99215": [
       "long appointment with my doctor",
       "extended office visit",
@@ -112,6 +120,10 @@
       "the hospital's own charge"
     ],
     "cms-ed-99284-complete": [
+      "sent me home from the ER",
+      "sent home from the ER",
+      "sent me home from the emergency room",
+      "sent home from the emergency room",
       "ER trip",
       "trip to the ER",
       "emergency visit",
@@ -125,6 +137,8 @@
       "blood draw",
       "they drew my blood",
       "drew my blood",
+      "took blood",
+      "took my blood",
       "blood panel",
       "more blood tests",
       "so much bloodwork",
@@ -139,16 +153,31 @@
     "cms-lab-tsh": [
       "thyroid level",
       "TSH level",
-      "checked my thyroid levels"
+      "checked my thyroid levels",
+      "blood to check my thyroid",
+      "check my thyroid"
     ],
     "cms-lab-ana": [
       "ANA panel",
       "screened me for lupus",
-      "autoimmune screen"
+      "autoimmune screen",
+      "blood work for lupus",
+      "lupus blood work",
+      "tested me for lupus",
+      "checked me for lupus",
+      "lupus test",
+      "autoimmune blood work",
+      "blood work for autoimmune",
+      "blood test for lupus",
+      "test for lupus",
+      "tested for lupus"
     ],
     "cms-lab-esr": [
       "sed rate test",
-      "ESR test"
+      "ESR test",
+      "how fast the blood settled",
+      "how fast the blood settled in the tube",
+      "watched how fast the blood settled"
     ],
     "cms-lab-crp": [
       "CRP test",
@@ -166,7 +195,9 @@
       "chest xray",
       "x ray of my chest",
       "chest radiograph",
-      "xray of my lungs"
+      "xray of my lungs",
+      "picture of my lungs",
+      "picture of my chest"
     ],
     "cms-img-ct-chest-nc": [
       "CT of my chest",
@@ -175,9 +206,7 @@
       "lung CT"
     ],
     "cms-img-ct-chest-c": [
-      "CT of my chest with contrast",
-      "CT angiogram of my chest",
-      "CTA of my chest"
+      "CT of my chest with contrast"
     ],
     "cms-img-echo": [
       "heart echo",
@@ -191,12 +220,11 @@
       "MRI of my brain",
       "brain scan",
       "MRI of the brain",
-      "head MRI"
+      "head MRI",
+      "scanned my head in the tunnel"
     ],
     "cms-img-mri-brain-both": [
-      "MRI with and without contrast",
-      "brain MRI with and without contrast",
-      "MRI of my brain with contrast"
+      "brain MRI with and without contrast"
     ],
     "cms-test-spirometry": [
       "breathing tests",
@@ -219,20 +247,21 @@
     ],
     "cms-test-cpet": [
       "cardiopulmonary exercise testing",
-      "exercise test with a mask",
-      "invasive exercise test"
+      "exercise test with a mask"
     ],
     "cms-test-holter": [
       "two day heart monitor",
-      "wore a monitor for 48 hours"
+      "wore a monitor for 48 hours",
+      "48 hour heart monitor",
+      "24 hour heart monitor",
+      "heart monitor for 48 hours",
+      "heart monitor for 24 hours"
     ],
     "cms-mh-psych-eval": [
       "psych eval",
       "psychiatry intake",
       "mental health intake",
       "psychiatric assessment",
-      "told me it was stress",
-      "told me it was all in my head",
       "sent me to mental health"
     ],
     "cms-mh-therapy-45": [
@@ -246,7 +275,9 @@
     ],
     "cms-mh-therapy-60": [
       "long therapy session",
-      "full hour of therapy"
+      "full hour of therapy",
+      "hour long session",
+      "hour long session with my therapist"
     ],
     "cms-test-ecg": [
       "EKG test",
@@ -262,25 +293,25 @@
     ],
     "cms-test-event-monitor": [
       "30 day monitor",
-      "heart patch",
       "month long heart monitor",
-      "long term heart monitor"
+      "long term heart monitor",
+      "heart monitor for a month",
+      "heart monitor for 30 days"
     ],
     "cms-test-sleep-study": [
       "overnight sleep study",
       "night in the sleep lab",
       "polysomnography",
-      "sleep study in a lab"
+      "sleep study in a lab",
+      "sleap study",
+      "sleep study at the hospital"
     ],
     "cms-test-eeg": [
-      "EEG test",
-      "brain waves test",
-      "electrodes on my head"
+      "EEG while I slept",
+      "sleep deprived EEG"
     ],
     "cms-test-emg": [
       "EMG test",
-      "nerve conduction study",
-      "nerve testing",
       "needles in my muscles"
     ],
     "cms-img-ct-head-nc": [
@@ -292,7 +323,9 @@
       "MRI of my back",
       "lower back MRI",
       "lumbar spine MRI",
-      "MRI of my spine"
+      "MRI of my spine",
+      "lower back inside the tunnel machine",
+      "lower back in the tunnel"
     ],
     "cms-img-mri-joint-nc": [
       "MRI of my hip",
@@ -303,7 +336,9 @@
       "ultrasound of my abdomen",
       "liver ultrasound",
       "gallbladder ultrasound",
-      "abdominal scan"
+      "abdominal scan",
+      "jelly and the wand on my belly",
+      "belly with the jelly"
     ],
     "cms-img-us-pelvic": [
       "ultrasound of my pelvis area",
@@ -338,7 +373,10 @@
     "cms-pt-eval-low": [
       "first PT appointment",
       "physio evaluation",
-      "physical therapy assessment"
+      "physical therapy assessment",
+      "first hour with a physical therapist",
+      "first visit with a physical therapist",
+      "PT evaluation"
     ],
     "cms-pt-exercise-15": [
       "PT",
@@ -347,7 +385,9 @@
       "rehab session",
       "PT visit",
       "physical therapy appointment",
-      "exercise therapy session"
+      "exercise therapy session",
+      "physcial therapy",
+      "physical theraphy"
     ],
     "cms-eye-exam-new": [
       "went to the eye doctor",
@@ -363,7 +403,9 @@
     ],
     "cms-test-neuropsych-1h": [
       "neuropsych evaluation",
-      "full neuropsychological testing"
+      "full neuropsychological testing",
+      "memory and attention puzzles",
+      "memory and attention testing"
     ],
     "cms-test-allergy-skin-per-test": [
       "allergy scratch testing",
@@ -405,11 +447,16 @@
     "cms-lab-urinalysis": [
       "urine analysis",
       "peed in a cup",
-      "urine dipstick"
+      "urine dipstick",
+      "dipped my urine",
+      "urine dipped and looked at under the microscope"
     ],
     "cms-lab-urine-culture": [
       "culture of my urine",
-      "urine culture test"
+      "urine culture test",
+      "urine sample grown in the lab",
+      "sent the urine off to be grown",
+      "they grew the urine sample"
     ],
     "cms-lab-covid-pcr": [
       "covid swab",
@@ -417,7 +464,9 @@
       "nose swab for covid"
     ],
     "cms-lab-magnesium": [
-      "magnesium blood test"
+      "magnesium blood test",
+      "magnesium",
+      "magnesium blood level"
     ],
     "cms-lab-ck": [
       "CPK test",
@@ -429,11 +478,15 @@
     ],
     "cms-lab-troponin": [
       "troponin test",
-      "troponins"
+      "troponins",
+      "test for damage to the heart muscle",
+      "heart muscle damage test"
     ],
     "cms-lab-pt-inr": [
       "INR check",
-      "INR test"
+      "INR test",
+      "how fast my blood clots",
+      "how quickly my blood clots"
     ],
     "cms-lab-ptt": [
       "PTT test",
@@ -452,7 +505,9 @@
       "IgE blood test"
     ],
     "cms-lab-free-testosterone": [
-      "testosterone level"
+      "testosterone level",
+      "level of the male hormone",
+      "male hormone"
     ],
     "cms-lab-fsh": [
       "FSH level"
@@ -546,7 +601,9 @@
     ],
     "cms-proc-colonoscopy-polyp": [
       "polyp removed during a colonoscopy",
-      "colonoscopy where a polyp came out"
+      "colonoscopy where a polyp came out",
+      "colonoscopy where they took out a polyp",
+      "took out a polyp"
     ],
     "cms-proc-colonoscopy-biopsy": [
       "biopsies taken during a colonoscopy"
@@ -619,7 +676,9 @@
     ],
     "cms-img-cta-chest": [
       "ct scan to rule out a clot in my lung",
-      "ct angiogram for a pulmonary embolism"
+      "ct angiogram for a pulmonary embolism",
+      "CT angiogram of my chest",
+      "CTA of my chest"
     ],
     "cms-img-nuclear-stress": [
       "nuclear stress test of my heart",
@@ -818,10 +877,28 @@
       "mra of my brain arteries"
     ],
     "cms-test-eeg-awake-drowsy": [
-      "eeg while awake and drowsy"
+      "eeg while awake and drowsy",
+      "EEG test",
+      "brain waves test",
+      "electrodes on my head"
     ],
     "cms-test-ncs-1-2": [
       "nerve conduction study of one or two nerves"
+    ],
+    "cms-lab-hscrp": [
+      "high sensitivity version",
+      "high sensitivity inflammation test"
+    ],
+    "cms-96127": [
+      "questionnaire about my mood",
+      "little questionnaire about my mood"
+    ],
+    "cms-lab-lyme-screen": [
+      "lyme blood test",
+      "lyme disease test",
+      "blood test for lyme",
+      "tested for lyme",
+      "lyme antibody test"
     ]
   }
 }

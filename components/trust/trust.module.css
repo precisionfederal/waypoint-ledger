@@ -1,0 +1,173 @@
+/* The trust pages, in the DESIGN R1 tokens only: white cards on --ground,
+   16 px cards, 12 px inner blocks, hairlines, one teal accent. Dark mode comes
+   from the tokens; nothing here names a colour of its own except the method
+   badges, which borrow the good/warn/flag soft pairs. */
+
+.lead{font-size:1.1875rem;line-height:1.5;color:var(--ink-2);max-width:60ch;margin:0 0 1.5rem}
+.actions{display:flex;flex-wrap:wrap;gap:.6rem;margin:0 0 2rem}
+
+/* ---- at a glance ---- */
+.glance{list-style:none;margin:0 0 2.25rem;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(13.5rem,100%),1fr));gap:1rem}
+.gCard{display:flex;flex-direction:column;gap:.3rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.1rem 1.2rem 1.2rem}
+.gIc{display:inline-flex;width:2.4rem;height:2.4rem;align-items:center;justify-content:center;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent-ink);margin-bottom:.4rem}
+.gBig{font-family:var(--font-d);font-weight:700;font-size:1.6rem;line-height:1.15;letter-spacing:-.02em;color:var(--ink);font-variant-numeric:tabular-nums}
+.gText{font-size:.9375rem;line-height:1.45;color:var(--ink-2)}
+@media (max-width:640px){.glance{grid-template-columns:1fr 1fr;gap:.6rem}.gCard{padding:.85rem .9rem}.gIc{width:2rem;height:2rem;margin-bottom:.2rem}.gBig{font-size:1.35rem}}
+
+/* ---- section heading above a group of cards ---- */
+.h2{font-size:clamp(1.35rem,2vw,1.625rem);margin:2.5rem 0 .4rem}
+.h2sub{color:var(--ink-2);margin:0 0 1.1rem;max-width:62ch}
+
+/* ---- folded card rows ---- */
+.fold{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);margin:0 0 .75rem}
+.fold>summary{display:flex;align-items:center;gap:1rem;min-height:56px;padding:.95rem 1.25rem;cursor:pointer;list-style:none;border-radius:var(--r-lg)}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary:hover{background:var(--surface-2)}
+.fold>summary:focus-visible{outline:none;box-shadow:var(--ring)}
+.foldHead{display:flex;flex-direction:column;gap:.15rem;min-width:0;flex:1}
+.foldTitle{margin:0;font-size:1.1875rem;line-height:1.3;letter-spacing:-.012em}
+.fold3 .foldTitle{font-size:1.0625rem}
+.foldSum{font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
+.chev{flex:none;width:2rem;height:2rem;border-radius:50%;background:var(--ground);position:relative}
+.chev::after{content:'';position:absolute;left:50%;top:45%;width:.45rem;height:.45rem;border-right:1.5px solid var(--ink-2);border-bottom:1.5px solid var(--ink-2);transform:translate(-50%,-50%) rotate(45deg);transition:transform .18s ease}
+.fold[open]>summary .chev::after{top:58%;transform:translate(-50%,-50%) rotate(-135deg)}
+@media (prefers-reduced-motion:reduce){.chev::after{transition:none}}
+.foldBody{padding:.25rem 1.25rem 1.25rem;border-top:1px solid var(--line-2)}
+.foldBody>:first-child{margin-top:1rem}
+.foldBody p,.foldBody li{color:var(--ink-2);max-width:70ch}
+.foldBody p:last-child{margin-bottom:0}
+.fold .fold{box-shadow:none;background:var(--surface-2)}
+.fold .fold>summary:hover{background:var(--ground-2)}
+
+/* ---- labelled caveat line ---- */
+.caveat{font-size:.9375rem;line-height:1.5;color:var(--ink-2);margin:.6rem 0}
+.caveatLbl{display:inline-block;font-weight:600;color:var(--ink);background:var(--ground);border:1px solid var(--line);border-radius:var(--r-pill);padding:0 .55rem;margin-right:.25rem;font-size:.875rem}
+
+/* ---- code blocks ---- */
+.code{margin:0 0 1rem;border:1px solid var(--line);border-radius:var(--r-md);background:var(--surface-2);overflow:hidden;min-width:0}
+.codeCap{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.3rem .4rem .3rem 1rem;border-bottom:1px solid var(--line);font-size:.875rem;color:var(--ink-3)}
+.pre,.preTall{margin:0;padding:.9rem 1rem;overflow:auto;font-family:var(--font-m);font-size:.8125rem;line-height:1.6;color:var(--ink-2);white-space:pre;background:none;border:0}
+.preTall{max-height:24rem}
+.pre:focus-visible,.preTall:focus-visible{outline:none;box-shadow:inset var(--ring)}
+.copy{display:inline-flex;align-items:center;gap:.35rem;min-height:44px;min-width:44px;justify-content:center;padding:0 .75rem;border:0;border-radius:var(--r-sm);background:none;color:var(--accent-ink);font:600 .875rem var(--font-b);cursor:pointer}
+.copy:hover{background:var(--ground-2)}
+.copy:focus-visible{outline:none;box-shadow:var(--ring)}
+
+/* ---- method badges ---- */
+.badge{display:inline-flex;align-items:center;justify-content:center;min-width:3.6rem;padding:.12rem .5rem;border-radius:var(--r-sm);font:700 .8125rem var(--font-m);letter-spacing:.02em}
+.get{background:var(--good-soft);color:var(--good-ink)}
+.post{background:var(--accent-soft);color:var(--accent-ink)}
+.put{background:var(--warn-soft);color:var(--warn-ink)}
+.del{background:var(--flag-soft);color:var(--flag-ink)}
+
+/* ---- a grid of plain cards ---- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(20rem,100%),1fr));gap:1rem;margin:0 0 1rem}
+.card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.25rem 1.35rem;min-width:0}
+.card>h3{margin:0 0 .35rem}
+.card>p{color:var(--ink-2)}
+.card>:last-child{margin-bottom:0}
+.kicker{display:flex;align-items:center;gap:.6rem;margin:0 0 .5rem;font-weight:600;color:var(--ink)}
+.kicker a{min-height:auto}
+
+/* ---- a table that turns into stacked cards on a phone ---- */
+.tbl{width:100%;border-collapse:collapse;font-size:.9375rem}
+.tbl caption{text-align:left;font-size:.875rem;color:var(--ink-3);padding:0 0 .5rem}
+.tbl th,.tbl td{text-align:left;vertical-align:top;padding:.65rem .75rem;border-bottom:1px solid var(--line-2)}
+.tbl thead th{font-weight:600;color:var(--ink-3);font-size:.875rem;background:var(--surface-2)}
+.tbl tbody th{font-weight:600;color:var(--ink)}
+.tbl code{font-size:.8125rem;word-break:break-word}
+.std td:nth-of-type(1) strong{display:inline-block;white-space:nowrap;font-size:.875rem;font-weight:600;padding:.1rem .6rem;border-radius:var(--r-pill);background:var(--ground-2);color:var(--ink-2)}
+.std tr:first-child td:nth-of-type(1) strong{background:var(--good-soft);color:var(--good-ink)}
+.gloss{display:block;font-weight:400;color:var(--ink-3);font-size:.875rem;margin-top:.15rem}
+@media (max-width:640px){
+  .tbl thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .tbl,.tbl tbody,.tbl tr,.tbl th,.tbl td{display:block;width:100%}
+  .tbl tr{border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface);margin:0 0 .6rem;padding:.35rem 0}
+  .tbl th,.tbl td{border:0;padding:.3rem .85rem}
+  .tbl td[data-label]{display:flex;justify-content:space-between;gap:1rem}
+  .tbl td[data-label]::before{content:attr(data-label);color:var(--ink-3);font-weight:600;font-size:.875rem}
+  .tbl td.wide[data-label]{display:block}
+  .tbl td.wide[data-label]::before{display:block}
+  .tbl th a{display:inline-flex;align-items:center;min-height:44px}
+}
+
+/* ---- privacy: where your words go ---- */
+.map{list-style:none;margin:0 0 2.5rem;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;counter-reset:lane}
+.lane{position:relative;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.1rem 1.15rem 1.2rem;display:flex;flex-direction:column}
+.lane h3{display:flex;align-items:center;gap:.55rem;margin:0 0 .15rem;font-size:1.0625rem}
+.laneWho{font-size:.875rem;color:var(--ink-3);margin:0 0 .75rem}
+.lane ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.55rem}
+.lane li{font-size:.9375rem;line-height:1.45;color:var(--ink-2);padding-left:.9rem;position:relative}
+.lane li::before{content:'';position:absolute;left:0;top:.6em;width:.35rem;height:.35rem;border-radius:50%;background:var(--accent)}
+.lane li b{color:var(--ink);font-weight:600}
+.laneIc{display:inline-flex;width:2.1rem;height:2.1rem;border-radius:var(--r-sm);align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-ink);flex:none}
+.laneNever .laneIc{background:var(--ground-2);color:var(--ink-2)}
+.laneNever li::before{background:var(--ink-4);border-radius:1px;width:.45rem;height:1.5px;top:.72em}
+.lane:not(:last-child)::after{content:'';position:absolute;right:-.85rem;top:1.9rem;width:.7rem;height:.7rem;border-top:1.5px solid var(--ink-4);border-right:1.5px solid var(--ink-4);transform:rotate(45deg);z-index:1}
+.lane:nth-child(3)::after{display:none}
+@media (max-width:1100px){.map{grid-template-columns:repeat(2,minmax(0,1fr))}.lane::after{display:none}}
+@media (max-width:640px){.map{grid-template-columns:1fr}}
+
+/* ---- privacy: the legend under the field tables ---- */
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(15rem,100%),1fr));gap:.5rem 1.25rem;margin:0 0 1.25rem;padding:0}
+.legend dt{font-weight:600;color:var(--ink);font-size:.9375rem}
+.legend dd{margin:0 0 .4rem;color:var(--ink-2);font-size:.9375rem}
+
+/* ---- adopt: numbered stepper ---- */
+.stepper{list-style:none;margin:0 0 1rem;padding:0;counter-reset:st}
+.step{position:relative;padding:0 0 1.5rem 3.5rem;counter-increment:st}
+.step::before{content:counter(st);position:absolute;left:0;top:0;width:2.35rem;height:2.35rem;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);font:700 1rem var(--font-b);display:flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.step:not(:last-child)::after{content:'';position:absolute;left:1.15rem;top:2.6rem;bottom:.25rem;width:1.5px;background:var(--line)}
+.step>h3{margin:.35rem 0 .35rem;font-size:1.125rem}
+.step>p{color:var(--ink-2);max-width:66ch}
+@media (max-width:640px){.step{padding-left:3rem}}
+
+/* ---- developers: endpoint cards ---- */
+.routes{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(21rem,100%),1fr));gap:.6rem}
+.route{display:flex;flex-direction:column;gap:.35rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.75rem .9rem}
+.routeTop{display:flex;align-items:center;gap:.6rem;min-width:0}
+.routeTop code{font-size:.8125rem;color:var(--ink);word-break:break-all}
+.route p{margin:0;font-size:.9375rem;color:var(--ink-2)}
+.links{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(21rem,100%),1fr));gap:.6rem}
+.links li{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-md);padding:.7rem .9rem;display:flex;flex-direction:column;gap:.2rem}
+.links li>span{font-weight:600;color:var(--ink);font-size:.9375rem}
+.links li>div{display:flex;flex-wrap:wrap;gap:0 1rem;font-size:.9375rem}
+.links a{display:inline-flex;align-items:center;min-height:44px}
+.rules{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(20rem,100%),1fr));gap:1rem}
+
+/* ---- account ---- */
+.acctHero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,26rem);gap:clamp(1.5rem,4vw,3rem);align-items:start}
+.acctHero>:nth-child(2){grid-column:2;grid-row:1 / span 2}
+.acctFacts{grid-column:1}
+.acctHero{grid-template-rows:auto 1fr}
+@media (max-width:900px){.acctHero{grid-template-columns:1fr;grid-template-rows:none}.acctHero>:nth-child(2),.acctFacts{grid-column:auto;grid-row:auto}}
+.assure{list-style:none;margin:1.25rem 0 0;padding:0;display:flex;flex-direction:column;gap:.85rem}
+.assure li{display:flex;gap:.75rem;align-items:flex-start;color:var(--ink-2);font-size:1rem;line-height:1.5}
+.assure li>span:first-child{color:var(--accent-ink);flex:none;margin-top:.05rem}
+.assure b{color:var(--ink)}
+.signCard{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2);padding:clamp(1.25rem,3vw,1.75rem)}
+.signCard h2{font-size:1.375rem;margin:0 0 .35rem}
+.signCard>p{color:var(--ink-2)}
+.or{display:flex;align-items:center;gap:.75rem;color:var(--ink-3);font-size:.875rem;margin:1.25rem 0}
+.or::before,.or::after{content:'';flex:1;height:1px;background:var(--line)}
+.stack{display:flex;flex-direction:column;gap:.6rem}
+.stack>:global(.btn){width:100%;justify-content:center}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(14rem,100%),1fr));gap:1rem;margin:0}
+.kv>div{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:1rem 1.1rem}
+.kv dt{display:flex;align-items:center;gap:.5rem;font-weight:600;color:var(--ink);margin:0 0 .3rem}
+.kv dt span{color:var(--accent-ink);display:inline-flex}
+.kv dd{margin:0;color:var(--ink-2);font-size:.9375rem;line-height:1.5}
+.dash{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:1.25rem;align-items:start}
+.dashMain,.dashSide{display:flex;flex-direction:column;gap:1.25rem;min-width:0}
+.dashMain>:global(.card),.dashSide>:global(.card){margin:0}
+@media (max-width:900px){.dash{grid-template-columns:1fr}}
+.footLinks{display:flex;flex-wrap:wrap;gap:.6rem;margin:1.5rem 0 0}
+
+/* ---- code blocks at the body floor (VISUAL-4b kit, 2026-09-30) ----
+   The code in a Code block read at 13 px, under the site's 15 px body floor.
+   It now reads at 15 px and wraps inside its card at every width, so nobody
+   on a 320 px phone scrolls sideways to read a request. Indentation is kept
+   (pre-wrap); a long URL or token breaks anywhere rather than overflowing. */
+.pre,.preTall{font-size:.9375rem;white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;tab-size:2;overflow-x:hidden}
+
+/* PageHero lives in ./PageHero.module.css (re-merge: its own module, so /method does not ship this file's whole class map for one hero). */

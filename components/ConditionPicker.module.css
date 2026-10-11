@@ -3,7 +3,7 @@
    bar's chips, the card is .card.year. */
 
 .group{min-width:0}
-.lbl{margin:0 0 var(--sp-2);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.lbl{margin:0 0 var(--sp-2);font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .note{margin:0 0 var(--sp-3);font-size:.9rem;color:var(--ink-3)}
 .chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
 .chip{min-height:44px;padding:.55rem 1rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2);font-size:1rem;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
@@ -18,7 +18,7 @@
 .blank{margin:var(--sp-3) 0 0;padding-top:var(--sp-3);border-top:1px solid var(--line-2);font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
 
 /* the year-ahead panel */
-.kind{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .6rem;border-radius:var(--r-pill);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.kind{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .6rem;border-radius:var(--r-pill);font-family:var(--font-b);font-size:.875rem;letter-spacing:0;text-transform:none;font-weight:700;white-space:nowrap}
 .kindExcess{background:var(--brand-soft);color:var(--brand-ink)}
 .kindAttr{background:var(--sun-soft);color:var(--warn-ink)}
 .kindNone{background:var(--flag-soft);color:var(--flag-ink)}

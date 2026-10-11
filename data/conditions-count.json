@@ -1,0 +1,4 @@
+{
+  "_from": "data/conditions.json, by scripts/gen-conditions-count.mjs",
+  "conditions": 72
+}

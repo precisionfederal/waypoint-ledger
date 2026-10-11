@@ -1,0 +1,21 @@
+/* ---- PageHero: the one inner-page hero (VISUAL-4b hero, 2026-09-30 night) ----
+   The site rule agreed with the VISUAL session and measured on /gap and
+   /register/live: words left, art right in a 527 px column (527x231 at 1440),
+   H1 clamp(1.75rem, 2.2vw + 1rem, 2.75rem); under 860 px one column with the
+   art first in an 11rem crop. The dark twin is components/ThemedImg (two imgs,
+   one hidden), so the box never changes size (CLS 0). */
+.ph{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,527px);gap:clamp(1.5rem,3vw,2.5rem);align-items:center;margin:0 0 .5rem}
+.phCopy{min-width:0}
+/* doubled so ".page h1" (0,1,1) on phones cannot shrink it */
+.phH1.phH1{font-size:var(--hero-h1);line-height:1.1;letter-spacing:-.025em;max-width:18ch;margin:.25rem 0 .9rem}
+.phLead{font-size:1.125rem;line-height:1.55;color:var(--ink-2);max-width:60ch;margin:0}
+.phMore{margin-top:1.25rem;min-width:0}
+.phMore>:last-child{margin-bottom:0}
+.phArt{display:block;width:100%;height:auto;aspect-ratio:1200/525;object-fit:cover;object-position:var(--ph-pos,50% 50%);border-radius:var(--r-lg);
+  -webkit-mask-image:radial-gradient(120% 120% at 55% 50%,#000 58%,transparent 100%);mask-image:radial-gradient(120% 120% at 55% 50%,#000 58%,transparent 100%)}
+@media (max-width:860px){
+  .ph{grid-template-columns:1fr;gap:.25rem}
+  .phArt{order:-1;max-height:11rem;object-position:var(--ph-pos-m,50% 55%);margin:0 0 .5rem}
+  .phH1.phH1{max-width:none}
+}
+@media print{.phArt{display:none!important}}

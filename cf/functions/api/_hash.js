@@ -9,9 +9,15 @@
    unambiguous and needs no separator. The first row of a table chains to
    GENESIS (64 zeros). `integrity_heads` holds the current head and the count.
 
-   WHAT THE CHAIN COVERS. Exactly the fields we publish for that table — the
-   columns of the CSV export, nothing more. A third party who downloads the CSV
-   can recompute every hash and the head themselves. Private fields (an
+   WHAT THE CHAIN COVERS. The fields of each row as it was written, listed in
+   PUBLISHED below. For corrections every one of them is in the CSV, and a
+   third party who downloads it can recompute every hash and the head. Since
+   2026-10-01 the survey and gap CSVs publish the day instead of the time, and
+   the survey CSV no longer publishes the self-description (see
+   export/[kind].js): on those two files a third party checks the links from
+   row to row (prev_hash, row_hash, the head), and the stored rows are walked
+   in full by /api/integrity?verify=1. The chain itself was not rewritten: the
+   projections below are frozen, as they must be. Private fields (an
    optional note, an encrypted sentence, interview answers) are deliberately
    OUTSIDE the chain: we never publish them, so nobody could ever check them,
    and a hash over data nobody can see proves nothing to anybody.
@@ -69,6 +75,11 @@ export async function rowHash(prevHash, publishedFields) {
 /** Newest first. `from` is the instrument version at which the field set began. */
 export const SURVEY_PROJECTIONS = [
   {
+    from: '2026-10-01.1',
+    keys: ['age', 'sex', 'insurance', 'region', 'state', 'stage', 'respondent', 'onset_age', 'diagnosis_age'],
+    note: 'adds who is answering (the person who was ill, or a parent or caregiver answering for a child), the age the symptoms began and the age at diagnosis, after a patient advocate who fell ill as a child wrote on 12 September 2026 that the questions assumed a working adult. Chained from this version on; rows collected earlier keep the field set they were hashed over.',
+  },
+  {
     from: '2026-09-09.3',
     keys: ['age', 'sex', 'insurance', 'region', 'state', 'stage'],
     note: 'adds sex, asked from this version on after the Federal Sprint Lead for the Invisible Illness track asked every team on 26 August 2026 to be intentional about sex differences where relevant. Chained from this version on, so ctx_sex is never published outside the walk.',
@@ -76,7 +87,7 @@ export const SURVEY_PROJECTIONS = [
   {
     from: '2026-09-09.2',
     keys: ['age', 'insurance', 'region', 'state', 'stage'],
-    note: 'adds the state or territory — published in the CSV since the instrument carried it, and chained from this version on.',
+    note: 'adds the state or territory, published in the CSV since the instrument carried it, and chained from this version on.',
   },
   {
     from: null,
@@ -267,10 +278,17 @@ const JOINED_FROM_TABLE = (what) =>
   'not part of the correction a person sent: ' + what + ', joined at export time from the published '
   + 'price table and data/AUDIT.json so the file can be routed to the agency without our bundle. '
   + 'The price table carries its own version, and every figure in it re-derives from the federal file '
-  + 'it cites — see /method.';
+  + 'it cites. See /method.';
+
+/* team_test is a mark made AFTER the row was written (migration 0007,
+   _annotations.js), so it cannot be inside the row's hash, and it must not be:
+   marking a row never moves the chain. Anyone can check the marks against
+   GET /api/annotations, which lists every marked row_hash. */
+const TEAM_TEST_REASON = 'a published mark joined at export time from the annotations table (GET /api/annotations): true on a row we marked as our own team testing the form. Made after the row was written, so it is outside the hash by design, and marking a row never changes its hash or the chain.';
 
 export const UNCHAINED_CSV = {
   corrections: {
+    team_test: TEAM_TEST_REASON,
     row_hash: 'the hash itself: a value cannot be inside its own input.',
     /* Everything below describes the FIGURE, never the person or what they said.
        Each is reproducible by anyone: take price_id, open /api/table/{id}. */
@@ -299,13 +317,36 @@ export const UNCHAINED_CSV = {
     counted_as_of: 'the day the file was generated: a property of the download, not of any row in it.',
     /* Counts across the file, recomputable from the verdict column of the rows
        themselves — which ARE chained. */
-    figure_confirmed_right: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
-    figure_flagged_wrong: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
-    figure_responses: 'a count over the rows of this file, recomputable from price_id and verdict, both chained.',
-    figure_fit_rate_pct: 'confirmed_right over responses, recomputable from price_id and verdict, both chained.',
+    figure_confirmed_right: 'a count over the rows of this file, recomputable from price_id and verdict, both chained, over the rows whose team_test is false.',
+    figure_flagged_wrong: 'a count over the rows of this file, recomputable from price_id and verdict, both chained, over the rows whose team_test is false.',
+    figure_responses: 'a count over the rows of this file, recomputable from price_id and verdict, both chained, over the rows whose team_test is false.',
+    figure_fit_rate_pct: 'confirmed_right over responses, recomputable from price_id and verdict, both chained, over the rows whose team_test is false.',
   },
-  gap: { row_hash: 'the hash itself: a value cannot be inside its own input.' },
-  survey: { row_hash: 'the hash itself: a value cannot be inside its own input.' },
+  gap: {
+    team_test: TEAM_TEST_REASON,
+    prev_hash: 'the row_hash of the row above, published so the links can be checked row by row: a link, not a field of the row.',
+    row_hash: 'the hash itself: a value cannot be inside its own input.',
+  },
+  survey: {
+    team_test: TEAM_TEST_REASON,
+    prev_hash: 'the row_hash of the row above, published so the links can be checked row by row: a link, not a field of the row.',
+    row_hash: 'the hash itself: a value cannot be inside its own input.',
+  },
+};
+
+/** A published column that is a coarsened copy of a chained field: it is inside
+ *  the chain (the full value was hashed), but the file carries less of it. */
+export const COARSENED_CSV = { received_on: 'received_at' };
+
+/** Chained fields a CSV leaves out on purpose, and why. The chain covers them
+ *  as written; the file does not publish them, so on that file the chain is
+ *  checked link by link rather than recomputed. */
+export const WITHHELD_FROM_CSV = {
+  gap: { received_at: 'published as the day only (received_on): a time to the millisecond beside a row hash lets anyone who guessed the rest of a row confirm the guess.' },
+  survey: {
+    received_at: 'published as the day only (received_on): a time to the millisecond beside a row hash lets anyone who guessed the rest of a row confirm the guess.',
+    context: 'every optional self-description (age band, sex, coverage, region, state, stage, who answered, ages at onset and diagnosis). One row carrying all of them can point at a person, so they are published only as counts at /api/survey, with any value under 11 answers not shown.',
+  },
 };
 
 /**
@@ -328,6 +369,7 @@ export function chainCoverage(kind, header, opts = {}) {
   for (const column of header) {
     if (Object.prototype.hasOwnProperty.call(exempt, column)) { unchained.push({ column, reason: exempt[column] }); continue; }
     if (fields.has(column)) { covered.push({ column, field: column }); continue; }
+    if (COARSENED_CSV[column] && fields.has(COARSENED_CSV[column])) { covered.push({ column, field: COARSENED_CSV[column] + ' (the day only)' }); continue; }
     if (/^rank_\d+$/.test(column) && fields.has('ranking')) { covered.push({ column, field: 'ranking' }); continue; }
     if (column.startsWith('ctx_') && fields.has('context')) {
       const k = column.slice(4);
@@ -349,7 +391,7 @@ export const RECIPES = {
     projection: ['received_at', 'price_id', 'verdict', 'believed_usd', 'table_version'],
     steps: [
       'Download the CSV. The first line begins with # and names the price-table version and the audit; the header is the next line. The rows are in the order they were written, oldest first.',
-      'Use only these five columns. Every other column describes the FEDERAL FIGURE, not the correction, and is joined at export time from the published price table — none of them is inside the hash.',
+      'Use only these five columns. Every other column describes the FEDERAL FIGURE, not the correction, and is joined at export time from the published price table. None of them is inside the hash.',
       'Start with prev_hash = 64 zeros.',
       'For each row build the object {received_at, price_id, verdict, believed_usd, table_version}, using null for an empty believed_usd and for an empty table_version.',
       'Serialize it as JSON with the keys sorted, no whitespace, then take SHA-256 of prev_hash concatenated with that string, lower-case hex.',
@@ -360,19 +402,21 @@ export const RECIPES = {
   gap: {
     file: '/api/export/gap.csv',
     projection: ['received_at', 'counts', 'ranking', 'table_version'],
+    check: 'links',
     steps: [
-      'Download the CSV. The six category columns are the counts object, keyed by the column name; an empty cell means the key is absent, not zero.',
-      'The rank_1 … rank_6 columns are the ranking array, in order, with empty cells dropped.',
-      'Build {received_at, counts, ranking, table_version} and hash it exactly as for corrections.csv.',
+      'Download the CSV. Rows are in the order they were chained, oldest first. The file publishes the day each report arrived (received_on), not the time, so a row_hash cannot be recomputed from it: the hash was taken over the full time.',
+      'Check the links instead. The first row\'s prev_hash is 64 zeros; every later row\'s prev_hash equals the row_hash of the row above it.',
+      'The last row_hash is the head for gap_reports at /api/integrity, and the number of rows is its row count. /api/integrity?verify=1 recomputes every hash over the stored rows and prints the result, whether or not it matches.',
     ],
   },
   survey: {
     file: '/api/export/survey.csv',
     projection: ['received_at', 'channel', 'ranking', 'unasked', 'lead', 'decide', 'clinicians', 'context', 'survey_version'],
+    check: 'links',
     steps: [
-      'Download the CSV. rank_1 … rank_5 are the ranking array in order.',
-      'The context object holds the ctx_ columns for the field set in force at that row\'s survey_version: see the projection table at /api/integrity. Every field in that set is present, with null where the cell is empty.',
-      'clinicians is a number or null. Build {received_at, channel, ranking, unasked, lead, decide, clinicians, context, survey_version} and hash it exactly as for corrections.csv.',
+      'Download the CSV. Rows are in the order they were chained, oldest first. The file publishes the day each answer arrived (received_on) and no self-description at all, so a row_hash cannot be recomputed from it: the hash was taken over the full time and the self-description, which are published only as counts at /api/survey, with any value under 11 answers not shown.',
+      'Check the links instead. The first row\'s prev_hash is 64 zeros; every later row\'s prev_hash equals the row_hash of the row above it.',
+      'The last row_hash is the head for survey_responses at /api/integrity, and the number of rows is its row count. /api/integrity?verify=1 recomputes every hash over the stored rows and prints the result, whether or not it matches.',
     ],
   },
 };

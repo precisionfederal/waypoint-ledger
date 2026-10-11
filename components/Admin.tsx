@@ -44,6 +44,8 @@ interface CorrectionRow {
 interface ChangeRow {
   id: string; date: string; said: string; changed: string; who: string;
   sourceInterviewId?: string | null; source_interview_id?: string | null;
+  /** false = a draft: held in the database, never served by /api/changes. */
+  published?: boolean;
 }
 interface Stats {
   tables?: Record<string, number>;
@@ -52,7 +54,7 @@ interface Stats {
 
 const at = (r: { receivedAt?: string; received_at?: string }) => r.receivedAt ?? r.received_at ?? '';
 const reviewed = (r: Interview) => r.reviewedAt ?? r.reviewed_at ?? null;
-const day = (iso: string) => (iso ? iso.slice(0, 10) : '—');
+const day = (iso: string) => (iso ? iso.slice(0, 10) : '–');
 const pickList = <T,>(j: Record<string, unknown>, ...keys: string[]): T[] => {
   for (const k of keys) if (Array.isArray(j[k])) return j[k] as T[];
   return [];
@@ -61,7 +63,7 @@ const pickList = <T,>(j: Record<string, unknown>, ...keys: string[]): T[] => {
 const CONSENT_LABEL: Record<string, string> = {
   'quote-by-name': 'may be quoted by name',
   'quote-anonymously': 'may be quoted without a name',
-  notes: 'notes only — do not quote',
+  notes: 'notes only: do not quote',
 };
 
 export default function Admin() {
@@ -77,7 +79,7 @@ export default function Admin() {
   const [changes, setChanges] = useState<ChangeRow[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
-  const [form, setForm] = useState({ date: '', who: '', said: '', changed: '', sourceInterviewId: '' });
+  const [form, setForm] = useState({ date: '', who: '', said: '', changed: '', sourceInterviewId: '', published: true });
 
   useEffect(() => {
     try { setToken(sessionStorage.getItem(TOKEN_KEY) || ''); } catch { /* private mode */ }
@@ -129,7 +131,7 @@ export default function Admin() {
     const text = iv.answers?.[qid];
     if (!text || iv.consent === 'notes') return null;
     const attribution = iv.consent === 'quote-by-name' && iv.name ? iv.name : 'a person who wrote to Waypoint Ledger';
-    return `“${text.trim()}” — ${attribution}`;
+    return `“${text.trim()}”, ${attribution}`;
   };
 
   const copy = async (key: string, text: string) => {
@@ -147,9 +149,17 @@ export default function Admin() {
     const body = JSON.stringify({
       date: form.date, who: form.who, said: form.said, changed: form.changed,
       ...(form.sourceInterviewId ? { sourceInterviewId: form.sourceInterviewId } : {}),
+      published: form.published,
     });
     const j = await call('/api/admin/changes', { method: 'POST', body });
-    if (j) { setForm({ date: '', who: '', said: '', changed: '', sourceInterviewId: '' }); void load('changes'); }
+    if (j) { setForm({ date: '', who: '', said: '', changed: '', sourceInterviewId: '', published: true }); void load('changes'); }
+  };
+
+  /* A draft is held until someone who has read it against the interview and
+     its consent publishes it; publishing is one click, and so is taking back. */
+  const setPublished = async (id: string, published: boolean) => {
+    const j = await call(`/api/admin/changes/${id}`, { method: 'PATCH', body: JSON.stringify({ published }) });
+    if (j) void load('changes');
   };
 
   const removeChange = async (id: string) => {
@@ -238,7 +248,7 @@ export default function Admin() {
                       <p style={{ whiteSpace: 'pre-wrap' }}>{text}</p>
                       {q
                         ? <button className="link-btn" onClick={() => void copy(`${iv.id}:${qid}`, q)}>{copied === `${iv.id}:${qid}` ? 'Copied' : 'Copy as a quote'}</button>
-                        : <p className="micro">Notes only — this writer did not consent to be quoted.</p>}
+                        : <p className="micro">Notes only. This writer did not consent to be quoted.</p>}
                     </div>
                   );
                 })}
@@ -259,9 +269,9 @@ export default function Admin() {
                       <td>{day(at(c))}</td>
                       <td>{c.priceId ?? c.price_id}</td>
                       <td>{c.verdict}</td>
-                      <td className="r">{typeof (c.believedValueUsd ?? c.believed_usd) === 'number' ? `$${c.believedValueUsd ?? c.believed_usd}` : '—'}</td>
-                      <td>{c.note || '—'}</td>
-                      <td>{c.priceTableVersion ?? c.table_version ?? '—'}</td>
+                      <td className="r">{typeof (c.believedValueUsd ?? c.believed_usd) === 'number' ? `$${c.believedValueUsd ?? c.believed_usd}` : '–'}</td>
+                      <td>{c.note || '–'}</td>
+                      <td>{c.priceTableVersion ?? c.table_version ?? '–'}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -281,20 +291,24 @@ export default function Admin() {
               <label className="field"><span>What they said</span><textarea required maxLength={600} value={form.said} onChange={(e) => setForm({ ...form, said: e.target.value })} /></label>
               <label className="field"><span>What changed</span><textarea required maxLength={600} value={form.changed} onChange={(e) => setForm({ ...form, changed: e.target.value })} /></label>
               <label className="field"><span>Interview it came from (optional)</span><input type="text" maxLength={80} value={form.sourceInterviewId} onChange={(e) => setForm({ ...form, sourceInterviewId: e.target.value })} /></label>
-              <button className="btn primary" type="submit">Publish it</button>
+              <label className="check"><input type="checkbox" checked={form.published} onChange={(e) => setForm({ ...form, published: e.target.checked })} /><span>Publish now (untick to keep it as a draft only this console shows)</span></label>
+              <button className="btn primary" type="submit">{form.published ? 'Publish it' : 'Save as draft'}</button>
             </form>
             {changes.map((c) => (
               <article className="card" key={c.id}>
                 <div className="row between">
-                  <p className="lbl">{c.date} · {c.who}</p>
-                  <button className="link-btn danger" onClick={() => void removeChange(c.id)}>Remove</button>
+                  <p className="lbl">{c.date} · {c.who}{c.published === false && <span className="basis" style={{ marginLeft: '.5rem' }}>DRAFT · not public</span>}</p>
+                  <span>
+                    <button className="link-btn" onClick={() => void setPublished(c.id, c.published === false)}>{c.published === false ? 'Publish' : 'Unpublish'}</button>{' '}
+                    <button className="link-btn danger" onClick={() => void removeChange(c.id)}>Remove</button>
+                  </span>
                 </div>
                 <p><strong>Said:</strong> {c.said}</p>
                 <p><strong>Changed:</strong> {c.changed}</p>
                 {(c.sourceInterviewId ?? c.source_interview_id) && <p className="micro">From interview {c.sourceInterviewId ?? c.source_interview_id}</p>}
               </article>
             ))}
-            {!changes.length && !busy && <p className="sub">Nothing published yet.</p>}
+            {!changes.length && !busy && <p className="sub">Nothing in the change log yet, published or draft.</p>}
           </>
         )}
 

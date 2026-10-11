@@ -43,7 +43,7 @@ OUT = os.path.join(HERE, 'state-charges.json')
 FILE_NAME = 'MUP_PHY_R26_P05_V10_D24_Geo.csv'
 FILE_URL = ('https://data.cms.gov/sites/default/files/2026-05/'
             'e534c74b-79b8-4892-8a95-5a17e2dfec9f/MUP_PHY_R26_P05_V10_D24_Geo.csv')
-SOURCE_TITLE = ('CMS, Medicare Physician & Other Practitioners — by Geography and Service, '
+SOURCE_TITLE = ('CMS, Medicare Physician & Other Practitioners - by Geography and Service, '
                 'calendar year 2024 (released 2026-05)')
 LANDING = ('https://data.cms.gov/provider-summary-by-type-of-service/'
            'medicare-physician-other-practitioners/'
@@ -152,7 +152,7 @@ def main():
                     'place of service and in the same field the audited National companion figure on that '
                     'row came from. Nothing is derived, averaged or estimated. A submitted charge is what '
                     'providers billed, not what anyone paid; it is never added to an allowed amount or to a '
-                    'total. A state that CMS publishes no cell for is listed in states_missing — a published '
+                    'total. A state that CMS publishes no cell for is listed in states_missing: a published '
                     'absence, not a zero. A figure whose National cell does not equal the figure already '
                     'published in data/prices.json is not published here at all; the reason is in _excluded. '
                     'Rebuild: data/build_state_charges.py · verify: data/verify_state_charges.py'),

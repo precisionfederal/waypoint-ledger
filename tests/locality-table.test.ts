@@ -1,7 +1,7 @@
 /* ==========================================================================
    THE PUBLISHED LOCALITY TABLE MUST REPRODUCE FROM ITS OWN COLUMNS.
 
-   5,123 figures are the most reusable thing this project owns, and a published
+   5,668 figures are the most reusable thing this project owns, and a published
    number that cannot be recomputed from the inputs printed beside it is worth
    less than no number at all. So this suite does not check that the file exists.
    It recomputes every figure from the RVUs and geographic indices on that row,
@@ -126,7 +126,8 @@ describe('public/data/locality-prices.csv — the open data', () => {
   });
 
   it('never lets a cell open as a spreadsheet formula', () => {
-    for (const r of body) for (const c of r) expect(c.startsWith('=')).toBe(false);
+    // One assertion over every cell (a per-cell expect timed out under machine load; same rule).
+    expect(body.flatMap((r, i) => r.filter((c) => c.startsWith('=')).map((c) => `row ${i + 1}: ${c}`))).toEqual([]);
   });
 
   it('🔴 is not stale — regenerating produces byte-for-byte the same file', () => {

@@ -12,7 +12,7 @@
    register is a lie about how many people have spoken.
    ========================================================================== */
 import { describe, it, expect, vi } from 'vitest';
-import { cachedAggregate, isFresh, parsePayload, writeProbe, readCache, AGG_SOURCE } from '../cf/functions/api/_counters.js';
+import { cachedAggregate, isFresh, parsePayload, writeProbe, readCache, AGG_SOURCE, AGG_SHAPE } from '../cf/functions/api/_counters.js';
 import { isDryRun, dryOk } from '../cf/functions/api/_http.js';
 
 interface State { agg: Record<string, unknown> | null; rows: number; head: string; writes: number }
@@ -65,13 +65,27 @@ describe('the fold is used only when it is exactly current', () => {
   });
 
   it('serves from the fold without touching a row when the fingerprint matches', async () => {
-    const state: State = { agg: { kind: 'survey', rows_folded: 3, head_hash: 'aaa', payload_json: JSON.stringify({ ok: true, n: 3 }), updated_at: 'T' }, rows: 3, head: 'aaa', writes: 0 };
+    const state: State = { agg: { kind: 'survey', rows_folded: 3, head_hash: 'aaa', payload_json: JSON.stringify({ ok: true, n: 3, aggShape: AGG_SHAPE }), updated_at: '2026-09-15T16:21:20.328Z' }, rows: 3, head: 'aaa', writes: 0 };
     const { env } = fakeD1(state);
     const s = spec([1, 2, 3]);
     const out = await cachedAggregate(env, s);
-    expect(out).toMatchObject({ ok: true, n: 3, fold: { hit: true, rows: 3, foldedAt: 'T' } });
+    // the day only: a fold is written moments after an answer, so its time would be that answer's time
+    expect(out).toMatchObject({ ok: true, n: 3, fold: { hit: true, rows: 3, foldedAt: '2026-09-15T00:00:00' } });
+    expect((out as Record<string, unknown>).aggShape).toBeUndefined();   // bookkeeping, never served
     expect(s.loadRows).not.toHaveBeenCalled();
     expect(state.writes).toBe(0);
+  });
+
+  it('refolds a current fold written in an older SHAPE (2026-10-01: folds from before server-side small-cell suppression)', async () => {
+    // Production's folds held raw breakdowns (a state with a count of 1) under a fingerprint that still matched.
+    const state: State = { agg: { kind: 'survey', rows_folded: 3, head_hash: 'aaa', payload_json: JSON.stringify({ ok: true, n: 3, coverage: { state: { Georgia: 1 } } }), updated_at: 'T' }, rows: 3, head: 'aaa', writes: 0 };
+    const { env } = fakeD1(state);
+    const s = spec([1, 2, 3]);
+    const out = await cachedAggregate(env, s);
+    expect(out.fold.hit).toBe(false);
+    expect(s.loadRows).toHaveBeenCalledTimes(1);
+    expect((out as Record<string, unknown>).coverage).toBeUndefined();
+    expect(JSON.parse(String(state.agg!.payload_json)).aggShape).toBe(AGG_SHAPE);
   });
 
   it('refolds after an append: the head moved', async () => {

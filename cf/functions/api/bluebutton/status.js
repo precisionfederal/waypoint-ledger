@@ -7,9 +7,20 @@
    heading, not the words. A capability we have not proved does not get to
    appear on the page describing itself. */
 import { json } from '../_http.js';
-import { isConfigured, cookieOf, TOKEN_COOKIE, SANDBOX } from './_bb.js';
+import { isConfigured, cookieOf, TOKEN_COOKIE, REFUSAL_COOKIE, killCookie, refusalOf, SANDBOX } from './_bb.js';
+
+/** CMS's reason for the last refused sign-in in this browser, if the callback
+ *  left one. Cleaned again on the way out, and cleared once read. */
+function readRefusal(request) {
+  const raw = cookieOf(request, REFUSAL_COOKIE);
+  if (!raw) return { refusal: null, present: false };
+  let v = null;
+  try { v = JSON.parse(raw); } catch { v = null; }
+  return { refusal: v ? refusalOf(v.e, v.d) : null, present: true };
+}
 
 export function onRequestGet({ request, env }) {
+  const { refusal, present } = readRefusal(request);
   return json({
     ok: true,
     configured: isConfigured(env),
@@ -19,6 +30,8 @@ export function onRequestGet({ request, env }) {
     scopes: SANDBOX.scopes,
     // What this site will and will not do with the connection, in the response
     // itself, so an auditor reading the API sees the same promise the page makes.
-    retention: 'none — claims are fetched, mapped in your browser and never stored on this server',
-  });
+    retention: 'none: claims are fetched, mapped in your browser and never stored on this server',
+    // Why CMS refused the last sign-in from this browser, in CMS's own words, or null.
+    refusal,
+  }, 200, present ? { 'set-cookie': killCookie(REFUSAL_COOKIE) } : {});
 }

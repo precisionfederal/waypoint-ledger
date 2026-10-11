@@ -2,14 +2,22 @@
  "_what_this_is": "Every row of the Waypoint Ledger price table, re-derived or re-read from the federal file it cites. PASS means the number was reproduced. UNVERIFIED means the source could not be read in that run, or the figure is not machine-checkable from the document text layer. It never means \"probably fine\".",
  "generated": "2026-09-09",
  "table_version": "2026-09-09.1",
- "rows": 117,
- "pass": 117,
+ "rows": 274,
+ "pass": 274,
  "fail": 0,
  "unverified": 0,
- "alternates": 67,
- "alternates_pass": 67,
+ "alternates": 80,
+ "alternates_pass": 80,
  "alternates_fail": 0,
  "alternates_unverified": 0,
+ "facility_figures": 134,
+ "facility_pass": 134,
+ "facility_fail": 0,
+ "facility_unverified": 0,
+ "per_year_caps": 5,
+ "per_year_pass": 5,
+ "per_year_fail": 0,
+ "per_year_unverified": 0,
  "localities": {
   "rows": 52,
   "figures": 5668,
@@ -21,7 +29,7 @@
   "evidence": "5668 figures re-derived from PPRRVU2026_Jul_nonQPP.csv and GPCI2026.csv at the cent"
  },
  "version": "2026-09-09.1",
- "version_line": "117 rows · 117 reproduce · 67 CY2024 companion figures · 5,668 locality figures · audited 2026-09-09",
+ "version_line": "274 rows · 274 reproduce · 80 CY2024 companion figures · 134 hospital-setting figures · 5,668 locality figures · audited 2026-09-09",
  "conversion_factor": 33.4009,
  "conversion_factor_note": null,
  "sources": {
@@ -62,7 +70,7 @@
    "bytes": 42078094,
    "retrieved": "2026-09-09",
    "url": "https://data.cms.gov/sites/default/files/2026-05/e534c74b-79b8-4892-8a95-5a17e2dfec9f/MUP_PHY_R26_P05_V10_D24_Geo.csv",
-   "title": "CMS, Medicare Physician & Other Practitioners — by Geography and Service, calendar year 2024",
+   "title": "CMS, Medicare Physician & Other Practitioners - by Geography and Service, calendar year 2024",
    "file": "MUP_PHY_R26_P05_V10_D24_Geo.csv"
   },
   "pmc": {
@@ -189,15 +197,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 189.25,
-     "evidence": "Avg_Sbmtd_Chrg = $189.25 on the National office row for 99213"
+     "evidence": "Avg_Sbmtd_Chrg = $189.25 on the National office row for 99213, alongside 64,778,139 services from 631,995 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 85.37,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $85.37 on the National office row for 99213"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $85.37 on the National office row for 99213, alongside 64,778,139 services from 631,995 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 57.45,
+     "evidence": "1.72 facility total RVUs on the unmodified line for 99213 x $33.4009 = $57.45"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99213",
@@ -218,15 +235,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 276.45,
-     "evidence": "Avg_Sbmtd_Chrg = $276.45 on the National office row for 99214"
+     "evidence": "Avg_Sbmtd_Chrg = $276.45 on the National office row for 99214, alongside 95,439,230 services from 641,674 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 119.71,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $119.71 on the National office row for 99214"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $119.71 on the National office row for 99214, alongside 95,439,230 services from 641,674 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 84.5,
+     "evidence": "2.53 facility total RVUs on the unmodified line for 99214 x $33.4009 = $84.50"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99214",
@@ -247,15 +273,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 406.36,
-     "evidence": "Avg_Sbmtd_Chrg = $406.36 on the National office row for 99215"
+     "evidence": "Avg_Sbmtd_Chrg = $406.36 on the National office row for 99215, alongside 10,326,407 services from 340,863 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 169.67,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $169.67 on the National office row for 99215"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $169.67 on the National office row for 99215, alongside 10,326,407 services from 340,863 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 125.59,
+     "evidence": "3.76 facility total RVUs on the unmodified line for 99215 x $33.4009 = $125.59"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99215",
@@ -276,15 +311,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 267.25,
-     "evidence": "Avg_Sbmtd_Chrg = $267.25 on the National office row for 99203"
+     "evidence": "Avg_Sbmtd_Chrg = $267.25 on the National office row for 99203, alongside 8,070,604 services from 388,139 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 105.33,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $105.33 on the National office row for 99203"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $105.33 on the National office row for 99203, alongside 8,070,604 services from 388,139 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 71.48,
+     "evidence": "2.14 facility total RVUs on the unmodified line for 99203 x $33.4009 = $71.48"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99203",
@@ -305,15 +349,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 410.82,
-     "evidence": "Avg_Sbmtd_Chrg = $410.82 on the National office row for 99204"
+     "evidence": "Avg_Sbmtd_Chrg = $410.82 on the National office row for 99204, alongside 11,402,207 services from 459,358 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 160.28,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $160.28 on the National office row for 99204"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $160.28 on the National office row for 99204, alongside 11,402,207 services from 459,358 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 116.9,
+     "evidence": "3.50 facility total RVUs on the unmodified line for 99204 x $33.4009 = $116.90"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99204",
@@ -334,15 +387,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 560.92,
-     "evidence": "Avg_Sbmtd_Chrg = $560.92 on the National office row for 99205"
+     "evidence": "Avg_Sbmtd_Chrg = $560.92 on the National office row for 99205, alongside 2,338,334 services from 198,901 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 213.67,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $213.67 on the National office row for 99205"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $213.67 on the National office row for 99205, alongside 2,338,334 services from 198,901 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 160.32,
+     "evidence": "4.80 facility total RVUs on the unmodified line for 99205 x $33.4009 = $160.32"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99205",
@@ -363,15 +425,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 118.03,
-     "evidence": "Avg_Sbmtd_Chrg = $118.03 on the National office row for 99212"
+     "evidence": "Avg_Sbmtd_Chrg = $118.03 on the National office row for 99212, alongside 6,241,712 services from 319,826 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 53.59,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $53.59 on the National office row for 99212"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $53.59 on the National office row for 99212, alongside 6,241,712 services from 319,826 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 31.06,
+     "evidence": "0.93 facility total RVUs on the unmodified line for 99212 x $33.4009 = $31.06"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99212",
@@ -388,6 +459,8 @@
    "value_usd": 136.02,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "HCPCS G0463 (APC 5012)",
@@ -408,9 +481,17 @@
      "key": "cy2024_physician_component_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 788.07,
-     "evidence": "Avg_Sbmtd_Chrg = $788.07 on the National facility row for 99284"
+     "evidence": "Avg_Sbmtd_Chrg = $788.07 on the National facility row for 99284, alongside 4,531,103 services from 117,351 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 114.81,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $114.81 on the National facility row for 99284, alongside 4,531,103 services from 117,351 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99284 (APC 5024)",
@@ -427,6 +508,8 @@
    "value_usd": 426.3,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 99284 (APC 5024)",
@@ -443,6 +526,8 @@
    "value_usd": 118.24,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99284",
@@ -463,9 +548,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 37.12,
-     "evidence": "Avg_Sbmtd_Chrg = $37.12 on the National office row for 85025"
+     "evidence": "Avg_Sbmtd_Chrg = $37.12 on the National office row for 85025, alongside 26,189,197 services from 54,652 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 7.59,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $7.59 on the National office row for 85025, alongside 26,189,197 services from 54,652 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 85025",
@@ -486,9 +579,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 61.45,
-     "evidence": "Avg_Sbmtd_Chrg = $61.45 on the National office row for 80053"
+     "evidence": "Avg_Sbmtd_Chrg = $61.45 on the National office row for 80053, alongside 27,211,637 services from 45,390 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 10.33,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $10.33 on the National office row for 80053, alongside 27,211,637 services from 45,390 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 80053",
@@ -509,9 +610,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 47.97,
-     "evidence": "Avg_Sbmtd_Chrg = $47.97 on the National office row for 80048"
+     "evidence": "Avg_Sbmtd_Chrg = $47.97 on the National office row for 80048, alongside 5,130,544 services from 31,822 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 8.27,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $8.27 on the National office row for 80048, alongside 5,130,544 services from 31,822 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 80048",
@@ -532,9 +641,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 95.9,
-     "evidence": "Avg_Sbmtd_Chrg = $95.90 on the National office row for 84443"
+     "evidence": "Avg_Sbmtd_Chrg = $95.90 on the National office row for 84443, alongside 13,896,671 services from 32,960 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 16.44,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $16.44 on the National office row for 84443, alongside 13,896,671 services from 32,960 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 84443",
@@ -555,9 +672,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 81.33,
-     "evidence": "Avg_Sbmtd_Chrg = $81.33 on the National office row for 86038"
+     "evidence": "Avg_Sbmtd_Chrg = $81.33 on the National office row for 86038, alongside 684,386 services from 4,162 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 11.83,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $11.83 on the National office row for 86038, alongside 684,386 services from 4,162 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86038",
@@ -578,9 +703,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 29.54,
-     "evidence": "Avg_Sbmtd_Chrg = $29.54 on the National office row for 85652"
+     "evidence": "Avg_Sbmtd_Chrg = $29.54 on the National office row for 85652, alongside 2,160,438 services from 13,607 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 2.64,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $2.64 on the National office row for 85652, alongside 2,160,438 services from 13,607 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 85652",
@@ -601,9 +734,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 55.53,
-     "evidence": "Avg_Sbmtd_Chrg = $55.53 on the National office row for 86140"
+     "evidence": "Avg_Sbmtd_Chrg = $55.53 on the National office row for 86140, alongside 2,378,356 services from 16,048 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 5.07,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $5.07 on the National office row for 86140, alongside 2,378,356 services from 16,048 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86140",
@@ -624,9 +765,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 70.03,
-     "evidence": "Avg_Sbmtd_Chrg = $70.03 on the National office row for 86141"
+     "evidence": "Avg_Sbmtd_Chrg = $70.03 on the National office row for 86141, alongside 499,083 services from 2,959 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 12.67,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $12.67 on the National office row for 86141, alongside 499,083 services from 2,959 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86141",
@@ -647,9 +796,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 129.04,
-     "evidence": "Avg_Sbmtd_Chrg = $129.04 on the National office row for 85379"
+     "evidence": "Avg_Sbmtd_Chrg = $129.04 on the National office row for 85379, alongside 139,977 services from 5,418 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 9.96,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $9.96 on the National office row for 85379, alongside 139,977 services from 5,418 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 85379",
@@ -670,9 +827,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 78.75,
-     "evidence": "Avg_Sbmtd_Chrg = $78.75 on the National office row for 82728"
+     "evidence": "Avg_Sbmtd_Chrg = $78.75 on the National office row for 82728, alongside 3,450,027 services from 21,739 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 13.33,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $13.33 on the National office row for 82728, alongside 3,450,027 services from 21,739 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82728",
@@ -693,9 +858,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 142.89,
-     "evidence": "Avg_Sbmtd_Chrg = $142.89 on the National office row for 86618"
+     "evidence": "Avg_Sbmtd_Chrg = $142.89 on the National office row for 86618, alongside 166,407 services from 2,982 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 16.67,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $16.67 on the National office row for 86618, alongside 166,407 services from 2,982 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86618",
@@ -716,9 +889,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 112.73,
-     "evidence": "Avg_Sbmtd_Chrg = $112.73 on the National office row for 86617"
+     "evidence": "Avg_Sbmtd_Chrg = $112.73 on the National office row for 86617, alongside 129,177 services from 503 providers"
+    },
+    {
+     "key": "cy2024_average_allowed_usd",
+     "status": "PASS",
+     "value_usd": 15.17,
+     "evidence": "Avg_Mdcr_Alowd_Amt = $15.17 on the National office row for 86617, alongside 129,177 services from 503 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86617",
@@ -739,15 +920,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 89.42,
-     "evidence": "Avg_Sbmtd_Chrg = $89.42 on the National office row for 71046"
+     "evidence": "Avg_Sbmtd_Chrg = $89.42 on the National office row for 71046, alongside 3,250,829 services from 86,953 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 23.13,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $23.13 on the National office row for 71046"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $23.13 on the National office row for 71046, alongside 3,250,829 services from 86,953 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 10.02,
+     "evidence": "0.30 facility total RVUs on the modifier 26 line for 71046 x $33.4009 = $10.02"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 71046",
@@ -768,15 +958,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 671.96,
-     "evidence": "Avg_Sbmtd_Chrg = $671.96 on the National office row for 71250"
+     "evidence": "Avg_Sbmtd_Chrg = $671.96 on the National office row for 71250, alongside 882,795 services from 21,207 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 97.8,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $97.80 on the National office row for 71250"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $97.80 on the National office row for 71250, alongside 882,795 services from 21,207 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 49.43,
+     "evidence": "1.48 facility total RVUs on the modifier 26 line for 71250 x $33.4009 = $49.43"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 71250",
@@ -797,15 +996,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 704.47,
-     "evidence": "Avg_Sbmtd_Chrg = $704.47 on the National office row for 71260"
+     "evidence": "Avg_Sbmtd_Chrg = $704.47 on the National office row for 71260, alongside 588,994 services from 18,880 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 84.2,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $84.20 on the National office row for 71260"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $84.20 on the National office row for 71260, alongside 588,994 services from 18,880 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 53.78,
+     "evidence": "1.61 facility total RVUs on the modifier 26 line for 71260 x $33.4009 = $53.78"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 71260",
@@ -826,15 +1034,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 690.55,
-     "evidence": "Avg_Sbmtd_Chrg = $690.55 on the National office row for 93306"
+     "evidence": "Avg_Sbmtd_Chrg = $690.55 on the National office row for 93306, alongside 2,948,622 services from 28,683 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 173.1,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $173.10 on the National office row for 93306"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $173.10 on the National office row for 93306, alongside 2,948,622 services from 28,683 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 67.47,
+     "evidence": "2.02 facility total RVUs on the modifier 26 line for 93306 x $33.4009 = $67.47"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93306",
@@ -855,15 +1072,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 1290.96,
-     "evidence": "Avg_Sbmtd_Chrg = $1290.96 on the National office row for 70551"
+     "evidence": "Avg_Sbmtd_Chrg = $1290.96 on the National office row for 70551, alongside 349,977 services from 11,590 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 155.06,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $155.06 on the National office row for 70551"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $155.06 on the National office row for 70551, alongside 349,977 services from 11,590 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 67.8,
+     "evidence": "2.03 facility total RVUs on the modifier 26 line for 70551 x $33.4009 = $67.80"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 70551",
@@ -884,15 +1110,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 1918.76,
-     "evidence": "Avg_Sbmtd_Chrg = $1918.76 on the National office row for 70553"
+     "evidence": "Avg_Sbmtd_Chrg = $1918.76 on the National office row for 70553, alongside 416,344 services from 11,400 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 229.98,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $229.98 on the National office row for 70553"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $229.98 on the National office row for 70553, alongside 416,344 services from 11,400 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 105.21,
+     "evidence": "3.15 facility total RVUs on the modifier 26 line for 70553 x $33.4009 = $105.21"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 70553",
@@ -913,15 +1148,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 96.77,
-     "evidence": "Avg_Sbmtd_Chrg = $96.77 on the National office row for 94010"
+     "evidence": "Avg_Sbmtd_Chrg = $96.77 on the National office row for 94010, alongside 615,658 services from 18,915 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 25.49,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $25.49 on the National office row for 94010"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $25.49 on the National office row for 94010, alongside 615,658 services from 18,915 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.35,
+     "evidence": "0.25 facility total RVUs on the modifier 26 line for 94010 x $33.4009 = $8.35"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 94010",
@@ -942,15 +1186,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 150.43,
-     "evidence": "Avg_Sbmtd_Chrg = $150.43 on the National office row for 94729"
+     "evidence": "Avg_Sbmtd_Chrg = $150.43 on the National office row for 94729, alongside 591,662 services from 8,681 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 51.03,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $51.03 on the National office row for 94729"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $51.03 on the National office row for 94729, alongside 591,662 services from 8,681 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 9.35,
+     "evidence": "0.28 facility total RVUs on the modifier 26 line for 94729 x $33.4009 = $9.35"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 94729, add-on",
@@ -971,15 +1224,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 118.27,
-     "evidence": "Avg_Sbmtd_Chrg = $118.27 on the National office row for 94727"
+     "evidence": "Avg_Sbmtd_Chrg = $118.27 on the National office row for 94727, alongside 185,282 services from 3,887 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 42.8,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $42.80 on the National office row for 94727"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $42.80 on the National office row for 94727, alongside 185,282 services from 3,887 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 12.02,
+     "evidence": "0.36 facility total RVUs on the modifier 26 line for 94727 x $33.4009 = $12.02"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 94727",
@@ -1000,15 +1262,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 633.56,
-     "evidence": "Avg_Sbmtd_Chrg = $633.56 on the National office row for 93660"
+     "evidence": "Avg_Sbmtd_Chrg = $633.56 on the National office row for 93660, alongside 1,957 services from 283 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 145.23,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $145.23 on the National office row for 93660"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $145.23 on the National office row for 93660, alongside 1,957 services from 283 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 89.85,
+     "evidence": "2.69 facility total RVUs on the modifier 26 line for 93660 x $33.4009 = $89.85"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93660",
@@ -1029,15 +1300,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 401.97,
-     "evidence": "Avg_Sbmtd_Chrg = $401.97 on the National office row for 94621"
+     "evidence": "Avg_Sbmtd_Chrg = $401.97 on the National office row for 94621, alongside 8,598 services from 562 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 134.11,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $134.11 on the National office row for 94621"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $134.11 on the National office row for 94621, alongside 8,598 services from 562 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 67.8,
+     "evidence": "2.03 facility total RVUs on the modifier 26 line for 94621 x $33.4009 = $67.80"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 94621",
@@ -1058,15 +1338,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 380.34,
-     "evidence": "Avg_Sbmtd_Chrg = $380.34 on the National office row for 93224"
+     "evidence": "Avg_Sbmtd_Chrg = $380.34 on the National office row for 93224, alongside 117,189 services from 6,789 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 68.1,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $68.10 on the National office row for 93224"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $68.10 on the National office row for 93224, alongside 117,189 services from 6,789 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93224",
@@ -1087,15 +1369,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 293.32,
-     "evidence": "Avg_Sbmtd_Chrg = $293.32 on the National office row for 90791"
+     "evidence": "Avg_Sbmtd_Chrg = $293.32 on the National office row for 90791, alongside 545,302 services from 70,767 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 144.74,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $144.74 on the National office row for 90791"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $144.74 on the National office row for 90791, alongside 545,302 services from 70,767 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 137.28,
+     "evidence": "4.11 facility total RVUs on the unmodified line for 90791 x $33.4009 = $137.28"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 90791",
@@ -1116,15 +1407,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 175.89,
-     "evidence": "Avg_Sbmtd_Chrg = $175.89 on the National office row for 90834"
+     "evidence": "Avg_Sbmtd_Chrg = $175.89 on the National office row for 90834, alongside 3,094,068 services from 63,898 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 87.48,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $87.48 on the National office row for 90834"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $87.48 on the National office row for 90834, alongside 3,094,068 services from 63,898 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 91.85,
+     "evidence": "2.75 facility total RVUs on the unmodified line for 90834 x $33.4009 = $91.85"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 90834",
@@ -1145,15 +1445,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 207.77,
-     "evidence": "Avg_Sbmtd_Chrg = $207.77 on the National office row for 90837"
+     "evidence": "Avg_Sbmtd_Chrg = $207.77 on the National office row for 90837, alongside 6,700,424 services from 87,981 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 124.97,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $124.97 on the National office row for 90837"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $124.97 on the National office row for 90837, alongside 6,700,424 services from 87,981 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 135.27,
+     "evidence": "4.05 facility total RVUs on the unmodified line for 90837 x $33.4009 = $135.27"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 90837",
@@ -1170,6 +1479,8 @@
    "value_usd": 4098,
    "basis": "total_expenditure",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1186,6 +1497,8 @@
    "value_usd": null,
    "basis": "out_of_pocket",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1202,6 +1515,8 @@
    "value_usd": 54,
    "basis": "out_of_pocket",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1224,6 +1539,8 @@
    "value_usd": 190,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1240,6 +1557,8 @@
    "value_usd": 1048,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1256,6 +1575,8 @@
    "value_usd": 927,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1272,6 +1593,8 @@
    "value_usd": 166,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1288,6 +1611,8 @@
    "value_usd": 143,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1304,6 +1629,8 @@
    "value_usd": 303,
    "basis": "payment",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1320,6 +1647,8 @@
    "value_usd": 750,
    "basis": "facility_cost",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ HCUP",
    "code": null,
@@ -1347,12 +1676,14 @@
    "value_usd": null,
    "basis": "ratio",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ HCUP",
    "code": null,
    "loinc": null,
    "check": "all-payer ED cost-to-charge ratio, 2021",
-   "evidence": "N=993 hospitals, min 0.02, max 1.49, mean 0.21, SD 0.14 — read on the summary line",
+   "evidence": "N=993 hospitals, min 0.02, max 1.49, mean 0.21, SD 0.14. Read on the summary line",
    "source_url": "https://hcup-us.ahrq.gov/db/ccr/ed-ccr/SummaryStats_edcc2021neds.PDF",
    "source_key": "edccr",
    "extras": []
@@ -1363,6 +1694,8 @@
    "value_usd": 4900,
    "basis": "total_expenditure",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1385,6 +1718,8 @@
    "value_usd": 5810,
    "basis": "total_expenditure",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1401,6 +1736,8 @@
    "value_usd": 6765,
    "basis": "total_expenditure",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "AHRQ MEPS",
    "code": null,
@@ -1417,6 +1754,15 @@
    "value_usd": 283,
    "basis": "out_of_pocket",
    "alternates": [],
+   "facility": [],
+   "frequency": [
+    {
+     "key": "max_per_year",
+     "status": "PASS",
+     "value_usd": null,
+     "evidence": "The Part B deductible is an annual amount (CMS publishes one figure per calendar year), so it is never multiplied by a "
+    }
+   ],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": null,
@@ -1439,6 +1785,8 @@
    "value_usd": 2100,
    "basis": "out_of_pocket",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": null,
@@ -1461,6 +1809,8 @@
    "value_usd": 1251,
    "basis": "wage",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "BLS",
    "code": null,
@@ -1488,12 +1838,14 @@
    "value_usd": 17.21,
    "basis": "wage",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "BLS",
    "code": null,
    "loinc": null,
    "check": "$17.21 median hourly, Home Health and Personal Care Aides (31-1120)",
-   "evidence": "plus 31-1131 $20.32, 29-1141 $46.90, 00-0000 $24.51, employment 4,305,810 — all read in the OEWS file",
+   "evidence": "plus 31-1131 $20.32, 29-1141 $46.90, 00-0000 $24.51, employment 4,305,810: all read in the OEWS file",
    "source_url": "https://www.bls.gov/oes/special-requests/oesm25nat.zip",
    "source_key": "oews",
    "extras": []
@@ -1504,6 +1856,15 @@
    "value_usd": 75.15,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 41.08,
+     "evidence": "1.23 facility total RVUs on the unmodified line for 99202 x $33.4009 = $41.08"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99202",
@@ -1520,6 +1881,15 @@
    "value_usd": 24.38,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 7.68,
+     "evidence": "0.23 facility total RVUs on the unmodified line for 99211 x $33.4009 = $7.68"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99211",
@@ -1536,6 +1906,8 @@
    "value_usd": 15.36,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93000",
@@ -1552,6 +1924,8 @@
    "value_usd": 73.48,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93015",
@@ -1568,6 +1942,8 @@
    "value_usd": 169.68,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93268",
@@ -1584,6 +1960,15 @@
    "value_usd": 673.7,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 119.58,
+     "evidence": "3.58 facility total RVUs on the modifier 26 line for 95810 x $33.4009 = $119.58"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 95810",
@@ -1600,6 +1985,15 @@
    "value_usd": 482.31,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 56.78,
+     "evidence": "1.70 facility total RVUs on the modifier 26 line for 95819 x $33.4009 = $56.78"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 95819",
@@ -1616,6 +2010,15 @@
    "value_usd": 99.87,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 45.43,
+     "evidence": "1.36 facility total RVUs on the modifier 26 line for 95886 x $33.4009 = $45.43"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 95886",
@@ -1632,6 +2035,15 @@
    "value_usd": 106.55,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 39.41,
+     "evidence": "1.18 facility total RVUs on the modifier 26 line for 70450 x $33.4009 = $39.41"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 70450",
@@ -1648,6 +2060,15 @@
    "value_usd": 191.72,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 68.47,
+     "evidence": "2.05 facility total RVUs on the modifier 26 line for 72148 x $33.4009 = $68.47"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 72148",
@@ -1664,6 +2085,15 @@
    "value_usd": 204.41,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 62.79,
+     "evidence": "1.88 facility total RVUs on the modifier 26 line for 73721 x $33.4009 = $62.79"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 73721",
@@ -1680,6 +2110,15 @@
    "value_usd": 114.23,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 37.41,
+     "evidence": "1.12 facility total RVUs on the modifier 26 line for 76700 x $33.4009 = $37.41"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 76700",
@@ -1696,6 +2135,15 @@
    "value_usd": 105.21,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 32.4,
+     "evidence": "0.97 facility total RVUs on the modifier 26 line for 76856 x $33.4009 = $32.40"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 76856",
@@ -1712,6 +2160,15 @@
    "value_usd": 189.05,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 37.41,
+     "evidence": "1.12 facility total RVUs on the modifier 26 line for 93880 x $33.4009 = $37.41"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 93880",
@@ -1728,6 +2185,15 @@
    "value_usd": 300.27,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 83.84,
+     "evidence": "2.51 facility total RVUs on the modifier 26 line for 74177 x $33.4009 = $83.84"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 74177",
@@ -1744,6 +2210,15 @@
    "value_usd": 378.1,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 164.67,
+     "evidence": "4.93 facility total RVUs on the unmodified line for 45378 x $33.4009 = $164.67"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 45378",
@@ -1760,6 +2235,15 @@
    "value_usd": 418.85,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 123.58,
+     "evidence": "3.70 facility total RVUs on the unmodified line for 43239 x $33.4009 = $123.58"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 43239",
@@ -1776,6 +2260,8 @@
    "value_usd": 97.86,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 97161",
@@ -1792,6 +2278,8 @@
    "value_usd": 29.06,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 97110",
@@ -1808,6 +2296,15 @@
    "value_usd": 149.64,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 77.82,
+     "evidence": "2.33 facility total RVUs on the unmodified line for 92004 x $33.4009 = $77.82"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 92004",
@@ -1824,6 +2321,15 @@
    "value_usd": 94.19,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 72.15,
+     "evidence": "2.16 facility total RVUs on the unmodified line for 96116 x $33.4009 = $72.15"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 96116",
@@ -1840,6 +2346,15 @@
    "value_usd": 122.25,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 98.53,
+     "evidence": "2.95 facility total RVUs on the unmodified line for 96132 x $33.4009 = $98.53"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 96132",
@@ -1856,6 +2371,8 @@
    "value_usd": 3.67,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 95004",
@@ -1872,6 +2389,15 @@
    "value_usd": 35.74,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 25.72,
+     "evidence": "0.77 facility total RVUs on the unmodified line for 92557 x $33.4009 = $25.72"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 92557",
@@ -1888,6 +2414,15 @@
    "value_usd": 68.81,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 39.75,
+     "evidence": "1.19 facility total RVUs on the unmodified line for 20610 x $33.4009 = $39.75"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 20610",
@@ -1904,6 +2439,8 @@
    "value_usd": 29.6,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82306",
@@ -1920,6 +2457,8 @@
    "value_usd": 15.08,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82607",
@@ -1936,6 +2475,8 @@
    "value_usd": 9.71,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 83036",
@@ -1952,6 +2493,8 @@
    "value_usd": 13.39,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 80061",
@@ -1968,6 +2511,8 @@
    "value_usd": 9.02,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 84439",
@@ -1984,6 +2529,8 @@
    "value_usd": 3.93,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82947",
@@ -2000,6 +2547,8 @@
    "value_usd": 3.17,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 81001",
@@ -2016,6 +2565,8 @@
    "value_usd": 8.07,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 87086",
@@ -2032,6 +2583,8 @@
    "value_usd": 51.31,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 87635",
@@ -2048,6 +2601,8 @@
    "value_usd": 6.7,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 83735",
@@ -2064,6 +2619,8 @@
    "value_usd": 6.51,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82550",
@@ -2080,6 +2637,8 @@
    "value_usd": 39.26,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 83880",
@@ -2096,6 +2655,8 @@
    "value_usd": 12.47,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 84484",
@@ -2112,6 +2673,8 @@
    "value_usd": 4.29,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 85610",
@@ -2128,6 +2691,8 @@
    "value_usd": 6.01,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 85730",
@@ -2144,6 +2709,8 @@
    "value_usd": 17.93,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86235",
@@ -2160,6 +2727,8 @@
    "value_usd": 13.74,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86225",
@@ -2176,6 +2745,8 @@
    "value_usd": 5.22,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86003",
@@ -2192,6 +2763,8 @@
    "value_usd": 25.47,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 84402",
@@ -2208,6 +2781,8 @@
    "value_usd": 18.58,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 83001",
@@ -2224,6 +2799,8 @@
    "value_usd": 27.94,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82670",
@@ -2240,6 +2817,8 @@
    "value_usd": 19.38,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 84146",
@@ -2256,6 +2835,8 @@
    "value_usd": 8.74,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 83550",
@@ -2272,6 +2853,8 @@
    "value_usd": 14.7,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 82746",
@@ -2288,6 +2871,8 @@
    "value_usd": 13.24,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86780",
@@ -2304,6 +2889,8 @@
    "value_usd": 10.33,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 87340",
@@ -2320,6 +2907,8 @@
    "value_usd": 14.27,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 86803",
@@ -2336,6 +2925,8 @@
    "value_usd": 24.08,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 87389",
@@ -2352,6 +2943,8 @@
    "value_usd": 0.76,
    "basis": "rate",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "GSA",
    "code": null,
@@ -2372,15 +2965,17 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 22.81,
-     "evidence": "Avg_Sbmtd_Chrg = $22.81 on the National office row for 96127"
+     "evidence": "Avg_Sbmtd_Chrg = $22.81 on the National office row for 96127, alongside 955,088 services from 38,264 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 4.46,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $4.46 on the National office row for 96127"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $4.46 on the National office row for 96127, alongside 955,088 services from 38,264 providers"
     }
    ],
+   "facility": [],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 96127",
@@ -2401,15 +2996,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 287.66,
-     "evidence": "Avg_Sbmtd_Chrg = $287.66 on the National office row for 96156"
+     "evidence": "Avg_Sbmtd_Chrg = $287.66 on the National office row for 96156, alongside 11,773 services from 875 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 90.66,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $90.66 on the National office row for 96156"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $90.66 on the National office row for 96156, alongside 11,773 services from 875 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 86.84,
+     "evidence": "2.60 facility total RVUs on the unmodified line for 96156 x $33.4009 = $86.84"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 96156",
@@ -2430,15 +3034,24 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 411.48,
-     "evidence": "Avg_Sbmtd_Chrg = $411.48 on the National office row for 99495"
+     "evidence": "Avg_Sbmtd_Chrg = $411.48 on the National office row for 99495, alongside 692,449 services from 95,133 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 182.49,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $182.49 on the National office row for 99495"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $182.49 on the National office row for 99495, alongside 692,449 services from 95,133 providers"
     }
    ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 122.25,
+     "evidence": "3.66 facility total RVUs on the unmodified line for 99495 x $33.4009 = $122.25"
+    }
+   ],
+   "frequency": [],
    "confidence": "DERIVED",
    "agency": "CMS",
    "code": "CPT 99495",
@@ -2459,13 +3072,29 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 40.74,
-     "evidence": "Avg_Sbmtd_Chrg = $40.74 on the National office row for G0442"
+     "evidence": "Avg_Sbmtd_Chrg = $40.74 on the National office row for G0442, alongside 1,002,324 services from 17,920 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 18.01,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $18.01 on the National office row for G0442"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $18.01 on the National office row for G0442, alongside 1,002,324 services from 17,920 providers"
+    }
+   ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.02,
+     "evidence": "0.24 facility total RVUs on the unmodified line for G0442 x $33.4009 = $8.02"
+    }
+   ],
+   "frequency": [
+    {
+     "key": "max_per_year",
+     "status": "PASS",
+     "value_usd": null,
+     "evidence": "CMS long descriptor for G0442: 'Annual alcohol misuse screening, 5 to 15 minutes'"
     }
    ],
    "confidence": "DERIVED",
@@ -2488,13 +3117,29 @@
      "key": "cy2024_average_submitted_charge_usd",
      "status": "PASS",
      "value_usd": 40.78,
-     "evidence": "Avg_Sbmtd_Chrg = $40.78 on the National office row for G0444"
+     "evidence": "Avg_Sbmtd_Chrg = $40.78 on the National office row for G0444, alongside 2,560,500 services from 48,370 providers"
     },
     {
      "key": "cy2024_average_allowed_usd",
      "status": "PASS",
      "value_usd": 17.85,
-     "evidence": "Avg_Mdcr_Alowd_Amt = $17.85 on the National office row for G0444"
+     "evidence": "Avg_Mdcr_Alowd_Amt = $17.85 on the National office row for G0444, alongside 2,560,500 services from 48,370 providers"
+    }
+   ],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.02,
+     "evidence": "0.24 facility total RVUs on the unmodified line for G0444 x $33.4009 = $8.02"
+    }
+   ],
+   "frequency": [
+    {
+     "key": "max_per_year",
+     "status": "PASS",
+     "value_usd": null,
+     "evidence": "CMS long descriptor for G0444: 'Annual depression screening, 5 to 15 minutes'"
     }
    ],
    "confidence": "DERIVED",
@@ -2513,12 +3158,14 @@
    "value_usd": null,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 99401",
    "loinc": null,
    "check": "PFS status indicator, read in the file",
-   "evidence": "99401 carries status N — non-covered. CMS publishes 0.48 work, 0.68 non-facility practice expense and 0.03 malpractice RVUs for it and pays nothing, so this row carries no figure",
+   "evidence": "99401 carries status N: non-covered. CMS publishes 0.48 work, 0.68 non-facility practice expense and 0.03 malpractice RVUs for it and pays nothing, so this row carries no figure",
    "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
    "source_key": "rvu",
    "extras": []
@@ -2529,14 +3176,3486 @@
    "value_usd": null,
    "basis": "allowed_amount",
    "alternates": [],
+   "facility": [],
+   "frequency": [],
    "confidence": "VERIFIED",
    "agency": "CMS",
    "code": "CPT 99408",
    "loinc": null,
    "check": "PFS status indicator, read in the file",
-   "evidence": "99408 carries status N — non-covered. CMS publishes 0.65 work, 0.36 non-facility practice expense and 0.04 malpractice RVUs for it and pays nothing, so this row carries no figure",
+   "evidence": "99408 carries status N: non-covered. CMS publishes 0.65 work, 0.36 non-facility practice expense and 0.04 malpractice RVUs for it and pays nothing, so this row carries no figure",
    "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
    "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ed-99281-physician",
+   "status": "PASS",
+   "value_usd": 11.02,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 99281",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.33 total non-facility RVUs x $33.4009 = $11.02",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ed-99282-physician",
+   "status": "PASS",
+   "value_usd": 40.42,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 99282",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.21 total non-facility RVUs x $33.4009 = $40.42",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ed-99283-physician",
+   "status": "PASS",
+   "value_usd": 69.47,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 99283",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.08 total non-facility RVUs x $33.4009 = $69.47",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ed-99285-physician",
+   "status": "PASS",
+   "value_usd": 171.35,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 99285",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.13 total non-facility RVUs x $33.4009 = $171.35",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-98016",
+   "status": "PASS",
+   "value_usd": 17.37,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 13.03,
+     "evidence": "0.39 facility total RVUs on the unmodified line for 98016 x $33.4009 = $13.03"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 98016",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.52 total non-facility RVUs x $33.4009 = $17.37",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-g0438",
+   "status": "PASS",
+   "value_usd": 174.35,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [
+    {
+     "key": "max_per_year",
+     "status": "PASS",
+     "value_usd": null,
+     "evidence": "CMS long descriptor for G0438: 'Annual wellness visit; includes a personalized prevention plan of service (pps), initial visit'"
+    }
+   ],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "HCPCS G0438",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.22 total non-facility RVUs x $33.4009 = $174.35",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-g0439",
+   "status": "PASS",
+   "value_usd": 137.61,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [
+    {
+     "key": "max_per_year",
+     "status": "PASS",
+     "value_usd": null,
+     "evidence": "CMS long descriptor for G0439: 'Annual wellness visit, includes a personalized prevention plan of service (pps), subsequent visit'"
+    }
+   ],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "HCPCS G0439",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.12 total non-facility RVUs x $33.4009 = $137.61",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-99483",
+   "status": "PASS",
+   "value_usd": 292.93,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 169.68,
+     "evidence": "5.08 facility total RVUs on the unmodified line for 99483 x $33.4009 = $169.68"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 99483",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "8.77 total non-facility RVUs x $33.4009 = $292.93",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-mh-therapy-30",
+   "status": "PASS",
+   "value_usd": 85.84,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 69.47,
+     "evidence": "2.08 facility total RVUs on the unmodified line for 90832 x $33.4009 = $69.47"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90832",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.57 total non-facility RVUs x $33.4009 = $85.84",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-mh-psych-eval-meds",
+   "status": "PASS",
+   "value_usd": 202.08,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 159.32,
+     "evidence": "4.77 facility total RVUs on the unmodified line for 90792 x $33.4009 = $159.32"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90792",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.05 total non-facility RVUs x $33.4009 = $202.08",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-mh-family-therapy",
+   "status": "PASS",
+   "value_usd": 109.55,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 102.87,
+     "evidence": "3.08 facility total RVUs on the unmodified line for 90847 x $33.4009 = $102.87"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90847",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.28 total non-facility RVUs x $33.4009 = $109.55",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-mh-group-therapy",
+   "status": "PASS",
+   "value_usd": 30.39,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 24.38,
+     "evidence": "0.73 facility total RVUs on the unmodified line for 90853 x $33.4009 = $24.38"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90853",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.91 total non-facility RVUs x $33.4009 = $30.39",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-mh-crisis-60",
+   "status": "PASS",
+   "value_usd": 160.32,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 129.6,
+     "evidence": "3.88 facility total RVUs on the unmodified line for 90839 x $33.4009 = $129.60"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90839",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.80 total non-facility RVUs x $33.4009 = $160.32",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-psych-testing-1h",
+   "status": "PASS",
+   "value_usd": 123.92,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 99.53,
+     "evidence": "2.98 facility total RVUs on the unmodified line for 96130 x $33.4009 = $99.53"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 96130",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.71 total non-facility RVUs x $33.4009 = $123.92",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-pt-eval-mod",
+   "status": "PASS",
+   "value_usd": 97.86,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97162",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.93 total non-facility RVUs x $33.4009 = $97.86",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-pt-eval-high",
+   "status": "PASS",
+   "value_usd": 97.86,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97163",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.93 total non-facility RVUs x $33.4009 = $97.86",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-pt-manual-therapy-15",
+   "status": "PASS",
+   "value_usd": 27.72,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97140",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.83 total non-facility RVUs x $33.4009 = $27.72",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-pt-neuro-reeducation-15",
+   "status": "PASS",
+   "value_usd": 32.73,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97112",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.98 total non-facility RVUs x $33.4009 = $32.73",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-pt-therapeutic-activities-15",
+   "status": "PASS",
+   "value_usd": 35.07,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97530",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.05 total non-facility RVUs x $33.4009 = $35.07",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ot-eval-low",
+   "status": "PASS",
+   "value_usd": 100.54,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97165",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.01 total non-facility RVUs x $33.4009 = $100.54",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-ot-eval-high",
+   "status": "PASS",
+   "value_usd": 100.54,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97167",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.01 total non-facility RVUs x $33.4009 = $100.54",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-speech-therapy",
+   "status": "PASS",
+   "value_usd": 76.15,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92507",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.28 total non-facility RVUs x $33.4009 = $76.15",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-chiro-3-4-regions",
+   "status": "PASS",
+   "value_usd": 38.41,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 28.06,
+     "evidence": "0.84 facility total RVUs on the unmodified line for 98941 x $33.4009 = $28.06"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 98941",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.15 total non-facility RVUs x $33.4009 = $38.41",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-acupuncture-15",
+   "status": "PASS",
+   "value_usd": 48.1,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 27.39,
+     "evidence": "0.82 facility total RVUs on the unmodified line for 97810 x $33.4009 = $27.39"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97810",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.44 total non-facility RVUs x $33.4009 = $48.10",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-massage-therapy-15",
+   "status": "PASS",
+   "value_usd": 29.73,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 97124",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.89 total non-facility RVUs x $33.4009 = $29.73",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-cxr-1view",
+   "status": "PASS",
+   "value_usd": 25.38,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.35,
+     "evidence": "0.25 facility total RVUs on the modifier 26 line for 71045 x $33.4009 = $8.35"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 71045",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.76 total non-facility RVUs x $33.4009 = $25.38",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-xray-knee-3",
+   "status": "PASS",
+   "value_usd": 42.42,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 9.35,
+     "evidence": "0.28 facility total RVUs on the modifier 26 line for 73562 x $33.4009 = $9.35"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 73562",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.27 total non-facility RVUs x $33.4009 = $42.42",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-xray-lumbar",
+   "status": "PASS",
+   "value_usd": 53.44,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 12.69,
+     "evidence": "0.38 facility total RVUs on the modifier 26 line for 72110 x $33.4009 = $12.69"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 72110",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.60 total non-facility RVUs x $33.4009 = $53.44",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-xray-shoulder",
+   "status": "PASS",
+   "value_usd": 35.74,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 9.02,
+     "evidence": "0.27 facility total RVUs on the modifier 26 line for 73030 x $33.4009 = $9.02"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 73030",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.07 total non-facility RVUs x $33.4009 = $35.74",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-xray-hand",
+   "status": "PASS",
+   "value_usd": 38.08,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.68,
+     "evidence": "0.26 facility total RVUs on the modifier 26 line for 73130 x $33.4009 = $8.68"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 73130",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.14 total non-facility RVUs x $33.4009 = $38.08",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-xray-foot",
+   "status": "PASS",
+   "value_usd": 34.07,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.02,
+     "evidence": "0.24 facility total RVUs on the modifier 26 line for 73630 x $33.4009 = $8.02"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 73630",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.02 total non-facility RVUs x $33.4009 = $34.07",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-mri-cervical-nc",
+   "status": "PASS",
+   "value_usd": 190.72,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 68.14,
+     "evidence": "2.04 facility total RVUs on the modifier 26 line for 72141 x $33.4009 = $68.14"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 72141",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.71 total non-facility RVUs x $33.4009 = $190.72",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-mri-upper-joint-nc",
+   "status": "PASS",
+   "value_usd": 205.08,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 63.13,
+     "evidence": "1.89 facility total RVUs on the modifier 26 line for 73221 x $33.4009 = $63.13"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 73221",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.14 total non-facility RVUs x $33.4009 = $205.08",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-ct-abd-pelvis-nc",
+   "status": "PASS",
+   "value_usd": 183.04,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 79.83,
+     "evidence": "2.39 facility total RVUs on the modifier 26 line for 74176 x $33.4009 = $79.83"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 74176",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.48 total non-facility RVUs x $33.4009 = $183.04",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-ct-sinus",
+   "status": "PASS",
+   "value_usd": 128.26,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 39.75,
+     "evidence": "1.19 facility total RVUs on the modifier 26 line for 70486 x $33.4009 = $39.75"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 70486",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.84 total non-facility RVUs x $33.4009 = $128.26",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-ct-lumbar",
+   "status": "PASS",
+   "value_usd": 129.93,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 46.43,
+     "evidence": "1.39 facility total RVUs on the modifier 26 line for 72131 x $33.4009 = $46.43"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 72131",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.89 total non-facility RVUs x $33.4009 = $129.93",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-us-thyroid",
+   "status": "PASS",
+   "value_usd": 108.55,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 26.39,
+     "evidence": "0.79 facility total RVUs on the modifier 26 line for 76536 x $33.4009 = $26.39"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 76536",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.25 total non-facility RVUs x $33.4009 = $108.55",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-us-breast",
+   "status": "PASS",
+   "value_usd": 100.2,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 33.73,
+     "evidence": "1.01 facility total RVUs on the modifier 26 line for 76641 x $33.4009 = $33.73"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 76641",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.00 total non-facility RVUs x $33.4009 = $100.20",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-us-kidneys",
+   "status": "PASS",
+   "value_usd": 106.21,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 34.07,
+     "evidence": "1.02 facility total RVUs on the modifier 26 line for 76770 x $33.4009 = $34.07"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 76770",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.18 total non-facility RVUs x $33.4009 = $106.21",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-us-transvaginal",
+   "status": "PASS",
+   "value_usd": 117.57,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 32.4,
+     "evidence": "0.97 facility total RVUs on the modifier 26 line for 76830 x $33.4009 = $32.40"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 76830",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.52 total non-facility RVUs x $33.4009 = $117.57",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-mammo-screen",
+   "status": "PASS",
+   "value_usd": 126.26,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 35.07,
+     "evidence": "1.05 facility total RVUs on the modifier 26 line for 77067 x $33.4009 = $35.07"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 77067",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.78 total non-facility RVUs x $33.4009 = $126.26",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-mammo-dx-uni",
+   "status": "PASS",
+   "value_usd": 123.92,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 37.74,
+     "evidence": "1.13 facility total RVUs on the modifier 26 line for 77065 x $33.4009 = $37.74"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 77065",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.71 total non-facility RVUs x $33.4009 = $123.92",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-dexa",
+   "status": "PASS",
+   "value_usd": 39.41,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 9.35,
+     "evidence": "0.28 facility total RVUs on the modifier 26 line for 77080 x $33.4009 = $9.35"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 77080",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.18 total non-facility RVUs x $33.4009 = $39.41",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-cta-chest",
+   "status": "PASS",
+   "value_usd": 280.57,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 83.5,
+     "evidence": "2.50 facility total RVUs on the modifier 26 line for 71275 x $33.4009 = $83.50"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 71275",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "8.40 total non-facility RVUs x $33.4009 = $280.57",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-mra-head",
+   "status": "PASS",
+   "value_usd": 214.77,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 55.11,
+     "evidence": "1.65 facility total RVUs on the modifier 26 line for 70544 x $33.4009 = $55.11"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 70544",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.43 total non-facility RVUs x $33.4009 = $214.77",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-nuclear-stress",
+   "status": "PASS",
+   "value_usd": 427.87,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 74.48,
+     "evidence": "2.23 facility total RVUs on the modifier 26 line for 78452 x $33.4009 = $74.48"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 78452",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "12.81 total non-facility RVUs x $33.4009 = $427.87",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-bone-scan",
+   "status": "PASS",
+   "value_usd": 259.19,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 38.75,
+     "evidence": "1.16 facility total RVUs on the modifier 26 line for 78306 x $33.4009 = $38.75"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 78306",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "7.76 total non-facility RVUs x $33.4009 = $259.19",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-stress-tracing",
+   "status": "PASS",
+   "value_usd": 39.08,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93017",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.17 total non-facility RVUs x $33.4009 = $39.08",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ecg-interp",
+   "status": "PASS",
+   "value_usd": 8.35,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93010",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.25 total non-facility RVUs x $33.4009 = $8.35",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-echo-no-doppler",
+   "status": "PASS",
+   "value_usd": 137.95,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 43.09,
+     "evidence": "1.29 facility total RVUs on the modifier 26 line for 93307 x $33.4009 = $43.09"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93307",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.13 total non-facility RVUs x $33.4009 = $137.95",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-tee",
+   "status": "PASS",
+   "value_usd": 239.48,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 105.21,
+     "evidence": "3.15 facility total RVUs on the modifier 26 line for 93312 x $33.4009 = $105.21"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93312",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "7.17 total non-facility RVUs x $33.4009 = $239.48",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-stress-echo",
+   "status": "PASS",
+   "value_usd": 185.37,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 67.47,
+     "evidence": "2.02 facility total RVUs on the modifier 26 line for 93350 x $33.4009 = $67.47"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93350",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.55 total non-facility RVUs x $33.4009 = $185.37",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-arterial-studies",
+   "status": "PASS",
+   "value_usd": 133.6,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 21.38,
+     "evidence": "0.64 facility total RVUs on the modifier 26 line for 93923 x $33.4009 = $21.38"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 93923",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.00 total non-facility RVUs x $33.4009 = $133.60",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-eeg-awake-drowsy",
+   "status": "PASS",
+   "value_usd": 413.5,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 56.45,
+     "evidence": "1.69 facility total RVUs on the modifier 26 line for 95816 x $33.4009 = $56.45"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95816",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "12.38 total non-facility RVUs x $33.4009 = $413.50",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-1-2",
+   "status": "PASS",
+   "value_usd": 94.19,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 53.44,
+     "evidence": "1.60 facility total RVUs on the modifier 26 line for 95907 x $33.4009 = $53.44"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95907",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.82 total non-facility RVUs x $33.4009 = $94.19",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-3-4",
+   "status": "PASS",
+   "value_usd": 118.24,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 67.14,
+     "evidence": "2.01 facility total RVUs on the modifier 26 line for 95908 x $33.4009 = $67.14"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95908",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.54 total non-facility RVUs x $33.4009 = $118.24",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-5-6",
+   "status": "PASS",
+   "value_usd": 141.95,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 80.16,
+     "evidence": "2.40 facility total RVUs on the modifier 26 line for 95909 x $33.4009 = $80.16"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95909",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.25 total non-facility RVUs x $33.4009 = $141.95",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-7-8",
+   "status": "PASS",
+   "value_usd": 184.71,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 106.21,
+     "evidence": "3.18 facility total RVUs on the modifier 26 line for 95910 x $33.4009 = $106.21"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95910",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "5.53 total non-facility RVUs x $33.4009 = $184.71",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-9-10",
+   "status": "PASS",
+   "value_usd": 220.11,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 132.6,
+     "evidence": "3.97 facility total RVUs on the modifier 26 line for 95911 x $33.4009 = $132.60"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95911",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.59 total non-facility RVUs x $33.4009 = $220.11",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-11-12",
+   "status": "PASS",
+   "value_usd": 254.85,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 158.32,
+     "evidence": "4.74 facility total RVUs on the modifier 26 line for 95912 x $33.4009 = $158.32"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95912",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "7.63 total non-facility RVUs x $33.4009 = $254.85",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-ncs-13plus",
+   "status": "PASS",
+   "value_usd": 299.94,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 187.71,
+     "evidence": "5.62 facility total RVUs on the modifier 26 line for 95913 x $33.4009 = $187.71"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95913",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "8.98 total non-facility RVUs x $33.4009 = $299.94",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-emg-limited",
+   "status": "PASS",
+   "value_usd": 64.46,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 18.37,
+     "evidence": "0.55 facility total RVUs on the modifier 26 line for 95885 x $33.4009 = $18.37"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95885",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.93 total non-facility RVUs x $33.4009 = $64.46",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-lumbar-puncture",
+   "status": "PASS",
+   "value_usd": 165.0,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 58.79,
+     "evidence": "1.76 facility total RVUs on the unmodified line for 62270 x $33.4009 = $58.79"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 62270",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.94 total non-facility RVUs x $33.4009 = $165.00",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-epley",
+   "status": "PASS",
+   "value_usd": 40.75,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 29.73,
+     "evidence": "0.89 facility total RVUs on the unmodified line for 95992 x $33.4009 = $29.73"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95992",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.22 total non-facility RVUs x $33.4009 = $40.75",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-home-sleep-full",
+   "status": "PASS",
+   "value_usd": 141.29,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 38.75,
+     "evidence": "1.16 facility total RVUs on the modifier 26 line for 95800 x $33.4009 = $38.75"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95800",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.23 total non-facility RVUs x $33.4009 = $141.29",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-home-sleep-basic",
+   "status": "PASS",
+   "value_usd": 103.21,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 44.76,
+     "evidence": "1.34 facility total RVUs on the modifier 26 line for 95806 x $33.4009 = $44.76"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95806",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.09 total non-facility RVUs x $33.4009 = $103.21",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-sleep-cpap",
+   "status": "PASS",
+   "value_usd": 707.77,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 123.92,
+     "evidence": "3.71 facility total RVUs on the modifier 26 line for 95811 x $33.4009 = $123.92"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95811",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "21.19 total non-facility RVUs x $33.4009 = $707.77",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-colonoscopy-biopsy",
+   "status": "PASS",
+   "value_usd": 479.97,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 177.69,
+     "evidence": "5.32 facility total RVUs on the unmodified line for 45380 x $33.4009 = $177.69"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 45380",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "14.37 total non-facility RVUs x $33.4009 = $479.97",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-colonoscopy-polyp",
+   "status": "PASS",
+   "value_usd": 500.01,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 223.45,
+     "evidence": "6.69 facility total RVUs on the unmodified line for 45385 x $33.4009 = $223.45"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 45385",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "14.97 total non-facility RVUs x $33.4009 = $500.01",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-sigmoidoscopy",
+   "status": "PASS",
+   "value_usd": 215.1,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 53.78,
+     "evidence": "1.61 facility total RVUs on the unmodified line for 45330 x $33.4009 = $53.78"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 45330",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.44 total non-facility RVUs x $33.4009 = $215.10",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-egd-dx",
+   "status": "PASS",
+   "value_usd": 322.65,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 110.56,
+     "evidence": "3.31 facility total RVUs on the unmodified line for 43235 x $33.4009 = $110.56"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 43235",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "9.66 total non-facility RVUs x $33.4009 = $322.65",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-capsule-endoscopy",
+   "status": "PASS",
+   "value_usd": 802.29,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 117.91,
+     "evidence": "3.53 facility total RVUs on the modifier 26 line for 91110 x $33.4009 = $117.91"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 91110",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "24.02 total non-facility RVUs x $33.4009 = $802.29",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-esophageal-ph",
+   "status": "PASS",
+   "value_usd": 202.41,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 50.44,
+     "evidence": "1.51 facility total RVUs on the modifier 26 line for 91034 x $33.4009 = $50.44"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 91034",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "6.06 total non-facility RVUs x $33.4009 = $202.41",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-img-upper-gi-series",
+   "status": "PASS",
+   "value_usd": 134.61,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 41.75,
+     "evidence": "1.25 facility total RVUs on the modifier 26 line for 74246 x $33.4009 = $41.75"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 74246",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.03 total non-facility RVUs x $33.4009 = $134.61",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-gastric-emptying",
+   "status": "PASS",
+   "value_usd": 289.92,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 35.74,
+     "evidence": "1.07 facility total RVUs on the modifier 26 line for 78264 x $33.4009 = $35.74"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 78264",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "8.68 total non-facility RVUs x $33.4009 = $289.92",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-breath-hydrogen",
+   "status": "PASS",
+   "value_usd": 64.46,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 9.69,
+     "evidence": "0.29 facility total RVUs on the modifier 26 line for 91065 x $33.4009 = $9.69"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 91065",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.93 total non-facility RVUs x $33.4009 = $64.46",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-g0121-screening-colonoscopy",
+   "status": "PASS",
+   "value_usd": 378.43,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 165.0,
+     "evidence": "4.94 facility total RVUs on the unmodified line for G0121 x $33.4009 = $165.00"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "HCPCS G0121",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "11.33 total non-facility RVUs x $33.4009 = $378.43",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-spirometry-bronchodilator",
+   "status": "PASS",
+   "value_usd": 43.42,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 10.35,
+     "evidence": "0.31 facility total RVUs on the modifier 26 line for 94060 x $33.4009 = $10.35"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 94060",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.30 total non-facility RVUs x $33.4009 = $43.42",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-treat-nebulizer",
+   "status": "PASS",
+   "value_usd": 8.68,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 94640",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.26 total non-facility RVUs x $33.4009 = $8.68",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-allergy-intradermal-per-test",
+   "status": "PASS",
+   "value_usd": 7.68,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 1.0,
+     "evidence": "0.03 facility total RVUs on the unmodified line for 95024 x $33.4009 = $1.00"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95024",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.23 total non-facility RVUs x $33.4009 = $7.68",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-patch-testing-per-test",
+   "status": "PASS",
+   "value_usd": 5.01,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95044",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.15 total non-facility RVUs x $33.4009 = $5.01",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-treat-allergy-shot",
+   "status": "PASS",
+   "value_usd": 17.37,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 2.67,
+     "evidence": "0.08 facility total RVUs on the unmodified line for 95165 x $33.4009 = $2.67"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 95165",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.52 total non-facility RVUs x $33.4009 = $17.37",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-injection-im",
+   "status": "PASS",
+   "value_usd": 15.36,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 96372",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.46 total non-facility RVUs x $33.4009 = $15.36",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-iv-infusion-first-hour",
+   "status": "PASS",
+   "value_usd": 67.14,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 96365",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.01 total non-facility RVUs x $33.4009 = $67.14",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-iv-infusion-extra-hour",
+   "status": "PASS",
+   "value_usd": 21.38,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 96366",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.64 total non-facility RVUs x $33.4009 = $21.38",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-iv-push",
+   "status": "PASS",
+   "value_usd": 37.74,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 96374",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.13 total non-facility RVUs x $33.4009 = $37.74",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-joint-injection-small",
+   "status": "PASS",
+   "value_usd": 57.12,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 32.06,
+     "evidence": "0.96 facility total RVUs on the unmodified line for 20605 x $33.4009 = $32.06"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 20605",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.71 total non-facility RVUs x $33.4009 = $57.12",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-joint-injection-us",
+   "status": "PASS",
+   "value_usd": 104.21,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 50.1,
+     "evidence": "1.50 facility total RVUs on the unmodified line for 20611 x $33.4009 = $50.10"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 20611",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.12 total non-facility RVUs x $33.4009 = $104.21",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-tendon-injection",
+   "status": "PASS",
+   "value_usd": 60.46,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 33.4,
+     "evidence": "1.00 facility total RVUs on the unmodified line for 20550 x $33.4009 = $33.40"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 20550",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.81 total non-facility RVUs x $33.4009 = $60.46",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-trigger-point-1-2",
+   "status": "PASS",
+   "value_usd": 51.77,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 35.74,
+     "evidence": "1.07 facility total RVUs on the unmodified line for 20552 x $33.4009 = $35.74"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 20552",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.55 total non-facility RVUs x $33.4009 = $51.77",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-epidural-transforaminal",
+   "status": "PASS",
+   "value_usd": 264.87,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 99.53,
+     "evidence": "2.98 facility total RVUs on the unmodified line for 64483 x $33.4009 = $99.53"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 64483",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "7.93 total non-facility RVUs x $33.4009 = $264.87",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-epidural-interlaminar",
+   "status": "PASS",
+   "value_usd": 273.22,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 89.18,
+     "evidence": "2.67 facility total RVUs on the unmodified line for 62323 x $33.4009 = $89.18"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 62323",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "8.18 total non-facility RVUs x $33.4009 = $273.22",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-skin-biopsy-shave",
+   "status": "PASS",
+   "value_usd": 95.53,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 30.06,
+     "evidence": "0.90 facility total RVUs on the unmodified line for 11102 x $33.4009 = $30.06"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 11102",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.86 total non-facility RVUs x $33.4009 = $95.53",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-skin-biopsy-punch",
+   "status": "PASS",
+   "value_usd": 121.25,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 38.08,
+     "evidence": "1.14 facility total RVUs on the unmodified line for 11104 x $33.4009 = $38.08"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 11104",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.63 total non-facility RVUs x $33.4009 = $121.25",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-wart-removal",
+   "status": "PASS",
+   "value_usd": 111.22,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 62.46,
+     "evidence": "1.87 facility total RVUs on the unmodified line for 17110 x $33.4009 = $62.46"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 17110",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.33 total non-facility RVUs x $33.4009 = $111.22",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-precancer-destruction",
+   "status": "PASS",
+   "value_usd": 66.47,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 47.76,
+     "evidence": "1.43 facility total RVUs on the unmodified line for 17000 x $33.4009 = $47.76"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 17000",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.99 total non-facility RVUs x $33.4009 = $66.47",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-abscess-drainage",
+   "status": "PASS",
+   "value_usd": 128.59,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 100.54,
+     "evidence": "3.01 facility total RVUs on the unmodified line for 10060 x $33.4009 = $100.54"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 10060",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.85 total non-facility RVUs x $33.4009 = $128.59",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-wound-repair-simple",
+   "status": "PASS",
+   "value_usd": 113.9,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 44.09,
+     "evidence": "1.32 facility total RVUs on the unmodified line for 12001 x $33.4009 = $44.09"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 12001",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.41 total non-facility RVUs x $33.4009 = $113.90",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-earwax-removal",
+   "status": "PASS",
+   "value_usd": 47.76,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 27.05,
+     "evidence": "0.81 facility total RVUs on the unmodified line for 69210 x $33.4009 = $27.05"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 69210",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.43 total non-facility RVUs x $33.4009 = $47.76",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-wrist-splint",
+   "status": "PASS",
+   "value_usd": 79.16,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 41.08,
+     "evidence": "1.23 facility total RVUs on the unmodified line for 29125 x $33.4009 = $41.08"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 29125",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.37 total non-facility RVUs x $33.4009 = $79.16",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-eye-exam-est-comprehensive",
+   "status": "PASS",
+   "value_usd": 127.26,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 62.13,
+     "evidence": "1.86 facility total RVUs on the unmodified line for 92014 x $33.4009 = $62.13"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92014",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.81 total non-facility RVUs x $33.4009 = $127.26",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-eye-exam-est-intermediate",
+   "status": "PASS",
+   "value_usd": 90.52,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 41.42,
+     "evidence": "1.24 facility total RVUs on the unmodified line for 92012 x $33.4009 = $41.42"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92012",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.71 total non-facility RVUs x $33.4009 = $90.52",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-eye-visual-field",
+   "status": "PASS",
+   "value_usd": 63.8,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 26.39,
+     "evidence": "0.79 facility total RVUs on the modifier 26 line for 92083 x $33.4009 = $26.39"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92083",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.91 total non-facility RVUs x $33.4009 = $63.80",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-eye-oct-retina",
+   "status": "PASS",
+   "value_usd": 32.73,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 17.7,
+     "evidence": "0.53 facility total RVUs on the modifier 26 line for 92134 x $33.4009 = $17.70"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92134",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.98 total non-facility RVUs x $33.4009 = $32.73",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-eye-fundus-photos",
+   "status": "PASS",
+   "value_usd": 37.07,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 20.37,
+     "evidence": "0.61 facility total RVUs on the modifier 26 line for 92250 x $33.4009 = $20.37"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92250",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.11 total non-facility RVUs x $33.4009 = $37.07",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-tympanometry",
+   "status": "PASS",
+   "value_usd": 16.03,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 8.68,
+     "evidence": "0.26 facility total RVUs on the unmodified line for 92567 x $33.4009 = $8.68"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92567",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.48 total non-facility RVUs x $33.4009 = $16.03",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-test-otoacoustic",
+   "status": "PASS",
+   "value_usd": 33.73,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 28.72,
+     "evidence": "0.86 facility total RVUs on the modifier 26 line for 92588 x $33.4009 = $28.72"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 92588",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "1.01 total non-facility RVUs x $33.4009 = $33.73",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-laryngoscopy",
+   "status": "PASS",
+   "value_usd": 127.26,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 61.12,
+     "evidence": "1.83 facility total RVUs on the unmodified line for 31575 x $33.4009 = $61.12"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 31575",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "3.81 total non-facility RVUs x $33.4009 = $127.26",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-colposcopy-biopsy",
+   "status": "PASS",
+   "value_usd": 166.0,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 118.91,
+     "evidence": "3.56 facility total RVUs on the unmodified line for 57454 x $33.4009 = $118.91"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 57454",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "4.97 total non-facility RVUs x $33.4009 = $166.00",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-endometrial-biopsy",
+   "status": "PASS",
+   "value_usd": 98.2,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 55.11,
+     "evidence": "1.65 facility total RVUs on the unmodified line for 58100 x $33.4009 = $55.11"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 58100",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.94 total non-facility RVUs x $33.4009 = $98.20",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-path-tissue-exam",
+   "status": "PASS",
+   "value_usd": 70.14,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 35.07,
+     "evidence": "1.05 facility total RVUs on the modifier 26 line for 88305 x $33.4009 = $35.07"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 88305",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "2.10 total non-facility RVUs x $33.4009 = $70.14",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-surg-knee-arthroscopy",
+   "status": "PASS",
+   "value_usd": 515.71,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 29881",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "15.44 total non-facility RVUs x $33.4009 = $515.71",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-surg-cataract",
+   "status": "PASS",
+   "value_usd": 462.6,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 66984",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "13.85 total non-facility RVUs x $33.4009 = $462.60",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-surg-carpal-tunnel",
+   "status": "PASS",
+   "value_usd": 482.64,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 423.19,
+     "evidence": "12.67 facility total RVUs on the unmodified line for 64721 x $33.4009 = $423.19"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 64721",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "14.45 total non-facility RVUs x $33.4009 = $482.64",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-breast-biopsy-us",
+   "status": "PASS",
+   "value_usd": 475.63,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [
+    {
+     "key": "facility_setting_physician_payment_usd",
+     "status": "PASS",
+     "value_usd": 130.6,
+     "evidence": "3.91 facility total RVUs on the unmodified line for 19083 x $33.4009 = $130.60"
+    }
+   ],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 19083",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "14.24 total non-facility RVUs x $33.4009 = $475.63",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-proc-vaccine-admin",
+   "status": "PASS",
+   "value_usd": 22.04,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "DERIVED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 90471",
+   "loinc": null,
+   "check": "PFS re-derivation, non-facility setting",
+   "evidence": "0.66 total non-facility RVUs x $33.4009 = $22.04",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c",
+   "source_key": "rvu",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-venipuncture",
+   "status": "PASS",
+   "value_usd": 9.34,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 36415",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 36415 pays $9.34 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-urinalysis-auto",
+   "status": "PASS",
+   "value_usd": 2.25,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 81003",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 81003 pays $2.25 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-strep-rapid",
+   "status": "PASS",
+   "value_usd": 16.53,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87880",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87880 pays $16.53 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-flu-rapid",
+   "status": "PASS",
+   "value_usd": 16.55,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87804",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87804 pays $16.55 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-strep-naat",
+   "status": "PASS",
+   "value_usd": 35.09,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87651",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87651 pays $35.09 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-hepatitis-panel",
+   "status": "PASS",
+   "value_usd": 47.63,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 80074",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 80074 pays $47.63 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-celiac-ttg",
+   "status": "PASS",
+   "value_usd": 11.53,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86364",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86364 pays $11.53 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-cortisol",
+   "status": "PASS",
+   "value_usd": 16.3,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82533",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82533 pays $16.30 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-total-testosterone",
+   "status": "PASS",
+   "value_usd": 25.81,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84403",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84403 pays $25.81 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-psa",
+   "status": "PASS",
+   "value_usd": 18.39,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84153",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84153 pays $18.39 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-iron",
+   "status": "PASS",
+   "value_usd": 6.47,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 83540",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 83540 pays $6.47 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-lactate",
+   "status": "PASS",
+   "value_usd": 11.57,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 83605",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 83605 pays $11.57 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-thyroid-antibodies",
+   "status": "PASS",
+   "value_usd": 14.55,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86376",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86376 pays $14.55 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-ccp",
+   "status": "PASS",
+   "value_usd": 12.95,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86200",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86200 pays $12.95 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-rheumatoid-factor",
+   "status": "PASS",
+   "value_usd": 5.67,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86431",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86431 pays $5.67 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-homocysteine",
+   "status": "PASS",
+   "value_usd": 17.92,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 83090",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 83090 pays $17.92 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-uric-acid",
+   "status": "PASS",
+   "value_usd": 4.52,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84550",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84550 pays $4.52 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-creatinine",
+   "status": "PASS",
+   "value_usd": 5.12,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82565",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82565 pays $5.12 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-bun",
+   "status": "PASS",
+   "value_usd": 3.95,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84520",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84520 pays $3.95 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-hepatic-panel",
+   "status": "PASS",
+   "value_usd": 8.17,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 80076",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 80076 pays $8.17 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-renal-panel",
+   "status": "PASS",
+   "value_usd": 8.68,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 80069",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 80069 pays $8.68 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-electrolytes",
+   "status": "PASS",
+   "value_usd": 7.01,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 80051",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 80051 pays $7.01 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-hemoglobin-only",
+   "status": "PASS",
+   "value_usd": 2.37,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 85018",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 85018 pays $2.37 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-chlamydia",
+   "status": "PASS",
+   "value_usd": 35.09,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87491",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87491 pays $35.09 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-gonorrhea",
+   "status": "PASS",
+   "value_usd": 35.09,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87591",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87591 pays $35.09 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-bacterial-culture",
+   "status": "PASS",
+   "value_usd": 8.62,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87070",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87070 pays $8.62 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-ova-parasites",
+   "status": "PASS",
+   "value_usd": 8.9,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 87177",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 87177 pays $8.90 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-fit-stool",
+   "status": "PASS",
+   "value_usd": 15.92,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82274",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82274 pays $15.92 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-cologuard",
+   "status": "PASS",
+   "value_usd": 508.87,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 81528",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 81528 pays $508.87 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-hcg-quant",
+   "status": "PASS",
+   "value_usd": 15.05,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84702",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84702 pays $15.05 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-hcg-qual",
+   "status": "PASS",
+   "value_usd": 7.52,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84703",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84703 pays $7.52 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-insulin",
+   "status": "PASS",
+   "value_usd": 11.43,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 83525",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 83525 pays $11.43 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-gtt",
+   "status": "PASS",
+   "value_usd": 12.87,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82951",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82951 pays $12.87 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-free-t3",
+   "status": "PASS",
+   "value_usd": 16.94,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84481",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84481 pays $16.94 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-total-t4",
+   "status": "PASS",
+   "value_usd": 6.87,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 84436",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 84436 pays $6.87 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-blood-type",
+   "status": "PASS",
+   "value_usd": 2.99,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86900",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86900 pays $2.99 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-microalbumin",
+   "status": "PASS",
+   "value_usd": 5.78,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82043",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82043 pays $5.78 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-mono",
+   "status": "PASS",
+   "value_usd": 5.18,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86308",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86308 pays $5.18 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-h-pylori-ab",
+   "status": "PASS",
+   "value_usd": 16.85,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 86677",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 86677 pays $16.85 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-h-pylori-breath",
+   "status": "PASS",
+   "value_usd": 67.36,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 83013",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 83013 pays $67.36 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
+   "extras": []
+  },
+  {
+   "id": "cms-lab-glucose-fingerstick",
+   "status": "PASS",
+   "value_usd": 3.28,
+   "basis": "allowed_amount",
+   "alternates": [],
+   "facility": [],
+   "frequency": [],
+   "confidence": "VERIFIED",
+   "agency": "Centers for Medicare & Medicaid Services",
+   "code": "CPT 82962",
+   "loinc": null,
+   "check": "CLFS lookup",
+   "evidence": "CPT 82962 pays $3.28 on the CY2026 Q3 file",
+   "source_url": "https://www.cms.gov/medicare/payment/fee-schedules/clinical-laboratory-fee-schedule-clfs/files/26clabq3",
+   "source_key": "clfs",
    "extras": []
   }
  ]

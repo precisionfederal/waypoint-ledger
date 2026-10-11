@@ -1,0 +1,60 @@
+/* /integrity: the chains drawn as linked blocks, and the in-browser check
+   (VISUAL tech, 2026-09-30 night). DESIGN R1 tokens only. */
+.panel{margin:0 0 1.25rem;padding:1.15rem 1.25rem 1.25rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2)}
+.top{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem 1.5rem;flex-wrap:wrap}
+.top>div{flex:1 1 26rem;min-width:0}
+.h{margin:0 0 .3rem;font-size:1.125rem}
+.lead{margin:0;font-size:.9375rem;line-height:1.55;color:var(--ink-2);max-width:62ch}
+.btn{flex:none;display:inline-flex;align-items:center;gap:.5rem;min-height:48px;padding:0 1.25rem;border-radius:var(--r-pill);border:1px solid transparent;background:var(--brand-fill);color:var(--on-brand);font:600 1rem var(--font-b);cursor:pointer;box-shadow:0 1px 2px rgba(17,28,39,.14)}
+.btn:hover{background:var(--brand-fill-2)}
+.btn:disabled{opacity:.75;cursor:progress}
+.btn:focus-visible{outline:none;box-shadow:var(--ring)}
+.status{margin:.5rem 0 0;min-height:1.4rem;font-size:.9375rem;color:var(--ink-3)}
+.status:empty{min-height:0;margin:0}
+.list{list-style:none;margin:.75rem 0 0;padding:0;display:grid;gap:.9rem}
+.item{padding:.9rem 0 0;border-top:1px solid var(--line-2);min-width:0}
+.name{display:flex;align-items:baseline;gap:.6rem;margin:0 0 .6rem;font-size:1rem}
+.name b{color:var(--ink)}
+.name span{font-size:.9375rem;color:var(--ink-3)}
+.wrap{width:100%;min-width:0}
+.svg{display:block;overflow:visible}
+.res{margin:.55rem 0 0;font-size:.9375rem;line-height:1.5;color:var(--ink-3)}
+.resOk{color:var(--good-ink);font-weight:600}
+.resBad{color:var(--flag-ink);font-weight:600}
+@media (max-width:720px){.res a{display:inline-block;padding:.7rem 0}}
+
+/* blocks */
+.block rect{fill:var(--surface);stroke:var(--line);stroke-width:1.25;transition:fill .3s ease-out,stroke .3s ease-out}
+.block text{transition:fill .3s ease-out}
+.bk{font:600 13px var(--font-b);fill:var(--ink)}
+.bh{font:500 13px var(--font-m);fill:var(--ink-3)}
+.start rect{fill:var(--ground);stroke-dasharray:4 3;stroke:var(--ink-4)}
+.head rect{fill:var(--brand-fill);stroke:var(--brand-fill)}
+.head .bk,.head .bh{fill:var(--on-brand)}
+.ok rect{fill:var(--good-soft);stroke:var(--good)}
+.ok .bh{fill:var(--good-ink)}
+.head.ok rect{fill:var(--brand-fill);stroke:var(--good);stroke-width:2.5}
+.head.ok .bh{fill:var(--on-brand)}
+.bad rect{fill:var(--flag-soft);stroke:var(--flag)}
+.bad .bh{fill:var(--flag-ink)}
+.mark{fill:none;stroke:var(--good-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.head .mark{stroke:#7fe0b4}
+.bad .mark{stroke:var(--flag-ink)}
+.gapB rect{fill:none;stroke:var(--line);stroke-dasharray:4 3}
+.gapB text{font:500 13px var(--font-b);fill:var(--ink-3)}
+.link path{stroke:var(--ink-4);stroke-width:1.5;fill:none;transition:stroke .3s ease-out}
+.link rect{fill:var(--surface);stroke:var(--ink-4);stroke-width:1.5;transition:stroke .3s ease-out,fill .3s ease-out}
+.linkOn path,.linkOn rect{stroke:var(--good)}
+.linkOn rect{fill:var(--good-soft)}
+@media (prefers-reduced-motion: reduce){.block rect,.block text,.link path,.link rect{transition:none}}
+@media (forced-colors: active){.block rect,.link rect{stroke:CanvasText}.bk,.bh{fill:CanvasText}}
+
+/* phones: a tighter panel (VISUAL tech follow-up, 2026-09-30 night) */
+@media (max-width:640px){
+  .panel{padding:.9rem .75rem 1rem}
+  .btn{width:100%;justify-content:center}
+  .list{gap:.6rem;margin-top:.5rem}
+  .item{padding-top:.65rem}
+  .name{margin-bottom:.4rem}
+  .res{margin-top:.4rem}
+}

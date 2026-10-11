@@ -110,17 +110,23 @@ describe('what is published is a count, and the chain covers it', () => {
     const rows = [...many(3, 'Female'), ...many(2, 'Male'), ...many(1, undefined)];
     const agg = aggregateSurvey(rows) as unknown as { n: number; coverage: Record<string, Record<string, number>> };
     expect(agg.n).toBe(6);
-    expect(agg.coverage.sex).toEqual({ Female: 3, Male: 2, 'not stated': 1 });
+    /* 2026-10-01: suppressed on the server. Five stated answers across two sexes,
+       each under 11, are one withheld line; "not stated" names nobody and stays. */
+    expect(agg.coverage.sex).toEqual({ 'not stated': 1, 'fewer than 11, not shown': 5 });
+    expect(JSON.stringify(agg.coverage)).not.toMatch(/Female|Male/);
   });
 
-  it('ctx_sex is exported, so ctx_sex is hashed — the ctx_state defect, not repeated', () => {
+  it('sex is hashed but no longer exported: one row per answer carrying it could point at a person', () => {
     const header = String(exportRows('survey', [])).trim().split(',');
-    expect(header).toContain('ctx_sex');
-    expect(SURVEY_CTX_KEYS).toContain('sex');
+    expect(header).not.toContain('ctx_sex');
+    expect(header.filter((h) => h.startsWith('ctx_'))).toEqual([]);
+    expect(SURVEY_CTX_KEYS).toContain('sex');                 // the chain still covers it, as written
     expect(surveyCtxKeysFor(SURVEY_VERSION)).toContain('sex');
     const cov = chainCoverage('survey', header, {}) as { uncovered: string[]; covered: { column: string; field: string }[] };
     expect(cov.uncovered).toEqual([]);
-    expect(Object.fromEntries(cov.covered.map((c) => [c.column, c.field])).ctx_sex).toBe('context.sex');
+    // A ctx_sex column, if anyone added one back, would still be recognised as covered.
+    const back = chainCoverage('survey', [...header, 'ctx_sex'], {}) as { covered: { column: string; field: string }[] };
+    expect(Object.fromEntries(back.covered.map((c) => [c.column, c.field])).ctx_sex).toBe('context.sex');
   });
 
   it('a row written before the instrument asked sex is still walked under its own field set', () => {

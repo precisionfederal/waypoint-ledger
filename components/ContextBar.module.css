@@ -5,7 +5,7 @@
 /* three questions, not two: each keeps its own column until they no longer fit */
 .groups{display:grid;grid-template-columns:repeat(auto-fit,minmax(16rem,1fr));gap:var(--sp-5)}
 .group{min-width:0}
-.lbl{margin:0 0 var(--sp-2);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.lbl{margin:0 0 var(--sp-2);font-family:var(--font-m);font-size:.8125rem;letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
 .chip{min-height:44px;padding:.55rem 1rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2);font-size:1rem;font-weight:600;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
 .chip:hover{border-color:var(--accent);color:var(--ink)}
@@ -16,7 +16,7 @@
 .hint{margin:var(--sp-2) 0 0;font-size:.9rem;color:var(--ink-3)}
 
 /* the per-row verdict, in the ledger table and on the sheet */
-.fit{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .55rem;border-radius:var(--r-pill);font-family:var(--font-m);font-size:.8125rem;letter-spacing:.06em;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.fit{display:inline-flex;align-items:center;gap:.35rem;padding:.18rem .55rem;border-radius:var(--r-pill);font-family:var(--font-m);font-size:.8125rem;letter-spacing:0;text-transform:none;font-weight:700;white-space:nowrap}
 .fitYou{background:var(--good-soft);color:var(--good-ink)}
 .fitRef{background:var(--brand-soft);color:var(--brand-ink)}
 .fitBilled{background:var(--sun-soft);color:var(--warn-ink)}
@@ -49,7 +49,7 @@
 .ask .note{max-width:62ch}
 .collapsed{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--sp-3);padding-top:var(--sp-3);padding-bottom:var(--sp-3)}
 .sumLine{display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem;margin:0;min-width:0}
-.sumLbl{font-family:var(--font-m);font-size:.8125rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.sumLbl{font-family:var(--font-m);font-size:.8125rem;letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .sumVal{font-size:1rem;color:var(--ink)}
 .change{min-height:44px;padding:.4rem 1rem;border:1px solid var(--line);border-radius:var(--r-pill);background:var(--surface-2);color:var(--ink-2);font:inherit;font-size:.9375rem;font-weight:600;cursor:pointer}
 .change:hover{border-color:var(--accent);color:var(--ink)}
@@ -92,6 +92,20 @@
 .fitChange:hover{color:var(--ink)}
 .fitChange:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-sm)}
 
+/* JUDGE-6 #10: the line wrapped as two blocks, so on a phone "· Change" stood
+   alone on a line of its own, led by its dot (/journey at 320, 375 and 390;
+   /ledger at 320). It is now one run of text: Change follows the last word
+   when it fits, and the dot is glued to that word by a no-break space, so a
+   wrap leaves "national ·" above and "Change" below, never a leading dot
+   (the line may break after the dot, never before it).
+   The dot stays out of what a screen reader says. */
+.fitLine{display:block}
+.fitLine > .fitTxt + .fitTxt::before{content:" "}
+.fitLine > .fitTxt:has(+ .fitChange)::after{content:"\a0\b7\20";color:var(--ink-4);font-weight:400}
+.fitLine > .fitTxt:has(+ .fitChange)::after{content:"\a0\b7\20" / ""}
+.fitLine > .fitChange{padding-left:0}
+.fitLine > .fitChange::before{content:none}
+
 /* Under the box on /journey — the same size as the rest of the page's small print. */
 .fitLineAsk{margin:var(--sp-3) 0 var(--sp-4);font-size:.9375rem}
 /* Under the number on /ledger — small type, tucked against the card above it. */
@@ -130,3 +144,21 @@
 .numNone{color:var(--ink-4)}
 .barWait{display:block;font-size:.95rem;line-height:1.3;color:var(--ink-3);max-width:20ch}
 .waitNote{margin:.35rem 0 var(--sp-3);font-size:1rem;line-height:1.45;color:var(--ink-3)}
+
+/* DESIGN R1 (2026-09-30): labels are sentence case in the text face; the source
+   agency reads as a quiet word, not a code tag; the counts beside the total are
+   figures with a plain caption. */
+.lbl,.sumLbl{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--ink-2)}
+.agency{font-family:var(--font-b);font-size:.9375rem;font-weight:600;letter-spacing:0;color:var(--ink-2)}
+.fit{font-family:var(--font-b);font-size:.875rem;letter-spacing:0;font-weight:600;text-transform:lowercase}
+.chip.on{background:var(--brand-fill);border-color:var(--brand-fill)}
+.bar{box-shadow:var(--sh-1);border-color:var(--line-2)}
+.figV{font-family:var(--font-b);font-weight:700;font-size:1.5rem;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.figL{font-size:.9375rem;font-weight:600;color:var(--ink-2)}
+.figS{font-size:.875rem;color:var(--ink-3)}
+.fitLineNum{font-size:.9375rem}
+.stepBand{background:var(--surface);border:1px solid var(--line-2);border-left:1px solid var(--line-2);box-shadow:var(--sh-1)}
+.stepBandBody h2{font-weight:700;color:var(--ink)}
+.gapBtn{font-size:.9375rem}
+.bracket b{font-family:var(--font-b);font-weight:700;font-variant-numeric:tabular-nums}
+.refFig b{font-family:var(--font-b)}

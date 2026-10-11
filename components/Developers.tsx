@@ -6,10 +6,21 @@
    ========================================================================== */
 
 import Link from 'next/link';
-import { LongLayout, LongSection, type TocItem } from './LongSection';
+import { LongLayout, type TocItem } from './LongSection';
+import { Badge, Caveat, Fold, Glance, TI, trust as s } from './trust/Kit';
 import { OPENAPI } from '@/lib/openapi';
+import { EXAMPLE_STORY } from '@/lib/fhir';
 import { TABLE, SELECTABLE, TABLE_VERSION } from '@/lib/table';
 import { LOCALITIES, LOCALITY_ROW_COUNT } from '@/lib/fit';
+import OrgKitAgency from './OrgKitAgency';
+import { ShowCall, dp } from './DevPagesKit';
+import dv from './developers.module.css';
+import HiCode from './tech/HiCode';
+import TryIt from './tech/TryIt';
+import ThemedImg from './ThemedImg';
+import { FhirTree, Flow, RouteMap, ROUTES_WIDE } from './tech/DevVisuals';
+import FoldOpen from './tech/FoldOpen';
+import tc from './tech/tech.module.css';
 
 /* Counted, never typed. The locality file grows every time a code is added to the
    price table, and a page that still says 5,123 after it becomes 5,668 is a lie
@@ -17,18 +28,17 @@ import { LOCALITIES, LOCALITY_ROW_COUNT } from '@/lib/fit';
 const LOCALITY_FIGURES = LOCALITY_ROW_COUNT * LOCALITIES.length;
 const N = (n: number) => n.toLocaleString('en-US');
 
-const pre: React.CSSProperties = {
-  background: 'var(--surface-2)', border: '1px solid var(--line-2)', borderRadius: 'var(--r-md)',
-  padding: '1rem 1.1rem', overflowX: 'auto', fontFamily: 'var(--font-m)', fontSize: '.85rem',
-  lineHeight: 1.55, color: 'var(--ink-2)', margin: '0 0 1rem', whiteSpace: 'pre',
-};
+/* Every copyable block starts with its own BASE line, so a block copied alone runs
+   (FLOW adopter-6). A line break is only ever BETWEEN JSON keys, never inside a quoted
+   string: a break inside one is invalid JSON and the first call a developer copied
+   came back 400 (FLOW adopter-1). tests/flow-adopter.test.ts parses every -d body. */
+export const BASE_LINE = 'BASE=https://waypointledger.org';
 
-const CURL_PRICE = `BASE=https://waypoint-ledger.pages.dev
+export const CURL_PRICE = `${BASE_LINE}
 
 curl -s -X POST $BASE/api/price \\
   -H 'content-type: application/json' \\
-  -d '{"story":"saw my regular doctor three times, then a cardiologist,
-        an echocardiogram, blood work twice, and I missed work"}'`;
+  -d '{"story":"saw my regular doctor three times, then a cardiologist, an echocardiogram, blood work twice, and I missed work"}'`;
 
 const OUT_PRICE = String.raw`{
   "ok": true,
@@ -65,7 +75,7 @@ const OUT_PRICE = String.raw`{
       "raw": "I missed work",
       "kind": "known-unpriceable",
       "unpriceableId": "lost-work",
-      "reason": "Valuing a lost workday requires your actual earnings, not a national median. The Bureau of Labor Statistics pu …",
+      "reason": "Shown on the workdays card, at the published median or your own pay, and never added to the medical total. The Bureau of Labor Statistics pu …",
       "whatWouldFixIt": "Ask the person for their own hourly or weekly pay and multiply. That is arithmetic on a figure they supplied, …"
     }
   ],
@@ -88,7 +98,9 @@ const OUT_PRICE = String.raw`{
   "method": "A deterministic matcher maps words to a unit of care; a published federal table prices it. No model produces a dollar figure."
 }`;
 
-const CURL_TABLE = `curl -s $BASE/api/table/cms-99213`;
+export const CURL_TABLE = `${BASE_LINE}
+
+curl -s $BASE/api/table/cms-99213`;
 
 const OUT_TABLE = String.raw`{
   "ok": true,
@@ -116,10 +128,12 @@ const OUT_TABLE = String.raw`{
   }
 }`;
 
-const CURL_JOURNEY = `curl -s -X POST $BASE/api/journeys \\
+export const CURL_JOURNEY = `${BASE_LINE}
+
+curl -s -X POST $BASE/api/journeys \\
   -H 'content-type: application/json' \\
   -d '{"title":"Two years of looking",
-       "entries":[{"raw":"saw my regular doctor about the fatigue","itemId":"cms-99214","times":6},
+       "entries":[{"raw":"saw my regular doctor about the fatigue","itemId":"cms-99213","times":6},
                   {"raw":"echocardiogram","itemId":"cms-img-echo","times":1}]}'`;
 
 const OUT_JOURNEY = String.raw`{
@@ -130,7 +144,9 @@ const OUT_JOURNEY = String.raw`{
   "savedTo": "link"
 }`;
 
-const CURL_FIT = `curl -s -X POST $BASE/api/price \\
+export const CURL_FIT = `${BASE_LINE}
+
+curl -s -X POST $BASE/api/price \\
   -H 'content-type: application/json' \\
   -d '{"story":"saw my regular doctor three times, then an echocardiogram",
        "coverage":"uninsured", "state":"IA"}'`;
@@ -204,7 +220,9 @@ const OUT_FIT = String.raw`{
   "tableVersion": "2026-09-08.1-verified"
 }`;
 
-const CURL_MEDICAID = `curl -s -X POST $BASE/api/price \\
+export const CURL_MEDICAID = `${BASE_LINE}
+
+curl -s -X POST $BASE/api/price \\
   -H 'content-type: application/json' \\
   -d '{"story":"saw my regular doctor three times, then an echocardiogram",
        "coverage":"medicaid", "locality":"TX-18"}'`;
@@ -218,7 +236,9 @@ const OUT_MEDICAID = String.raw`"fitted": {
   "verdicts": [{ "verdict": "NOT DESCRIBED", "lines": 2 }]
 }`;
 
-const CURL_ERRORS = String.raw`# a state with more than one CMS payment locality
+export const CURL_ERRORS = String.raw`BASE=https://waypointledger.org
+
+# a state with more than one CMS payment locality
 curl -s -X POST $BASE/api/price -H 'content-type: application/json' \
   -d '{"story":"a doctor visit","state":"TX"}'
 
@@ -232,7 +252,9 @@ TX-18 (Houston), TX-99 (Rest Of Texas)."}
 medicare, uninsured, unsure. Send no coverage at all and every line comes back
 as a reference price."}`;
 
-const CURL_LOCALITY = String.raw`curl -s $BASE/data/locality-prices.csv -o locality-prices.csv
+export const CURL_LOCALITY = String.raw`BASE=https://waypointledger.org
+
+curl -s $BASE/data/locality-prices.csv -o locality-prices.csv
 
 head -1 locality-prices.csv
 price_id,code,label,state,locality,locality_key,locality_name,mac,work_rvu,
@@ -243,9 +265,11 @@ national_audit_status,rvu_file,rvu_file_sha256,gpci_file,gpci_file_sha256,table_
 grep '^cms-img-echo,.*,TX-18,' locality-prices.csv | cut -d, -f1,6,7,16,17
 cms-img-echo,TX-18,HOUSTON,197.09,196.73`;
 
-const CURL_CITATION = `curl -s $BASE/api/citation/cms-99213?format=text`;
+export const CURL_CITATION = `${BASE_LINE}
 
-const OUT_CITATION = String.raw`PUBLIC CORRECTION REPORT — Waypoint Ledger
+curl -s "$BASE/api/citation/cms-99213?format=text"`;
+
+const OUT_CITATION = String.raw`PUBLIC CORRECTION REPORT: Waypoint Ledger
 
 Published figure: Doctor's office visit, established patient, low complexity
 Row identifier:   cms-99213  ·  code CPT 99213
@@ -257,17 +281,19 @@ Published by:     Centers for Medicare & Medicaid Services
 Source:           CMS, CY2026 National Physician Fee Schedule Relative Value File (RVU26C, July release, published 2026-06-30)
 Source URL:       https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c
 
-What the public said about this row: 0 responses — 0 say the figure describes them, 0 say it does not.
+What the public said about this row: 0 responses: 0 say the figure describes them, 0 say it does not.
 Median amount respondents said they actually paid: none reported.
 
-Sample: self-selected members of the public using a free tool. Counts are reported exactly as entered — no weighting, no imputation, no extrapolation to a population.
+Sample: self-selected members of the public using a free tool. Counts are reported exactly as entered: no weighting, no imputation, no extrapolation to a population.
 Counted as of: 2026-09-09
-Method and every source: https://waypoint-ledger.pages.dev/method`;
+Method and every source: https://waypointledger.org/method`;
 
-const CURL_PLACE = String.raw`# one row, priced where the person actually lives
+export const CURL_PLACE = String.raw`BASE=https://waypointledger.org
+
+# one row, priced where the person actually lives
 curl -s "$BASE/api/table/cms-99213?locality=IA-00"
 
-# the whole table for one place — or a state, where CMS gives it a single locality
+# the whole table for one place, or a state where CMS gives it a single locality
 curl -s "$BASE/api/table?locality=IA-00"
 curl -s "$BASE/api/table?state=IA"
 
@@ -313,346 +339,453 @@ const OUT_PLACE = String.raw`{
   }
 }`;
 
-const OUT_PLACE_ERRORS = String.raw`# a locality that does not exist — refused, never quietly national
+const OUT_PLACE_ERRORS = String.raw`# a locality that does not exist: refused, never quietly national
 {"ok":false,"error":"No CMS locality has the key \"IA-99\". A key is the two-letter
 state and the two-digit CMS locality number, like \"IA-00\" or \"TX-31\". All 109 are
 published at /data/locality-prices.json."}
 
-# a state CMS splits into several — refused, and it names them
+# a state CMS splits into several: refused, and it names them
 {"ok":false,"error":"Texas has more than one CMS payment locality, so a state is not
 enough to price a line. Send one of: TX-31 (Austin), TX-20 (Beaumont), TX-09
 (Brazoria), TX-11 (Dallas), TX-28 (Fort Worth), TX-15 (Galveston), TX-18 (Houston),
 TX-99 (Rest Of Texas)."}`;
 
-const CURL_TAKE_IT = String.raw`# the catalog, in the shape data.gov harvests
+export const CURL_TAKE_IT = String.raw`BASE=https://waypointledger.org
+
+# the catalog, in the shape data.gov harvests
 curl -s $BASE/data.json
 
-# the whole application — source, data, migrations, tests, and a README to run from
+# the whole application: source, data, migrations, tests, and a README to run from
 curl -sL $BASE/waypoint-ledger-source.tar.gz | tar -xz && cd waypoint-public
-npm install && npm test
-npm run dev`;
+npm install
+npm run build:static        # the static export the size budgets measure
+npm test                    # the suite that guards every rule below
+npm run dev                 # http://localhost:3000`;
 
-/* Response blocks are tall; they scroll in place so the page stays scannable,
-   and carry tabIndex so a keyboard can reach the scroll region. */
-const preOut: React.CSSProperties = { ...pre, maxHeight: '26rem', overflow: 'auto' };
+/* The FHIR example is real output: toFhirBundle() on the journey builder's example
+   sentence (/journey: its empty box and its Use an example link), exactly what
+   GET /api/fhir/example runs (cf/functions/api/fhir/example.js),
+   captured 2026-09-30 against price table 2026-09-09.1. One ChargeItem of the five is
+   shown; the other thirteen entries are elided and marked. */
+export const CURL_FHIR = `${BASE_LINE}
 
+curl -s $BASE/api/fhir/example
+
+# or any ledger, as entries or as a story, fitted to a person
+curl -s -X POST "$BASE/api/fhir?envelope=1" \\
+  -H 'content-type: application/json' \\
+  -d '{"story":"saw my regular doctor three times, then an echocardiogram",
+       "coverage":"medicare", "state":"IA"}'`;
+
+const OUT_FHIR = String.raw`{
+  "resourceType": "Bundle",
+  "meta": {
+    "source": "https://waypointledger.org/api/table",
+    "tag": [{
+      "system": "https://waypointledger.org/fhir/CodeSystem/price-table-version",
+      "code": "2026-09-09.1",
+      "display": "The price table this bundle was built from"
+    }]
+  },
+  "type": "collection",
+  "timestamp": "2026-09-30T22:52:42.076Z",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:99d5285c-ce27-4bad-94b3-3f4f9ca2d254",
+      "resource": {
+        "resourceType": "ChargeItem",
+        "status": "unknown",
+        "code": {
+          "coding": [{
+            "system": "http://www.ama-assn.org/go/cpt",
+            "code": "99213",
+            "display": "Doctor's office visit, established patient, low complexity"
+          }]
+        },
+        "subject": { "display": "A person using Waypoint Ledger. No identity is recorded." },
+        "quantity": { "value": 3 },
+        "priceOverride": { "value": 285.57, "currency": "USD" },
+        "overrideReason": "3 x $95.19 = $285.57. CMS, CY2026 National Physician Fee Schedule Relative Value File (RVU26C, July release, published 2026-06-30), 2026. Basis: allowed. … This is a published federal reference figure, not a bill …",
+        "definitionUri": ["https://www.cms.gov/medicare/payment/fee-schedules/physician/pfs-relative-value-files/rvu26c"],
+        "note": [{ "text": "The person described this as: \"saw my regular doctor three times\"" }]
+      }
+    },
+    { "…": "13 more entries: 3 Encounter, 2 Procedure, 4 ChargeItem, 2 DocumentReference, 2 Provenance" }
+  ]
+}`;
+
+const CONTACT = 'https://precisionfederal.com/contact';
 const METHODS = ['get', 'post', 'put', 'delete'] as const;
 
 const TOC: TocItem[] = [
   { id: 'price-a-story', text: 'Price a story' },
+  { id: 'fhir', text: 'The ledger as FHIR R4' },
   { id: 'more-calls', text: 'Nine more worked calls' },
   { id: 'take', text: 'What you can take without asking' },
-  { id: 'routes', text: 'Every route' },
+  { id: 'agency-reuse', text: 'Reuse it in your agency' },
   { id: 'rules', text: 'The rules' },
   { id: 'why', text: 'Why reuse this' },
+  { id: 'routes', text: 'Every route' },
 ];
 
+/* PAGES R1 (2026-09-30): the same page as cards. Every sentence is kept; the
+   em-dashes in prose became commas, colons or parentheses. Captured responses
+   are left exactly as the API printed them. */
 export default function Developers() {
   const routes = Object.entries(OPENAPI.paths).flatMap(([path, item]) =>
     METHODS.filter((m) => item[m]).map((m) => ({ path, method: m.toUpperCase(), op: item[m]! })));
+  const glance = [
+    { icon: <TI.key />, big: 'No key', text: 'No key, no account, no sign-up. Every route below is open.' },
+    { icon: <TI.table />, big: `${TABLE.length} rows`, text: <>Price table version {TABLE_VERSION}: {SELECTABLE.length} of them priced and addable, each with the file it was read from.</> },
+    { icon: <TI.target />, big: N(LOCALITY_FIGURES), text: 'locality prices, every one with the inputs that made it' },
+    { icon: <TI.code />, big: `${routes.length} routes`, text: 'in the OpenAPI 3.1 description, every request and response schema' },
+  ];
+
+  const take: { what: React.ReactNode; json: React.ReactNode; csv?: React.ReactNode }[] = [
+    { what: 'Everything, one call', json: <a href="/api/register">/api/register</a> },
+    { what: 'The whole price table, with provenance', json: <a href="/api/table">/api/table</a>, csv: <a href="/data/price-table.csv">price-table.csv</a> },
+    { what: <>All {N(LOCALITY_FIGURES)} CMS locality figures</>, json: <a href="/data/locality-prices.json">locality-prices.json</a>, csv: <a href="/data/locality-prices.csv">locality-prices.csv</a> },
+    { what: 'One CMS payment locality, priced', json: <a href="/api/localities/IA-00">/api/localities/&#123;key&#125;</a> },
+    { what: 'The open-data catalog (DCAT-US v1.1)', json: <a href="/data.json">/data.json</a> },
+    { what: 'The application itself, to run yourself', json: <a href="/waypoint-ledger-source.tar.gz">waypoint-ledger-source.tar.gz</a> },
+    { what: 'The licence, as a file counsel can read', json: <a href="/LICENSE.txt">LICENSE</a>, csv: <a href="/NOTICE.txt">NOTICE</a> },
+    { what: <>One figure&rsquo;s provenance and counts</>, json: <a href="/api/citation/cms-99213">/api/citation/&#123;id&#125;</a>, csv: <a href="/api/citation/cms-99213?format=text">as plain text</a> },
+    { what: 'The hash-chain head of every count', json: <a href="/api/integrity">/api/integrity</a> },
+    { what: 'Corrections to published figures', json: <a href="/api/corrections">/api/corrections</a>, csv: <><a href="/api/export/corrections.csv">corrections.csv</a> <a href="/api/export/corrections.json">corrections.json</a></> },
+    { what: 'Care that no claim recorded', json: <a href="/api/gap">/api/gap</a>, csv: <a href="/api/export/gap.csv">gap.csv</a> },
+    { what: 'How people ranked the burdens', json: <a href="/api/survey">/api/survey</a>, csv: <a href="/api/export/survey.csv">survey.csv</a> },
+    { what: 'Written interviews (count only, ever)', json: <a href="/api/interview">/api/interview</a> },
+    { what: 'What changed because someone said so', json: <a href="/api/changes">/api/changes</a> },
+  ];
 
   return (
-    <section className="page">
+    <section className={`page ${dp.dp} ${tc.devPage}`}>
       <div className="wrap">
+        <div className={tc.hero}>
+        <div>
         <p className="eyebrow">For developers, agencies and researchers</p>
-        <h1>Price a diagnostic journey with one request</h1>
-        <p className="sub">
+        <h1 className={tc.h1}>Price a diagnostic journey with one request</h1>
+        <p className={s.lead}>
           Send a sentence a person actually wrote. Get back every unit of care it names, priced and cited.
         </p>
-        <div className="row" style={{ marginBottom: 'var(--sp-5)' }}>
+        <p className={dv.tryIt}>
+          Try it now, in this tab: <a href="/api/table/cms-99213">GET /api/table/cms-99213</a>, one published
+          figure with its source, basis and year.
+        </p>
+        <div className={`${s.actions} ${tc.heroActs}`}>
           <a className="btn primary" href="/api/openapi.json">OpenAPI 3.1 description</a>
           <a className="btn ghost" href="/data/locality-prices.csv">{N(LOCALITY_FIGURES)} locality prices (CSV)</a>
           <a className="btn ghost" href="/waypoint-ledger-source.tar.gz">Download the whole application</a>
           <Link className="btn ghost" href="/adopt">Run this for your own condition</Link>
           <Link className="btn ghost" href="/method">How each number is made</Link>
         </div>
-
-        <div className="notice">
-          <p>
-            <strong>No key, no account, no sign-up.</strong> Every route below is open. GET routes send
-            <code> access-control-allow-origin: *</code>, so a browser app can call them directly.
-            The price table is version <strong>{TABLE_VERSION}</strong>: {TABLE.length} rows,
-            {' '}{SELECTABLE.length} of them priced and addable, each with the file it was read from.
-          </p>
+        {/* decorative: the path as data lines over the hills (VISUAL-art.md); words stay in HTML */}
+        <ThemedImg light="/img/v2/developers-hero.webp" dark="/img/v2/developers-hero-dark.webp" width={1200} height={525} alt="" className={tc.heroArt} loading="eager" />
+        </div>
+        <TryIt />
         </div>
 
+        {/* JUDGE-3 #10: a phone scrolls these sideways, so say so (the /policy "Swipe for all N" cue) */}
+        <p className={tc.swipe} aria-hidden="true">Swipe for all {glance.length}</p>
+        <div className={tc.glanceRow} tabIndex={0} role="region" aria-label="At a glance; on a narrow screen, scroll sideways">
+        <Glance items={glance} />
+        </div>
+        <h2 className={s.h2} style={{ marginTop: 0 }}>From a sentence to a FHIR Bundle</h2>
+        <Flow rows={TABLE.length} />
+        <Caveat label="CORS">Every public GET route, and <code>POST /api/price</code> and <code>POST /api/fhir</code>, send <code>access-control-allow-origin: *</code>, so a browser app on another site can call them directly. Call <code>POST /api/map</code> from your own server.</Caveat>
+
+        <div style={{ height: '1.5rem' }} aria-hidden="true" />
         <LongLayout items={TOC}>
-        <LongSection id="price-a-story" title="Price a story" first open>
-        <p className="sub">
-          Every response carries the published federal figure that prices each unit of care, and the year,
-          basis, population and source URL behind that figure &mdash; so whatever you build can show any
-          number it prints. A deterministic matcher maps words to a unit of care; a published table prices
-          it. No model produces a dollar figure.
-        </p>
-        <div className="card">
-          <p className="lbl">1 &middot; The call the site itself makes</p>
-          <p>One request, one journey, every line traceable.</p>
-          <pre style={pre} tabIndex={0}><code>{CURL_PRICE}</code></pre>
-          <p className="micro">Real response. Long coverage statements and three further segments are elided, marked with an ellipsis key:</p>
-          <pre style={preOut} tabIndex={0} aria-label="Response to the pricing request"><code>{OUT_PRICE}</code></pre>
-          <p>
-            <strong>What to notice.</strong> <code>matchedOn</code> shows the exact words in the table the
-            phrase matched, so the mapping is never a black box. &ldquo;I missed work&rdquo; comes back in
-            <code> unpriced</code> with the reason it will not be priced and what would fix it &mdash; valuing
-            a lost day needs that person&rsquo;s own pay, not a national median. And
-            <code> confidence: &quot;DERIVED&quot;</code> says this figure was computed from two numbers read
-            in the CMS file, not lifted from a dollar column that does not exist.
+          <h2 id="price-a-story" className={s.h2} style={{ marginTop: 0 }}>Price a story</h2>
+          <p className={`${s.h2sub} ${dv.sub}`}>
+            Every response carries the published federal figure that prices each unit of care, and the year,
+            basis, population and source URL behind that figure, so whatever you build can show any
+            number it prints. A deterministic matcher maps words to a unit of care; a published table prices
+            it. No model produces a dollar figure.
           </p>
-        </div>
+          <div className={s.card}>
+            <p className={s.kicker}><Badge method="POST" /> <code>/api/price</code></p>
+            <h3>The call the site itself makes</h3>
+            <p>One request, one journey, every line traceable.</p>
+            <p className={dv.noticeH}>What to notice.</p>
+            <ul className={dv.notice}>
+              <li><code>matchedOn</code> shows the exact words in the table the phrase matched, so the mapping is never a black box.</li>
+              <li>&ldquo;I missed work&rdquo; comes back in <code>unpriced</code> with the reason it will not be priced and what would fix it: valuing a lost day needs that person&rsquo;s own pay, not a national median.</li>
+              <li><code>confidence: &quot;DERIVED&quot;</code> says this figure was computed from two numbers read in the CMS file, not lifted from a dollar column that does not exist.</li>
+            </ul>
+            <ShowCall what="The curl request and the real response">
+              <HiCode code={CURL_PRICE} label="the pricing request" caption="Request" />
+              <HiCode code={OUT_PRICE} label="Response to the pricing request" caption={`Real response, captured against price table 2026-09-08.1-verified (the live table is ${TABLE_VERSION}). Long coverage statements and three further segments are elided, marked with an ellipsis key.`} tall />
+            </ShowCall>
+          </div>
 
-        </LongSection>
-
-        <LongSection id="more-calls" title="Nine more worked calls">
-        <div className="card">
-          <p className="lbl">2 &middot; Read one unit of care, with its provenance</p>
-          <p>Every row carries who it describes, who it does not, and the rules about adding it to anything else.</p>
-          <pre style={pre} tabIndex={0}><code>{CURL_TABLE}</code></pre>
-          <pre style={preOut} tabIndex={0} aria-label="Response for one row of the price table"><code>{OUT_TABLE}</code></pre>
-          <p>
-            <strong>What to notice.</strong> <code>rules.summable</code> and
-            <code> rules.mutuallyExclusiveWith</code> are machine-readable, because a rule written only in
-            prose is a wish. Ask <code>/api/price</code> for a whole-year figure alongside per-visit lines and
-            it comes back priced and flagged in <code>excludedFromTotal</code>, with the conflict named:
-            the year already contains the visits, so adding them counts the same care twice. The figure is
-            never quietly dropped and never quietly summed.
+          <h2 id="fhir" className={s.h2}>The ledger as an HL7 FHIR R4 Bundle</h2>
+          <p className={`${s.h2sub} ${dv.sub}`}>
+            Any ledger, as entries or as a story, comes back as a FHIR R4 Bundle of type <code>collection</code>,
+            served as <code>application/fhir+json</code>.
           </p>
-        </div>
+          <div className={s.card}>
+            <div>
+              <div>
+                <p className={s.kicker}><Badge method="GET" /> <code>/api/fhir/example</code></p>
+                <p>The example sentence in the journey builder&rsquo;s empty box on <a href="/journey">/journey</a>, &ldquo;{EXAMPLE_STORY}&rdquo;, priced from the published table and returned as a FHIR R4 Bundle: 14 entries. The home page&rsquo;s box shows a different one: three lines of the full example ledger.</p>
+              </div>
+              <div>
+                <p className={s.kicker}><Badge method="POST" /> <code>/api/fhir</code></p>
+                <p>
+                  Send <code>entries</code> (the shape POST /api/journeys takes) or <code>story</code> (the shape POST /api/price
+                  takes). One Encounter per visit line, one Procedure per test or procedure line coded in CPT or HCPCS from the row
+                  itself, one ChargeItem per priced line whose <code>priceOverride</code> is the published figure and whose{' '}
+                  <code>definitionUri</code> is the federal file it came from, and one DocumentReference plus one Provenance per federal file.
+                </p>
+              </div>
+            </div>
+            <div className={dv.cavs}>
+              <Caveat label="No identity">There is no Patient resource, no <code>identifier</code> element and no date of care in the bundle: the tool never collected them.</Caveat>
+              <Caveat label="Not a bill">Every ChargeItem carries status <code>unknown</code>: the figure is a published federal reference price, not a bill.</Caveat>
+              <Caveat label="Envelope"><code>?envelope=1</code> adds what was deliberately left out and why.</Caveat>
+            </div>
+            <div className={tc.treeFold}>
+              <Fold id="fhir-tree" level={3} title="The example Bundle, as a tree" summary="14 entries by resource type, one ChargeItem opened to its fields, and no Patient">
+                <FhirTree />
+              </Fold>
+            </div>
+            <ShowCall what="Two curl requests and the example Bundle, one ChargeItem shown">
+              <HiCode code={CURL_FHIR} label="the FHIR requests" caption="Request" />
+              <HiCode code={OUT_FHIR} label="The example Bundle" caption="Real output, one ChargeItem of five shown; the rest elided and marked." tall />
+            </ShowCall>
+          </div>
 
-        <div className="card">
-          <p className="lbl">3 &middot; Save a journey and get a link back</p>
-          <p>Anonymous by default. A journey holds units of care, counts and the words the person typed. Nothing else.</p>
-          <pre style={pre} tabIndex={0}><code>{CURL_JOURNEY}</code></pre>
-          <p className="micro">Real response &mdash; the <code>url</code> echoes the host you called; this run was against a local instance of this code:</p>
-          <pre style={preOut} tabIndex={0} aria-label="Response to saving a journey"><code>{OUT_JOURNEY}</code></pre>
-          <p>
-            <code>GET /api/journeys/&#123;slug&#125;</code> reads it back with the table version it was priced
-            against, so a link opened next year still says which edition of the table it came from.
+          <h2 id="more-calls" className={s.h2}>Nine more worked calls</h2>
+          <p className={`${s.h2sub} ${dv.sub}`}>Each with a real request and response. Open the one you need.</p>
+
+          <div className={dp.foldGrid}>
+          <Fold id="call-table" level={3} title="Read one unit of care, with its provenance" summary={<><Badge method="GET" /> <code>/api/table/cms-99213</code></>}>
+            <p>Every row carries who it describes, who it does not, and the rules about adding it to anything else.</p>
+            <HiCode code={CURL_TABLE} label="reading one row" caption="Request" />
+            <HiCode code={OUT_TABLE} label="Response for one row of the price table" caption="Response" tall />
+            <p>
+              <strong>What to notice.</strong> <code>rules.summable</code> and
+              <code> rules.mutuallyExclusiveWith</code> are machine-readable, because a rule written only in
+              prose is a wish. Ask <code>/api/price</code> for a whole-year figure alongside per-visit lines and
+              it comes back priced and flagged in <code>excludedFromTotal</code>, with the conflict named:
+              the year already contains the visits, so adding them counts the same care twice. The figure is
+              never quietly dropped and never quietly summed.
+            </p>
+          </Fold>
+
+          <Fold id="call-save" level={3} title="Save a journey and get a link back" summary={<><Badge method="POST" /> <code>/api/journeys</code></>}>
+            <p>Anonymous by default. A journey holds units of care, counts and the words the person typed. Nothing else.</p>
+            <HiCode code={CURL_JOURNEY} label="saving a journey" caption="Request" />
+            <HiCode code={OUT_JOURNEY} label="Response to saving a journey" caption="Real response. The url echoes the host you called; this run was against a local instance of this code." />
+            <p>
+              <code>GET /api/journeys/&#123;slug&#125;</code> reads it back with the table version it was priced
+              against, so a link opened next year still says which edition of the table it came from.
+            </p>
+          </Fold>
+
+          <Fold id="call-fit" level={3} title="Price it for a person, not for the country" summary={<><Badge method="POST" /> <code>/api/price</code> with coverage and state</>}>
+            <p>
+              Add <code>coverage</code> and <code>state</code> (or a CMS <code>locality</code> key) and the
+              response carries the same answer the site shows that person: whether the published figure
+              describes them, which figure applies instead if it does not, and what that service costs from the
+              cheapest CMS locality to the dearest.
+            </p>
+            <HiCode code={CURL_FIT} label="pricing for a person" caption="Request" />
+            <HiCode code={OUT_FIT} label="Response to a pricing request with coverage and state" caption={`Real response, captured against price table 2026-09-08.1-verified (the live table is ${TABLE_VERSION}). Long fields already shown above are elided with an ellipsis key.`} tall />
+            <p>
+              <strong>What to notice.</strong> <code>valueUsd</code> is still the published national figure and
+              never moves. <code>localityUsd</code> is what Medicare allows in Iowa for the same code, from
+              CMS&rsquo;s own formula and the three geographic indices echoed in <code>context</code>. And
+              because this caller is uninsured, <code>fit.figureUsd</code> is neither of those: it is the
+              average charge providers submitted, because a charge is what an uninsured person is billed
+              against. Three different true numbers for one line, each labelled with what it is.
+            </p>
+          </Fold>
+
+          <Fold id="call-medicaid" level={3} title="When nothing published describes the person" summary={<><Badge method="POST" /> <code>/api/price</code> returns null, never 0</>}>
+            <p>
+              Medicaid rates are set by each state and are in no national dataset. Roughly one in five Americans
+              is on Medicaid, and they are over-represented in exactly the population this tool is built for.
+              So the API does not return a zero.
+            </p>
+            <HiCode code={CURL_MEDICAID} label="a Medicaid request" caption="Request" />
+            <HiCode code={OUT_MEDICAID} label="Fitted totals when no published figure applies" caption="Response" tall />
+            <p>
+              <code>totalUsd</code> is <code>null</code>, never <code>0</code>, because a zero would be read as
+              a price. Each line still comes back with the Medicare figure, what it is, and who it does
+              describe. The honest output here is a counted gap, and{' '}
+              <code>POST /api/gap</code> is where it goes.
+            </p>
+          </Fold>
+
+          <Fold id="call-errors" level={3} title="Errors are sentences, and a value we cannot honour is never ignored" summary={<><Badge method="POST" /> <code>/api/price</code> refuses, and says what to send</>}>
+            <p>
+              Before this round the API took a <code>state</code>, ignored it, and returned the national figure
+              with no warning. It now refuses, and the refusal tells you what to send.
+            </p>
+            <HiCode code={CURL_ERRORS} label="Error responses from the pricing endpoint" caption="Requests and responses" tall />
+          </Fold>
+
+          <Fold id="call-locality" level={3} title={<>Take all {N(LOCALITY_FIGURES)} locality figures, with the inputs that made them</>} summary={<><Badge method="GET" /> <code>/data/locality-prices.csv</code></>}>
+            <p>
+              {LOCALITY_ROW_COUNT} CMS Physician Fee Schedule codes priced for each of the {LOCALITIES.length}{' '}
+              Medicare payment localities. Every
+              row carries the three RVU components, the three geographic indices, the conversion factor, the
+              formula written out, and the SHA256 of both CMS files it came from, so a state health
+              department can filter it to their own state and recompute every figure without us.
+            </p>
+            <HiCode code={CURL_LOCALITY} label="Downloading and filtering the locality price table" caption="Request and output" tall />
+            <p className="micro">
+              Also as <a href="/data/locality-prices.json">JSON</a> with the formula, the sources and the audit;
+              columns explained in <a href="/data/locality-dictionary.csv">locality-dictionary.csv</a>. The
+              generator is the audit: <code>node scripts/gen-locality-table.mjs</code> recomputes all{' '}
+              {N(LOCALITY_FIGURES)} from the published RVUs and indices and exits non-zero on one cent of drift.
+            </p>
+          </Fold>
+
+          <Fold id="call-place" level={3} title="Ask for one place, not for the whole country" summary={<><Badge method="GET" /> <code>?locality=</code> or <code>?state=</code> on any read route</>}>
+            <p>
+              A national Medicare figure is not what anyone is charged. Send <code>?locality=</code> or{' '}
+              <code>?state=</code> to any read route and every row CMS prices geographically comes back as that
+              place&rsquo;s allowed amount, with the three relative value units, the three geographic indices and
+              the formula that produced it: enough to re-derive the number without this API.{' '}
+              <code>valueUsd</code> is never overwritten, so the national figure and the local one can never be
+              confused for each other.
+            </p>
+            <HiCode code={CURL_PLACE} label="requests for one place" caption="Requests" />
+            <HiCode code={OUT_PLACE} label="One priced row for a CMS payment locality" caption="Real response, one field elided and marked." tall />
+            <Caveat label="Never a silent fallback">A place we cannot honour is a 400, never a silent national fallback. That was the defect worth fixing: an answer to a question nobody asked, returned with no warning, is wrong and looks right.</Caveat>
+            <HiCode code={OUT_PLACE_ERRORS} label="Errors from an unknown locality or a multi-locality state" caption="Refusals" tall />
+          </Fold>
+
+          <Fold id="call-take" level={3} title="Take the whole thing, and the catalog that describes it" summary={<><Badge method="GET" /> <code>/data.json</code> and the source archive</>}>
+            <p>
+              <a href="/data.json">/data.json</a> is a <strong>DCAT-US v1.1</strong> catalog (the metadata
+              standard <a href="https://resources.data.gov/resources/dcat-us/">data.gov harvests</a>)
+              describing the price table, the locality table, the three register exports and the dictionary, each
+              with its licence, its distributions, its data dictionary and the federal files it was built from. It
+              validates against the government&rsquo;s own published JSON Schema; the schema is vendored in this
+              repository with its SHA-256 and the test re-hashes it before it validates anything.
+            </p>
+            <p>
+              The application itself is downloadable in one file. Not a description of a repository: the source,
+              the data, the migrations, the tests and a README you can run from.
+            </p>
+            <HiCode code={CURL_TAKE_IT} label="taking the catalog and the application" caption="Commands" />
+            <p className="micro">
+              The code is <a href="/LICENSE.txt">Apache-2.0</a>; the data is CC0 1.0, public domain.{' '}
+              <a href="/NOTICE.txt">NOTICE</a> says which is which, line by line. The five DCAT-US fields that
+              belong to federal agencies (<code>bureauCode</code>, <code>programCode</code>,{' '}
+              <code>dataQuality</code>, <code>primaryITInvestmentUII</code>, <code>systemOfRecords</code>) are
+              absent from our catalog, as the standard&rsquo;s own guidance directs for a non-federal publisher.
+              We are not an agency, and an OMB bureau code we do not have would be exactly the kind of invented
+              federal number this project exists to refuse.
+            </p>
+          </Fold>
+
+          <Fold id="call-citation" level={3} title="A correction, addressed to the body that published the number" summary={<><Badge method="GET" /> <code>/api/citation/cms-99213?format=text</code></>}>
+            <p>
+              A thumb on a ledger line is bound to one published federal row. This is that row&rsquo;s
+              provenance and the public counts in one call: no bundle, no join, no account. Add{' '}
+              <code>?format=text</code> and there is nothing to parse.
+            </p>
+            <HiCode code={CURL_CITATION} label="the citation request" caption="Request" />
+            <HiCode lang="text" code={OUT_CITATION} label="A citation block as plain text" caption="Response counted as of 2026-09-09; the live call returns the counts of the day you run it." tall />
+            <p className="micro">
+              Without <code>?format=text</code> the same call returns JSON with the figure, the publisher, the
+              document, the source URL and the counts as separate fields, plus this block in{' '}
+              <code>text</code>. Every row of the table answers, including the rows nobody has spoken about yet.
+            </p>
+          </Fold>
+          </div>
+
+          <h2 id="take" className={s.h2}>What you can take without asking</h2>
+          <p className={`${s.h2sub} ${dv.sub}`}>
+            The register is public: what people said a federal figure got wrong, what care never entered any
+            claims file, and how the people who carried the burden ranked it. Counts and a de-identified CSV,
+            not free text.
           </p>
-        </div>
+          <div className={dp.foldGrid}>
+          <Fold id="take-survey" level={3} title={<>The survey and gap exports carry no one&rsquo;s self-description</>} summary="The day an answer arrived, never the time. Who answered is published only as counts.">
+              <p>
+                Each row of{' '}
+                <a href="/api/export/survey.csv">survey.csv</a> and <a href="/api/export/gap.csv">gap.csv</a> gives the
+                day it arrived (<code>received_on</code>), never the time. Who answered is published only as counts, at{' '}
+                <a href="/api/survey">/api/survey</a> and <a href="/api/gap">/api/gap</a>, and any value held by fewer
+                than 11 answers is counted as &ldquo;fewer than 11, not shown&rdquo; on the server and never named. Their{' '}
+                <code>prev_hash</code> and <code>row_hash</code> columns let you check the chain link by link against{' '}
+                <a href="/api/integrity">/api/integrity</a>. corrections.csv carries every field its hashes cover, so
+                every hash in it can be recomputed from the file alone.
+              </p>
+          </Fold>
+          <Fold id="take-corrections" level={3} title="The corrections export is a defect report, not a comment box" summary="Every row is bound to the published federal row and the file it came from. Free text is never exported.">
+              <p>
+                Every row carries the
+                price row id, the CPT or HCPCS code (and the LOINC code where the row is a lab), the published figure
+                with its basis, year, geography and population, the federal file <em>by name</em> with its URL, its
+                SHA-256 and the day we read it, the exact line or arithmetic the figure was re-read from, the audit
+                verdict, the direction of the correction, the counts and fit rate on that figure, the chained row hash,
+                and a permalink that renders it as a paste-ready report for the agency that published the number. The
+                first line of the CSV is a comment naming the price-table version and the audit;{' '}
+                <a href="/api/export/corrections.json">/api/export/corrections.json</a> publishes the same rows with the
+                column contract beside them. Free text is never exported.
+              </p>
+          </Fold>
+          </div>
+          <ul className={dv.take} aria-label="Data you can take, as JSON and CSV">
+            {take.map((r, i) => (
+              <li key={i}>
+                <span>{r.what}</span>
+                <div>{r.json}{r.csv && <> {r.csv}</>}</div>
+              </li>
+            ))}
+          </ul>
 
-        <div className="card">
-          <p className="lbl">4 &middot; Price it for a person, not for the country</p>
-          <p>
-            Add <code>coverage</code> and <code>state</code> (or a CMS <code>locality</code> key) and the
-            response carries the same answer the site shows that person: whether the published figure
-            describes them, which figure applies instead if it does not, and what that service costs from the
-            cheapest CMS locality to the dearest.
+          <h2 id="agency-reuse" className={s.h2}>Reuse it in your agency</h2>
+          <OrgKitAgency />
+
+          <div className={dp.foldGrid} style={{ marginTop: '2rem' }}>
+          <Fold id="rules" title="The rules" summary="No model makes a dollar figure, figures that cannot be added are not, and errors are sentences. Rate limits and privacy.">
+          <ul className={dv.rules}>
+            <li><h3>No model, average or interpolation ever produces a dollar figure.</h3><p>A phrase that maps to nothing stays unpriced and is returned as unpriced, with the reason.</p></li>
+            <li><h3>Figures that cannot be added are not added.</h3><p>Measures that answer different questions raise <code>basisWarning</code>; a whole-year figure is returned outside the total in <code>excludedFromTotal</code>.</p></li>
+            <li><h3>Rate limits, per network per hour</h3><p>300 to <code>/api/price</code>, 30 to <code>/api/journeys</code>, 300 to <code>/api/survey</code> (a flood guard only: a person or a clinic is never refused), 5 an hour (10 a day) to <code>/api/interview</code>, 300 to <code>/api/gap</code> and <code>/api/corrections</code> (corrections also take at most 3 an hour and 8 a day on any one figure from one network), 20 to each other write route. Over the limit returns 429 with a sentence that says when to try again, and a <code>retry-after</code> header. Write routes refuse requests sent from another website; <code>/api/price</code>, <code>/api/map</code> and <code>/api/fhir</code> accept them, and the answers of <code>/api/price</code> and <code>/api/fhir</code> are readable from any origin.</p></li>
+            <li><h3>Privacy is the precondition.</h3><p>No account is required and none is offered by these routes. No IP address is stored; rate limiting hashes it with a daily salt and forgets it within the hour. Free text sent to the register is held privately and is never served back or exported.</p></li>
+            <li><h3>Errors are sentences.</h3><p>Every failure is <code>{'{ ok: false, error }'}</code> with the right status, written for a person reading a log.</p></li>
+          </ul>
+          </Fold>
+          <Fold id="why" title="Why reuse this" summary="The hard part of a cost-of-illness number is knowing which published figure applies.">
+            <p>
+              The hard part of a cost-of-illness number is not arithmetic. It is knowing which published figure
+              applies, what it measures, who it leaves out, and what it must not be added to. That work is in the
+              table and its rules, and this API hands you all of it with every response.
+            </p>
+            <p>
+              A state health agency
+              costing a care pathway, a patient organization building its own tool, a researcher who needs the
+              same unit prices we used: none of you need our interface, and none of you should have to take
+              our word for a number.
+            </p>
+            <p>
+              If you want to stand the whole thing up for your own condition, your own state or your own
+              population, <Link href="/adopt">/adopt</Link> is the procedure: the files to edit, in order, and the
+              two commands that refuse a figure which does not reproduce. The whole application is{' '}
+              <a href="/waypoint-ledger-source.tar.gz">one download</a>, and it runs on your own machine in four
+              commands, so none of that is a promise you have to take on trust.
+            </p>
+            <p className="micro">Questions, or a row you think is wrong: <a href={CONTACT}>Contact</a>.</p>
+          </Fold>
+          </div>
+
+          <h2 id="routes" className={s.h2}>Every route</h2>
+          <p className={`${s.h2sub} ${dv.sub}`}>
+            {routes.length} routes, each with its method and what it does. The full description, with every request and
+            response schema, is at <a href="/api/openapi.json">/api/openapi.json</a>. Administrative routes take a bearer
+            token and are not published there.
           </p>
-          <pre style={pre} tabIndex={0}><code>{CURL_FIT}</code></pre>
-          <p className="micro">Real response. Long fields already shown above are elided with an ellipsis key:</p>
-          <pre style={preOut} tabIndex={0} aria-label="Response to a pricing request with coverage and state"><code>{OUT_FIT}</code></pre>
-          <p>
-            <strong>What to notice.</strong> <code>valueUsd</code> is still the published national figure and
-            never moves. <code>localityUsd</code> is what Medicare allows in Iowa for the same code, from
-            CMS&rsquo;s own formula and the three geographic indices echoed in <code>context</code>. And
-            because this caller is uninsured, <code>fit.figureUsd</code> is neither of those &mdash; it is the
-            average charge providers submitted, because a charge is what an uninsured person is billed
-            against. Three different true numbers for one line, each labelled with what it is.
-          </p>
-        </div>
-
-        <div className="card">
-          <p className="lbl">5 &middot; When nothing published describes the person</p>
-          <p>
-            Medicaid rates are set by each state and are in no national dataset. Roughly one in five Americans
-            is on Medicaid, and they are over-represented in exactly the population this tool is built for.
-            So the API does not return a zero.
-          </p>
-          <pre style={pre} tabIndex={0}><code>{CURL_MEDICAID}</code></pre>
-          <pre style={preOut} tabIndex={0} aria-label="Fitted totals when no published figure applies"><code>{OUT_MEDICAID}</code></pre>
-          <p>
-            <code>totalUsd</code> is <code>null</code>, never <code>0</code>, because a zero would be read as
-            a price. Each line still comes back with the Medicare figure, what it is, and who it does
-            describe. The honest output here is a counted gap, and{' '}
-            <code>POST /api/gap</code> is where it goes.
-          </p>
-        </div>
-
-        <div className="card">
-          <p className="lbl">6 &middot; Errors are sentences, and a value we cannot honour is never ignored</p>
-          <p>
-            Before this round the API took a <code>state</code>, ignored it, and returned the national figure
-            with no warning. It now refuses, and the refusal tells you what to send.
-          </p>
-          <pre style={preOut} tabIndex={0} aria-label="Error responses from the pricing endpoint"><code>{CURL_ERRORS}</code></pre>
-        </div>
-
-        <div className="card">
-          <p className="lbl">7 &middot; Take all {N(LOCALITY_FIGURES)} locality figures, with the inputs that made them</p>
-          <p>
-            {LOCALITY_ROW_COUNT} CMS Physician Fee Schedule codes priced for each of the {LOCALITIES.length}{' '}
-            Medicare payment localities. Every
-            row carries the three RVU components, the three geographic indices, the conversion factor, the
-            formula written out, and the SHA256 of both CMS files it came from &mdash; so a state health
-            department can filter it to their own state and recompute every figure without us.
-          </p>
-          <pre style={preOut} tabIndex={0} aria-label="Downloading and filtering the locality price table"><code>{CURL_LOCALITY}</code></pre>
-          <p className="micro">
-            Also as <a href="/data/locality-prices.json">JSON</a> with the formula, the sources and the audit;
-            columns explained in <a href="/data/locality-dictionary.csv">locality-dictionary.csv</a>. The
-            generator is the audit: <code>node scripts/gen-locality-table.mjs</code> recomputes all{' '}
-            {N(LOCALITY_FIGURES)} from the published RVUs and indices and exits non-zero on one cent of drift.
-          </p>
-        </div>
-
-        <div className="card">
-          <p className="lbl">8 &middot; Ask for one place, not for the whole country</p>
-          <p>
-            A national Medicare figure is not what anyone is charged. Send <code>?locality=</code> or{' '}
-            <code>?state=</code> to any read route and every row CMS prices geographically comes back as that
-            place&rsquo;s allowed amount, with the three relative value units, the three geographic indices and
-            the formula that produced it &mdash; enough to re-derive the number without this API.{' '}
-            <code>valueUsd</code> is never overwritten, so the national figure and the local one can never be
-            confused for each other.
-          </p>
-          <pre style={pre} tabIndex={0}><code>{CURL_PLACE}</code></pre>
-          <p className="micro">Real response, one field elided and marked:</p>
-          <pre style={preOut} tabIndex={0} aria-label="One priced row for a CMS payment locality"><code>{OUT_PLACE}</code></pre>
-          <p>
-            <strong>A place we cannot honour is a 400, never a silent national fallback.</strong> That was the
-            defect worth fixing: an answer to a question nobody asked, returned with no warning, is wrong and
-            looks right.
-          </p>
-          <pre style={preOut} tabIndex={0} aria-label="Errors from an unknown locality or a multi-locality state"><code>{OUT_PLACE_ERRORS}</code></pre>
-        </div>
-
-        <div className="card">
-          <p className="lbl">9 &middot; Take the whole thing, and the catalog that describes it</p>
-          <p>
-            <a href="/data.json">/data.json</a> is a <strong>DCAT-US v1.1</strong> catalog &mdash; the metadata
-            standard <a href="https://resources.data.gov/resources/dcat-us/">data.gov harvests</a> &mdash;
-            describing the price table, the locality table, the three register exports and the dictionary, each
-            with its licence, its distributions, its data dictionary and the federal files it was built from. It
-            validates against the government&rsquo;s own published JSON Schema; the schema is vendored in this
-            repository with its SHA-256 and the test re-hashes it before it validates anything.
-          </p>
-          <p>
-            The application itself is downloadable in one file. Not a description of a repository: the source,
-            the data, the migrations, the tests and a README you can run from.
-          </p>
-          <pre style={pre} tabIndex={0}><code>{CURL_TAKE_IT}</code></pre>
-          <p className="micro">
-            The code is <a href="/LICENSE.txt">Apache-2.0</a>; the data is CC0 1.0, public domain &mdash;{' '}
-            <a href="/NOTICE.txt">NOTICE</a> says which is which, line by line. The five DCAT-US fields that
-            belong to federal agencies (<code>bureauCode</code>, <code>programCode</code>,{' '}
-            <code>dataQuality</code>, <code>primaryITInvestmentUII</code>, <code>systemOfRecords</code>) are
-            absent from our catalog, as the standard&rsquo;s own guidance directs for a non-federal publisher.
-            We are not an agency, and an OMB bureau code we do not have would be exactly the kind of invented
-            federal number this project exists to refuse.
-          </p>
-        </div>
-
-        <div className="card">
-          <p className="lbl">10 &middot; A correction, addressed to the body that published the number</p>
-          <p>
-            A thumb on a ledger line is bound to one published federal row. This is that row&rsquo;s
-            provenance and the public counts in one call &mdash; no bundle, no join, no account. Add{' '}
-            <code>?format=text</code> and there is nothing to parse.
-          </p>
-          <pre style={pre} tabIndex={0}><code>{CURL_CITATION}</code></pre>
-          <pre style={preOut} tabIndex={0} aria-label="A citation block as plain text"><code>{OUT_CITATION}</code></pre>
-          <p className="micro">
-            Without <code>?format=text</code> the same call returns JSON with the figure, the publisher, the
-            document, the source URL and the counts as separate fields, plus this block in{' '}
-            <code>text</code>. Every row of the table answers, including the rows nobody has spoken about yet.
-          </p>
-        </div>
-
-        </LongSection>
-
-        <LongSection id="take" title="What you can take without asking">
-        <p className="sub">
-          The register is public: what people said a federal figure got wrong, what care never entered any
-          claims file, and how the people who carried the burden ranked it. Counts and a de-identified CSV,
-          not free text.
-        </p>
-        <p className="sub">
-          <strong>The corrections export is a defect report, not a comment box.</strong> Every row carries the
-          price row id, the CPT or HCPCS code (and the LOINC code where the row is a lab), the published figure
-          with its basis, year, geography and population, the federal file <em>by name</em> with its URL, its
-          SHA-256 and the day we read it, the exact line or arithmetic the figure was re-read from, the audit
-          verdict, the direction of the correction, the counts and fit rate on that figure, the chained row hash,
-          and a permalink that renders it as a paste-ready report for the agency that published the number. The
-          first line of the CSV is a comment naming the price-table version and the audit;{' '}
-          <a href="/api/export/corrections.json">/api/export/corrections.json</a> publishes the same rows with the
-          column contract beside them. Free text is never exported.
-        </p>
-        <div className="table-scroll" tabIndex={0}>
-          <table className="ledger-table">
-            <thead><tr><th>Data</th><th>JSON</th><th>CSV</th></tr></thead>
-            <tbody>
-              <tr><td>Everything, one call</td><td><a href="/api/register">/api/register</a></td><td>&mdash;</td></tr>
-              <tr><td>The whole price table, with provenance</td><td><a href="/api/table">/api/table</a></td><td><a href="/data/price-table.csv">price-table.csv</a></td></tr>
-              <tr><td>All {N(LOCALITY_FIGURES)} CMS locality figures</td><td><a href="/data/locality-prices.json">locality-prices.json</a></td><td><a href="/data/locality-prices.csv">locality-prices.csv</a></td></tr>
-              <tr><td>One CMS payment locality, priced</td><td><a href="/api/localities/IA-00">/api/localities/&#123;key&#125;</a></td><td>&mdash;</td></tr>
-              <tr><td>The open-data catalog (DCAT-US v1.1)</td><td><a href="/data.json">/data.json</a></td><td>&mdash;</td></tr>
-              <tr><td>The application itself, to run yourself</td><td><a href="/waypoint-ledger-source.tar.gz">waypoint-ledger-source.tar.gz</a></td><td>&mdash;</td></tr>
-              <tr><td>The licence, as a file counsel can read</td><td><a href="/LICENSE.txt">LICENSE</a></td><td><a href="/NOTICE.txt">NOTICE</a></td></tr>
-              <tr><td>One figure&rsquo;s provenance and counts</td><td><a href="/api/citation/cms-99213">/api/citation/&#123;id&#125;</a></td><td><a href="/api/citation/cms-99213?format=text">as plain text</a></td></tr>
-              <tr><td>The hash-chain head of every count</td><td><a href="/api/integrity">/api/integrity</a></td><td>&mdash;</td></tr>
-              <tr><td>Corrections to published figures</td><td><a href="/api/corrections">/api/corrections</a></td><td><a href="/api/export/corrections.csv">corrections.csv</a> · <a href="/api/export/corrections.json">corrections.json</a></td></tr>
-              <tr><td>Care that no claim recorded</td><td><a href="/api/gap">/api/gap</a></td><td><a href="/api/export/gap.csv">gap.csv</a></td></tr>
-              <tr><td>How people ranked the burdens</td><td><a href="/api/survey">/api/survey</a></td><td><a href="/api/export/survey.csv">survey.csv</a></td></tr>
-              <tr><td>Written interviews (count only, ever)</td><td><a href="/api/interview">/api/interview</a></td><td>&mdash;</td></tr>
-              <tr><td>What changed because someone said so</td><td><a href="/api/changes">/api/changes</a></td><td>&mdash;</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        </LongSection>
-
-        <LongSection id="routes" title="Every route">
-        <div className="table-scroll" tabIndex={0}>
-          <table className="ledger-table">
-            <thead><tr><th>Method</th><th>Path</th><th>What it does</th></tr></thead>
-            <tbody>
-              {routes.map((r) => (
-                <tr key={`${r.method} ${r.path}`}>
-                  <td><code>{r.method}</code></td>
-                  <td><code>{r.path}</code></td>
-                  <td>{r.op.summary}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="micro">
-          The full description, with every request and response schema, is at{' '}
-          <a href="/api/openapi.json">/api/openapi.json</a>. Administrative routes take a bearer token and are
-          not published there.
-        </p>
-
-        </LongSection>
-
-        <LongSection id="rules" title="The rules">
-        <ul>
-          <li><strong>No model, average or interpolation ever produces a dollar figure.</strong> A phrase that maps to nothing stays unpriced and is returned as unpriced, with the reason.</li>
-          <li><strong>Figures that cannot be added are not added.</strong> Measures that answer different questions raise <code>basisWarning</code>; a whole-year figure is returned outside the total in <code>excludedFromTotal</code>.</li>
-          <li><strong>Rate limits, per network per hour:</strong> 300 to <code>/api/price</code>, 30 to <code>/api/journeys</code>, 20 to each write route. Over the limit returns 429 with a sentence, not a code.</li>
-          <li><strong>Privacy is the precondition.</strong> No account is required and none is offered by these routes. No IP address is stored; rate limiting hashes it with a daily salt and forgets it within the hour. Free text sent to the register is held privately and is never served back or exported.</li>
-          <li><strong>Errors are sentences.</strong> Every failure is <code>{'{ ok: false, error }'}</code> with the right status, written for a person reading a log.</li>
-        </ul>
-
-        </LongSection>
-
-        <LongSection id="why" title="Why reuse this">
-        <p>
-          The hard part of a cost-of-illness number is not arithmetic. It is knowing which published figure
-          applies, what it measures, who it leaves out, and what it must not be added to. That work is in the
-          table and its rules, and this API hands you all of it with every response. A state health agency
-          costing a care pathway, a patient organization building its own tool, a researcher who needs the
-          same unit prices we used &mdash; none of you need our interface, and none of you should have to take
-          our word for a number.
-        </p>
-        <p>
-          If you want to stand the whole thing up for your own condition, your own state or your own
-          population, <Link href="/adopt">/adopt</Link> is the procedure: the files to edit, in order, and the
-          two commands that refuse a figure which does not reproduce. The application is a{' '}
-          <a href="/waypoint-ledger-source.tar.gz">single download</a> and runs on your machine in three
-          commands, so none of that is a promise you have to take on trust.
-        </p>
-        <p className="micro">Questions, or a row you think is wrong: <a href="mailto:bo@precisionfederal.com">bo@precisionfederal.com</a>.</p>
-        </LongSection>
+          <RouteMap />
+          <FoldOpen wide={['fhir-tree', ...ROUTES_WIDE]} />
         </LongLayout>
       </div>
     </section>

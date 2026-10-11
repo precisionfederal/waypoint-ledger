@@ -39,7 +39,7 @@ PRICES = os.path.join(HERE, 'prices.json')
 CACHE = os.path.expanduser('~/.cache/waypoint-ledger/sources')
 UA = 'WaypointLedger/1.0 (+https://waypoint-ledger.pages.dev; bo@precisionfederal.com)'
 
-DATASET_TITLE = ('CMS, Medicare Physician & Other Practitioners — by Geography and Service, '
+DATASET_TITLE = ('CMS, Medicare Physician & Other Practitioners - by Geography and Service, '
                  'calendar year 2024 (released 2026-05)')
 DATASET_PAGE = ('https://data.cms.gov/provider-summary-by-type-of-service/'
                 'medicare-physician-other-practitioners/'
@@ -169,8 +169,8 @@ def main():
         alt['cy2024_source_file_sha256'] = digest
         alt['cy2024_source_row'] = ('Rndrng_Prvdr_Geo_Lvl=National, HCPCS_Cd=%s, Place_Of_Srvc=%s'
                                     % (code, pos))
-        alt['cy2024_place_of_service'] = ('O — provider office / non-facility setting' if pos == 'O'
-                                          else 'F — facility setting (hospital or ASC)')
+        alt['cy2024_place_of_service'] = ('O: provider office / non-facility setting' if pos == 'O'
+                                          else 'F: facility setting (hospital or ASC)')
         alt['cy2024_retrieved'] = retrieved
         if any(k in alt for k in CHARGE_KEYS):
             alt['cy2024_charge_field'] = 'Avg_Sbmtd_Chrg'

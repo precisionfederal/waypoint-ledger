@@ -263,7 +263,7 @@ export function stuckText(): string {
     return `- ${priceId}: ${verdict}${believed} (first tried ${it.queuedAt})`;
   });
   return [
-    'Waypoint Ledger — a correction that did not reach the server.',
+    'Waypoint Ledger: a correction that did not reach the server.',
     'Sent by hand because the site could not deliver it.',
     '',
     ...lines,

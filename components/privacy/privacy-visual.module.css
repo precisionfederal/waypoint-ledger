@@ -1,0 +1,102 @@
+/* /privacy diagram and store table. Tokens only, so the dark theme reads right. */
+
+/* ---- the flow diagram ---- */
+.flow{margin:0 0 1rem;padding:0}
+.row{display:grid;grid-template-columns:minmax(0,.9fr) 3.5rem minmax(0,1.25fr) 3.5rem minmax(0,1fr);align-items:center}
+.node,.never{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:1.1rem 1.15rem 1.2rem;min-width:0}
+.device{border-top:3px solid var(--accent)}
+.cross{background:var(--surface)}
+.kept{border-top:3px solid var(--ink-4)}
+.kick{display:flex;align-items:center;gap:.55rem;margin:0 0 .2rem;font-family:var(--font-d);font-weight:700;font-size:1.0625rem;line-height:1.3;color:var(--ink)}
+.ic{display:inline-flex;width:2.1rem;height:2.1rem;border-radius:var(--r-sm);align-items:center;justify-content:center;background:var(--accent-soft);color:var(--accent-ink);flex:none}
+.icNever{background:var(--ground-2);color:var(--ink-2)}
+.icSm{display:inline-flex;vertical-align:-.35em;margin-right:.35rem;color:var(--accent-ink)}
+.icSm svg{width:18px;height:18px}
+.who{font-size:.9375rem;color:var(--ink-3);margin:0 0 .75rem}
+.hop{font-size:.9375rem;font-weight:600;color:var(--ink-2);margin:.2rem 0 .55rem}
+.hop2{margin-top:1rem;padding-top:.85rem;border-top:1px dashed var(--line)}
+.node ul,.never ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:.55rem}
+.node li,.never li{font-size:.9375rem;line-height:1.45;color:var(--ink-2);padding-left:.95rem;position:relative}
+.node li::before{content:'';position:absolute;left:0;top:.6em;width:.38rem;height:.38rem;border-radius:50%;background:var(--accent)}
+.kept li::before{background:var(--ink-4)}
+.node li b,.never li b{color:var(--ink);font-weight:600}
+.never{margin-top:1rem;background:var(--surface-2);border-style:dashed;border-color:var(--line)}
+.never ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem 1.25rem;margin-top:.6rem}
+.never li::before{content:'';position:absolute;left:0;top:.72em;width:.5rem;height:1.5px;background:var(--ink-3)}
+.cap{font-size:.9375rem;color:var(--ink-3);margin:.75rem 0 0}
+
+/* the arrows between the boxes */
+.wire{display:flex;align-items:center;justify-content:center;color:var(--accent)}
+.wire svg{display:block;overflow:visible}
+.fwd,.back,.fwdHead,.backHead{fill:none;stroke-linecap:round;stroke-linejoin:round}
+.fwd,.fwdHead{stroke:var(--accent);stroke-width:2}
+.back,.backHead{stroke:var(--ink-4);stroke-width:1.5}
+.back{stroke-dasharray:.08 .07}
+.fwd{stroke-dasharray:1;stroke-dashoffset:0}
+
+@media (max-width:1000px){
+  .row{grid-template-columns:minmax(0,1fr)}
+  .wire{height:3.25rem}
+  .wire svg{transform:rotate(90deg)}
+  .never ul{grid-template-columns:minmax(0,1fr)}
+}
+
+/* motion: the arrow draws itself the first time the diagram is scrolled to */
+.flow[data-pv="wait"] .fwd{stroke-dashoffset:1}
+.flow[data-pv="wait"] .fwdHead,.flow[data-pv="wait"] .back,.flow[data-pv="wait"] .backHead{opacity:0}
+.flow[data-pv="in"] .fwd{transition:stroke-dashoffset .55s ease-out .25s}
+.flow[data-pv="in"] .fwdHead,.flow[data-pv="in"] .back,.flow[data-pv="in"] .backHead{transition:opacity .35s ease-out .6s}
+@media (prefers-reduced-motion:reduce){.flow .fwd,.flow .fwdHead,.flow .back,.flow .backHead{transition:none!important}}
+
+/* ---- the store table ---- */
+.storeWrap{margin:0 0 1rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);padding:.4rem .4rem .2rem}
+.storeWrap:focus-visible{outline:none;box-shadow:var(--ring)}
+.store.store caption{padding:.6rem .75rem .5rem}
+.store.store thead th{background:var(--surface-2);font-size:.9375rem}
+.store.store caption{font-size:.9375rem}
+.store thead th:first-child{border-top-left-radius:var(--r-md)}
+.store thead th:last-child{border-top-right-radius:var(--r-md)}
+.store tbody tr:last-child>*{border-bottom:0}
+.store{table-layout:fixed}
+.store thead th:nth-child(1){width:27%}.store thead th:nth-child(2){width:27%}.store thead th:nth-child(3){width:23%}
+.rowHead{display:flex;gap:.6rem;align-items:flex-start}
+.store td{color:var(--ink-2)}
+.store td code{font-size:.8125rem}
+.rowIc{display:inline-flex;flex:none;width:1.9rem;height:1.9rem;border-radius:var(--r-sm);align-items:center;justify-content:center;background:var(--ground-2);color:var(--ink-2)}
+.rowIc svg{width:18px;height:18px}
+.onDevice .rowIc{background:var(--accent-soft);color:var(--accent-ink)}
+.long{font-weight:600;color:var(--ink)!important}
+@media (max-width:640px){
+  .storeWrap{background:none;border:0;box-shadow:none;padding:0}
+  .storeWrap .store caption{display:block;width:100%;padding:0 0 .6rem}
+  .storeWrap .store{table-layout:auto}
+  .storeWrap .store tbody th{padding-top:.6rem}
+  .storeWrap .store td[data-label]{display:block}
+  .storeWrap .store td[data-label]::before{display:block;margin-bottom:.1rem}
+}
+
+/* ---- every table, counted ---- */
+.fo{margin:1.25rem 0 0;padding:1.1rem 1.2rem 1.2rem;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.foCap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 1.5rem;font-size:.9375rem;color:var(--ink-2);margin:0 0 .85rem}
+.foKey{display:flex;flex-wrap:wrap;gap:.35rem 1rem;color:var(--ink-3)}
+.foKey span{display:inline-flex;align-items:center;gap:.4rem}
+.foKey i{display:inline-block;width:.8rem;height:.8rem;border-radius:3px}
+.foList{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.15rem 2rem}
+.foList li{display:grid;grid-template-columns:10.5rem minmax(0,1fr);grid-template-rows:auto auto;column-gap:.85rem;align-items:center;padding:.3rem 0;border-bottom:1px solid var(--line-2)}
+.foName{grid-row:span 2;display:inline-flex;align-items:center;min-height:44px;text-decoration:none}
+.foName code{font-size:.9375rem;color:var(--accent-ink);background:none;padding:0}
+.foName:hover code{text-decoration:underline}
+.foBar{display:flex;height:.65rem;border-radius:var(--r-pill);overflow:hidden;gap:2px;min-width:1.5rem;transform-origin:left center}
+.foBar i{display:block;height:100%;flex-basis:0}
+.kPub{background:var(--accent)}
+.kEnc{background:var(--ink-2)}
+.kRest{background:var(--line)}
+.foNums{font-size:.9375rem;color:var(--ink-3);font-variant-numeric:tabular-nums;line-height:1.35;margin-top:.15rem}
+@media (max-width:900px){.foList{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.foList li{grid-template-columns:minmax(0,1fr)}.foName{grid-row:auto;min-height:44px}}
+/* bars grow once, the first time the overview is scrolled to */
+.fo[data-pv="wait"] .foBar{transform:scaleX(0)}
+.fo[data-pv="in"] .foBar{transform:none;transition:transform .55s ease-out}
+.fo[data-pv="in"] li:nth-child(n+5) .foBar{transition-delay:.08s}
+.fo[data-pv="in"] li:nth-child(n+9) .foBar{transition-delay:.16s}
+@media (prefers-reduced-motion:reduce){.fo .foBar{transform:none!important;transition:none!important}}

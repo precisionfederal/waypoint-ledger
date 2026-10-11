@@ -56,6 +56,6 @@ export function siteOfServiceFinding(): SiteOfServiceFinding | null {
   const money = (v: number) => `$${Math.round(v).toLocaleString('en-US')}`;
   return {
     officeUsd, hospitalUsd, gapUsd, ratio, year: office.year,
-    line: `The same visit code costs ${money(gapUsd)} more in a hospital clinic than in a doctor's office — CMS, CY${office.year}.`,
+    line: `The same visit code costs ${money(gapUsd)} more in a hospital clinic than in a doctor's office (CMS, CY${office.year}).`,
   };
 }

@@ -1,0 +1,47 @@
+/* PAGES DETAIL (2026-09-30): the 404 on the DESIGN R1 card system.
+   VISUAL tech (2026-09-30 night): the fork-in-the-path art beside the words,
+   three ways onward as large cards, the rest as one quiet row. */
+.page{padding-top:clamp(2rem,5vw,3.5rem)}
+.hero{display:grid;grid-template-columns:minmax(0,22rem) minmax(0,1fr);gap:clamp(1.25rem,4vw,3.5rem);align-items:center}
+.art{display:block;width:100%;height:auto;animation:settle .6s ease-out both}
+@keyframes settle{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion: reduce){.art{animation:none}}
+.head{max-width:40rem;min-width:0}
+.head h1{font-size:var(--hero-h1);line-height:1.1;letter-spacing:-.025em;margin:0} /* the inner-page hero token: 44 px at 1440, 28 px at 390 */
+.lede{font-size:1.1875rem;line-height:1.55;color:var(--ink-2);max-width:34rem;margin:.9rem 0 0}
+@media (max-width:760px){
+  .hero{grid-template-columns:minmax(0,1fr)}
+  .art{max-width:15rem;margin:0 auto -.5rem}
+}
+
+.h2{font-size:1.25rem;margin:clamp(2rem,4.5vw,3rem) 0 .9rem}
+.ways{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1rem}
+@media (max-width:900px){.ways{grid-template-columns:minmax(0,1fr)}}
+.way{display:flex;gap:.9rem;align-items:flex-start;height:100%;min-height:44px;padding:1.2rem 1.25rem;background:var(--surface);
+  border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-2);color:var(--ink);text-decoration:none;
+  transition:border-color .15s,transform .15s,box-shadow .15s}
+.way:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-2px);box-shadow:var(--sh-3)}
+.way:focus-visible{outline:none;box-shadow:var(--ring)}
+@media (prefers-reduced-motion: reduce){.way{transition:none}.way:hover{transform:none}}
+.wayMain{background:var(--brand-fill);border-color:var(--brand-fill);color:var(--on-brand)}
+.wayMain:hover{border-color:var(--brand-fill-2);background:var(--brand-fill-2)}
+.wayMain .text b,.wayMain .go{color:var(--on-brand)}
+.wayMain .text span{color:color-mix(in srgb,var(--on-brand) 84%,transparent)}
+.wayMain .icon{background:color-mix(in srgb,var(--on-brand) 14%,transparent);color:var(--on-brand)}
+.go{flex:none;margin:.2rem 0 0 auto;color:var(--accent-ink)}
+
+.h2b{font-size:1rem;font-weight:600;color:var(--ink-2);margin:2rem 0 .7rem}
+.grid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:.75rem}
+.card{display:flex;gap:.85rem;align-items:flex-start;height:100%;min-height:44px;padding:.9rem 1rem;
+  background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);box-shadow:var(--sh-1);
+  color:var(--ink);text-decoration:none;transition:border-color .15s}
+.card:hover{border-color:var(--accent);text-decoration:none}
+.card:focus-visible{outline:none;box-shadow:var(--ring)}
+.icon{display:grid;place-items:center;flex:none;width:2.5rem;height:2.5rem;border-radius:var(--r-md);background:var(--accent-soft);color:var(--accent-ink)}
+.card .icon{background:var(--surface-2)}
+.text{display:flex;flex-direction:column;gap:.2rem;min-width:0}
+.text b{font-weight:600;font-size:1.0625rem;color:var(--ink)}
+.card .text b{font-size:1rem}
+.text span{font-size:.9375rem;line-height:1.45;color:var(--ink-3)}
+.foot{margin:1.75rem 0 0;font-size:.9375rem;color:var(--ink-3)}
+.foot a{display:inline-flex;align-items:center;min-height:44px;color:var(--accent-ink);font-weight:600}

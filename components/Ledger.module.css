@@ -28,3 +28,22 @@
    on a phone — 0px wide on the widest label, 9px on the next. The pills are
    unchanged; the icon simply stops being the thing that gives way. */
 .exportBtn svg{flex:0 0 auto}
+
+/* PHONES ONLY (patient-9, patient-19, access-18). Nothing above 480px changes.
+   1. The four export pills shrank to one letter per line at 390 ("C/S/V",
+      "F/H/I/R/R/4"): two per row, labels never broken.
+   2. The Figure and total cells broke "$95.1" over "9": a figure never wraps.
+   The markup in Ledger.tsx is untouched; the table is reached from the local
+   export class through :has, so the selector stays a module selector. The
+   doubled class outranks globals.css .actions .row .btn{flex:1}. */
+@media (max-width:480px){
+  :global(.actions) :global(.row) .exportBtn.exportBtn{flex:1 1 calc(50% - var(--sp-2));min-width:0;white-space:nowrap;justify-content:center}
+  :global(.ledger):has(.exportBtn) :global(.ledger-table td.r){white-space:nowrap}
+}
+
+/* FLOW4 flow4-11: the "Time spent searching" band repeats the months under the
+   total; under 480 px it steps aside so the first line reaches screen 1. The
+   doubled class outranks core.css .ledger-top>.ledger-figs>*{display:block}. */
+@media (max-width:479.98px){
+  :global(.ledger-figs)>.phoneDup.phoneDup{display:none}
+}

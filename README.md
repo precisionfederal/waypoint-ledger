@@ -8,8 +8,8 @@ filling it with the nearest number.
 **No model, average or interpolation produces a dollar figure anywhere in this codebase.** If you keep one
 thing when you adapt this, keep that.
 
-Live: <https://waypoint-ledger.pages.dev> · How to adapt it: <https://waypoint-ledger.pages.dev/adopt> ·
-The API: <https://waypoint-ledger.pages.dev/developers>
+Live: <https://waypointledger.org> · How to adapt it: <https://waypointledger.org/adopt> ·
+The API: <https://waypointledger.org/developers>
 
 ---
 

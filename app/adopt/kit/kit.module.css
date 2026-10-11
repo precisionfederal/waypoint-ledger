@@ -1,0 +1,170 @@
+/* /adopt/kit, and the per-link count page. Tokens only, so a redesign restyles it.
+   The flyer is paper: black on white in every colour scheme, on screen and in print. */
+.kit :global(.card) { min-width: 0; }
+.form { display: grid; gap: var(--sp-3); max-width: 40rem; margin-bottom: var(--sp-5); }
+.form input { width: 100%; }
+.warn { color: var(--warn-ink); font-weight: 600; margin: 0; }
+.linkish { background: none; border: 0; padding: 0; min-height: 44px; color: var(--brand-3); text-decoration: underline; font: inherit; cursor: pointer; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: var(--sp-4); margin-bottom: var(--sp-6); }
+.grid :global(.row) { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin: var(--sp-3) 0; }
+.mono { font-family: var(--font-m); font-size: .95rem; overflow-wrap: anywhere; word-break: break-all; }
+.blurb { line-height: 1.6; overflow-wrap: anywhere; }
+.qr { display: block; width: min(100%, 13rem); height: auto; aspect-ratio: 1; border: 1px solid var(--line); border-radius: var(--r-sm); }
+
+.flyerHead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-3); margin-bottom: var(--sp-3); }
+.flyer {
+  background: #fff; color: #000; border: 1px solid var(--line); border-radius: var(--r-md);
+  padding: clamp(1.25rem, 5vw, 3rem); max-width: 50rem; margin: 0 auto var(--sp-6);
+  font-family: var(--font-b); overflow-wrap: anywhere;
+}
+.flyer p { color: #000; font-size: 1.05rem; line-height: 1.5; margin: 0 0 .8rem; }
+.flyerOrg { font-family: var(--font-d); font-weight: 700; font-size: 1.15rem !important; letter-spacing: .01em; }
+.flyerH { font-family: var(--font-d); color: #000; font-size: clamp(1.6rem, 5vw, 2.4rem); line-height: 1.15; margin: 0 0 1.25rem; }
+.flyerBody { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.flyerQr { width: 100%; height: auto; aspect-ratio: 1; display: block; }
+/* FLOW adopter-11: a caption that tells a waiting room what to do, and an address
+   that breaks only at the <wbr>s OrgKit puts after the host and after "?". */
+.flyerFig { margin: 0; }
+.flyerCap { font-family: var(--font-d); font-weight: 700; font-size: 1.1rem; color: #000; text-align: center; margin-top: .5rem; }
+.flyer p.flyerUrl { font-family: var(--font-m); font-size: 1rem; overflow-wrap: normal; word-break: normal; margin: 1rem 0 0; }
+.quote { margin: 1.5rem 0 1rem; padding: .9rem 1.1rem; border-left: 4px solid #000; background: #f4f4f4; }
+.quote p { font-size: .95rem; margin: 0 0 .4rem; }
+.quote footer { font-size: .85rem; color: #333; }
+.flyerFoot { font-size: .9rem !important; color: #333 !important; margin: 0 !important; }
+@media (max-width: 560px) {
+  .flyerBody { grid-template-columns: 1fr; }
+  .flyerQr { max-width: 14rem; }
+  .qrBoxFlyer { max-width: 14rem; }
+}
+@media print {
+  @page { size: letter; margin: 0.6in; }
+  .kit { padding: 0 !important; }
+  .flyer { border: 0; border-radius: 0; padding: 0; margin: 0; max-width: none; break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .flyer p.flyerOrg { font-size: 16pt !important; }
+  .flyerH { font-size: 36pt; margin-bottom: 0.3in; }
+  .flyer p { font-size: 15pt; }
+  .flyerBody { grid-template-columns: 3.8in 1fr; gap: 0.35in; }
+  .flyerCap { font-size: 15pt; margin-top: 0.12in; }
+  .flyer p.flyerUrl { font-size: 13pt; margin-top: 0.3in; }
+  .quote { margin-top: 0.35in; }
+  .quote p { font-size: 12pt; }
+  .quote footer { font-size: 10pt; }
+}
+
+/* ---- VISUAL-4b (2026-09-30): the form, the outputs and the flyer read as a
+   product (the hero is the Kit PageHero). Tokens only; the flyer stays paper. ---- */
+.kit :global(.btn) { min-height: 44px; }
+.form { max-width: none; padding: clamp(1.1rem, 3vw, 1.75rem); margin-top: var(--sp-5); scroll-margin-top: 6rem; }
+.formH { margin: 0; font-size: 1.3125rem; }
+@media (min-width: 900px) {
+  .form { grid-template-columns: 1fr 1fr; column-gap: var(--sp-5); }
+  .form > .formH, .form > p { grid-column: 1 / -1; }
+}
+.well { word-break: normal; overflow-wrap: anywhere; background: var(--ground); border: 1px solid var(--line-2); border-radius: var(--r-md); padding: .7rem .85rem; color: var(--ink); margin: var(--sp-2) 0 0; }
+.grid > :global(.card) { display: flex; flex-direction: column; }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.grid :global(.lbl) { font-size: 1.0625rem; color: var(--ink); margin: 0 0 var(--sp-2); }
+.stage {
+  margin: 0 0 var(--sp-6); padding: clamp(1rem, 4vw, 3rem); border-radius: var(--r-lg);
+  border: 1px solid var(--line-2);
+  background: radial-gradient(circle at 1px 1px, var(--line) 1px, transparent 1.5px) 0 0 / 18px 18px, var(--ground);
+}
+.stage .flyer { margin-bottom: 0; border: 0; border-radius: 4px; box-shadow: 0 1px 2px color-mix(in srgb, var(--ink) 12%, transparent), 0 18px 40px -12px color-mix(in srgb, var(--ink) 28%, transparent); }
+@media print {
+  .stage { padding: 0; margin: 0; border: 0; background: none; }
+  .stage .flyer { box-shadow: none; }
+}
+
+/* ---- POLISH-B (2026-09-30, judge-2 fix 15): the sample kit. Before a name is
+   typed the five outputs show for "Your organization", greyed on a hatched
+   ground and marked Sample; text stays AA (ink-3 on surface-2). The QR code is
+   dimmed and crossed by a band a third of its height, which no level-M reader
+   can repair, so a screenshot of the sample never scans. ---- */
+.qrBox { position: relative; display: block; width: min(100%, 13rem); }
+.qrBox .qr { width: 100%; }
+.qrBoxFlyer { width: 100%; }
+.qrBand { display: none; }
+.sample .qrBand {
+  display: grid; place-items: center; position: absolute; left: 7%; right: 7%; top: 33%; height: 34%;
+  background: var(--surface); color: var(--ink-2); border: 1.5px solid var(--line);
+  border-radius: var(--r-sm); font-family: var(--font-d); font-weight: 700; font-size: 1.05rem; letter-spacing: .02em;
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--ink) 30%, transparent);
+}
+.sample .qrBoxFlyer .qrBand { background: #fff; color: #333; border-color: #bbb; font-size: clamp(1.1rem, 3vw, 1.6rem); }
+.sample .qr, .sample .flyerQr { opacity: .38; filter: grayscale(1); }
+.sampleBar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2) var(--sp-3);
+  margin: 0 0 var(--sp-4); padding: var(--sp-3) var(--sp-4);
+  border: 1.5px dashed var(--line); border-radius: var(--r-lg); background: var(--surface);
+}
+.sampleBar p { flex: 1 1 22rem; margin: 0; color: var(--ink-2); font-size: 1rem; line-height: 1.5; }
+.sampleBar p strong { color: var(--ink); }
+.sampleTag {
+  flex: 0 0 auto; display: inline-flex; align-items: center; min-height: 1.75rem; padding: 0 .7rem; border-radius: 999px;
+  background: var(--ground-2); color: var(--ink-2); border: 1px solid var(--line);
+  font-family: var(--font-d); font-weight: 700; font-size: .875rem; letter-spacing: .04em; text-transform: uppercase;
+}
+.sample .grid > :global(.card) {
+  border-style: dashed;
+  background: repeating-linear-gradient(135deg, transparent 0 11px, color-mix(in srgb, var(--ink) 3%, transparent) 11px 22px), var(--surface-2);
+}
+.sample .grid :global(.lbl)::after {
+  content: 'Sample'; margin-left: .5rem; padding: .1rem .5rem; border-radius: 999px; vertical-align: .1em;
+  background: var(--ground-2); color: var(--ink-3); font-size: .75rem; letter-spacing: .04em; text-transform: uppercase;
+}
+.sample .well, .sample .blurb, .sample .grid .mono { color: var(--ink-3); }
+.sample .well { background: transparent; border-style: dashed; }
+.sample :global(.btn)[aria-disabled="true"] { opacity: .55; cursor: not-allowed; box-shadow: none; }
+.sample :global(.btn)[aria-disabled="true"]:hover { filter: none; transform: none; }
+/* The sample flyer: still paper, its words a mid grey, a faint diagonal "Sample" across the sheet. */
+.sample .flyer { position: relative; overflow: hidden; }
+.sample .flyer p, .sample .flyer .flyerH, .sample .flyer .flyerCap { color: #555; }
+.sample .flyer::after {
+  content: 'Sample'; position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none;
+  font-family: var(--font-d); font-weight: 800; font-size: clamp(4rem, 16vw, 10rem); letter-spacing: .06em;
+  color: rgb(0 0 0 / .06); transform: rotate(-20deg);
+}
+
+/* The hero art's sky is open (transparent in the light copy, near the page's own
+   black in the dark one), so its sun floated on the page with no box around it.
+   Light: a soft sky painted behind the image. Dark: the same sky laid over it with
+   "lighten", which lifts only the near-black sky and leaves the hills as drawn.
+   Both sit under PageHero's own edge mask, so the box keeps its soft edges. */
+.hero img { background: linear-gradient(180deg, color-mix(in srgb, var(--brand-2) 13%, var(--surface)) 0%, var(--accent-soft) 60%, var(--surface) 100%); grid-column: 2; grid-row: 1; }
+.hero::after {
+  content: ''; display: none; grid-column: 2; grid-row: 1; align-self: center; width: 100%; aspect-ratio: 1200 / 525;
+  border-radius: var(--r-lg); pointer-events: none; mix-blend-mode: lighten;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--brand-soft) 85%, var(--brand)) 0%, var(--brand-soft) 45%, transparent 80%);
+  -webkit-mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%); mask-image: radial-gradient(120% 120% at 55% 50%, #000 58%, transparent 100%);
+}
+/* Dark: the night twin (eddbd268fa) draws its own moonlit sky fading into the page, as every other
+   dark hero does, so no sky is laid over it and the light copy's painted sky stays off. */
+@media screen {
+  :global(:root[data-theme="dark"]) .hero img { background: none; }
+}
+@media screen and (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme="light"])) .hero img { background: none; }
+}
+@media (max-width: 860px) {
+  .hero img, .hero::after { grid-column: 1; grid-row: 1; }
+  .hero::after { max-height: 11rem; margin: 0 0 .5rem; }
+}
+
+/* The per-link count page */
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: var(--sp-3); margin: var(--sp-4) 0; }
+.stat { border: 1px solid var(--line); border-radius: var(--r-md); padding: var(--sp-3) var(--sp-4); background: var(--surface); }
+.stat b { display: block; font-family: var(--font-m); font-size: 1.6rem; color: var(--ink); }
+.stat span { color: var(--ink-2); font-size: .95rem; }
+.lookup { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: flex-end; margin: var(--sp-4) 0; }
+.lookup :global(.field) { flex: 1 1 14rem; }
+.lookup input { width: 100%; }
+
+/* FLOW5 flow5-5: the link as it is made, under the name box, on a phone only;
+   from 480 px the link card itself is close enough to see. */
+.linkNow { display: none; }
+@media (max-width: 479.98px) {
+  .linkNow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-2); margin: var(--sp-2) 0; padding: .6rem .75rem; background: var(--ground); border: 1px solid var(--line-2); border-radius: var(--r-md); }
+  .linkNow > span { flex: 1 1 12rem; min-width: 0; }
+  .linkNow .mono { word-break: normal; overflow-wrap: anywhere; }
+}
+@media print { .linkNow { display: none; } }

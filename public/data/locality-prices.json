@@ -2,7 +2,7 @@
  "what_this_is": "The Medicare allowed amount for each of these services in each of the 109 CMS payment localities. Every figure is CMS’s own formula applied to CMS’s own published inputs, which are on the same row. None of it is estimated, modelled or interpolated. It is what Medicare allows; for a person who is not on Medicare it is a published reference price and not a bill, and for a person on Medicaid it does not describe what their state pays at all.",
  "table_version": "2026-09-09.1",
  "price_table_version": "2026-09-09.1",
- "generated": "2026-09-10",
+ "generated": "2026-10-11",
  "rows": 5668,
  "codes": 52,
  "locality_count": 109,
@@ -10,12 +10,12 @@
  "conversion_factor": 33.4009,
  "formula": "(work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009",
  "license": "The CMS relative value units, geographic practice cost indices and conversion factor are U.S. Government works and are in the public domain. The arrangement, the plain-language labels and this audit are dedicated to the public domain by Precision Federal LLC under CC0 1.0. Take it, fork it, correct it.",
- "how_to_cite": "Waypoint Ledger locality price table, version 2026-09-09.1, Precision Federal LLC, https://waypoint-ledger.pages.dev/data/locality-prices.csv. The figures are derived from CMS CY2026 Physician Fee Schedule files; cite CMS for the inputs and this file for the derivation.",
+ "how_to_cite": "Waypoint Ledger locality price table, version 2026-09-09.1, Precision Federal LLC, https://waypointledger.org/data/locality-prices.csv. The figures are derived from CMS CY2026 Physician Fee Schedule files; cite CMS for the inputs and this file for the derivation.",
  "audit": {
   "method": "Every figure below was recomputed from the RVU and GPCI columns on its own row and compared to the value data/state-prices.json holds, to the cent.",
   "figures_checked": 5668,
   "mismatches": 0,
-  "ran": "2026-09-10",
+  "ran": "2026-10-11",
   "reproduce": "node scripts/gen-locality-table.mjs",
   "independent": {
    "by": "data/verify_price_table.py",
@@ -130,7 +130,7 @@
   {
    "field": "national_usd",
    "type": "number",
-   "note": "The same code with every index set to 1.000 — the national figure on the price table."
+   "note": "The same code with every index set to 1.000: the national figure on the price table."
   },
   {
    "field": "pct_of_national",
@@ -145,7 +145,7 @@
   {
    "field": "basis",
    "type": "text",
-   "note": "allowed — a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays."
+   "note": "allowed: a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays."
   },
   {
    "field": "year",

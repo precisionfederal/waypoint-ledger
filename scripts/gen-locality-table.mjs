@@ -118,7 +118,7 @@ if (mismatches.length) fatal(`${mismatches.length} of ${checked} published local
 const LOC = audit?.localities ?? null;
 const LOCALITY_STATUS = LOC && LOC.status === 'PASS' && LOC.figures === checked && LOC.fail === 0
   ? 'REPRODUCED'
-  : 'REPRODUCED IN THIS GENERATOR ONLY — NOT YET RE-DERIVED BY data/verify_price_table.py';
+  : 'REPRODUCED IN THIS GENERATOR ONLY, NOT YET RE-DERIVED BY data/verify_price_table.py';
 
 /* ------------------------------------------------------------------- columns */
 const COLUMNS = [
@@ -138,10 +138,10 @@ const COLUMNS = [
   ['mp_gpci', 'number', 'Malpractice geographic practice cost index for this locality.'],
   ['conversion_factor', 'number', 'The CY2026 non-qualifying-APM conversion factor, in dollars per RVU.'],
   ['allowed_usd', 'number', 'The Medicare allowed amount for this code in this locality. DERIVED by the formula in the formula column, never estimated.'],
-  ['national_usd', 'number', 'The same code with every index set to 1.000 — the national figure on the price table.'],
+  ['national_usd', 'number', 'The same code with every index set to 1.000: the national figure on the price table.'],
   ['pct_of_national', 'number', 'allowed_usd as a percentage of national_usd, to one decimal. Arithmetic on the two columns beside it.'],
   ['formula', 'text', "CMS's own formula, written out, so the row can be recomputed without this file."],
-  ['basis', 'text', 'allowed — a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays.'],
+  ['basis', 'text', 'allowed: a fee-schedule amount. It is what Medicare pays, not what anyone was billed and not what a commercial plan pays.'],
   ['year', 'text', 'The calendar year of the fee schedule.'],
   ['population', 'text', 'Who the figure describes: Medicare Part B fee-for-service beneficiaries. For anyone else it is a reference price.'],
   ['locality_audit_status', 'text', 'REPRODUCED means two independent runs recomputed this exact figure from the RVUs and GPCIs in the columns to the left: this generator, and data/verify_price_table.py reading the CMS files itself.'],
@@ -201,7 +201,7 @@ const LICENSE =
 
 const HOW_TO_CITE =
   `Waypoint Ledger locality price table, version ${sp._version}, Precision Federal LLC, `
-  + 'https://waypoint-ledger.pages.dev/data/locality-prices.csv. The figures are derived from CMS '
+  + 'https://waypointledger.org/data/locality-prices.csv. The figures are derived from CMS '
   + 'CY2026 Physician Fee Schedule files; cite CMS for the inputs and this file for the derivation.';
 
 const WHAT_THIS_IS =

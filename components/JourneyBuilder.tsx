@@ -1,150 +1,27 @@
 'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { saidQuote } from '@/lib/said-quote';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ITEMS, UNPRICEABLE, useStore } from '@/lib/store';
-import { search } from '@/lib/search';
-import { parseJourney, parseJourneyWithModel, type ParsedSegment } from '@/lib/mapper';
+import { ITEMS, STORY_MAX, UNPRICEABLE, clearStoryDraft, readStoryDraft, saveStoryDraft, useStore } from '@/lib/store';
+import { alternativesFor, search } from '@/lib/search';
+import { StartOverButton } from './LineControls';
 import { CATEGORIES, categoryKey } from '@/lib/categories';
-import { priceJourney, totals, usd } from '@/lib/pricing';
+import { JOURNEY_TOTAL_BASIS, priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION } from '@/lib/table';
 import type { PriceItem, PricedLine } from '@/lib/types';
 import ShareCard, { type ShareCardData } from './ShareCard';
 import { detectState } from '@/lib/state-detect';
 import ContextBar from './ContextBar';
 import cs from './ContextBar.module.css';
-import { gapSummary, odysseyClauses } from '@/lib/sheet';
+import { NO_FIGURE, gapSummary, odysseyClauses } from '@/lib/sheet';
+import { searchLength } from '@/lib/search-length';
 import { siteOfServiceFinding } from '@/lib/site-of-service';
 import { Icon } from './Icons';
+import { LivePreviewChips, addLabel, useLivePreview } from './LivePreview';
+export { LivePreviewChips, addLabel, previewTotals, sharedRead, useLivePreview, type LivePreview } from './LivePreview';
 
 const EXAMPLE = 'saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER once when my heart was racing';
-const COACH_EXAMPLES = ['an MRI of my brain', 'the ER once', 'blood work twice'];
-
-/* ==========================================================================
-   LIVE PARSE — the sentence becomes an itemized, cited ledger while they type.
-
-   Nothing here prices anything: parseJourney maps words to units of care and
-   the published table supplies the figure, exactly as it does after the button
-   is pressed. The preview is the same computation, shown 250 ms earlier.
-   ========================================================================== */
-
-export interface LivePreview {
-  segments: ParsedSegment[];
-  matched: number;
-  previewTotal: number;
-  /** True while the debounce is still waiting on the current keystroke. */
-  pending: boolean;
-  /** The AI reader did not answer (busy, capped, offline): the lines shown are the rules' alone. */
-  readerDown: boolean;
-}
-
-const DEBOUNCE_MS = 250;
-
-export function useLivePreview(story: string): LivePreview {
-  const [debounced, setDebounced] = useState('');
-  useEffect(() => {
-    const t = setTimeout(() => setDebounced(story), DEBOUNCE_MS);
-    return () => clearTimeout(t);
-  }, [story]);
-
-  /* The rules answer instantly. The AI reader answers a moment later, for the
-     phrases the rules left blank, and only if the story has not changed since. */
-  const [modelRead, setModelRead] = useState<{ story: string; segments: ParsedSegment[]; model: string | null } | null>(null);
-  const [readerDown, setReaderDown] = useState(false);
-  useEffect(() => {
-    if (!debounced.trim()) { setReaderDown(false); return; }
-    const ctl = new AbortController();
-    parseJourneyWithModel(debounced, ITEMS, fetch, ctl.signal).then((r) => {
-      if (ctl.signal.aborted) return;
-      if (r.model) { setModelRead({ story: debounced, ...r }); setReaderDown(false); }
-      else setReaderDown(true);
-    }).catch(() => { if (!ctl.signal.aborted) setReaderDown(true); });
-    return () => ctl.abort();
-  }, [debounced]);
-
-  return useMemo(() => {
-    const rules = debounced.trim() ? parseJourney(debounced, ITEMS) : [];
-    const read = modelRead && modelRead.story === debounced ? modelRead.segments : rules;
-    const segments = read.filter((s) => !s.absorbed);
-    return { segments, ...previewTotals(segments), pending: debounced !== story, readerDown: readerDown && modelRead?.story !== debounced };
-  }, [debounced, story, modelRead, readerDown]);
-}
-
-/** The preview's arithmetic: one published figure times the count in the phrase. */
-export function previewTotals(segments: ParsedSegment[]): { matched: number; previewTotal: number } {
-  let matched = 0;
-  let previewTotal = 0;
-  for (const s of segments) {
-    if (!s.result.item) continue;
-    matched++;
-    previewTotal += (s.result.item.valueUsd ?? 0) * s.times;
-  }
-  return { matched, previewTotal };
-}
-
-/** A segment the matcher refused may carry its own reason; show that, never a guess. */
-function blankReason(seg: ParsedSegment): string {
-  const r = (seg.result as { reason?: unknown }).reason;
-  return typeof r === 'string' && r.trim() ? r : 'no federal figure — kept blank';
-}
-
-/** The counter a refused phrase belongs in, read defensively. Null on a priced
- *  or ordinary unmatched line, so only real gaps take the gap style. */
-function gapCategoryOf(seg: ParsedSegment): string | null {
-  const g = (seg.result as { gapCategory?: unknown }).gapCategory;
-  return typeof g === 'string' && g.trim() ? g : null;
-}
-
-/** The matcher's own confidence, read defensively so a mapper change never breaks the chip. */
-function confidenceOf(seg: ParsedSegment): string | null {
-  const c = (seg.result as { confidence?: unknown }).confidence;
-  return typeof c === 'string' ? c : null;
-}
-
-export function LivePreviewChips({ preview, onExample }: { preview: LivePreview; onExample?: (text: string) => void }) {
-  const { segments, matched, previewTotal } = preview;
-  if (!segments.length) return null;
-  return (
-    <div className="lp">
-      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {segments.length} {segments.length === 1 ? 'phrase' : 'phrases'} read, {matched} carrying a published figure and the rest shown blank and named,
-        {' '}{usd(previewTotal)} from published figures so far.
-      </p>
-      <ul className="lp-chips" aria-label="What this sentence maps to so far">
-        {segments.map((s, i) => {
-          const it = s.result.item;
-          const low = confidenceOf(s) === 'low';
-          return it ? (
-            <li key={`${i}-${it.id}`} className={`lp-chip${low ? ' is-low' : ''}`}>
-              <b>{it.label}</b>
-              {s.source === 'model' && <span className="lp-ai" title={s.modelWhy ? `AI read this as ${it.label}: ${s.modelWhy}` : `AI read this as ${it.label}`}>AI read</span>}
-              <span className="lp-x">×{s.times}</span>
-              {s.countNote && <span className="lp-note">{s.countNote}</span>}
-              {low && <span className="lp-low" title="A one-word match. Open the line and change it if this is not what you had.">worth a check</span>}
-              <span className="lp-amt">{usd((it.valueUsd ?? 0) * s.times)}</span>
-            </li>
-          ) : (
-            <li key={`${i}-blank`} className={`lp-chip is-blank${gapCategoryOf(s) ? ' is-gap' : ''}`}>
-              <b>{s.raw}</b>
-              <span className="lp-amt">{blankReason(s)}</span>
-            </li>
-          );
-        })}
-      </ul>
-      {matched === 0 && (
-        <p className="lp-coach">
-          Nothing recognised yet — name a visit, a scan or a test.{' '}
-          {COACH_EXAMPLES.map((e, i) => (
-            <span key={e}>
-              {i > 0 && ' · '}
-              <button type="button" className="link-btn" onClick={() => onExample?.(e)}>{e}</button>
-            </span>
-          ))}
-        </p>
-      )}
-    </div>
-  );
-}
 
 export default function JourneyBuilder() {
   const st = useStore();
@@ -152,7 +29,9 @@ export default function JourneyBuilder() {
   const [q, setQ] = useState('');
   const [cat, setCat] = useState(CATEGORIES[0].key);
   const [open, setOpen] = useState(false);
-  const [hi, setHi] = useState(0);
+  /* patient-2: -1 = nothing chosen yet, so Enter adds the words as typed (what the
+     list's own footer says). Only an arrow key or the pointer chooses a hit. */
+  const [hi, setHi] = useState(-1);
   /* One tab stop for the whole catalogue: Arrow keys move inside it, Tab leaves
      it. Before this, 40+ chips were 40+ stops between the sentence and the total. */
   const [chipAt, setChipAt] = useState(0);
@@ -164,7 +43,31 @@ export default function JourneyBuilder() {
   const hits = useMemo(() => search(q, ITEMS, 8), [q]);
   const lines = useMemo(() => priceJourney(st.entries), [st.entries]);
   const sum = useMemo(() => totals(lines), [lines]);
-  const preview = useLivePreview(story);
+  /* 🔴 A PASTED STORY IS NEVER CUT IN SILENCE (R6 edge #11).
+     cf/functions/api/map.js takes the first 2,000 characters. A 2,400-character
+     account — the one a person has been writing for a year — lost its tail with
+     no message. Nothing is truncated behind their back now: the box says how
+     much it prices, the preview reads exactly what Add will price, and what is
+     over stays in the box as the next journey. */
+  const over = Math.max(0, story.length - STORY_MAX);
+  const storyForPricing = over ? story.slice(0, STORY_MAX) : story;
+  const preview = useLivePreview(storyForPricing);
+
+  /* The typed sentence survives Back and a hard refresh (R6 edge #14). Read
+     once on mount, held for this tab only, cleared when it becomes lines. */
+  /* 🔴 A sentence typed or pasted before hydration is in the box but not in
+     state (R1 UXM-06, S-05): it is read here, in the hydrating commit, before
+     a re-render can write '' over it, and it wins over an older draft because
+     it is what the person can see. */
+  useLayoutEffect(() => {
+    const typed = storyRef.current?.value;
+    if (typed) { setStory(typed); return; }
+    const draft = readStoryDraft(); if (draft) setStory(draft);
+  }, []);
+  useEffect(() => {
+    const t = setTimeout(() => saveStoryDraft(story), 500);
+    return () => clearTimeout(t);
+  }, [story]);
   /* 🔴 THE SENTENCE USUALLY SAYS WHERE. "I live in Houston" answers the second
      of the three questions before it is asked; reading it here means nobody has
      to find a 54-option select to repeat themselves. It is read in this browser,
@@ -176,7 +79,9 @@ export default function JourneyBuilder() {
     return m;
   }, []);
   const cats = CATEGORIES.filter((c) => byCat[c.key]?.length);
-  const appointments = st.entries.reduce((a, e) => a + e.times, 0);
+  /* POLISH judge2-12: one noun and one count with the ledger (components/Ledger.tsx
+     careEntries): visits and tests are the times on lines WITH a unit of care. */
+  const appointments = st.entries.reduce((a, e) => a + (e.item ? e.times : 0), 0);
   const card = useMemo(() => shareCardData(lines, st.entries.length, st.unpricedHits.length), [lines, st.entries.length, st.unpricedHits.length]);
   /* 🔴 A ZERO IS A CLAIM THAT THE CARE WAS FREE.
      The panel and the phone bar opened on "$0 · 0 appointments · 0 distinct
@@ -192,7 +97,12 @@ export default function JourneyBuilder() {
      sat at y = -295. Nobody scrolls up on a page they just opened, so every
      first-time visitor answered nothing and met a Medicare-labelled total. The
      caret still lands in the box; the page stays where it opened. */
-  useEffect(() => { if (!st.entries.length) storyRef.current?.focus({ preventScroll: true }); }, [st.entries.length]);
+  /* R1 UXM-13: on a phone the box is not focused on load, the same rule as the
+     home hero: a keyboard that opens by itself covers half the page before the
+     person has read it. */
+  useEffect(() => {
+    if (!st.entries.length && window.matchMedia?.('(min-width:900px) and (pointer:fine)').matches) storyRef.current?.focus({ preventScroll: true });
+  }, [st.entries.length]);
   useEffect(() => {
     const onDoc = (e: MouseEvent) => { if (!boxRef.current?.contains(e.target as Node)) setOpen(false); };
     document.addEventListener('mousedown', onDoc); return () => document.removeEventListener('mousedown', onDoc);
@@ -203,11 +113,16 @@ export default function JourneyBuilder() {
     if (!story.trim()) return;
     // The chips she saw are the lines she gets: the preview's read (AI fills included) when it is
     // for this exact sentence, else the rules alone.
-    const r = !preview.pending && preview.segments.length ? st.addSegments(preview.segments) : st.addStory(story);
+    const r = !preview.pending && preview.segments.length ? st.addSegments(preview.segments, storyForPricing) : st.addStory(storyForPricing);
     // "step" is the ledger's word for the SUM OF TIMES (11 steps, 6 distinct). What was
     // added here is lines, so the toast, the bar and the ledger card all count the same.
     st.toast(`${r.added} ${r.added === 1 ? 'line' : 'lines'} added · ${r.matched} priced from a published figure${r.added - r.matched ? ` · ${r.added - r.matched} kept unpriced` : ''}${r.unpriced ? ` · ${r.unpriced} named as a cost we will not price` : ''}`, r.matched === r.added && !r.unpriced ? 'ok' : 'info');
-    setStory('');
+    /* What was over the 2,000 the server prices stays in the box, named, so a
+       long account is added in two passes instead of losing its tail. */
+    const rest = over ? story.slice(STORY_MAX).replace(/^[\s,;.]+/, '') : '';
+    setStory(rest);
+    if (rest) { saveStoryDraft(rest); st.toast(`Priced the first ${STORY_MAX.toLocaleString()} characters. The rest of your story is still in the box. Press Add again and the ledger adds them together.`, 'info'); }
+    else clearStoryDraft();
     /* 🔴 THE FLOW ADVANCES ON ITS OWN.
        Pressing Add used to leave you on step 1 facing five controls with three
        different names — "Open my ledger", "See what it cost" twice, "My ledger
@@ -215,14 +130,18 @@ export default function JourneyBuilder() {
        priced ledger is one gesture, so the add IS the navigation. Adding a
        single unit from the catalogue below does not navigate: that is
        refinement, not a step of the flow. */
-    if (r.added > 0) router.push('/ledger');
+    if (r.added > 0 && !rest) router.push('/ledger');
   }
   function pick(it: PriceItem) { st.addItem(it, q.trim() && !/^\d/.test(q) ? q.trim() : undefined); setQ(''); setOpen(false); }
   function onKey(e: React.KeyboardEvent) {
     if (!open || !hits.length) { if (e.key === 'Enter') { e.preventDefault(); if (q.trim()) { st.addOne(q); setQ(''); } } return; }
-    if (e.key === 'ArrowDown') { e.preventDefault(); setHi((h) => (h + 1) % hits.length); }
-    else if (e.key === 'ArrowUp') { e.preventDefault(); setHi((h) => (h - 1 + hits.length) % hits.length); }
-    else if (e.key === 'Enter') { e.preventDefault(); pick(hits[hi].item); }
+    if (e.key === 'ArrowDown') { e.preventDefault(); setHi((h) => (h < 0 ? 0 : (h + 1) % hits.length)); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setHi((h) => (h < 0 ? hits.length - 1 : (h - 1 + hits.length) % hits.length)); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (hits[hi]) pick(hits[hi].item);
+      else if (q.trim()) { st.addOne(q); setQ(''); setOpen(false); }
+    }
     else if (e.key === 'Escape') setOpen(false);
   }
 
@@ -233,7 +152,14 @@ export default function JourneyBuilder() {
           <form onSubmit={submitStory} className="story-form">
             <label htmlFor="story" className="lbl">Tell it the way you remember it</label>
             <textarea id="story" ref={storyRef} rows={3} value={story} onChange={(e) => setStory(e.target.value)}
+              aria-describedby={story.length >= STORY_MAX - 500 ? 'story-count' : undefined}
               placeholder={`e.g. ${EXAMPLE}`} />
+            {story.length >= STORY_MAX - 500 && (
+              <p id="story-count" className={`micro story-count${over ? ' over' : ''}`} aria-live="polite">
+                {story.length.toLocaleString()} / {STORY_MAX.toLocaleString()} characters
+                {over ? `. This box prices the first ${STORY_MAX.toLocaleString()}. Press Add and the other ${over.toLocaleString()} stay in the box as a second journey; the ledger adds them together.` : ''}
+              </p>
+            )}
             {/* Visible only to a keyboard, and only when it has focus. It jumps the
                 catalogue and the per-line steppers and lands on the primary action. */}
             <a
@@ -252,20 +178,24 @@ export default function JourneyBuilder() {
                   own action looked switched off. It now carries the primary style
                   at every moment; while the box is empty it puts the cursor in the
                   box instead of submitting nothing. */}
+              {/* JUDGE-7 #10: one filled button at a time. Once the ledger holds a
+                  line, "See what it cost" is the filled one and Add is the
+                  secondary; before that, Add is filled and "See what it cost"
+                  is switched off. */}
               {story.trim() ? (
-                <button className="btn primary" type="submit">
-                  {preview.segments.length ? `Add these ${preview.segments.length}` : 'Add everything'} <Icon.Arrow />
+                <button className={`btn ${st.entries.length ? 'ghost' : 'primary'}`} type="submit">
+                  {addLabel(preview.segments.length, preview.matched, preview.reading)} <Icon.Arrow />
                 </button>
               ) : (
-                <button className="btn primary" type="button"
+                <button className={`btn ${st.entries.length ? 'ghost' : 'primary'}`} type="button"
                         onClick={() => storyRef.current?.focus({ preventScroll: true })}>
-                  Add everything <Icon.Arrow />
+                  {addLabel(0)} <Icon.Arrow />
                 </button>
               )}
             </div>
             {/* The honest version of the promise, kept where the typing happens.
                 It used to be a paragraph above the box; the fact is unchanged. */}
-            <p className="micro">What you type stays in this browser. It is sent to this site only if you press <strong>Save and share</strong>, and that save comes back with a code that deletes it.</p>
+            <p className="micro">While you type, your words are sent to this site to be read into units of care, and a phrase the rules cannot read goes, with at most a few words around it, to an AI reader (OpenAI). Leave out names. The ledger itself is kept in this browser until you press <strong>Save across devices</strong>, and that save comes back with a code that deletes it.</p>
           </form>
         </section>
 
@@ -282,8 +212,8 @@ export default function JourneyBuilder() {
           <div className="search" ref={boxRef}>
             <span className="search-ic" aria-hidden="true"><Icon.Search /></span>
             <input id="unit-search" type="text" value={q} role="combobox" aria-expanded={open && hits.length > 0} aria-controls="hits" aria-autocomplete="list"
-              aria-activedescendant={open && hits.length ? `hit-${hits[hi]?.item.id}` : undefined}
-              onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(0); }} onFocus={() => setOpen(true)} onKeyDown={onKey}
+              aria-activedescendant={open && hits[hi] ? `hit-${hits[hi].item.id}` : undefined}
+              onChange={(e) => { setQ(e.target.value); setOpen(true); setHi(-1); }} onFocus={() => setOpen(true)} onKeyDown={onKey}
               placeholder="Search: MRI, blood work, cardiologist, ER, therapy…" />
             {q && <button className="icon-btn in-search" type="button" aria-label="Clear the search" onClick={() => setQ('')}><Icon.X /></button>}
             {open && hits.length > 0 && (
@@ -295,7 +225,7 @@ export default function JourneyBuilder() {
                     <span className="hit-r">{usd(h.item.valueUsd)}<small>{h.item.code ?? ''}</small></span>
                   </li>
                 ))}
-                {q.trim() && <li className="hit-foot">Press Enter to add “{q.trim()}” as you wrote it</li>}
+                {q.trim() && <li className="hit-foot">{hits[hi] ? <>Press Enter to add “{hits[hi].item.label}”</> : <>Press Enter to add “{q.trim()}” as you wrote it</>}</li>}
               </ul>
             )}
           </div>
@@ -350,24 +280,24 @@ export default function JourneyBuilder() {
           <section className="card">
             <div className="row between">
               <p className="lbl">Your journey so far</p>
-              <button className="link-btn danger" onClick={() => { if (confirm('Clear the whole journey?')) st.reset(); }}>Start over</button>
+              <StartOverButton />
             </div>
             <ol className="journey">
               {lines.map((l) => {
                 const en = l.entry;
-                const alts = search(en.raw, ITEMS, 5).map((h) => h.item);
+                const alts = alternativesFor(en.raw, ITEMS, 5);
                 return (
                   <li key={en.key} className={en.item ? '' : 'is-unpriced'}>
                     <div className="j-main">
-                      <p className="j-raw">{en.raw}</p>
+                      <p className="j-raw">{saidQuote(en.raw)}</p>
                       {en.item ? (
                         <select className="j-map" value={en.item.id} aria-label={`Unit of care for ${en.raw}`} onChange={(e) => st.remap(en.key, e.target.value || null)}>
                           {[en.item, ...alts.filter((a) => a.id !== en.item!.id)].map((a) => <option key={a.id} value={a.id}>{a.label} · {usd(a.valueUsd)}</option>)}
-                          <option value="">No match — keep unpriced</option>
+                          <option value="">No match: keep unpriced</option>
                         </select>
                       ) : (
                         <select className="j-map is-unpriced" value="" aria-label={`Choose a unit of care for ${en.raw}`} onChange={(e) => st.remap(en.key, e.target.value || null)}>
-                          <option value="">No federal figure matched — choose one or leave unpriced</option>
+                          <option value="">No federal figure matched: choose one or leave unpriced</option>
                           {alts.map((a) => <option key={a.id} value={a.id}>{a.label} · {usd(a.valueUsd)}</option>)}
                         </select>
                       )}
@@ -378,7 +308,7 @@ export default function JourneyBuilder() {
                         <input type="number" min={1} max={365} value={en.times} onChange={(e) => st.setTimes(en.key, Number(e.target.value))} aria-label={`Times: ${en.raw}`} />
                         <button type="button" aria-label={`One more ${en.raw}`} onClick={() => st.setTimes(en.key, en.times + 1)}><Icon.Plus /></button>
                       </div>
-                      <span className={`j-amt ${l.priced ? '' : 'muted'}`}>{l.priced ? usd(l.totalUsd) : 'unpriced'}</span>
+                      <span className={`j-amt ${l.priced ? '' : 'muted'}`}>{l.priced ? usd(l.totalUsd, true) : 'unpriced'}</span>
                       <button type="button" className="icon-btn" aria-label={`Remove ${en.raw}`} onClick={() => st.remove(en.key)}><Icon.X /></button>
                     </div>
                   </li>
@@ -408,15 +338,15 @@ export default function JourneyBuilder() {
             <>
               <p className="lbl">So far · from the sentence you are typing</p>
               <p className="big-num">{usd(preview.previewTotal)}</p>
-              <p className="micro">{preview.matched} {preview.matched === 1 ? 'phrase' : 'phrases'} priced from published figures, all payers combined · press Add to keep them</p>
+              <p className="micro">{preview.matched} {preview.matched === 1 ? 'phrase' : 'phrases'} priced at {JOURNEY_TOTAL_BASIS} · press Add to keep them</p>
             </>
           ) : (
             <>
               <p className="lbl">Running total</p>
               <p className="big-num">{usd(sum.totalUsd)}</p>
-              <p className="micro">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? ` · ${sum.unpricedCount} unpriced` : ''} · what the published figures add up to, all payers combined</p>
+              <p className="micro">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? ` · ${sum.unpricedCount} unpriced` : ''} · {JOURNEY_TOTAL_BASIS}</p>
               {preview.previewTotal > 0 && (
-                <p className="lp-ghost">+ {usd(preview.previewTotal)} from the sentence you are typing — not added yet</p>
+                <p className="lp-ghost">+ {usd(preview.previewTotal)} from the sentence you are typing, not added yet</p>
               )}
             </>
           )}
@@ -424,19 +354,20 @@ export default function JourneyBuilder() {
             ? <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">So far {usd(preview.previewTotal)} from {preview.matched} priced {preview.matched === 1 ? 'phrase' : 'phrases'} in the sentence you are typing, not added yet.</p>
             : <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">Running total {usd(sum.totalUsd)} from {sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? `, ${sum.unpricedCount} unpriced` : ''}.</p>}
           {preview.readerDown && preview.segments.length > 0 && (
-            <p className="micro">Our reader is busy. These lines came from the rules alone — anything it could not read is listed as unpriced, and you can add it from the search box.</p>
+            <p className="micro">Our reader is busy. These lines came from the rules alone. Anything it could not read is listed as unpriced, and you can add it from the search box.</p>
           )}
           {st.entries.length
             ? <Link className="btn primary full" href="/ledger" id="see-what-it-cost" data-go="total">See what it cost <Icon.Arrow /></Link>
             : <button className="btn primary full is-disabled" type="button" data-go="total" disabled>See what it cost <Icon.Arrow /></button>}
           {st.entries.length > 0 && <ShareCard data={{ ...card, url: st.shareUrl(), tableVersion: TABLE_VERSION }} />}
-          <p className="micro">Every line links to the federal source it came from. What you type stays in this browser unless you press Save.</p>
+          <p className="micro">Every line links to the federal source it came from. Your ledger is kept in this browser until you press Save across devices.</p>
         </div>
       </section>
 
       <div className="mobile-bar">
         {/* One journey count, then its sub-line. The bar and the ledger count the same
-            way: appointments is the sum of times, distinct lines is how many rows. */}
+            way: appointments is the sum of times, and the lines are counted as the
+            ledger counts them, "N priced lines" (JUDGE-7 #10). */}
         {nothingYet ? (
           <div>
             <span className={cs.barWait}>Type what happened and it counts here</span>
@@ -450,8 +381,8 @@ export default function JourneyBuilder() {
         ) : (
           <div>
             <span className="mb-total">{usd(sum.totalUsd)}</span>
-            <span className="mb-sub">{appointments} {appointments === 1 ? 'appointment' : 'appointments'}</span>
-            <span className="mb-sub mb-distinct">{st.entries.length} distinct {st.entries.length === 1 ? 'line' : 'lines'}</span>
+            <span className="mb-sub">{appointments} {appointments === 1 ? 'visit or test' : 'visits and tests'}</span>
+            <span className="mb-sub mb-distinct">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}</span>
           </div>
         )}
         {st.entries.length
@@ -473,7 +404,7 @@ function focusPrimary(): void {
 }
 
 /** The card carries only what the share link carries: units, counts, published figures. */
-export function shareCardData(lines: PricedLine[], distinctCount: number, namedUnpriced: number): Omit<ShareCardData, 'url' | 'tableVersion'> {
+export function shareCardData(lines: PricedLine[], _lineCount: number, namedUnpriced: number): Omit<ShareCardData, 'url' | 'tableVersion'> {
   const sum = totals(lines);
   const byCat = new Map<string, number>();
   for (const l of lines) {
@@ -493,11 +424,22 @@ export function shareCardData(lines: PricedLine[], distinctCount: number, namedU
      and nothing here is typed text. */
   const entries = lines.map((l) => l.entry);
   const gaps = gapSummary(entries);
+  /* 🔴 round 2 (c1): the card said "8 visits and tests" and "2 left blank"
+     where the ledger said 6 and 1. The card now counts exactly what the
+     ledger counts (components/Ledger.tsx): visits and tests are the times on
+     lines WITH a unit of care, and "left blank" is the lines that happened with
+     no figure plus the named costs we will not price. */
+  const visits = lines.reduce((a, l) => a + (l.entry.item ? l.entry.times : 0), 0);
+  const blank = (gaps.cats.find(([id]) => id === NO_FIGURE)?.[1].lines ?? 0) + namedUnpriced;
   const story = odysseyClauses({
     months: gaps.months,
-    appointments: lines.reduce((a, l) => a + l.entry.times, 0),
+    appointments: visits,
     cats: gaps.cats,
   });
+  /* judge panel #6: the clinicians she named or counted travel with the card,
+     right after how long it took; nothing when she named fewer than two. */
+  const { cliniciansPhrase } = searchLength(entries);
+  if (cliniciansPhrase) story.splice(gaps.months > 0 ? 1 : 0, 0, cliniciansPhrase);
   /* One published, currently-true comparison line, or null. `siteOfServiceFinding`
      returns null unless both rows are present and both carry the current
      fee-schedule year, so the card can never post a stale ratio. */
@@ -505,9 +447,9 @@ export function shareCardData(lines: PricedLine[], distinctCount: number, namedU
   return {
     totalUsd: sum.totalUsd,
     pricedCount: sum.pricedCount,
-    stepCount: lines.reduce((a, l) => a + l.entry.times, 0),
-    distinctCount,
-    blankCount: sum.unpricedCount + namedUnpriced,
+    stepCount: visits,
+    distinctCount: new Set(lines.flatMap((l) => (l.entry.item ? [l.entry.item.id] : []))).size,
+    blankCount: blank,
     bars,
     story,
     footnote: sos ? sos.line : null,

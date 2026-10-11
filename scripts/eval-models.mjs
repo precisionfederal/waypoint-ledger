@@ -25,11 +25,36 @@
      node scripts/eval-models.mjs --models gpt-5.4-mini    # one
      node scripts/eval-models.mjs --limit 40 --concurrency 6
      node scripts/eval-models.mjs --effort medium --append   # a second table under the first
+
+   Rules only (no key, no model call, no cost): scores what lib/mapper.ts reads
+   on its own, prints it, and with --write replaces ONLY the "rules only" row of
+   READER-EVAL.md and the dated line under it; the model rows are left as
+   measured, because they were not re-run.
+     node scripts/eval-models.mjs --rules-only [--out rows.json] [--write]
    ========================================================================== */
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import { parseJourney } from '../lib/mapper.ts';
-import { catalogFor, candidatesOf, rulesReadOf, SYSTEM_PROMPT, buildUserPrompt, parseModelJson, applyModel } from '../lib/map-model.ts';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { registerHooks } from 'node:module';
+
+// lib/ imports its siblings without an extension ('./state-detect') and data
+// through the '@/' alias, which the bundler resolves and plain node does not.
+// Resolve both the way vitest.config.ts does, so this harness runs the same
+// source the worker runs.
+const APP_ROOT = new URL('../', import.meta.url);
+registerHooks({
+  resolve(specifier, context, next) {
+    let spec = specifier;
+    if (spec.startsWith('@/')) spec = new URL(spec.slice(2), APP_ROOT).href;
+    const fromTs = context.parentURL?.endsWith('.ts');
+    const withAttrs = (r) => (r.url.endsWith('.json') ? { ...r, importAttributes: { type: 'json' } } : r);
+    if (fromTs && /^(\.\.?\/|file:)/.test(spec) && !/\.[cm]?[jt]sx?$|\.json$/.test(spec)) {
+      try { return next(`${spec}.ts`, context); } catch { /* fall through */ }
+    }
+    return withAttrs(next(spec, context));
+  },
+});
+const { parseJourney } = await import('../lib/mapper.ts');
+const { catalogFor, candidatesOf, rulesReadOf, SYSTEM_PROMPT, buildUserPrompt, parseModelJson, applyModel } = await import('../lib/map-model.ts');
 
 const arg = (name, dflt) => {
   const i = process.argv.indexOf(`--${name}`);
@@ -42,8 +67,9 @@ const CONCURRENCY = Number(arg('concurrency', '6')) || 6;
 const TIMEOUT_MS = Number(arg('timeout', '30000')) || 30000;
 const OUT = arg('out', null);
 const MD = arg('md', fileURLToPath(new URL('../data/test-fixtures/READER-EVAL.md', import.meta.url)));
+const RULES_ONLY = process.argv.includes('--rules-only');
 const KEY = process.env.OPENAI_API_KEY;
-if (!KEY) { console.error('no OPENAI_API_KEY in the environment: set -a; . ~/.config/precision-federal/openai.env; set +a'); process.exit(2); }
+if (!KEY && !RULES_ONLY) { console.error('no OPENAI_API_KEY in the environment: set -a; . ~/.config/precision-federal/openai.env; set +a'); process.exit(2); }
 
 /* ---- the table, exactly as lib/table.ts builds it (SELECTABLE) ---- */
 const here = (p) => fileURLToPath(new URL(p, import.meta.url));
@@ -79,6 +105,39 @@ const orphan = [...new Set(fixture.cases.flatMap((c) => c.expect))].filter((id) 
 if (orphan.length) { console.error(`the fixture expects ${orphan.length} id(s) the table does not hold: ${orphan.join(', ')}`); process.exit(2); }
 console.log(`catalog: ${SELECTABLE.length} selectable rows (data/prices.json + ${ADDITIONS.length} additions file(s))`);
 const CASES = LIMIT ? fixture.cases.slice(0, LIMIT) : fixture.cases;
+
+/* ---- rules only: what lib/mapper.ts reads with no model at all ---- */
+if (RULES_ONLY) {
+  const t = { tp: 0, fp: 0, fn: 0 };
+  const rows = [];
+  const wrongs = [];
+  for (const c of CASES) {
+    const segments = parseJourney(c.story, SELECTABLE);
+    const got = [...new Set(segments.filter((s) => s.result.item).map((s) => s.result.item.id))];
+    const exp = new Set(c.expect);
+    const tp = got.filter((x) => exp.has(x)).length;
+    t.tp += tp; t.fp += got.length - tp; t.fn += [...exp].filter((x) => !got.includes(x)).length;
+    rows.push({ id: c.id, kind: c.kind, story: c.story, expect: c.expect, rules: got });
+    const wrong = got.filter((x) => !exp.has(x));
+    if (wrong.length) wrongs.push({ id: c.id, kind: c.kind, story: c.story, wrong, expect: c.expect });
+  }
+  const pct1 = (n, d) => (d === 0 ? null : Math.round((n / d) * 1000) / 10);
+  const r = { precision: pct1(t.tp, t.tp + t.fp), recall: pct1(t.tp, t.tp + t.fn), f1: pct1(2 * t.tp, 2 * t.tp + t.fp + t.fn), ...t, sentencesWithAWrongUnit: wrongs.length };
+  console.log(`rules only over ${CASES.length} sentences: F1 ${r.f1}%  precision ${r.precision}%  recall ${r.recall}%  tp ${r.tp}  fp ${r.fp}  fn ${r.fn}  sentences with a wrong unit ${r.sentencesWithAWrongUnit}`);
+  if (OUT) { writeFileSync(OUT, JSON.stringify({ rulesOnly: r, rows, wrongs }, null, 2)); console.log(`rows  -> ${OUT}`); }
+  if (process.argv.includes('--write')) {
+    const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+    let md = readFileSync(MD, 'utf8');
+    const row = `| rules only (no model) | ${r.precision}% | ${r.recall}% | **${r.f1}%** | ${r.fp} | — | — | — | — |`;
+    if (!/^\| rules only \(no model\) \|.*$/m.test(md)) { console.error(`no rules-only row in ${MD}`); process.exit(2); }
+    md = md.replace(/^\| rules only \(no model\) \|.*$/m, row);
+    const note = `Rules row re-measured ${stamp}Z with \`--rules-only\` (no model called); the model rows below it are from the run above, over the rules as they stood that day (rules only then: 71.1% F1), and were not re-run.`;
+    md = /^Rules row re-measured .*$/m.test(md) ? md.replace(/^Rules row re-measured .*$/m, note) : md.replace(/^\| reader \| precision \|/m, `${note}\n\n| reader | precision |`);
+    writeFileSync(MD, md);
+    console.log(`rules row -> ${MD}`);
+  }
+  process.exit(0);
+}
 
 /* ---- one call ---- */
 async function ask(model, system, user) {

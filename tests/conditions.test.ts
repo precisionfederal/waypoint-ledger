@@ -100,6 +100,9 @@ describe('benchmarkFor', () => {
     const b = benchmarkFor('heart-disease');
     if (b?.kind !== 'figure') throw new Error('expected a figure');
     expect(b.median).toBe(660);
+    const d = benchmarkFor('diabetes');
+    if (d?.kind !== 'figure') throw new Error('expected a figure');
+    expect(d.median).toBe(1770);   // stat568.pdf: "a median of $1,770 and a mean of $5,810"
   });
 
   it('returns an absence with a reason, never a substitute figure', () => {
@@ -143,7 +146,20 @@ describe('an absence stays an absence', () => {
   for (const c of RAW.conditions) {
     if (c.price_row_id) continue;
     it(`${c.id} carries no dollar amount and no figure_kind`, () => {
-      expect(JSON.stringify(c)).not.toMatch(/\$[0-9]/);
+      /* Round 4: a national total an agency publishes about the condition (CDC's
+         ME/CFS economic estimate) may sit in national_context, with its source.
+         It is a country's total, never a year for one person, and every other
+         field of an absence stays free of a dollar amount. */
+      /* 2026-09-30: published_figures (a count, a per-case cost, a national cost,
+         never a year for one person) carry their own dollar amounts, each with
+         two sources re-read by verify_conditions.py; the rest stays clean. */
+      const { national_context, national_context_source, national_context_url, published_figures: _pf, ...rest } = c as Record<string, unknown>;
+      expect(JSON.stringify(rest)).not.toMatch(/\$[0-9]/);
+      if (national_context) {
+        expect(String(national_context)).toMatch(/never added to your ledger/);
+        expect(String(national_context_url)).toMatch(/^https:\/\/www\.cdc\.gov\//);
+        expect(String(national_context_source).length).toBeGreaterThan(10);
+      }
       expect(c.figure_kind ?? null).toBeNull();
       expect(c.figure_is_government_publication ?? null).toBeNull();
     });
@@ -228,13 +244,30 @@ describe('the panel renders what the row says, and nothing else', () => {
   it('long COVID: the interval, the kind, and who published it', async () => {
     const html = await renderCard('long-covid');
     expect(html).toContain('$1,619 to $6,578');
-    expect(html).toContain('Point estimate $4,098');
-    expect(html).toContain('Excess');
-    expect(html).toContain('The year ahead');
+    /* R6 sense F11: the plain line leads and the point estimate follows it. "The
+       interval is the answer, not the middle of it" arrived before the reader knew
+       what the number was, and contradicted the sentence it sat inside. */
+    /* round 2 judge2-1: the /conditions form. The point estimate leads, the
+       interval is called a 95% interval, and "the year ahead" is gone. */
+    expect(html).toContain('$4,098 more in a year (2022)');
+    expect(html).toContain('95% interval $1,619 to $6,578');
+    expect(html).not.toContain('The year ahead');
+    expect(html).not.toContain('range is the answer');
+    expect(html).toContain('the excess');       // the term, glossed under the meaning
+    expect(html).toContain('A year with long COVID');
     expect(html).toContain('Long COVID');
     // the panel must never present a peer-reviewed reanalysis as a federal report
     expect(html).toContain('not a federal publication');
-    expect(html).toContain('AHRQ MEPS data');   // the survey is AHRQ's; the estimate is not
+    /* R6 sense F5 / data F8: the whole distinction used to be carried by the word
+       "data" — "2022 AHRQ MEPS data" — which no human reads as "someone else's
+       estimate". The credit is on the face now, and that phrase is gone. */
+    expect(html).not.toContain('AHRQ MEPS data,');
+    expect(html).toContain('analysed by Neba et al.');
+    expect(html).toContain('the estimate is theirs');
+    /* R6 data F8: about nine tenths of the excess is an insurer's money, and the
+       published out-of-pocket share's interval crosses zero. Both off the rows. */
+    expect(html).toContain('$3,705 of it was paid by insurers');
+    expect(html).toContain('crosses zero');
     // and it must never be summed with the itemized lines
     expect(html).toContain('never added to the lines above');
   });
@@ -242,20 +275,32 @@ describe('the panel renders what the row says, and nothing else', () => {
   it('diabetes: the same panel swaps kind and figure with no code change', async () => {
     const html = await renderCard('diabetes');
     expect(html).toContain('$5,810');
-    expect(html).toContain('Condition-attributed');
+    expect(html).toContain('condition-attributed figure');
     expect(html).not.toContain('AHRQ MEPS data');   // this one IS the agency's own brief
     expect(html).not.toContain('Excess');
+    expect(html).not.toContain('excess');
+    /* R6 sense F12: the skew question is answered on every row. AHRQ Statistical
+       Brief #568 does publish the median (stat568.pdf: "had a median of $1,770 and
+       a mean of $5,810"), so the card prints it; the old "publishes no median"
+       sentence was false (FLOW judge-2). */
+    expect(html).toContain('The median for the same population is $1,770');
+    expect(html).not.toContain('publishes no median for this row');
     expect(html).not.toContain('$4,098');
     expect(html).not.toContain('long COVID');
   });
 
-  it('ME/CFS: an absence, in words, with a way to count it and no number', async () => {
+  it('ME/CFS: an absence, in words, with a way to count it and no number of its own', async () => {
     const html = await renderCard('me-cfs');
     expect(html).toContain('No published figure');
     expect(html).toContain('Count this gap');
     expect(html).toContain('G93.32');
     expect(html).toContain('href="/gap"');
-    expect(html).not.toMatch(/\$[0-9]/);
+    /* CDC's national estimate is printed apart, with its source, and is the only
+       dollar amount on the card. */
+    const national = html.match(/<p[^>]*data-testid="national-context"[^>]*>[\s\S]*?<\/p>/)?.[0] ?? '';
+    expect(national).toContain('$18 to $51 billion');
+    expect(national).toContain('href="https://www.cdc.gov/me-cfs/about/index.html"');
+    expect(html.replace(national, '')).not.toMatch(/\$[0-9]/);
   });
 
   it('nothing chosen renders no panel at all', async () => {

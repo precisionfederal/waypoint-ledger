@@ -26,7 +26,7 @@ import { categoryKey } from '../lib/categories';
 import type { JourneyEntry, PriceItem } from '../lib/types';
 import {
   CPT_SYSTEM, HCPCS_SYSTEM, ACT_CODE_SYSTEM, PROVENANCE_AGENT_TYPE_SYSTEM, SUBJECT_DISPLAY,
-  lineKindFor, parseCode, toFhirBundle,
+  APC_EXTENSION_URL, lineKindFor, parseCode, toFhirBundle,
   type FhirBundle, type FhirResource,
 } from '../lib/fhir';
 
@@ -34,9 +34,8 @@ const SCHEMA_URL = 'https://hl7.org/fhir/R4/fhir.schema.json.zip';
 const root = fileURLToPath(new URL('..', import.meta.url));
 const CACHE = `${root}tests/fixtures/fhir.schema.json.zip`;
 
-/* The sentence the site itself offers as an example, on the landing page and in
-   the journey builder. The demo bundle is the demo journey, not a happy path
-   invented here. */
+/* The sentence the journey builder (/journey) offers as its example. The
+   example bundle is that journey, not a happy path invented here. */
 const DEMO_STORY =
   'saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER once when my heart was racing';
 
@@ -373,7 +372,7 @@ describe('the codes come off the row, and an unknown system is never invented', 
     expect(parseCode('LOINC 1234-5')).toBeNull();
   });
 
-  it('🔴 emits only the two systems it verified, and keeps the APC out of the bundle', () => {
+  it('🔴 emits only code systems it verified, and never invents one for the APC', () => {
     const entries: JourneyEntry[] = [
       { key: 'a', raw: 'the hospital clinic', item: byId('cms-g0463-hospital-clinic-fee'), times: 1 },
       { key: 'b', raw: 'the ER', item: byId('cms-ed-99284-complete'), times: 1 },
@@ -382,8 +381,43 @@ describe('the codes come off the row, and an unknown system is never invented', 
     const systems = new Set<string>();
     JSON.stringify(out.bundle, (k, v) => { if (k === 'system') systems.add(v as string); return v; });
     expect([...systems].sort()).toEqual([ACT_CODE_SYSTEM, CPT_SYSTEM, HCPCS_SYSTEM, PROVENANCE_AGENT_TYPE_SYSTEM].sort());
-    expect(JSON.stringify(out.bundle)).not.toContain('APC');
     expect(out.codes.map((c) => c.apc)).toEqual(['5012', '5024']);
+
+    /* R6 · data F10, verbatim: "the ER ChargeItem is coded CPT 99284 alone and
+       priced $544.54 ... A machine consumer reads $544.54 as the professional
+       charge for 99284 — 4.6x the $118.24 PFS figure." So the APC now rides on
+       that line — in an extension of OURS, never as a code system we made up —
+       and the arithmetic is the first sentence a reader meets. */
+    const er = out.bundle.entry
+      .map((e) => e.resource)
+      .find((r) => r.resourceType === 'ChargeItem'
+        && String((r as { overrideReason?: string }).overrideReason).includes('emergency physician fee'));
+    expect(er, 'the ER ChargeItem').toBeTruthy();
+    expect(String((er as unknown as { overrideReason: string }).overrideReason))
+      .toContain('$544.54 = $426.30 hospital facility fee (OPPS APC 5024) + $118.24 emergency physician fee (CPT 99284). Two published rates, added; the addition is ours.');
+    /* 2026-10-01 (R3-fedexpert FX-11): the HL7 validator 6.10.4 errors on any
+       extension it cannot load from a package, and never fetched the definition
+       we serve at APC_EXTENSION_URL, so the APC rides in overrideReason (above)
+       and in codes[] only. The definition stays served for older bundles. */
+    expect((er as unknown as { extension?: unknown }).extension).toBeUndefined();
+    expect(JSON.stringify(out.bundle)).not.toContain(APC_EXTENSION_URL);
+    expectValid(out.bundle);
+  });
+
+  it('🔴 carries LOINC where the row has one — the thing a claims file drops', () => {
+    const cbc = byId('cms-lab-cbc');
+    expect(cbc?.loinc, 'the CBC row carries an NLM-confirmed LOINC').toBeTruthy();
+    const out = toFhirBundle(
+      [{ key: 'a', raw: 'a blood count', item: cbc, times: 1 }], TABLE,
+      { now: FIXED_NOW, uuid: seq() },
+    );
+    const codings = out.bundle.entry
+      .map((e) => e.resource)
+      .filter((r) => r.resourceType === 'Procedure')
+      .flatMap((r) => ((r as { code?: { coding?: { system?: string; code?: string }[] } }).code?.coding ?? []));
+    expect(codings.some((c) => c.system === CPT_SYSTEM && c.code === '85025')).toBe(true);
+    expect(codings.some((c) => c.system === 'http://loinc.org' && c.code === cbc!.loinc)).toBe(true);
+    expect(out.bundle.entry.every((e) => e.resource.resourceType !== 'Observation')).toBe(true);
     expectValid(out.bundle);
   });
 
@@ -423,13 +457,32 @@ describe('what becomes what', () => {
     for (const o of out.omitted) expect(o.reason.length).toBeGreaterThan(40);
   });
 
-  it('keeps words that matched nothing out of the bundle and says so', () => {
+  it('🔴 carries a burden nobody prices as an Observation, with the quantity', () => {
+    /* R6 · edge #7, verbatim: "The ledger's own banner says 'The burden no claims
+       file records'. The export a health-IT person opens records exactly as much
+       of it as a claims file does: nothing." And #8: "An actuary opening the CSV
+       cannot tell an 8-month wait from an 8-year one." */
     const out = toFhirBundle(
-      [{ key: 'a', raw: 'eighteen months of being told it was anxiety', item: null, times: 1 }],
+      [{ key: 'a', raw: 'waited 8 months', item: null, times: 1, months: 8,
+         gapCategory: 'Time spent searching rather than being treated' }],
       TABLE, { now: FIXED_NOW, uuid: seq() },
     );
-    expect(out.bundle.entry).toEqual([]);
+    expect(out.counts.burdenObservations).toBe(1);
+    const obs = out.bundle.entry.map((e) => e.resource).filter((r) => r.resourceType === 'Observation');
+    expect(obs).toHaveLength(1);
+    const o = obs[0] as unknown as {
+      status: string; code: { text: string }; valueQuantity: { value: number; unit: string };
+      note: { text: string }[];
+    };
+    expect(o.status).toBe('final');
+    expect(o.code.text).toBe('Burden with no published federal figure');
+    expect(o.valueQuantity).toEqual({ value: 8, unit: 'months' });
+    expect(o.note[0].text).toContain('waited 8 months');
+    expect(o.note[0].text).toContain('Time spent searching rather than being treated');
+    /* and never as money */
+    expect(JSON.stringify(o)).not.toContain('USD');
     expect(out.omitted[0].reason).toContain('No unit of care');
+    expectValid(out.bundle);
   });
 
   it('accepts the API shape as well as the browser shape', () => {

@@ -1,0 +1,46 @@
+/* Saved-ledger actions (FLOW contrib-23): Rename and Delete are buttons, not
+   bare text, with room between them on a phone. Delete carries the flag ink. */
+.acts{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center}
+.acts :global(.btn){min-height:44px}
+.acts .danger{margin-left:auto;color:var(--flag-ink);border-color:color-mix(in srgb,var(--flag-ink) 45%,transparent)}
+.acts .danger:hover{color:var(--flag-ink);border-color:var(--flag-ink)}
+
+/* VISUAL contrib (2026-09-30 night): saved ledgers as rich cards, the person
+   greeted by their own initial, and the erase made serious and plain. */
+.who{display:flex;align-items:center;gap:1rem;margin:0 0 .5rem}
+.who h1{margin:0}
+.avatar{flex:none;width:3.5rem;height:3.5rem;border-radius:50%;display:inline-grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent-ink);font-family:var(--font-d);font-weight:700;font-size:1.5rem;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent)}
+
+.ledgers{display:grid;grid-template-columns:1fr;gap:.75rem}
+.ledger{display:grid;grid-template-columns:auto minmax(0,1fr) auto;column-gap:.9rem;row-gap:0;align-items:start;
+  background:var(--surface-2);border:1px solid var(--line-2);padding:1.1rem 1.2rem 1rem}
+.ledgerIcon{grid-column:1;width:2.5rem;height:2.5rem;display:inline-grid;place-items:center;border-radius:var(--r-sm);
+  background:var(--surface);border:1px solid var(--line-2);color:var(--accent-ink)}
+.ledgerMain{grid-column:2;min-width:0}
+.ledgerMain :global(.who){margin:0;font-size:.9375rem;color:var(--ink-3);font-weight:600;font-family:var(--font-b);letter-spacing:0}
+.ledgerMain :global(h3){font-size:1.125rem;line-height:1.3;margin:.2rem 0 .25rem;overflow-wrap:anywhere}
+.version{margin:0;color:var(--ink-3);font-size:.9375rem;line-height:1.45}
+.lines{grid-column:3;margin:0;display:flex;flex-direction:column;align-items:flex-end;color:var(--ink-3);font-size:.9375rem;line-height:1.2;flex:none}
+.linesN{font-family:var(--font-b);font-weight:700;font-size:1.875rem;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.ledgerActs{grid-column:1 / -1;margin-top:.85rem}
+.ledger .acts{padding-top:.75rem;border-top:1px solid var(--line-2)}
+.confirm{margin:.5rem 0 0}
+
+.dangerFill{background:var(--flag-ink);border-color:var(--flag-ink);color:var(--surface)}
+.dangerFill:hover:not(:disabled){background:color-mix(in srgb,var(--flag-ink) 88%,#000);border-color:transparent;color:var(--surface)}
+.erase:global(.notice){margin-top:1rem;padding:1rem 1.1rem;border:1px solid color-mix(in srgb,var(--flag-ink) 40%,transparent);background:var(--flag-soft);border-radius:var(--r-md)}
+.eraseHead{display:flex;gap:.6rem;align-items:flex-start;margin:0;color:var(--ink)}
+.eraseIcon{flex:none;color:var(--flag-ink);margin-top:.1rem}
+@media (max-width:560px){.avatar{width:3rem;height:3rem;font-size:1.3rem}}
+@media (max-width:560px){
+  .ledger{grid-template-columns:minmax(0,1fr) auto;padding:.95rem .95rem .85rem}
+  .ledgerIcon{display:none}
+  .ledgerMain{grid-column:1}
+  .lines{grid-column:2}
+  .acts{gap:.5rem}
+}
+.out{text-align:center;padding:.5rem 0}
+.out :global(.step-actions){justify-content:center}
+.outSpot{display:block;width:min(15rem,70%);height:auto;aspect-ratio:480/230;object-fit:cover;object-position:50% 52%;margin:0 auto .75rem}

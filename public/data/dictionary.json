@@ -1,12 +1,12 @@
 {
- "generated": "2026-09-10",
+ "generated": "2026-10-11",
  "rows": [
   {
    "file": "survey.csv",
-   "field": "received_at",
-   "type": "ISO 8601 UTC timestamp",
-   "values": "when the response was recorded",
-   "note": "no other timing information is kept"
+   "field": "received_on",
+   "type": "date YYYY-MM-DD (UTC)",
+   "values": "the day the response was recorded",
+   "note": "the day only: the time is kept for the integrity chain and never published"
   },
   {
    "file": "survey.csv",
@@ -52,31 +52,59 @@
   },
   {
    "file": "survey.csv",
-   "field": "ctx_age",
-   "type": "enum or blank",
-   "values": "18–29 | 30–44 | 45–64 | 65 or older",
-   "note": "optional self-description: Age"
+   "field": "survey_version",
+   "type": "YYYY-MM-DD.N",
+   "values": "the instrument version the answer was collected under",
+   "note": "names which fields the integrity chain covers for that row"
   },
   {
    "file": "survey.csv",
-   "field": "ctx_insurance",
-   "type": "enum or blank",
-   "values": "Employer plan | Marketplace or individual plan | Medicaid | Medicare | Uninsured | Other or mixed",
-   "note": "optional self-description: Coverage during the search"
+   "field": "team_test",
+   "type": "true | false",
+   "values": "",
+   "note": "true on an answer we marked as our own team testing the form (GET /api/annotations). The row is kept because the chain forbids deletion, and every count at /api/survey leaves it out and reports how many as teamTests. A mark is made after the row was written, so it is outside the row_hash."
   },
   {
    "file": "survey.csv",
-   "field": "ctx_region",
-   "type": "enum or blank",
-   "values": "Northeast | Midwest | South | West | Outside the U.S.",
-   "note": "optional self-description: Region"
+   "field": "prev_hash",
+   "type": "64 hex characters",
+   "values": "",
+   "note": "the row_hash of the row above; 64 zeros on the first row. Check that each row links to the one above and that the last row_hash is the head at /api/integrity."
   },
   {
    "file": "survey.csv",
-   "field": "ctx_stage",
-   "type": "enum or blank",
-   "values": "Still searching | Diagnosed | Stopped looking",
-   "note": "optional self-description: Where you are now"
+   "field": "row_hash",
+   "type": "64 hex characters",
+   "values": "",
+   "note": "SHA-256 over the row as it was written, including the full time and, on the survey, the self-description. Those are not in this file, so the hash is checked by its links, not recomputed; /api/integrity?verify=1 recomputes every one over the stored rows."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.age",
+   "type": "count per value",
+   "values": "18–29 | 30–44 | 45–64 | 65 or older | not stated",
+   "note": "Optional self-description: Your age now. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.insurance",
+   "type": "count per value",
+   "values": "Employer plan | Marketplace or individual plan | Medicaid | Medicare | Uninsured | Other or mixed | not stated",
+   "note": "Optional self-description: Coverage during the search. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.region",
+   "type": "count per value",
+   "values": "Northeast | Midwest | South | West | Outside the U.S. | not stated",
+   "note": "Optional self-description: Region. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.stage",
+   "type": "count per value",
+   "values": "Still searching | Diagnosed | Stopped looking | not stated",
+   "note": "Optional self-description: Where you are now. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
   },
   {
    "file": "corrections.csv",
@@ -272,7 +300,7 @@
    "field": "figure_responses",
    "type": "integer",
    "values": "",
-   "note": "the denominator: corrections on this figure in this file"
+   "note": "the denominator: corrections on this figure in this file, not counting rows marked team_test"
   },
   {
    "file": "corrections.csv",
@@ -304,6 +332,13 @@
   },
   {
    "file": "corrections.csv",
+   "field": "team_test",
+   "type": "true | false",
+   "values": "",
+   "note": "true on a row we marked as our own team testing the form: kept, because the chain forbids deletion, and left out of every count; see /api/annotations"
+  },
+  {
+   "file": "corrections.csv",
    "field": "row_hash",
    "type": "hex or blank",
    "values": "",
@@ -311,45 +346,332 @@
   },
   {
    "file": "gap.csv",
-   "field": "received_at",
-   "type": "ISO 8601 UTC timestamp",
-   "values": "",
-   "note": ""
+   "field": "received_on",
+   "type": "date YYYY-MM-DD (UTC)",
+   "values": "the day the report was recorded",
+   "note": "the day only: the time is kept for the integrity chain and never published"
   },
   {
    "file": "gap.csv",
-   "field": "care-not-sought … life-lost",
+   "field": "care-not-sought … life-lost, care-made-worse",
    "type": "integer or blank",
    "values": "occasions, times or months as labelled on /gap",
    "note": "events that produce zero rows in MEPS, HCUP and CMS claims"
   },
   {
    "file": "gap.csv",
-   "field": "rank_1 … rank_6",
+   "field": "rank_1 … rank_7",
    "type": "enum or blank",
    "values": "gap category ids",
    "note": "the order the person put them in, most costly first"
   },
   {
-   "file": "survey.csv, gap.csv",
-   "field": "ctx_sex",
-   "type": "enum or blank",
-   "values": "Female | Male | Intersex | Prefer not to say",
-   "note": "Optional. The Federal Sprint Lead for the Invisible Illness track asked every team, on 26 August 2026, to be intentional about sex differences where relevant. Asked because the federal prevalence files we cite are published by sex, and because NIH expects sex to be accounted for as a biological variable in the research it funds. Optional. It is published only as a count, and it is joined to nothing. Asked as sex, not gender, because sex is the variable the federal prevalence files cited on /method are published by; NIH NOT-OD-15-102, Consideration of Sex as a Biological Variable in NIH-funded Research, 9 June 2015 sets the framing. \"Prefer not to say\" is a stated answer and is published as one; a blank is published as \"not stated\". On the published register any sex cell holding fewer than 11 responses is withheld under the same rule as the state, and the withheld cells are counted in public."
+   "file": "gap.csv",
+   "field": "table_version",
+   "type": "string or blank",
+   "values": "the price table version the report was sent against",
+   "note": ""
   },
   {
-   "file": "survey.csv, gap.csv",
-   "field": "ctx_state",
-   "type": "enum or blank",
+   "file": "gap.csv",
+   "field": "team_test",
+   "type": "true | false",
+   "values": "",
+   "note": "true on a report we marked as our own team testing the form (GET /api/annotations). The row is kept because the chain forbids deletion, and every count at /api/gap leaves it out and reports how many as teamTests. A mark is made after the row was written, so it is outside the row_hash."
+  },
+  {
+   "file": "gap.csv",
+   "field": "prev_hash",
+   "type": "64 hex characters",
+   "values": "",
+   "note": "the row_hash of the row above; 64 zeros on the first row. Check that each row links to the one above and that the last row_hash is the head at /api/integrity."
+  },
+  {
+   "file": "gap.csv",
+   "field": "row_hash",
+   "type": "64 hex characters",
+   "values": "",
+   "note": "SHA-256 over the row as it was written, including the full time and, on the survey, the self-description. Those are not in this file, so the hash is checked by its links, not recomputed; /api/integrity?verify=1 recomputes every one over the stored rows."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.sex",
+   "type": "count per value",
+   "values": "Female | Male | Intersex | Prefer not to say | not stated",
+   "note": "Optional. The Federal Sprint Lead for the Invisible Illness track asked every team, on 26 August 2026, to be intentional about sex differences where relevant. Asked because the federal prevalence files we cite are published by sex, and because NIH expects sex to be accounted for as a biological variable in the research it funds. Optional. It is published only as a count, and it is joined to nothing. Asked as sex, not gender, because sex is the variable the federal prevalence files cited on /method are published by; NIH NOT-OD-15-102, Consideration of Sex as a Biological Variable in NIH-funded Research, 9 June 2015 sets the framing. \"Prefer not to say\" is a stated answer and is counted as one; a blank is counted as \"not stated\". Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is. The ranking read by sex (rankingBySex) is withheld on the server for any sex group under 11 responses."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.state",
+   "type": "count per value",
    "values": "56 options: the 50 states, the District of Columbia and the five U.S. territories",
-   "note": "Optional. On the published register any state cell holding fewer than 11 responses is withheld, because a count of one or two people in a named place can identify a person; the number of withheld cells and the responses they hold are published instead. The raw export carries the value as entered."
+   "note": "Optional. A count of one or two people in a named place can identify a person, so any state cell holding fewer than 11 responses is withheld on the server before it is served. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.respondent",
+   "type": "count per value",
+   "values": "Me, about my own illness | A parent or caregiver, answering for a child | not stated",
+   "note": "Optional: Who is answering. Asked from instrument version 2026-10-01.1, so every earlier answer is counted as \"not stated\", never as adult-onset. A parent or caregiver answering for a child sees the same five burdens, with the same ids, worded for the family; the register reads the ranking by stratum and withholds any stratum under 11 responses, its count as well as its ranking. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.onset_age",
+   "type": "count per value",
+   "values": "Under 5 | 5–12 | 13–17 | 18–29 | 30–44 | 45–64 | 65 or older | not stated",
+   "note": "Optional: Age when the symptoms began. Asked from instrument version 2026-10-01.1, so every earlier answer is counted as \"not stated\", never as adult-onset. A parent or caregiver answering for a child sees the same five burdens, with the same ids, worded for the family; the register reads the ranking by stratum and withholds any stratum under 11 responses, its count as well as its ranking. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "coverage.diagnosis_age",
+   "type": "count per value",
+   "values": "Under 5 | 5–12 | 13–17 | 18–29 | 30–44 | 45–64 | 65 or older | Not diagnosed yet | not stated",
+   "note": "Optional: Age when it was diagnosed. Asked from instrument version 2026-10-01.1, so every earlier answer is counted as \"not stated\", never as adult-onset. A parent or caregiver answering for a child sees the same five burdens, with the same ids, worded for the family; the register reads the ranking by stratum and withholds any stratum under 11 responses, its count as well as its ranking. Published only as a count at /api/survey (coverage.*), never per answer. Any value held by fewer than 11 responses is not shown: it is counted in the line \"fewer than 11, not shown\" and never named. \"not stated\" is published as it is."
+  },
+  {
+   "file": "/api/survey",
+   "field": "answers",
+   "type": "integer",
+   "values": "",
+   "note": "Survey answers received: one per answer sent to POST /api/survey. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/survey, /api/register (survey) and /api/policy (uncounted.survey)."
+  },
+  {
+   "file": "/api/survey",
+   "field": "senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/survey",
+   "field": "submissions",
+   "type": "integer",
+   "values": "",
+   "note": "How many were sent: the same number as answers (survey blocks) or reports (gap blocks). Kept for callers that already read it."
+  },
+  {
+   "file": "/api/survey",
+   "field": "n",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of answers: the same number as answers on this endpoint and on every survey block that carries both (the payload's deprecated map says so). Kept for existing callers. Read answers instead."
+  },
+  {
+   "file": "/api/survey/channel",
+   "field": "answers",
+   "type": "integer or null",
+   "values": "",
+   "note": "Answers that arrived through this link. null when fewer than smallCellMin have arrived (withheld is then true)."
+  },
+  {
+   "file": "/api/survey/channel",
+   "field": "n",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of answers: the same number as answers on this endpoint and on every survey block that carries both (the payload's deprecated map says so). Kept for existing callers. Read answers instead."
+  },
+  {
+   "file": "/api/gap",
+   "field": "reports",
+   "type": "integer",
+   "values": "",
+   "note": "Uncounted-care reports received: one per report sent to POST /api/gap. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/gap, /api/register (gap) and /api/policy (uncounted.gap)."
+  },
+  {
+   "file": "/api/gap",
+   "field": "senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/gap",
+   "field": "submissions",
+   "type": "integer",
+   "values": "",
+   "note": "How many were sent: the same number as answers (survey blocks) or reports (gap blocks). Kept for callers that already read it."
+  },
+  {
+   "file": "/api/gap",
+   "field": "respondents",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of reports: the same number as reports on this endpoint and on every gap block that carries both (the payload's deprecated map says so). Kept for existing callers. Read reports instead."
+  },
+  {
+   "file": "/api/corrections",
+   "field": "sends",
+   "type": "integer",
+   "values": "",
+   "note": "Corrections received. Rows we marked as our own team testing the form are left out (teamTests says how many)."
+  },
+  {
+   "file": "/api/corrections",
+   "field": "browserFigurePairs",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct browser-and-figure keys among the corrections. The key a correction keeps is bound to one figure and table version, so one browser that corrects five figures holds five keys, and a repeat on the same figure is refused. This equals the corrections that carried a browser id. It is not a count of senders."
+  },
+  {
+   "file": "/api/corrections",
+   "field": "senders",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of browserFigurePairs: the same number. It is a different quantity from senders on the survey, gap and interview blocks (one network on one day), because a correction key is bound to one figure. Kept for existing callers. Read browserFigurePairs instead."
+  },
+  {
+   "file": "/api/register",
+   "field": "survey.answers",
+   "type": "integer",
+   "values": "",
+   "note": "Survey answers received: one per answer sent to POST /api/survey. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/survey, /api/register (survey) and /api/policy (uncounted.survey)."
+  },
+  {
+   "file": "/api/register",
+   "field": "survey.senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/register",
+   "field": "survey.n",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of answers: the same number as answers on this endpoint and on every survey block that carries both (the payload's deprecated map says so). Kept for existing callers. Read answers instead."
+  },
+  {
+   "file": "/api/register",
+   "field": "gap.reports",
+   "type": "integer",
+   "values": "",
+   "note": "Uncounted-care reports received: one per report sent to POST /api/gap. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/gap, /api/register (gap) and /api/policy (uncounted.gap)."
+  },
+  {
+   "file": "/api/register",
+   "field": "gap.senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/register",
+   "field": "gap.respondents",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of reports: the same number as reports on this endpoint and on every gap block that carries both (the payload's deprecated map says so). Kept for existing callers. Read reports instead."
+  },
+  {
+   "file": "/api/register",
+   "field": "corrections.browserFigurePairs",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct browser-and-figure keys among the corrections. The key a correction keeps is bound to one figure and table version, so one browser that corrects five figures holds five keys, and a repeat on the same figure is refused. This equals the corrections that carried a browser id. It is not a count of senders."
+  },
+  {
+   "file": "/api/register",
+   "field": "corrections.senders",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of browserFigurePairs: the same number. It is a different quantity from senders on the survey, gap and interview blocks (one network on one day), because a correction key is bound to one figure. Kept for existing callers. Read browserFigurePairs instead."
+  },
+  {
+   "file": "/api/register",
+   "field": "interviews.n",
+   "type": "integer",
+   "values": "",
+   "note": "Written interviews received. Rows we marked as our own team testing the form are left out (teamTests says how many)."
+  },
+  {
+   "file": "/api/register",
+   "field": "interviews.senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/interview",
+   "field": "n",
+   "type": "integer",
+   "values": "",
+   "note": "Written interviews received. Rows we marked as our own team testing the form are left out (teamTests says how many)."
+  },
+  {
+   "file": "/api/interview",
+   "field": "senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.survey.answers",
+   "type": "integer",
+   "values": "",
+   "note": "Survey answers received: one per answer sent to POST /api/survey. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/survey, /api/register (survey) and /api/policy (uncounted.survey)."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.survey.senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.survey.n",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of answers: the same number as answers on this endpoint and on every survey block that carries both (the payload's deprecated map says so). Kept for existing callers. Read answers instead."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.gap.reports",
+   "type": "integer",
+   "values": "",
+   "note": "Uncounted-care reports received: one per report sent to POST /api/gap. Rows we marked as our own team testing the form are left out (teamTests says how many). The same number on /api/gap, /api/register (gap) and /api/policy (uncounted.gap)."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.gap.senders",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct senders: one network on one day, counted once, never a verified person. A household on one connection is one sender, so this runs low, never high. Counted when a row is written, outside the row, and never larger than the answers or reports beside it. senderBasis says how to read it: \"senders\" when the sender index was read, \"sends\" when it could not be read and this equals the answers or reports, \"none\" when nothing has been sent."
+  },
+  {
+   "file": "/api/policy",
+   "field": "uncounted.gap.respondents",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of reports: the same number as reports on this endpoint and on every gap block that carries both (the payload's deprecated map says so). Kept for existing callers. Read reports instead."
+  },
+  {
+   "file": "/api/policy",
+   "field": "disputes.sends",
+   "type": "integer",
+   "values": "",
+   "note": "Corrections received. Rows we marked as our own team testing the form are left out (teamTests says how many)."
+  },
+  {
+   "file": "/api/policy",
+   "field": "disputes.browserFigurePairs",
+   "type": "integer",
+   "values": "",
+   "note": "Distinct browser-and-figure keys among the corrections. The key a correction keeps is bound to one figure and table version, so one browser that corrects five figures holds five keys, and a repeat on the same figure is refused. This equals the corrections that carried a browser id. It is not a count of senders."
+  },
+  {
+   "file": "/api/policy",
+   "field": "disputes.senders",
+   "type": "integer, deprecated alias",
+   "values": "",
+   "note": "Deprecated alias of browserFigurePairs: the same number. It is a different quantity from senders on the survey, gap and interview blocks (one network on one day), because a correction key is bound to one figure. Kept for existing callers. Read browserFigurePairs instead."
   },
   {
    "file": "all files",
    "field": "(absent)",
    "type": "",
    "values": "",
-   "note": "no name, no date of birth, no diagnosis, no IP address, no cookie, no free text. Free-text notes are held but never exported."
+   "note": "no name, no date of birth, no diagnosis, no IP address, no cookie and no free text in any file. survey.csv and gap.csv also carry no time of day and no self-description. Free-text notes are held but never exported."
   }
  ]
 }

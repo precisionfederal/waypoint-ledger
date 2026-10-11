@@ -1,12 +1,12 @@
 {
- "generated": "2026-09-10T02:15:34Z",
- "conditions_version": "2026-09-09.3",
+ "generated": "2026-09-30T22:50:50Z",
+ "conditions_version": "2026-09-30.3",
  "table_version": "2026-09-09.1",
- "conditions": 9,
- "coded": 6,
+ "conditions": 72,
+ "coded": 68,
  "priced": 3,
- "checks": 46,
- "pass": 46,
+ "checks": 410,
+ "pass": 410,
  "fail": 0,
  "unverified": 0,
  "icd10cm_years_checked": [
@@ -15,109 +15,361 @@
  ],
  "sources": {
   "icd10cm/fy2021": {
-   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2021.zip",
+   "path": "icd10cm/fy2021.zip",
    "sha256": "dffa100f5bc7e588cca63257c0da0668094b31ba9812283eba893d082d2e909f",
    "bytes": 2372334,
    "retrieved": "cache",
    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2021/icd10cm-codes-order-Jan-2021.zip"
   },
   "icd10cm/fy2022": {
-   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2022.zip",
+   "path": "icd10cm/fy2022.zip",
    "sha256": "bab2b3b041cf4b999f8380f3198c1dd6ca404ba7d5513ec60efc813a97f7c214",
    "bytes": 2245367,
    "retrieved": "cache",
    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2022/Code%20Descriptions%20zip.zip"
   },
   "icd10cm/fy2023": {
-   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2023.zip",
+   "path": "icd10cm/fy2023.zip",
    "sha256": "a7bfd4511dc154bff96fe0ced5fcd633bd26f997ccd6ae386f5c24595e1789b5",
    "bytes": 2404202,
    "retrieved": "cache",
    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2023/icd10-Order-CodeFiles2023.zip"
   },
   "icd10cm/fy2026": {
-   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2026.zip",
+   "path": "icd10cm/fy2026.zip",
    "sha256": "a852eb91b3344ae38476e63816976ee1eeb94dcced7151118324f060e8499f88",
    "bytes": 2198159,
    "retrieved": "cache",
    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2026/icd10cm-Code%20Descriptions-2026.zip"
   },
   "icd10cm/fy2027": {
-   "path": "/Users/bo/.cache/waypoint-ledger/icd10cm/fy2027.zip",
+   "path": "icd10cm/fy2027.zip",
    "sha256": "93e3ad6004badf470c55bfe679b748ae88fd9b2b421851e409eec382c7713b9a",
    "bytes": 2192779,
    "retrieved": "cache",
    "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Publications/ICD10CM/2027/icd10cm-code-descriptions-2027.zip"
   },
   "sources/pmc": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/pmc.html",
+   "path": "sources/pmc.html",
    "sha256": "3bc6a22cc2522257691b939ee0a671bfb615e597272c080a2617f0301fb93830",
    "bytes": 230662,
    "retrieved": "cache",
    "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12607343/"
   },
   "sources/st562": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/st562.pdf",
+   "path": "sources/st562.pdf",
    "sha256": "48a3f6e69893647bc5a7cc2121894a11d387ac973fba0bf4e517b610f12a42c1",
    "bytes": 486305,
    "retrieved": "cache",
    "url": "https://meps.ahrq.gov/data_files/publications/st562/stat562.pdf"
   },
   "sources/st568": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/st568.pdf",
+   "path": "sources/st568.pdf",
    "sha256": "78f76227dd8e0884b1bcecb5e18f2324f1dd23a6720f6b24b5b63278f7716f05",
    "bytes": 447121,
    "retrieved": "cache",
    "url": "https://meps.ahrq.gov/data_files/publications/st568/stat568.pdf"
   },
+  "sources/figures/mecfs-cdc-national-cost-1": {
+   "path": "sources/figures/mecfs-cdc-national-cost-1.html",
+   "sha256": "5944748e5cb5d2cf6e74913f087389da0e5726e5cf3c1c078fd0ead63e1a86e7",
+   "bytes": 56946,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/me-cfs/about/index.html"
+  },
+  "sources/figures/mecfs-cdc-national-cost-2": {
+   "path": "sources/figures/mecfs-cdc-national-cost-2.pdf",
+   "sha256": "7a2b6a900eaeac022294ec8d8708c1c75a7a40de252de7125d9435a3f2299b83",
+   "bytes": 439149,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/nchs/data/databriefs/db488.pdf"
+  },
+  "sources/figures/mecfs-cdc-prevalence-1": {
+   "path": "sources/figures/mecfs-cdc-prevalence-1.html",
+   "sha256": "5944748e5cb5d2cf6e74913f087389da0e5726e5cf3c1c078fd0ead63e1a86e7",
+   "bytes": 56946,
+   "retrieved": "2026-09-30T22:50:44Z",
+   "url": "https://www.cdc.gov/me-cfs/about/index.html"
+  },
+  "sources/figures/mecfs-cdc-prevalence-2": {
+   "path": "sources/figures/mecfs-cdc-prevalence-2.html",
+   "sha256": "08446b62aad42cbbb86b0da270d3e3fdaa72b0436eb039ab822f045de8648436",
+   "bytes": 66281,
+   "retrieved": "2026-09-30T22:50:45Z",
+   "url": "https://www.cdc.gov/me-cfs/hcp/clinical-overview/index.html"
+  },
+  "sources/figures/endo-owh-11pct-1": {
+   "path": "sources/figures/endo-owh-11pct-1.html",
+   "sha256": "565b5043b8faf34b33e845d508fcaebcc55a566a76c8b866beee4da54193254a",
+   "bytes": 85110,
+   "retrieved": "2026-09-30T22:50:46Z",
+   "url": "https://www.womenshealth.gov/a-z-topics/endometriosis"
+  },
+  "sources/figures/endo-owh-11pct-2": {
+   "path": "sources/figures/endo-owh-11pct-2.html",
+   "sha256": "aa01ff7d04a6939d35fb7ecaed3f12fa0a2aa6fc28be1e934332641b63644312",
+   "bytes": 2140,
+   "retrieved": "2026-09-30T22:50:46Z",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=21719000&rettype=abstract&retmode=text"
+  },
+  "sources/figures/scd-cdc-100k-1": {
+   "path": "sources/figures/scd-cdc-100k-1.html",
+   "sha256": "2f528645550a3c3712ee208387a82f2f86b627bd88d031e33e9bba45a4c70dfe",
+   "bytes": 56861,
+   "retrieved": "2026-09-30T22:50:47Z",
+   "url": "https://www.cdc.gov/sickle-cell/data/index.html"
+  },
+  "sources/figures/scd-cdc-100k-2": {
+   "path": "sources/figures/scd-cdc-100k-2.html",
+   "sha256": "305296f95fc12301c4df7aa2e9a39fa0949189fbd142266bb47320b4d61a3cca",
+   "bytes": 2242,
+   "retrieved": "2026-09-30T22:50:47Z",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=20331952&rettype=abstract&retmode=text"
+  },
+  "sources/figures/lyme-ticknet-societal-medical-1": {
+   "path": "sources/figures/lyme-ticknet-societal-medical-1.html",
+   "sha256": "cb7580a36dda34c3176c29ab599998bd23e0a197c39f969e3766b80168fd5bca",
+   "bytes": 407423,
+   "retrieved": "cache",
+   "url": "https://wwwnc.cdc.gov/eid/article/28/6/21-1335_article"
+  },
+  "sources/figures/lyme-ticknet-societal-medical-2": {
+   "path": "sources/figures/lyme-ticknet-societal-medical-2.html",
+   "sha256": "f0caf1c225372a5a50d635cb848fa350ee8675fd5dde40b1d5b3fa7f7088a847",
+   "bytes": 218893,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9155891/"
+  },
+  "sources/figures/lyme-ticknet-patient-cost-1": {
+   "path": "sources/figures/lyme-ticknet-patient-cost-1.html",
+   "sha256": "cb7580a36dda34c3176c29ab599998bd23e0a197c39f969e3766b80168fd5bca",
+   "bytes": 407423,
+   "retrieved": "cache",
+   "url": "https://wwwnc.cdc.gov/eid/article/28/6/21-1335_article"
+  },
+  "sources/figures/lyme-ticknet-patient-cost-2": {
+   "path": "sources/figures/lyme-ticknet-patient-cost-2.html",
+   "sha256": "7fa61f02434c7a68e69ced083ee5b634f27264ffe448a3264b82202c383c01da",
+   "bytes": 218893,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9155891/"
+  },
+  "sources/figures/lyme-cdc-diagnosed-per-year-1": {
+   "path": "sources/figures/lyme-cdc-diagnosed-per-year-1.html",
+   "sha256": "1af5fcbb2e0ad45ecba25e4276dd3d57363e6aed1ddb30f65400ec5393151394",
+   "bytes": 56804,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/lyme/data-research/facts-stats/index.html"
+  },
+  "sources/figures/lyme-cdc-diagnosed-per-year-2": {
+   "path": "sources/figures/lyme-cdc-diagnosed-per-year-2.html",
+   "sha256": "fa1f6fd05c109535b9597570edfd56d351da18426a42715139ae82463b46936b",
+   "bytes": 361907,
+   "retrieved": "cache",
+   "url": "https://wwwnc.cdc.gov/eid/article/27/2/20-2731_article"
+  },
+  "sources/figures/lupus-cdc-registries-prevalence-1": {
+   "path": "sources/figures/lupus-cdc-registries-prevalence-1.html",
+   "sha256": "03d3387e1770fe74949b4d57ecc44e289ac688aad44b0fa5ab4eeb4bea86aa8a",
+   "bytes": 46586,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/lupus/data-research/index.html"
+  },
+  "sources/figures/lupus-cdc-registries-prevalence-2": {
+   "path": "sources/figures/lupus-cdc-registries-prevalence-2.html",
+   "sha256": "f6872afb2d3ba4383bc25689bcff86c619e1b830a7e29ae5c6d0252e49180c45",
+   "bytes": 3377,
+   "retrieved": "cache",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=33474834&rettype=abstract&retmode=text"
+  },
+  "sources/figures/ms-prevalence-1": {
+   "path": "sources/figures/ms-prevalence-1.html",
+   "sha256": "5249d2e324e5af0814049ad8988f15bd79db605c8e977e5bc8b1c2c3d8fc7d66",
+   "bytes": 56786,
+   "retrieved": "cache",
+   "url": "https://cdmrp.health.mil/msrp/"
+  },
+  "sources/figures/ms-prevalence-2": {
+   "path": "sources/figures/ms-prevalence-2.html",
+   "sha256": "66cb7201f8539521e7615d22e0132cabf985d2771e08911b629114471c5fe982",
+   "bytes": 211464,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6442006/"
+  },
+  "sources/figures/migraine-nhis-2015-1": {
+   "path": "sources/figures/migraine-nhis-2015-1.pdf",
+   "sha256": "304b500add5daba859260ad5862c9a7712474e695b56da2b3a087be7212cfd6b",
+   "bytes": 188198,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NHIS/SHS/2015_SHS_Table_A-5.pdf"
+  },
+  "sources/figures/migraine-nhis-2015-2": {
+   "path": "sources/figures/migraine-nhis-2015-2.html",
+   "sha256": "30a2d14214e28710e72378f5abd12f13c042e3fdcd3e39d4bc140faf94e732cc",
+   "bytes": 2653,
+   "retrieved": "cache",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=29527677&rettype=abstract&retmode=text"
+  },
+  "sources/figures/ibd-cdc-prevalence-1": {
+   "path": "sources/figures/ibd-cdc-prevalence-1.html",
+   "sha256": "f63954f0ad70fd91fc68139018ea3b1671b545dddd76554c464cc48b2a57c0e8",
+   "bytes": 56713,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/inflammatory-bowel-disease/php/facts-stats/index.html"
+  },
+  "sources/figures/ibd-cdc-prevalence-2": {
+   "path": "sources/figures/ibd-cdc-prevalence-2.html",
+   "sha256": "0fa1bd244eb232084a9f18499022be100c4f7c6051ad743134c1c540c3520238",
+   "bytes": 115268,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/mmwr/volumes/65/wr/mm6542a3.htm"
+  },
+  "sources/figures/ic-niddk-prevalence-1": {
+   "path": "sources/figures/ic-niddk-prevalence-1.html",
+   "sha256": "09d8139dc1598020a345462529f9bd3bdef7b8a721c8c63d8e36f86b8cd6389d",
+   "bytes": 47542,
+   "retrieved": "cache",
+   "url": "https://www.niddk.nih.gov/health-information/urologic-diseases/interstitial-cystitis-bladder-pain-syndrome/definition-facts"
+  },
+  "sources/figures/ic-niddk-prevalence-2": {
+   "path": "sources/figures/ic-niddk-prevalence-2.html",
+   "sha256": "b1945e4a2d179b2752a9bc1b3c3e8237c9dd97224a765e8c25c6a8000fd3e956",
+   "bytes": 240205,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9404297/"
+  },
+  "sources/figures/celiac-niddk-prevalence-1": {
+   "path": "sources/figures/celiac-niddk-prevalence-1.html",
+   "sha256": "10a9401ff0947391a56162c0cf2fe76e43b4412cc7466ba8b316f8fe73568888",
+   "bytes": 47019,
+   "retrieved": "cache",
+   "url": "https://www.niddk.nih.gov/health-information/digestive-diseases/celiac-disease/definition-facts"
+  },
+  "sources/figures/celiac-niddk-prevalence-2": {
+   "path": "sources/figures/celiac-niddk-prevalence-2.html",
+   "sha256": "011178a96fd1aff660b42072b19041bd58a4844ce1a50afe8c88dbd4af2a0927",
+   "bytes": 176995,
+   "retrieved": "cache",
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5459670/"
+  },
+  "sources/figures/ckd-cdc-niddk-adults-1": {
+   "path": "sources/figures/ckd-cdc-niddk-adults-1.html",
+   "sha256": "d9cb6cb63bbb4034ddcfb3cb3563c627903718f0db8ad52b2b014eabc0a59258",
+   "bytes": 61725,
+   "retrieved": "2026-09-30T22:50:48Z",
+   "url": "https://www.cdc.gov/kidney-disease/about/index.html"
+  },
+  "sources/figures/ckd-cdc-niddk-adults-2": {
+   "path": "sources/figures/ckd-cdc-niddk-adults-2.html",
+   "sha256": "e5d64d6b6bf2db7f2014e21c8a27522cbcf3fc0c03abfd922dcf6d3928873f9c",
+   "bytes": 47205,
+   "retrieved": "2026-09-30T22:50:48Z",
+   "url": "https://www.niddk.nih.gov/health-information/health-statistics/kidney-disease"
+  },
+  "sources/figures/epilepsy-cdc-adults-1": {
+   "path": "sources/figures/epilepsy-cdc-adults-1.html",
+   "sha256": "3a8e87e50ee04a8daa17e473eb8830178956685899d68443fe21f428780d8ec5",
+   "bytes": 53527,
+   "retrieved": "2026-09-30T22:50:49Z",
+   "url": "https://www.cdc.gov/epilepsy/data-research/facts-stats/index.html"
+  },
+  "sources/figures/epilepsy-cdc-adults-2": {
+   "path": "sources/figures/epilepsy-cdc-adults-2.html",
+   "sha256": "3f18e5a866250677a6a30e3fd52e88dd99d0424a4c3845ad5d0c586729ef592e",
+   "bytes": 3308,
+   "retrieved": "2026-09-30T22:50:49Z",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=38820685&rettype=abstract&retmode=text"
+  },
+  "sources/figures/asd-cdc-addm-2022-1": {
+   "path": "sources/figures/asd-cdc-addm-2022-1.html",
+   "sha256": "4c82990bef879b1c7057759cd62d32503004141f716c2a40da32770b02f41fbe",
+   "bytes": 58238,
+   "retrieved": "2026-09-30T22:50:49Z",
+   "url": "https://www.cdc.gov/autism/data-research/index.html"
+  },
+  "sources/figures/asd-cdc-addm-2022-2": {
+   "path": "sources/figures/asd-cdc-addm-2022-2.html",
+   "sha256": "a3b3bebfaae7e88be96657eaf5f598456e8906483944660d0ba5d4610d5b5e0b",
+   "bytes": 7346,
+   "retrieved": "2026-09-30T22:50:49Z",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=40232988&rettype=abstract&retmode=text"
+  },
+  "sources/figures/hcv-cdc-prevalence-1": {
+   "path": "sources/figures/hcv-cdc-prevalence-1.html",
+   "sha256": "04d5781d2f19f3ebfad40b6b0b0bf816157471e3d828e8a1928dad3d1a15902e",
+   "bytes": 74469,
+   "retrieved": "2026-09-30T22:50:50Z",
+   "url": "https://www.cdc.gov/hepatitis-c/hcp/clinical-overview/index.html"
+  },
+  "sources/figures/hcv-cdc-prevalence-2": {
+   "path": "sources/figures/hcv-cdc-prevalence-2.html",
+   "sha256": "3ac5eaa92200c94d90eb710635bfcef76a7c37c66d21107fae1ef59084aec66b",
+   "bytes": 3024,
+   "retrieved": "2026-09-30T22:50:50Z",
+   "url": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=38739849&rettype=abstract&retmode=text"
+  },
   "sources/pulse-longcovid-sex": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/pulse-longcovid-sex.json",
+   "path": "sources/pulse-longcovid-sex.json",
    "sha256": "408429a0611582f45881098d821173cb86d794a18defbdb52aab974c4449a855",
    "bytes": 7296,
    "retrieved": "cache",
    "url": "https://data.cdc.gov/resource/gsea-w83j.json?$where=`group`='By%20Sex'%20AND%20state='United%20States'%20AND%20time_period='72'"
   },
   "sources/cdc-heart-facts": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-heart-facts.html",
+   "path": "sources/cdc-heart-facts.html",
    "sha256": "f6e156a24fb1d23f8d1045fd67ee143ce90717a6a1df44b04e2ee7df191ea4df",
    "bytes": 60207,
    "retrieved": "cache",
    "url": "https://www.cdc.gov/heart-disease/data-research/facts-stats/index.html"
   },
   "sources/cdc-diabetes-report": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-diabetes-report.html",
+   "path": "sources/cdc-diabetes-report.html",
    "sha256": "a76b904d4b8958902b43911c5107b7a879d85ad8e5d6eb95ed51f177c24d51d4",
    "bytes": 56453,
    "retrieved": "cache",
    "url": "https://www.cdc.gov/diabetes/php/data-research/index.html"
   },
   "sources/db488": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/db488.pdf",
+   "path": "sources/db488.pdf",
    "sha256": "7a2b6a900eaeac022294ec8d8708c1c75a7a40de252de7125d9435a3f2299b83",
    "bytes": 439149,
    "retrieved": "cache",
    "url": "https://www.cdc.gov/nchs/data/databriefs/db488.pdf"
   },
   "sources/niams-fibromyalgia": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/niams-fibromyalgia.html",
+   "path": "sources/niams-fibromyalgia.html",
    "sha256": "46fe4b6ba20a7f9773536283e27f07475e481f38ab10106b4a870fe21e2254ea",
    "bytes": 53011,
    "retrieved": "cache",
    "url": "https://www.niams.nih.gov/health-topics/fibromyalgia"
   },
   "sources/owh-endometriosis": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/owh-endometriosis.html",
+   "path": "sources/owh-endometriosis.html",
    "sha256": "375ead07ed53e341b9cdd31ec9cf757f8809b34048953fba5abc7f6fdd2720ce",
    "bytes": 88762,
    "retrieved": "cache",
    "url": "https://womenshealth.gov/a-z-topics/endometriosis"
   },
   "sources/cdc-scd-data": {
-   "path": "/Users/bo/.cache/waypoint-ledger/sources/cdc-scd-data.html",
+   "path": "sources/cdc-scd-data.html",
    "sha256": "2f528645550a3c3712ee208387a82f2f86b627bd88d031e33e9bba45a4c70dfe",
    "bytes": 56861,
    "retrieved": "cache",
    "url": "https://www.cdc.gov/sickle-cell/data/index.html"
+  },
+  "sources/cdc-lupus-data": {
+   "path": "sources/cdc-lupus-data.html",
+   "sha256": "03d3387e1770fe74949b4d57ecc44e289ac688aad44b0fa5ab4eeb4bea86aa8a",
+   "bytes": 46586,
+   "retrieved": "cache",
+   "url": "https://www.cdc.gov/lupus/data-research/index.html"
+  },
+  "sources/nchs-shs-2015-a5": {
+   "path": "sources/nchs-shs-2015-a5.pdf",
+   "sha256": "304b500add5daba859260ad5862c9a7712474e695b56da2b3a087be7212cfd6b",
+   "bytes": 188198,
+   "retrieved": "cache",
+   "url": "https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NHIS/SHS/2015_SHS_Table_A-5.pdf"
   }
  },
  "results": [
@@ -136,7 +388,7 @@
   {
    "check": "long-covid U09.9 first effective",
    "status": "PASS",
-   "detail": "absent from FY2021, present in FY2022 \u2014 first effective 2021-10-01",
+   "detail": "absent from FY2021, present in FY2022: first effective 2021-10-01",
    "evidence": "absent from the FY2021 file, present in the FY2022 file"
   },
   {
@@ -166,7 +418,7 @@
   {
    "check": "me-cfs G93.32 first effective",
    "status": "PASS",
-   "detail": "absent from FY2022, present in FY2023 \u2014 first effective 2022-10-01",
+   "detail": "absent from FY2022, present in FY2023: first effective 2022-10-01",
    "evidence": "absent from the FY2022 file, present in the FY2023 file"
   },
   {
@@ -184,7 +436,7 @@
   {
    "check": "pots-dysautonomia G90.A first effective",
    "status": "PASS",
-   "detail": "absent from FY2022, present in FY2023 \u2014 first effective 2022-10-01",
+   "detail": "absent from FY2022, present in FY2023: first effective 2022-10-01",
    "evidence": "absent from the FY2022 file, present in the FY2023 file"
   },
   {
@@ -202,7 +454,7 @@
   {
    "check": "fibromyalgia M79.7 no date claimed",
    "status": "PASS",
-   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
    "evidence": null
   },
   {
@@ -220,7 +472,7 @@
   {
    "check": "endometriosis N80 no date claimed",
    "status": "PASS",
-   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
    "evidence": null
   },
   {
@@ -238,7 +490,7 @@
   {
    "check": "sickle-cell D57 no date claimed",
    "status": "PASS",
-   "detail": "already in the FY2021 file, our earliest \u2014 claiming no first-effective date is correct",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
    "evidence": null
   },
   {
@@ -246,6 +498,1128 @@
    "status": "PASS",
    "detail": "no code, and the blank is explained",
    "evidence": "There is no ICD-10-CM code for not yet having a diagnosis. R69, \"Illness, unspecified\", is a code for an unspecified illness, not for a search; using it here wo"
+  },
+  {
+   "check": "lyme A69.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "A69.2 Lyme disease | billable=False"
+  },
+  {
+   "check": "lyme A69.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "A69.2 Lyme disease | billable=False"
+  },
+  {
+   "check": "lyme A69.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "lupus M32 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M32 Systemic lupus erythematosus (SLE) | billable=False"
+  },
+  {
+   "check": "lupus M32 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M32 Systemic lupus erythematosus (SLE) | billable=False"
+  },
+  {
+   "check": "lupus M32 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "multiple-sclerosis G35 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G35 Multiple sclerosis | billable=False"
+  },
+  {
+   "check": "multiple-sclerosis G35 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G35 Multiple sclerosis | billable=False"
+  },
+  {
+   "check": "multiple-sclerosis G35 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "migraine G43 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G43 Migraine | billable=False"
+  },
+  {
+   "check": "migraine G43 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G43 Migraine | billable=False"
+  },
+  {
+   "check": "migraine G43 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "ibd icd10cm blank",
+   "status": "PASS",
+   "detail": "no code, and the blank is explained",
+   "evidence": "Inflammatory bowel disease is two diagnoses with two code families, K50 (Crohn\u2019s disease) and K51 (ulcerative colitis), and the federal figure counts both toget"
+  },
+  {
+   "check": "interstitial-cystitis N30.1 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N30.1 Interstitial cystitis (chronic) | billable=False"
+  },
+  {
+   "check": "interstitial-cystitis N30.1 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N30.1 Interstitial cystitis (chronic) | billable=False"
+  },
+  {
+   "check": "interstitial-cystitis N30.1 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "celiac K90.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K90.0 Celiac disease | billable=True"
+  },
+  {
+   "check": "celiac K90.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K90.0 Celiac disease | billable=True"
+  },
+  {
+   "check": "celiac K90.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "irritable-bowel-syndrome K58 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K58 Irritable bowel syndrome | billable=False"
+  },
+  {
+   "check": "irritable-bowel-syndrome K58 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K58 Irritable bowel syndrome | billable=False"
+  },
+  {
+   "check": "irritable-bowel-syndrome K58 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "rheumatoid-arthritis M06.9 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M06.9 Rheumatoid arthritis, unspecified | billable=True"
+  },
+  {
+   "check": "rheumatoid-arthritis M06.9 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M06.9 Rheumatoid arthritis, unspecified | billable=True"
+  },
+  {
+   "check": "rheumatoid-arthritis M06.9 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "ehlers-danlos-syndromes Q79.6 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "Q79.6 Ehlers-Danlos syndromes | billable=False"
+  },
+  {
+   "check": "ehlers-danlos-syndromes Q79.6 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "Q79.6 Ehlers-Danlos syndromes | billable=False"
+  },
+  {
+   "check": "ehlers-danlos-syndromes Q79.6 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "complex-regional-pain-syndrome G90.5 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G90.5 Complex regional pain syndrome I (CRPS I) | billable=False"
+  },
+  {
+   "check": "complex-regional-pain-syndrome G90.5 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G90.5 Complex regional pain syndrome I (CRPS I) | billable=False"
+  },
+  {
+   "check": "complex-regional-pain-syndrome G90.5 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "ankylosing-spondylitis M45 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M45 Ankylosing spondylitis | billable=False"
+  },
+  {
+   "check": "ankylosing-spondylitis M45 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M45 Ankylosing spondylitis | billable=False"
+  },
+  {
+   "check": "ankylosing-spondylitis M45 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "psoriatic-arthritis L40.5 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L40.5 Arthropathic psoriasis | billable=False"
+  },
+  {
+   "check": "psoriatic-arthritis L40.5 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L40.5 Arthropathic psoriasis | billable=False"
+  },
+  {
+   "check": "psoriatic-arthritis L40.5 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "sjogrens-disease M35.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.0 Sjogren syndrome | billable=False"
+  },
+  {
+   "check": "sjogrens-disease M35.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.0 Sjogren syndrome | billable=False"
+  },
+  {
+   "check": "sjogrens-disease M35.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "hashimotos-thyroiditis E06.3 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E06.3 Autoimmune thyroiditis | billable=True"
+  },
+  {
+   "check": "hashimotos-thyroiditis E06.3 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E06.3 Autoimmune thyroiditis | billable=True"
+  },
+  {
+   "check": "hashimotos-thyroiditis E06.3 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "graves-disease E05.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E05.0 Thyrotoxicosis with diffuse goiter | billable=False"
+  },
+  {
+   "check": "graves-disease E05.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E05.0 Thyrotoxicosis with diffuse goiter | billable=False"
+  },
+  {
+   "check": "graves-disease E05.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "addisons-disease E27.1 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E27.1 Primary adrenocortical insufficiency | billable=True"
+  },
+  {
+   "check": "addisons-disease E27.1 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E27.1 Primary adrenocortical insufficiency | billable=True"
+  },
+  {
+   "check": "addisons-disease E27.1 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "chronic-kidney-disease N18 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N18 Chronic kidney disease (CKD) | billable=False"
+  },
+  {
+   "check": "chronic-kidney-disease N18 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N18 Chronic kidney disease (CKD) | billable=False"
+  },
+  {
+   "check": "chronic-kidney-disease N18 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "epilepsy G40 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G40 Epilepsy and recurrent seizures | billable=False"
+  },
+  {
+   "check": "epilepsy G40 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G40 Epilepsy and recurrent seizures | billable=False"
+  },
+  {
+   "check": "epilepsy G40 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "narcolepsy G47.4 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G47.4 Narcolepsy and cataplexy | billable=False"
+  },
+  {
+   "check": "narcolepsy G47.4 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G47.4 Narcolepsy and cataplexy | billable=False"
+  },
+  {
+   "check": "narcolepsy G47.4 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "idiopathic-intracranial-hypertension G93.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G93.2 Benign intracranial hypertension | billable=True"
+  },
+  {
+   "check": "idiopathic-intracranial-hypertension G93.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G93.2 Benign intracranial hypertension | billable=True"
+  },
+  {
+   "check": "idiopathic-intracranial-hypertension G93.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "chiari-malformation Q07.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "Q07.0 Arnold-Chiari syndrome | billable=False"
+  },
+  {
+   "check": "chiari-malformation Q07.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "Q07.0 Arnold-Chiari syndrome | billable=False"
+  },
+  {
+   "check": "chiari-malformation Q07.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "mast-cell-activation-syndrome D89.4 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D89.4 Mast cell activation syndrome and related disorders | billable=False"
+  },
+  {
+   "check": "mast-cell-activation-syndrome D89.4 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D89.4 Mast cell activation syndrome and related disorders | billable=False"
+  },
+  {
+   "check": "mast-cell-activation-syndrome D89.4 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "gastroparesis K31.84 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K31.84 Gastroparesis | billable=True"
+  },
+  {
+   "check": "gastroparesis K31.84 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K31.84 Gastroparesis | billable=True"
+  },
+  {
+   "check": "gastroparesis K31.84 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "vulvodynia N94.81 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N94.81 Vulvodynia | billable=False"
+  },
+  {
+   "check": "vulvodynia N94.81 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "N94.81 Vulvodynia | billable=False"
+  },
+  {
+   "check": "vulvodynia N94.81 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "polycystic-ovary-syndrome E28.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E28.2 Polycystic ovarian syndrome | billable=True"
+  },
+  {
+   "check": "polycystic-ovary-syndrome E28.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E28.2 Polycystic ovarian syndrome | billable=True"
+  },
+  {
+   "check": "polycystic-ovary-syndrome E28.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "myasthenia-gravis G70.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G70.0 Myasthenia gravis | billable=False"
+  },
+  {
+   "check": "myasthenia-gravis G70.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G70.0 Myasthenia gravis | billable=False"
+  },
+  {
+   "check": "myasthenia-gravis G70.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "trigeminal-neuralgia G50.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G50.0 Trigeminal neuralgia | billable=True"
+  },
+  {
+   "check": "trigeminal-neuralgia G50.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G50.0 Trigeminal neuralgia | billable=True"
+  },
+  {
+   "check": "trigeminal-neuralgia G50.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "occipital-neuralgia M54.81 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M54.81 Occipital neuralgia | billable=True"
+  },
+  {
+   "check": "occipital-neuralgia M54.81 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M54.81 Occipital neuralgia | billable=True"
+  },
+  {
+   "check": "occipital-neuralgia M54.81 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "cluster-headache G44.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G44.0 Cluster headaches and other trigeminal autonomic cephalgias (TAC) | billable=False"
+  },
+  {
+   "check": "cluster-headache G44.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G44.0 Cluster headaches and other trigeminal autonomic cephalgias (TAC) | billable=False"
+  },
+  {
+   "check": "cluster-headache G44.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "tinnitus H93.1 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "H93.1 Tinnitus | billable=False"
+  },
+  {
+   "check": "tinnitus H93.1 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "H93.1 Tinnitus | billable=False"
+  },
+  {
+   "check": "tinnitus H93.1 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "menieres-disease H81.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "H81.0 Meniere's disease | billable=False"
+  },
+  {
+   "check": "menieres-disease H81.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "H81.0 Meniere's disease | billable=False"
+  },
+  {
+   "check": "menieres-disease H81.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "chronic-pain-syndrome G89.4 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G89.4 Chronic pain syndrome | billable=True"
+  },
+  {
+   "check": "chronic-pain-syndrome G89.4 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G89.4 Chronic pain syndrome | billable=True"
+  },
+  {
+   "check": "chronic-pain-syndrome G89.4 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "peripheral-neuropathy G62.9 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G62.9 Polyneuropathy, unspecified | billable=True"
+  },
+  {
+   "check": "peripheral-neuropathy G62.9 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G62.9 Polyneuropathy, unspecified | billable=True"
+  },
+  {
+   "check": "peripheral-neuropathy G62.9 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "raynauds-syndrome I73.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "I73.0 Raynaud's syndrome | billable=False"
+  },
+  {
+   "check": "raynauds-syndrome I73.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "I73.0 Raynaud's syndrome | billable=False"
+  },
+  {
+   "check": "raynauds-syndrome I73.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "systemic-sclerosis M34 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M34 Systemic sclerosis [scleroderma] | billable=False"
+  },
+  {
+   "check": "systemic-sclerosis M34 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M34 Systemic sclerosis [scleroderma] | billable=False"
+  },
+  {
+   "check": "systemic-sclerosis M34 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "dermatomyositis-and-polymyositis M33 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M33 Dermatopolymyositis | billable=False"
+  },
+  {
+   "check": "dermatomyositis-and-polymyositis M33 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M33 Dermatopolymyositis | billable=False"
+  },
+  {
+   "check": "dermatomyositis-and-polymyositis M33 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "hidradenitis-suppurativa L73.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L73.2 Hidradenitis suppurativa | billable=True"
+  },
+  {
+   "check": "hidradenitis-suppurativa L73.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L73.2 Hidradenitis suppurativa | billable=True"
+  },
+  {
+   "check": "hidradenitis-suppurativa L73.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "eosinophilic-esophagitis K20.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K20.0 Eosinophilic esophagitis | billable=True"
+  },
+  {
+   "check": "eosinophilic-esophagitis K20.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K20.0 Eosinophilic esophagitis | billable=True"
+  },
+  {
+   "check": "eosinophilic-esophagitis K20.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "microscopic-colitis K52.83 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K52.83 Microscopic colitis | billable=False"
+  },
+  {
+   "check": "microscopic-colitis K52.83 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K52.83 Microscopic colitis | billable=False"
+  },
+  {
+   "check": "microscopic-colitis K52.83 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "sarcoidosis D86 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D86 Sarcoidosis | billable=False"
+  },
+  {
+   "check": "sarcoidosis D86 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D86 Sarcoidosis | billable=False"
+  },
+  {
+   "check": "sarcoidosis D86 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "autoimmune-hepatitis K75.4 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K75.4 Autoimmune hepatitis | billable=True"
+  },
+  {
+   "check": "autoimmune-hepatitis K75.4 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K75.4 Autoimmune hepatitis | billable=True"
+  },
+  {
+   "check": "autoimmune-hepatitis K75.4 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "primary-biliary-cholangitis K74.3 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K74.3 Primary biliary cirrhosis | billable=True"
+  },
+  {
+   "check": "primary-biliary-cholangitis K74.3 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "K74.3 Primary biliary cirrhosis | billable=True"
+  },
+  {
+   "check": "primary-biliary-cholangitis K74.3 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "depression F32 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F32 Depressive episode | billable=False"
+  },
+  {
+   "check": "depression F32 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F32 Depressive episode | billable=False"
+  },
+  {
+   "check": "depression F32 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "generalized-anxiety-disorder F41.1 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F41.1 Generalized anxiety disorder | billable=True"
+  },
+  {
+   "check": "generalized-anxiety-disorder F41.1 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F41.1 Generalized anxiety disorder | billable=True"
+  },
+  {
+   "check": "generalized-anxiety-disorder F41.1 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "post-traumatic-stress-disorder F43.1 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F43.1 Post-traumatic stress disorder (PTSD) | billable=False"
+  },
+  {
+   "check": "post-traumatic-stress-disorder F43.1 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F43.1 Post-traumatic stress disorder (PTSD) | billable=False"
+  },
+  {
+   "check": "post-traumatic-stress-disorder F43.1 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "adhd F90 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F90 Attention-deficit hyperactivity disorders | billable=False"
+  },
+  {
+   "check": "adhd F90 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F90 Attention-deficit hyperactivity disorders | billable=False"
+  },
+  {
+   "check": "adhd F90 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "autism F84.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F84.0 Autistic disorder | billable=True"
+  },
+  {
+   "check": "autism F84.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F84.0 Autistic disorder | billable=True"
+  },
+  {
+   "check": "autism F84.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "chronic-hepatitis-c B18.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "B18.2 Chronic viral hepatitis C | billable=True"
+  },
+  {
+   "check": "chronic-hepatitis-c B18.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "B18.2 Chronic viral hepatitis C | billable=True"
+  },
+  {
+   "check": "chronic-hepatitis-c B18.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "obstructive-sleep-apnea G47.33 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G47.33 Obstructive sleep apnea (adult) (pediatric) | billable=True"
+  },
+  {
+   "check": "obstructive-sleep-apnea G47.33 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G47.33 Obstructive sleep apnea (adult) (pediatric) | billable=True"
+  },
+  {
+   "check": "obstructive-sleep-apnea G47.33 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "restless-legs-syndrome G25.81 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G25.81 Restless legs syndrome | billable=True"
+  },
+  {
+   "check": "restless-legs-syndrome G25.81 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G25.81 Restless legs syndrome | billable=True"
+  },
+  {
+   "check": "restless-legs-syndrome G25.81 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "temporomandibular-joint-disorders M26.6 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M26.6 Temporomandibular joint disorders | billable=False"
+  },
+  {
+   "check": "temporomandibular-joint-disorders M26.6 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M26.6 Temporomandibular joint disorders | billable=False"
+  },
+  {
+   "check": "temporomandibular-joint-disorders M26.6 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "polymyalgia-rheumatica M35.3 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.3 Polymyalgia rheumatica | billable=True"
+  },
+  {
+   "check": "polymyalgia-rheumatica M35.3 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.3 Polymyalgia rheumatica | billable=True"
+  },
+  {
+   "check": "polymyalgia-rheumatica M35.3 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "behcets-disease M35.2 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.2 Behcet's disease | billable=True"
+  },
+  {
+   "check": "behcets-disease M35.2 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.2 Behcet's disease | billable=True"
+  },
+  {
+   "check": "behcets-disease M35.2 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "neuromyelitis-optica G36.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G36.0 Neuromyelitis optica [Devic] | billable=True"
+  },
+  {
+   "check": "neuromyelitis-optica G36.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G36.0 Neuromyelitis optica [Devic] | billable=True"
+  },
+  {
+   "check": "neuromyelitis-optica G36.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "chronic-inflammatory-demyelinating-polyneuropathy G61.81 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G61.81 Chronic inflammatory demyelinating polyneuritis | billable=True"
+  },
+  {
+   "check": "chronic-inflammatory-demyelinating-polyneuropathy G61.81 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "G61.81 Chronic inflammatory demyelinating polyneuritis | billable=True"
+  },
+  {
+   "check": "chronic-inflammatory-demyelinating-polyneuropathy G61.81 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "lichen-sclerosus L90.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L90.0 Lichen sclerosus et atrophicus | billable=True"
+  },
+  {
+   "check": "lichen-sclerosus L90.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "L90.0 Lichen sclerosus et atrophicus | billable=True"
+  },
+  {
+   "check": "lichen-sclerosus L90.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "premenstrual-dysphoric-disorder F32.81 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F32.81 Premenstrual dysphoric disorder | billable=True"
+  },
+  {
+   "check": "premenstrual-dysphoric-disorder F32.81 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "F32.81 Premenstrual dysphoric disorder | billable=True"
+  },
+  {
+   "check": "premenstrual-dysphoric-disorder F32.81 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "pernicious-anemia D51.0 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D51.0 Vitamin B12 deficiency anemia due to intrinsic factor deficiency | billable=True"
+  },
+  {
+   "check": "pernicious-anemia D51.0 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "D51.0 Vitamin B12 deficiency anemia due to intrinsic factor deficiency | billable=True"
+  },
+  {
+   "check": "pernicious-anemia D51.0 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "hemochromatosis E83.11 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E83.11 Hemochromatosis | billable=False"
+  },
+  {
+   "check": "hemochromatosis E83.11 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E83.11 Hemochromatosis | billable=False"
+  },
+  {
+   "check": "hemochromatosis E83.11 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "hypermobility-syndrome M35.7 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.7 Hypermobility syndrome | billable=True"
+  },
+  {
+   "check": "hypermobility-syndrome M35.7 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "M35.7 Hypermobility syndrome | billable=True"
+  },
+  {
+   "check": "hypermobility-syndrome M35.7 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "hypothyroidism E03.9 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E03.9 Hypothyroidism, unspecified | billable=True"
+  },
+  {
+   "check": "hypothyroidism E03.9 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "E03.9 Hypothyroidism, unspecified | billable=True"
+  },
+  {
+   "check": "hypothyroidism E03.9 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
+  },
+  {
+   "check": "asthma J45 FY2026",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "J45 Asthma | billable=False"
+  },
+  {
+   "check": "asthma J45 FY2027",
+   "status": "PASS",
+   "detail": "code, long description and billable flag all match CDC/NCHS",
+   "evidence": "J45 Asthma | billable=False"
+  },
+  {
+   "check": "asthma J45 no date claimed",
+   "status": "PASS",
+   "detail": "already in the FY2021 file, our earliest: claiming no first-effective date is correct",
+   "evidence": null
   },
   {
    "check": "long-covid publisher",
@@ -256,7 +1630,7 @@
   {
    "check": "long-covid figure",
    "status": "PASS",
-   "detail": "read in Neba et al., Healthcare (Basel) 2025;13(21):2704 \u2014 secondary analysis of MEPS 2022: the point estimate 4098 and the 95% CI 1619-6578, in one sentence; the same figures in the results table row",
+   "detail": "read in Neba et al., Healthcare (Basel) 2025;13(21):2704, secondary analysis of MEPS 2022: the point estimate 4098 and the 95% CI 1619-6578, in one sentence; the same figures in the results table row",
    "evidence": "row meps2022-longcovid-excess-total = $4098 (1619-6578), 2022"
   },
   {
@@ -320,9 +1694,693 @@
    "evidence": null
   },
   {
+   "check": "lyme asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "lupus asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "multiple-sclerosis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "migraine asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "ibd asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "interstitial-cystitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "celiac asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "irritable-bowel-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "rheumatoid-arthritis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "ehlers-danlos-syndromes asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "complex-regional-pain-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "ankylosing-spondylitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "psoriatic-arthritis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "sjogrens-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "hashimotos-thyroiditis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "graves-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "addisons-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "chronic-kidney-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "epilepsy asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "narcolepsy asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "idiopathic-intracranial-hypertension asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "chiari-malformation asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "mast-cell-activation-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "gastroparesis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "vulvodynia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "polycystic-ovary-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "myasthenia-gravis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "trigeminal-neuralgia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "occipital-neuralgia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "cluster-headache asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "tinnitus asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "menieres-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "chronic-pain-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "peripheral-neuropathy asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "raynauds-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "systemic-sclerosis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "dermatomyositis-and-polymyositis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "hidradenitis-suppurativa asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "eosinophilic-esophagitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "microscopic-colitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "sarcoidosis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "autoimmune-hepatitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "primary-biliary-cholangitis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "depression asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "generalized-anxiety-disorder asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "post-traumatic-stress-disorder asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "adhd asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "autism asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "chronic-hepatitis-c asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "obstructive-sleep-apnea asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "restless-legs-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "temporomandibular-joint-disorders asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "polymyalgia-rheumatica asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "behcets-disease asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "neuromyelitis-optica asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "chronic-inflammatory-demyelinating-polyneuropathy asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "lichen-sclerosus asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "premenstrual-dysphoric-disorder asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "pernicious-anemia asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "hemochromatosis asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "hypermobility-syndrome asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "hypothyroidism asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "asthma asserts no figure",
+   "status": "PASS",
+   "detail": "no price row, no figure_kind and no dollar amount anywhere in the row",
+   "evidence": null
+  },
+  {
+   "check": "me-cfs mecfs-cdc-national-cost two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "me-cfs mecfs-cdc-national-cost source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/me-cfs/about/index.html",
+   "evidence": "ME/CFS costs the U.S. economy about $18 to $51 billion annually in medical costs and lost income."
+  },
+  {
+   "check": "me-cfs mecfs-cdc-national-cost source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/nchs/data/databriefs/db488.pdf",
+   "evidence": "costs the U.S. economy about $18-$51 billion annually"
+  },
+  {
+   "check": "me-cfs mecfs-cdc-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "me-cfs mecfs-cdc-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/me-cfs/about/index.html",
+   "evidence": "It's estimated that up to 3.3 million people in the United States suffer from ME/CFS."
+  },
+  {
+   "check": "me-cfs mecfs-cdc-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/me-cfs/hcp/clinical-overview/index.html",
+   "evidence": "It's estimated that as many as 3.3 million people in the United States have ME/CFS."
+  },
+  {
+   "check": "endometriosis endo-owh-11pct two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "endometriosis endo-owh-11pct source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.womenshealth.gov/a-z-topics/endometriosis",
+   "evidence": "Researchers think that at least 11% of women, or more than 6 \u00bd million women in the United States, have endometriosis"
+  },
+  {
+   "check": "endometriosis endo-owh-11pct source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/21719000/",
+   "evidence": "Conservatively, 11% of women have undiagnosed endometriosis"
+  },
+  {
+   "check": "sickle-cell scd-cdc-100k two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "sickle-cell scd-cdc-100k source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/sickle-cell/data/index.html",
+   "evidence": "Two studies published in 2010 estimated that SCD affects approximately 100,000 people in the United States."
+  },
+  {
+   "check": "sickle-cell scd-cdc-100k source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/20331952/",
+   "evidence": "The number of individuals with SCD in the U.S. may approach 100,000"
+  },
+  {
+   "check": "lyme lyme-ticknet-societal-medical two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "lyme lyme-ticknet-societal-medical source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://wwwnc.cdc.gov/eid/article/28/6/21-1335_article",
+   "evidence": "Overall, the societal medical cost per participant ranged from $50 to $121,869, for a median of $478 and mean of $1,333"
+  },
+  {
+   "check": "lyme lyme-ticknet-societal-medical source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pmc.ncbi.nlm.nih.gov/articles/PMC9155891/",
+   "evidence": "Overall, the societal medical cost per participant ranged from $50 to $121,869, for a median of $478 and mean of $1,333"
+  },
+  {
+   "check": "lyme lyme-ticknet-patient-cost two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "lyme lyme-ticknet-patient-cost source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://wwwnc.cdc.gov/eid/article/28/6/21-1335_article",
+   "evidence": "The median cost was $244 and the mean cost $1,252, reflecting a highly positively skewed distribution"
+  },
+  {
+   "check": "lyme lyme-ticknet-patient-cost source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pmc.ncbi.nlm.nih.gov/articles/PMC9155891/",
+   "evidence": "The median cost was $244 and the mean cost $1,252, reflecting a highly positively skewed distribution"
+  },
+  {
+   "check": "lyme lyme-cdc-diagnosed-per-year two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "lyme lyme-cdc-diagnosed-per-year source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/lyme/data-research/facts-stats/index.html",
+   "evidence": "An estimate based on these data suggests 476,000 people may be diagnosed and treated for Lyme disease each year in the United States."
+  },
+  {
+   "check": "lyme lyme-cdc-diagnosed-per-year source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://wwwnc.cdc.gov/eid/article/27/2/20-2731_article",
+   "evidence": "we estimated that Lyme disease was diagnosed and treated in \u2248476,000 patients in the United States annually during 2010-2018"
+  },
+  {
+   "check": "lupus lupus-cdc-registries-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "lupus lupus-cdc-registries-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/lupus/data-research/index.html",
+   "evidence": "An estimated 204,000 people have SLE in the United States, according to the most recent data available."
+  },
+  {
+   "check": "lupus lupus-cdc-registries-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/33474834/",
+   "evidence": "In 2018, an estimated 204,295 individuals (95% CI 160,902-261,725) in the US fulfilled the ACR classification criteria for SLE."
+  },
+  {
+   "check": "multiple-sclerosis ms-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "multiple-sclerosis ms-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://cdmrp.health.mil/msrp/",
+   "evidence": "MS affects nearly 1 million individuals in the United States."
+  },
+  {
+   "check": "multiple-sclerosis ms-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pmc.ncbi.nlm.nih.gov/articles/PMC6442006/",
+   "evidence": "to 362.6 per 100,000 population (n = 913,925 persons with MS)"
+  },
+  {
+   "check": "migraine migraine-nhis-2015 two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "migraine migraine-nhis-2015 source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://ftp.cdc.gov/pub/Health_Statistics/NCHS/NHIS/SHS/2015_SHS_Table_A-5.pdf",
+   "evidence": "Total 15.3 (0.28)"
+  },
+  {
+   "check": "migraine migraine-nhis-2015 source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/29527677/",
+   "evidence": "15.3% overall [95% CI 14.75-15.85], 9.7% of males [95% CI 9.05-10.35] and 20.7% of females [95% CI 19.84-21.56]"
+  },
+  {
+   "check": "ibd ibd-cdc-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "ibd ibd-cdc-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/inflammatory-bowel-disease/php/facts-stats/index.html",
+   "evidence": "U.S. prevalence of inflammatory bowel disease (IBD) is estimated between 2.4 and 3.1 million"
+  },
+  {
+   "check": "ibd ibd-cdc-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/mmwr/volumes/65/wr/mm6542a3.htm",
+   "evidence": "In 2015, an estimated 3.1 million (1.3%) of U.S. adults had ever received a diagnosis of inflammatory bowel disease"
+  },
+  {
+   "check": "interstitial-cystitis ic-niddk-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "interstitial-cystitis ic-niddk-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.niddk.nih.gov/health-information/urologic-diseases/interstitial-cystitis-bladder-pain-syndrome/definition-facts",
+   "evidence": "Between 4 and 12 million people in the United States may have IC."
+  },
+  {
+   "check": "interstitial-cystitis ic-niddk-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pmc.ncbi.nlm.nih.gov/articles/PMC9404297/",
+   "evidence": "IC/BPS affects 3-8 million women and 1-4 million men in the United States"
+  },
+  {
+   "check": "celiac celiac-niddk-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "celiac celiac-niddk-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.niddk.nih.gov/health-information/digestive-diseases/celiac-disease/definition-facts",
+   "evidence": "experts estimate about 2 million people in the United States have celiac disease"
+  },
+  {
+   "check": "celiac celiac-niddk-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pmc.ncbi.nlm.nih.gov/articles/PMC5459670/",
+   "evidence": "which equates to approximately 2.0 million Americans"
+  },
+  {
+   "check": "chronic-kidney-disease ckd-cdc-niddk-adults two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "chronic-kidney-disease ckd-cdc-niddk-adults source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/kidney-disease/about/index.html",
+   "evidence": "About 35.5 million US adults are estimated to have CKD, and most are undiagnosed."
+  },
+  {
+   "check": "chronic-kidney-disease ckd-cdc-niddk-adults source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.niddk.nih.gov/health-information/health-statistics/kidney-disease",
+   "evidence": "Chronic kidney disease (CKD) affects more than 1 in 7 U.S. adults-an estimated 35.5 million Americans."
+  },
+  {
+   "check": "epilepsy epilepsy-cdc-adults two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "epilepsy epilepsy-cdc-adults source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/epilepsy/data-research/facts-stats/index.html",
+   "evidence": "During 2021 and 2022, about 2.9 million U.S. adults 18 and older reported having active epilepsy."
+  },
+  {
+   "check": "epilepsy epilepsy-cdc-adults source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/38820685/",
+   "evidence": "Among the 1.1 % of US adults with active epilepsy in 2021/2022 (estimated population about 2.9 million)"
+  },
+  {
+   "check": "autism asd-cdc-addm-2022 two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "autism asd-cdc-addm-2022 source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/autism/data-research/index.html",
+   "evidence": "About 1 in 31 (3.2%) children aged 8 years has been identified with ASD"
+  },
+  {
+   "check": "autism asd-cdc-addm-2022 source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/40232988/",
+   "evidence": "32.2 per 1,000 children (one in 31) across the 16 sites"
+  },
+  {
+   "check": "chronic-hepatitis-c hcv-cdc-prevalence two sources",
+   "status": "PASS",
+   "detail": "2 sources",
+   "evidence": null
+  },
+  {
+   "check": "chronic-hepatitis-c hcv-cdc-prevalence source 1",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://www.cdc.gov/hepatitis-c/hcp/clinical-overview/index.html",
+   "evidence": "It is estimated that in the United States more than 2.4 million people - and as many as 4 million people - had hepatitis C from 2017-2020."
+  },
+  {
+   "check": "chronic-hepatitis-c hcv-cdc-prevalence source 2",
+   "status": "PASS",
+   "detail": "the quoted sentence is in https://pubmed.ncbi.nlm.nih.gov/38739849/",
+   "evidence": "we estimated HCV RNA prevalence of 1.0% (95% CI: 0.5%-1.4%) among US adults in 2017-2020, corresponding to 2,463,700"
+  },
+  {
    "check": "long-covid sex note",
    "status": "PASS",
-   "detail": "re-read in CDC/NCHS Household Pulse Survey \u2014 Post-COVID Conditions (gsea-w83j), survey period 72: women 6.8 (6.2-7.4) and men 3.7 (3.3-4.3), Aug 20 - Sep 16, 2024",
+   "detail": "re-read in CDC/NCHS Household Pulse Survey, Post-COVID Conditions (gsea-w83j), survey period 72: women 6.8 (6.2-7.4) and men 3.7 (3.3-4.3), Aug 20 - Sep 16, 2024",
    "evidence": "CDC/NCHS Household Pulse Survey, 20 August to 16 September 2024: 6.8 percent of women (95% CI 6.2-7.4) and 3.7 percent o"
   },
   {
@@ -358,19 +2416,19 @@
   {
    "check": "pots-dysautonomia sex blank",
    "status": "PASS",
-   "detail": "We have found no federal publication giving POTS prevalence by sex. That is a statement about what we could find, not a claim that none exists \u2014 if yo",
+   "detail": "We have found no federal publication giving POTS prevalence by sex. That is a statement about what we could find, not a claim that none exists: if yo",
    "evidence": null
   },
   {
    "check": "fibromyalgia sex note",
    "status": "PASS",
-   "detail": "read in NIH NIAMS \u2014 Fibromyalgia: the NIAMS sentence, word for word",
+   "detail": "read in NIH NIAMS, Fibromyalgia: the NIAMS sentence, word for word",
    "evidence": "NIH NIAMS says plainly: \u201cAnyone can get fibromyalgia, but more women get it than men.\u201d It publishes a direction and no f"
   },
   {
    "check": "endometriosis sex note",
    "status": "PASS",
-   "detail": "read in HHS Office on Women's Health \u2014 Endometriosis: at least 11% of women; more than 6 1/2 million women",
+   "detail": "read in HHS Office on Women's Health, Endometriosis: at least 11% of women; more than 6 1/2 million women",
    "evidence": "HHS Office on Women's Health: \u201cResearchers think that at least 11% of women, or more than 6 \u00bd million women in the Unite"
   },
   {
@@ -389,6 +2447,384 @@
    "check": "undiagnosed sex blank",
    "status": "PASS",
    "detail": "Not a diagnosis, so there is no published prevalence to split by sex. The only thing this row can be read by sex on is what the register's own respond",
+   "evidence": null
+  },
+  {
+   "check": "lyme sex blank",
+   "status": "PASS",
+   "detail": "We have not verified a federal prevalence figure for Lyme disease by sex. The CDC cost study below reports that sex was not associated with a signific",
+   "evidence": null
+  },
+  {
+   "check": "lupus sex note",
+   "status": "PASS",
+   "detail": "read in CDC, People with Lupus: the CDC sentence, 9 out of every 10; about 184,000 females; about 20,000 males",
+   "evidence": "CDC: \u201cIt is estimated that 9 out of every 10 people with lupus are women.\u201d Of the estimated 204,000 people with SLE, CDC"
+  },
+  {
+   "check": "multiple-sclerosis sex blank",
+   "status": "PASS",
+   "detail": "The federal page we cite says MS is more commonly diagnosed in young adults, \u201cparticularly women\u201d, and gives no figure by sex; the study\u2019s sex ratio i",
+   "evidence": null
+  },
+  {
+   "check": "migraine sex note",
+   "status": "PASS",
+   "detail": "read in NCHS Summary Health Statistics, NHIS 2015, Table A-5: men 9.7% in Table A-5a; women 20.7% in Table A-5a",
+   "evidence": "CDC/NCHS, National Health Interview Survey 2015: 20.7 percent of women and 9.7 percent of men said they had a severe hea"
+  },
+  {
+   "check": "ibd sex blank",
+   "status": "PASS",
+   "detail": "CDC\u2019s MMWR report we cite says: \u201cThe prevalence of IBD did not differ by sex.\u201d With no difference to print, there is no sex figure here.",
+   "evidence": null
+  },
+  {
+   "check": "interstitial-cystitis sex blank",
+   "status": "PASS",
+   "detail": "NIDDK says IC is more common in women than men and gives no figure by sex on the page we cite; the 3 to 8 million women and 1 to 4 million men are the",
+   "evidence": null
+  },
+  {
+   "check": "celiac sex blank",
+   "status": "PASS",
+   "detail": "NIDDK says a celiac diagnosis is more common in females than in males and gives no figure by sex on the page we cite.",
+   "evidence": null
+  },
+  {
+   "check": "irritable-bowel-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Irritable bowel syndrome prevalence by sex. That is a statement about what we have checked, not ",
+   "evidence": null
+  },
+  {
+   "check": "rheumatoid-arthritis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Rheumatoid arthritis prevalence by sex. That is a statement about what we have checked, not a cl",
+   "evidence": null
+  },
+  {
+   "check": "ehlers-danlos-syndromes sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Ehlers-Danlos syndromes prevalence by sex. That is a statement about what we have checked, not a",
+   "evidence": null
+  },
+  {
+   "check": "complex-regional-pain-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Complex regional pain syndrome (type I) prevalence by sex. That is a statement about what we hav",
+   "evidence": null
+  },
+  {
+   "check": "ankylosing-spondylitis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Ankylosing spondylitis prevalence by sex. That is a statement about what we have checked, not a ",
+   "evidence": null
+  },
+  {
+   "check": "psoriatic-arthritis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Psoriatic arthritis prevalence by sex. That is a statement about what we have checked, not a cla",
+   "evidence": null
+  },
+  {
+   "check": "sjogrens-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Sj\u00f6gren\u2019s disease prevalence by sex. That is a statement about what we have checked, not a claim",
+   "evidence": null
+  },
+  {
+   "check": "hashimotos-thyroiditis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Hashimoto\u2019s thyroiditis prevalence by sex. That is a statement about what we have checked, not a",
+   "evidence": null
+  },
+  {
+   "check": "graves-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Graves\u2019 disease prevalence by sex. That is a statement about what we have checked, not a claim t",
+   "evidence": null
+  },
+  {
+   "check": "addisons-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Addison\u2019s disease prevalence by sex. That is a statement about what we have checked, not a claim",
+   "evidence": null
+  },
+  {
+   "check": "chronic-kidney-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Chronic kidney disease prevalence by sex. That is a statement about what we have checked, not a ",
+   "evidence": null
+  },
+  {
+   "check": "epilepsy sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Epilepsy prevalence by sex. That is a statement about what we have checked, not a claim that non",
+   "evidence": null
+  },
+  {
+   "check": "narcolepsy sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Narcolepsy prevalence by sex. That is a statement about what we have checked, not a claim that n",
+   "evidence": null
+  },
+  {
+   "check": "idiopathic-intracranial-hypertension sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Idiopathic intracranial hypertension prevalence by sex. That is a statement about what we have c",
+   "evidence": null
+  },
+  {
+   "check": "chiari-malformation sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Chiari malformation prevalence by sex. That is a statement about what we have checked, not a cla",
+   "evidence": null
+  },
+  {
+   "check": "mast-cell-activation-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Mast cell activation syndrome prevalence by sex. That is a statement about what we have checked,",
+   "evidence": null
+  },
+  {
+   "check": "gastroparesis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Gastroparesis prevalence by sex. That is a statement about what we have checked, not a claim tha",
+   "evidence": null
+  },
+  {
+   "check": "vulvodynia sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Vulvodynia prevalence by sex. That is a statement about what we have checked, not a claim that n",
+   "evidence": null
+  },
+  {
+   "check": "polycystic-ovary-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Polycystic ovary syndrome prevalence by sex. That is a statement about what we have checked, not",
+   "evidence": null
+  },
+  {
+   "check": "myasthenia-gravis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Myasthenia gravis prevalence by sex. That is a statement about what we have checked, not a claim",
+   "evidence": null
+  },
+  {
+   "check": "trigeminal-neuralgia sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Trigeminal neuralgia prevalence by sex. That is a statement about what we have checked, not a cl",
+   "evidence": null
+  },
+  {
+   "check": "occipital-neuralgia sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Occipital neuralgia prevalence by sex. That is a statement about what we have checked, not a cla",
+   "evidence": null
+  },
+  {
+   "check": "cluster-headache sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Cluster headache prevalence by sex. That is a statement about what we have checked, not a claim ",
+   "evidence": null
+  },
+  {
+   "check": "tinnitus sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Tinnitus prevalence by sex. That is a statement about what we have checked, not a claim that non",
+   "evidence": null
+  },
+  {
+   "check": "menieres-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving M\u00e9ni\u00e8re\u2019s disease prevalence by sex. That is a statement about what we have checked, not a claim",
+   "evidence": null
+  },
+  {
+   "check": "chronic-pain-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Chronic pain syndrome prevalence by sex. That is a statement about what we have checked, not a c",
+   "evidence": null
+  },
+  {
+   "check": "peripheral-neuropathy sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Peripheral neuropathy (polyneuropathy) prevalence by sex. That is a statement about what we have",
+   "evidence": null
+  },
+  {
+   "check": "raynauds-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Raynaud\u2019s syndrome prevalence by sex. That is a statement about what we have checked, not a clai",
+   "evidence": null
+  },
+  {
+   "check": "systemic-sclerosis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Systemic sclerosis (scleroderma) prevalence by sex. That is a statement about what we have check",
+   "evidence": null
+  },
+  {
+   "check": "dermatomyositis-and-polymyositis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Dermatomyositis and polymyositis prevalence by sex. That is a statement about what we have check",
+   "evidence": null
+  },
+  {
+   "check": "hidradenitis-suppurativa sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Hidradenitis suppurativa prevalence by sex. That is a statement about what we have checked, not ",
+   "evidence": null
+  },
+  {
+   "check": "eosinophilic-esophagitis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Eosinophilic esophagitis prevalence by sex. That is a statement about what we have checked, not ",
+   "evidence": null
+  },
+  {
+   "check": "microscopic-colitis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Microscopic colitis prevalence by sex. That is a statement about what we have checked, not a cla",
+   "evidence": null
+  },
+  {
+   "check": "sarcoidosis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Sarcoidosis prevalence by sex. That is a statement about what we have checked, not a claim that ",
+   "evidence": null
+  },
+  {
+   "check": "autoimmune-hepatitis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Autoimmune hepatitis prevalence by sex. That is a statement about what we have checked, not a cl",
+   "evidence": null
+  },
+  {
+   "check": "primary-biliary-cholangitis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Primary biliary cholangitis prevalence by sex. That is a statement about what we have checked, n",
+   "evidence": null
+  },
+  {
+   "check": "depression sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Depression prevalence by sex. That is a statement about what we have checked, not a claim that n",
+   "evidence": null
+  },
+  {
+   "check": "generalized-anxiety-disorder sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Generalized anxiety disorder prevalence by sex. That is a statement about what we have checked, ",
+   "evidence": null
+  },
+  {
+   "check": "post-traumatic-stress-disorder sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Post-traumatic stress disorder prevalence by sex. That is a statement about what we have checked",
+   "evidence": null
+  },
+  {
+   "check": "adhd sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving ADHD prevalence by sex. That is a statement about what we have checked, not a claim that none ex",
+   "evidence": null
+  },
+  {
+   "check": "autism sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Autism prevalence by sex. That is a statement about what we have checked, not a claim that none ",
+   "evidence": null
+  },
+  {
+   "check": "chronic-hepatitis-c sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Chronic hepatitis C prevalence by sex. That is a statement about what we have checked, not a cla",
+   "evidence": null
+  },
+  {
+   "check": "obstructive-sleep-apnea sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Obstructive sleep apnea prevalence by sex. That is a statement about what we have checked, not a",
+   "evidence": null
+  },
+  {
+   "check": "restless-legs-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Restless legs syndrome prevalence by sex. That is a statement about what we have checked, not a ",
+   "evidence": null
+  },
+  {
+   "check": "temporomandibular-joint-disorders sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Temporomandibular joint disorders prevalence by sex. That is a statement about what we have chec",
+   "evidence": null
+  },
+  {
+   "check": "polymyalgia-rheumatica sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Polymyalgia rheumatica prevalence by sex. That is a statement about what we have checked, not a ",
+   "evidence": null
+  },
+  {
+   "check": "behcets-disease sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Beh\u00e7et\u2019s disease prevalence by sex. That is a statement about what we have checked, not a claim ",
+   "evidence": null
+  },
+  {
+   "check": "neuromyelitis-optica sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Neuromyelitis optica prevalence by sex. That is a statement about what we have checked, not a cl",
+   "evidence": null
+  },
+  {
+   "check": "chronic-inflammatory-demyelinating-polyneuropathy sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Chronic inflammatory demyelinating polyneuropathy prevalence by sex. That is a statement about w",
+   "evidence": null
+  },
+  {
+   "check": "lichen-sclerosus sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Lichen sclerosus prevalence by sex. That is a statement about what we have checked, not a claim ",
+   "evidence": null
+  },
+  {
+   "check": "premenstrual-dysphoric-disorder sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Premenstrual dysphoric disorder prevalence by sex. That is a statement about what we have checke",
+   "evidence": null
+  },
+  {
+   "check": "pernicious-anemia sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Pernicious anemia prevalence by sex. That is a statement about what we have checked, not a claim",
+   "evidence": null
+  },
+  {
+   "check": "hemochromatosis sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Hemochromatosis prevalence by sex. That is a statement about what we have checked, not a claim t",
+   "evidence": null
+  },
+  {
+   "check": "hypermobility-syndrome sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Hypermobility syndrome prevalence by sex. That is a statement about what we have checked, not a ",
+   "evidence": null
+  },
+  {
+   "check": "hypothyroidism sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Hypothyroidism prevalence by sex. That is a statement about what we have checked, not a claim th",
+   "evidence": null
+  },
+  {
+   "check": "asthma sex blank",
+   "status": "PASS",
+   "detail": "We have not yet verified a federal publication giving Asthma prevalence by sex. That is a statement about what we have checked, not a claim that none ",
    "evidence": null
   },
   {

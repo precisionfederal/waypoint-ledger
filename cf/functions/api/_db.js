@@ -47,11 +47,17 @@ export async function userOf(env, request) {
   return { id: s.user_id, displayName: s.display_name };
 }
 export const SESSION_DAYS = 30;
+/* SameSite=Strict (R1-auth F1, 2026-09-30). The session is only ever read by
+   fetch() calls this site's own pages make, which are same-site, so Strict
+   costs nothing: a person arriving from a link elsewhere gets the static page,
+   and the page's own /api/me call carries the cookie. What Strict adds is that
+   no request started by another site ever carries or plants this cookie, which
+   is the second lock behind the Origin check in _middleware.js. */
 export function sessionCookie(sid, request) {
   const secure = new URL(request.url).protocol === 'https:' ? '; Secure' : '';
-  return `wl_session=${sid}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_DAYS * 86400}${secure}`;
+  return `wl_session=${sid}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${SESSION_DAYS * 86400}${secure}`;
 }
-export const clearCookie = () => 'wl_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0';
+export const clearCookie = () => 'wl_session=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0';
 /* The one door with no public purpose, so the one door worth timing.
 
    This used to be `a === `Bearer ${env.ADMIN_TOKEN}``. JavaScript's === on

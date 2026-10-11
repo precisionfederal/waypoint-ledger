@@ -121,15 +121,15 @@ describe('formatting and table health', () => {
   it('formats dollars without inventing precision', () => {
     expect(usd(135.61)).toBe('$136');
     expect(usd(135.61, true)).toBe('$135.61');
-    expect(usd(null)).toBe('—');
-    expect(usd(NaN)).toBe('—');
+    expect(usd(null)).toBe('–');
+    expect(usd(NaN)).toBe('–');
     expect(usd(1234567)).toBe('$1,234,567');
   });
   it('abbreviates only above a thousand', () => {
     expect(abbreviateUsd(950)).toBe('$950');
     expect(abbreviateUsd(4_100)).toBe('$4K');
     expect(abbreviateUsd(2_400_000)).toBe('$2.4M');
-    expect(abbreviateUsd(null)).toBe('—');
+    expect(abbreviateUsd(null)).toBe('–');
   });
   it('ships a loaded, versioned table where every row carries its source and coverage', () => {
     expect(priceTableIsLoaded(TABLE)).toBe(true);

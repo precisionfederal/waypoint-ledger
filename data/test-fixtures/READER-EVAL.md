@@ -1,12 +1,28 @@
 # The reader: which model, measured
 
-Corpus: `data/test-fixtures/map-eval.json` — 209 sentences, 220 expected units, 39 sentences that must produce nothing.
+Corpus: `data/test-fixtures/map-eval.json` — 209 sentences, 219 expected units, 39 sentences that must produce nothing.
 Harness: `scripts/eval-models.mjs`, reasoning effort `low`, run 2026-09-10 02:58Z.
 Same prompt, same catalog (251 selectable rows), same guarantees for every model: the model may only fill a phrase the rules left blank, only with an id the catalog holds, and never sees or returns a figure.
 
+Rules row re-measured 2026-09-30 21:52Z with `--rules-only` (no model called); the model rows below it are from the run above, over the rules as they stood that day (rules only then: 71.1% F1), and were not re-run.
+
+2026-09-30 R4 (mapper2): two expected rows in `map-eval.json` were corrected on the main session's decision on R3-fedexpert FX-02 (95886 is an add-on; the conduction study, 95908, is its own row): #152 "nerve conduction studies" now expects `cms-test-ncs-3-4`, and #185, the demo sentence, now expects six units (`cms-test-emg` from the AI reader and `cms-test-ncs-3-4` from the rules). Against the corpus as it stood before that correction the rules score 88.2% F1 (tp 179, fp 7, fn 41), up from 88.1%; against the corrected corpus, 88.9%.
+
+2026-09-30 R4b (mapper3): the main session withdrew the R4 reading of "shocked the nerves" as the 3-4 nerve conduction row (NEVER INVENT SPECIFICITY: CMS prices the conduction study by the number of nerves, 95907-95913, and no number was said). The rules now read it and leave it unpriced by name. Two expected rows were corrected to match, and nothing else: #152 "nerve conduction studies" (no number) and #185, the demo sentence, no longer expect `cms-test-ncs-3-4` (#185 keeps `cms-test-emg`, the AI reader's). Rules-only F1 before this round 88.9% (tp 181, fp 5, fn 40); after, on the corpus as it stood, 88.4% (tp 179, fp 5, fn 42, the two withdrawn units now counted as misses); after, on the corrected corpus, **88.8%** (tp 179, fp 5, fn 40). No other row's answer changed.
+
+2026-10-11 FINAL-1011 reader: 30 judge-style sentences added (cases 306-335, kind `judge`, written by hand; the corpus is now 335 sentences). Rules only, measured with `--rules-only` (no model called), the rules of the live build (eb5706682e) against the rules after this round:
+
+| corpus | before P / R / F1 (fp) | after P / R / F1 (fp) |
+|---|---|---|
+| all 335 | 97.6% / 89.2% / **93.2%** (7) | 99.0% / 89.8% / **94.2%** (3) |
+| the 30 new judge sentences | 86.7% / 92.9% / **89.7%** (4) | 100% / 100% / **100%** (0) |
+| the 305 that were there | 98.9% / 88.9% / **93.6%** (3) | 98.9% / 88.9% / **93.6%** (3) |
+
+The metric scores units only, so the counts, diagnosis markers and spans this round fixed ("8 physical therapy visits" ×8, "sick since 2022", "after 9 years", "doctor to doctor for 5 years") are asserted in `tests/judge-sentences.test.ts`, not here. The table below is the 209-sentence measurement and was not re-run.
+
 | reader | precision | recall | F1 | false positives | p50 ms | p95 ms | tokens in / out | errors |
 |---|---|---|---|---|---|---|---|---|
-| rules only (no model) | 74.3% | 68.2% | **71.1%** | 52 | — | — | — | — |
+| rules only (no model) | 97.3% | 81.7% | **88.8%** | 5 | — | — | — | — |
 | gpt-5.4-nano | 77.2% | 86.4% | **81.5%** | 56 | 1623 | 4627 | 1,196,882 / 6,099 | 0 |
 | gpt-5.4-mini | 78.3% | 88.6% | **83.2%** | 54 | 1041 | 2407 | 1,196,882 / 8,653 | 0 |
 | gpt-5.4 | 78.6% | 88.6% | **83.3%** | 53 | 1580 | 2540 | 1,196,882 / 9,738 | 0 |
@@ -757,4 +773,4 @@ Every flag raised (the strongest reader):
 - **181** (hypothetical) rules said `cms-test-tilt-table` for "a tilt table test might explain it" — flag: *Phrase says read online, not that a tilt-table test happened* ✅ the rules were wrong
 - **190** (lay) rules said `null` for "a probe on my finger" — flag: *Story mentions finger probe; matcher read only belt home sleep test* ✅ the rules were wrong
 
-Full rows, including every flag with its phrase: /private/tmp/claude-501/-Users-bo-Documents-100M-Lifetime-Revenue-Precision-Federal-Proposal-Builder-runs-TOPX-HHS-PHASE2-waypoint-app/1dbdfa79-3850-4f07-a82f-264c56014309/scratchpad/final209-low.json
+Full rows, including every flag with its phrase: kept with the evaluation run; rerun scripts/eval-models.mjs to regenerate them.

@@ -54,7 +54,20 @@ interface RawItem {
   loinc_long_common_name?: string;
   loinc_source?: string;
   pfs_status_indicator?: string;
+  max_per_year?: number;
+  max_per_year_basis?: string;
   alternates?: Record<string, unknown>;
+}
+
+/** A number an alternates block carries, or undefined. Never coerced, never
+ *  defaulted — a missing companion figure is a missing figure. */
+function altNum(a: Record<string, unknown> | undefined, key: string): number | undefined {
+  const v = a?.[key];
+  return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+}
+function altStr(a: Record<string, unknown> | undefined, key: string): string | undefined {
+  const v = a?.[key];
+  return typeof v === 'string' && v.trim() ? v : undefined;
 }
 
 /* ==========================================================================
@@ -174,6 +187,17 @@ export const TABLE: PriceItem[] = RAW_ITEMS.map((r) => {
     loincName: r.loinc_long_common_name || undefined,
     loincSource: r.loinc_source || undefined,
     pfsStatus: r.pfs_status_indicator || undefined,
+    /* The setting, and the frequency rule. R6 F3/F5/F12. */
+    facilityUsd: altNum(r.alternates, 'facility_setting_physician_payment_usd'),
+    facilityComponent: altStr(r.alternates, 'facility_setting_component'),
+    facilityNote: altStr(r.alternates, '_facility_setting_note'),
+    hospitalFeeUsd: altNum(r.alternates, 'hospital_outpatient_facility_fee_usd'),
+    hospitalFeeSource: altStr(r.alternates, 'hospital_outpatient_facility_fee_source'),
+    hospitalCopayUsd: altNum(r.alternates, 'hospital_outpatient_minimum_beneficiary_copay_usd'),
+    componentHospitalFeeUsd: altNum(r.alternates, 'hospital_facility_fee_usd'),
+    componentPhysicianFeeUsd: altNum(r.alternates, 'physician_fee_usd'),
+    maxPerYear: typeof r.max_per_year === 'number' ? r.max_per_year : undefined,
+    maxPerYearBasis: r.max_per_year_basis || undefined,
   };
 });
 

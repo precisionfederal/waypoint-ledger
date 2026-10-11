@@ -23,10 +23,22 @@
    would have been easy to look more complete and be less true):
    - No Patient, no identifier, no birth date, no dates of service. The tool
      never asked for them, so asserting them would be fabrication.
-   - No APC coding. CMS publishes an Ambulatory Payment Classification for two
-     of our rows, and FHIR publishes no canonical system URI for APC. Inventing
-     one would make a machine-readable claim we cannot stand behind, so the APC
-     is returned in `codes[]` beside the bundle and stays out of it.
+   - No APC *code system URI*. CMS publishes an Ambulatory Payment Classification
+     for two of our rows, and FHIR publishes no canonical system URI for APC.
+     Inventing one would make a machine-readable claim we cannot stand behind, so
+     the APC is returned in `codes[]` beside the bundle and, on the line whose
+     figure CONTAINS an APC payment, in the first sentence of overrideReason,
+     which says the figure is two published rates added and names the APC (R6
+     finding F10: a machine consumer read $544.54 as a professional fee for CPT
+     99284, 4.6x the real PFS figure). Until 2026-10-01 the APC also rode in an
+     extension of ours; the HL7 validator reports any extension it cannot load
+     from a package as an error, whatever its URL serves (R3-fedexpert FX-11,
+     re-run 2026-10-01: the definition served at its URL was never fetched), so
+     the extension is gone and the bundle validates with 0 errors.
+   - LOINC IS carried where the row has one. http://loinc.org is a canonical,
+     published system URI, and 36 of our lab rows hold an NLM-confirmed code; a
+     bundle that dropped them was dropping exactly what a health-IT reader needs
+     (R6 finding F10, R5 finding #10).
    - No second Procedure for a repeat. Where somebody said a test happened three
      times, the bundle carries one Procedure and a ChargeItem whose quantity is
      three. Three dated Procedures would be three assertions we were never told.
@@ -43,6 +55,7 @@
 
 import { categoryKey } from './categories';
 import type { JourneyEntry, PriceItem } from './types';
+import { paidArithmetic, paidFieldsIn, paidLineTotal } from './paid';
 
 /* --------------------------------------------------------------------------
    THE CODE SYSTEM URIs. Each was read at its publisher, not remembered:
@@ -59,14 +72,99 @@ export const CPT_SYSTEM = 'http://www.ama-assn.org/go/cpt';
 export const HCPCS_SYSTEM = 'http://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets';
 export const ACT_CODE_SYSTEM = 'http://terminology.hl7.org/CodeSystem/v3-ActCode';
 export const PROVENANCE_AGENT_TYPE_SYSTEM = 'http://terminology.hl7.org/CodeSystem/provenance-participant-type';
+/** LOINC's own canonical system URI, as HL7 publishes it in the R4 systems table. */
+export const LOINC_SYSTEM = 'http://loinc.org';
 
 /** Our own namespace, for the one tag that is ours: which price table built it. */
-export const WAYPOINT_BASE = 'https://waypoint-ledger.pages.dev';
+export const WAYPOINT_BASE = 'https://waypointledger.org';
 export const TABLE_VERSION_SYSTEM = `${WAYPOINT_BASE}/fhir/CodeSystem/price-table-version`;
+/** Ours, and declared as ours: the CMS payment classification a figure contains. Retired from bundles 2026-10-01; the definition is still served for bundles built before. */
+export const APC_EXTENSION_URL = `${WAYPOINT_BASE}/fhir/StructureDefinition/cms-apc`;
+/* --------------------------------------------------------------------------
+   THE TWO URLS OF OUR OWN RESOLVE (R3-fedexpert FX-11, 2026-10-01).
 
-/* The sentence the site itself offers as an example, on the landing page and in
-   the journey builder. GET /api/fhir/example prices this one, so the bundle a
-   developer meets first is the same journey the product demonstrates. */
+   The HL7 validator reported one error on every bundle with an ER line: the
+   APC extension URL named a definition nobody could fetch (404). Bundles no
+   longer carry that extension (see the header), but bundles already downloaded
+   do, and a canonical URL of ours has to answer with the definition it names,
+   so both are served, as FHIR JSON, from these objects by cf/functions/fhir/**:
+     ${WAYPOINT_BASE}/fhir/StructureDefinition/cms-apc
+     ${WAYPOINT_BASE}/fhir/CodeSystem/price-table-version
+   Each says exactly what we put in the bundle and no more.
+   -------------------------------------------------------------------------- */
+export const FHIR_DEFINITIONS_DATE = '2026-10-01';
+
+/** The StructureDefinition of the one extension the bundle carries. */
+export const APC_EXTENSION_DEFINITION = {
+  resourceType: 'StructureDefinition',
+  id: 'cms-apc',
+  url: APC_EXTENSION_URL,
+  version: FHIR_DEFINITIONS_DATE,
+  name: 'CmsApc',
+  title: 'CMS Ambulatory Payment Classification contained in a figure',
+  status: 'retired',
+  experimental: false,
+  date: FHIR_DEFINITIONS_DATE,
+  publisher: 'Precision Federal (Waypoint Ledger)',
+  description:
+    'Retired 2026-10-01: bundles built from that day carry the APC only in ChargeItem.overrideReason and in the '
+    + 'envelope codes[] of POST /api/fhir?envelope=1. Published so that bundles built before then still resolve. '
+    + 'Waypoint Ledger put this on a ChargeItem only where the published figure is two CMS rates added: a hospital '
+    + 'outpatient (OPPS) payment for an Ambulatory Payment Classification plus the physician fee for the CPT or HCPCS '
+    + 'code in ChargeItem.code. The value is the APC as text, for example "APC 5024". FHIR publishes no code system '
+    + 'URI for APC, so it is carried here as a string rather than as a coding. The first sentence of '
+    + 'ChargeItem.overrideReason states the same addition in words.',
+  fhirVersion: FHIR_VERSION,
+  kind: 'complex-type',
+  abstract: false,
+  context: [{ type: 'element', expression: 'ChargeItem' }],
+  type: 'Extension',
+  baseDefinition: 'http://hl7.org/fhir/StructureDefinition/Extension',
+  derivation: 'constraint',
+  differential: {
+    element: [
+      { id: 'Extension', path: 'Extension', short: 'The CMS APC a composed figure contains', definition: 'The CMS Ambulatory Payment Classification whose OPPS payment is one of the two published rates added to make this figure.', min: 0, max: '1' },
+      { id: 'Extension.extension', path: 'Extension.extension', max: '0' },
+      { id: 'Extension.url', path: 'Extension.url', fixedUri: APC_EXTENSION_URL },
+      { id: 'Extension.value[x]', path: 'Extension.value[x]', short: '"APC " followed by the APC number', definition: 'The APC as CMS publishes it in OPPS Addendum B, prefixed with "APC ".', min: 1, type: [{ code: 'string' }] },
+    ],
+  },
+} as const;
+
+/** The CodeSystem behind Bundle.meta.tag: which price table built the bundle. */
+export const TABLE_VERSION_CODESYSTEM = {
+  resourceType: 'CodeSystem',
+  id: 'price-table-version',
+  url: TABLE_VERSION_SYSTEM,
+  version: FHIR_DEFINITIONS_DATE,
+  name: 'WaypointPriceTableVersion',
+  title: 'Waypoint Ledger price table version',
+  status: 'active',
+  experimental: false,
+  date: FHIR_DEFINITIONS_DATE,
+  publisher: 'Precision Federal (Waypoint Ledger)',
+  description:
+    'The version of the Waypoint Ledger price table a bundle was built from, in the form YYYY-MM-DD.N (for example '
+    + '2026-09-09.1). Each version is a published table of federal figures, served at /api/table with its own '
+    + 'version, and every figure in it cites the federal file it was read from. Codes are not enumerated here: '
+    + 'the code is the version string itself.',
+  caseSensitive: true,
+  content: 'not-present',
+} as const;
+
+/** Ours: a burden a person carried that no published federal file prices. */
+export const BURDEN_CODE_TEXT = 'Burden with no published federal figure';
+/** The Observation that carries what the person says they paid (patient-reported, never a charge). */
+export const PAID_CODE_TEXT = 'Amount the person says they paid for this care (patient-reported)';
+export const PAID_PERFORMER_DISPLAY = 'The person this ledger belongs to, reporting for themselves. No identity is recorded.';
+
+/* The sentence the journey builder (/journey) offers as its example: the
+   placeholder in its empty box and the text its Use an example link fills in
+   (components/JourneyBuilder.tsx EXAMPLE, pinned equal in tests/fhir.test.ts).
+   The home page's box is different since JUDGE-3 #14: it shows three lines of
+   the full example ledger (app/page.tsx EXAMPLE and PREVIEW). GET
+   /api/fhir/example prices this sentence, so the bundle a developer meets first
+   is a journey the product itself offers. */
 export const EXAMPLE_STORY =
   'saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER once when my heart was racing';
 
@@ -94,7 +192,8 @@ export interface FhirBundle {
 /** Either a resolved ledger line (the browser's shape) or a raw one (the API's). */
 export type FhirEntryInput =
   | JourneyEntry
-  | { key?: string; raw: string; itemId: string | null; times: number };
+  | { key?: string; raw: string; itemId: string | null; times: number;
+      months?: number | null; gapCategory?: string | null; paid?: number | null; paidEach?: boolean | null };
 
 /** A published federal file, named so a reader can open it. */
 export interface FhirSource { url: string; title: string }
@@ -149,6 +248,10 @@ export interface FhirExport {
     /** charges whose figure is published but whose file this table does not hold,
      *  so the line cites none rather than citing the wrong one */
     chargeItemsWithoutASourceFile: number;
+    /** burden lines carried as Observations — care and time no claims file records */
+    burdenObservations: number;
+    /** what the person said they paid, one patient-reported Observation per line that carries it */
+    paidObservations: number;
   };
 }
 
@@ -226,7 +329,8 @@ const agencyDisplayOf = (item: PriceItem): string =>
 function resolve(e: FhirEntryInput, table: readonly PriceItem[]): JourneyEntry {
   if ('item' in e) return e;
   const item = e.itemId ? table.find((t) => t.id === e.itemId) ?? null : null;
-  return { key: e.key ?? e.itemId ?? e.raw, raw: e.raw, item, times: e.times };
+  return { key: e.key ?? e.itemId ?? e.raw, raw: e.raw, item, times: e.times,
+           months: e.months ?? null, gapCategory: e.gapCategory ?? null, ...paidFieldsIn(e) };
 }
 
 /** The sentence under every figure: the arithmetic, then what the figure is. */
@@ -266,6 +370,8 @@ export function toFhirBundle(
   let chargeItems = 0;
   let clinicalLinesWithNoFigure = 0;
   let chargeItemsWithoutASourceFile = 0;
+  let burdenObservations = 0;
+  let paidObservations = 0;
 
   const push = (resource: FhirResource): string => {
     const urn = `urn:uuid:${resource.id}`;
@@ -273,13 +379,64 @@ export function toFhirBundle(
     return urn;
   };
 
+  /* 🔴 WHAT THE PERSON PAID RIDES AS THEIR OWN REPORT, NEVER AS A CHARGE (round 5).
+     One Observation per line that carries an amount: the performer is the person
+     (a display-only reference, like every subject here), the value is dollars in
+     ISO 4217, `focus` points at the line's own resource, and the note says it is
+     self-reported, unchecked and added to nothing. No ChargeItem is touched. */
+  const pushPaid = (entry: JourneyEntry, focusUrn: string | null, what: string) => {
+    const total = paidLineTotal(entry);
+    if (total === null) return;
+    const math = paidArithmetic(entry, (n) => `$${round2(n).toFixed(2)}`);
+    push({
+      resourceType: 'Observation',
+      id: uuid(),
+      status: 'final',
+      code: { text: PAID_CODE_TEXT },
+      subject: { display: SUBJECT_DISPLAY },
+      performer: [{ display: PAID_PERFORMER_DISPLAY }],
+      ...(focusUrn ? { focus: [{ reference: focusUrn }] } : {}),
+      valueQuantity: { value: round2(total), unit: 'USD', system: 'urn:iso:std:iso:4217', code: 'USD' },
+      note: [{
+        text: `Reported by the person for "${what}"${math ? ` (${math})` : ''}. `
+            + 'Typed on their own device; not a published federal figure, not checked by anyone, and not added to any ChargeItem or total.',
+      }],
+    });
+    paidObservations += 1;
+  };
+
   for (const entry of entries) {
     const item = entry.item;
     if (!item) {
+      /* 🔴 R6 / edge finding #7. The ledger's own banner over these lines reads
+         "The burden no claims file records" — and the export a health-IT person
+         opened recorded exactly as much of it as a claims file does: nothing.
+         "waited 8 months" left with no months in it. An Observation is the R4
+         resource for a measured thing with no charge attached, so the wait, the
+         trips and the lost days ride out of here as data, with the person's own
+         words, and never as money. */
+      const quantity = typeof entry.months === 'number' && entry.months > 0
+        ? { value: entry.months, unit: 'months' }
+        : (entry.times > 1 ? { value: Math.floor(entry.times), unit: 'times' } : null);
+      const burdenUrn = push({
+        resourceType: 'Observation',
+        id: uuid(),
+        status: 'final',
+        code: { text: BURDEN_CODE_TEXT },
+        subject: { display: SUBJECT_DISPLAY },
+        ...(quantity ? { valueQuantity: quantity } : {}),
+        note: [{
+          text: `The person described this as: "${entry.raw}".`
+              + (entry.gapCategory ? ` Category: ${entry.gapCategory}.` : '')
+              + ' No published U.S. federal file prices this.',
+        }],
+      });
+      burdenObservations += 1;
+      pushPaid(entry, burdenUrn, entry.raw);
       omitted.push({
         raw: entry.raw,
         itemId: null,
-        reason: 'No unit of care in the published table matches these words, so there is no code and no figure to carry. It stays on the ledger, unpriced.',
+        reason: 'No unit of care in the published table matches these words, so there is no code and no figure to carry. It stays on the ledger, unpriced, and rides out in the bundle as an Observation with what the person said and how much of it there was.',
       });
       continue;
     }
@@ -291,14 +448,22 @@ export function toFhirBundle(
         itemId: item.id,
         reason: NOT_CLINICAL[categoryKey(item)] ?? NOT_CLINICAL.other,
       });
+      pushPaid(entry, null, entry.raw || item.label);
       continue;
     }
 
     const parsed = parseCode(item.code);
     if (item.code) codes.push({ itemId: item.id, code: item.code, apc: parsed?.apc ?? null });
 
+    /* CPT/HCPCS first, then LOINC where the row carries one. Both are canonical
+       published system URIs; nothing here is invented. */
+    const coding: FhirCoding[] = [];
+    if (parsed) coding.push({ system: parsed.system, code: parsed.code, display: item.label });
+    if (item.loinc) {
+      coding.push({ system: LOINC_SYSTEM, code: item.loinc, display: item.loincName || item.label });
+    }
     const concept: FhirCodeableConcept = {
-      ...(parsed ? { coding: [{ system: parsed.system, code: parsed.code, display: item.label }] } : {}),
+      ...(coding.length ? { coding } : {}),
       text: item.label,
     };
     const subject: FhirReference = { display: SUBJECT_DISPLAY };
@@ -333,6 +498,7 @@ export function toFhirBundle(
       });
       procedures += 1;
     }
+    pushPaid(entry, clinicalUrn, entry.raw || item.label);
 
     /* ---- the money, or an honest blank ---- */
     const override = opts.figureFor ? opts.figureFor(entry) : undefined;
@@ -350,6 +516,22 @@ export function toFhirBundle(
       : (item.sourceUrl ? { url: item.sourceUrl, title: item.sourceTitle } : null);
 
     const times = Math.max(1, Math.min(365, Math.floor(entry.times) || 1));
+    /* 🔴 R6 F10. Where this row's figure IS two published rates added — a hospital
+       APC payment plus the physician's fee — the bundle says so in its first
+       sentence and names the APC there (and in the envelope's codes[]). Without it
+       a machine reads $544.54 as a professional fee for CPT 99284, which is 4.6x the
+       truth. */
+    const hosp = item.componentHospitalFeeUsd;
+    const phys = item.componentPhysicianFeeUsd;
+    const composed = hosp !== undefined && phys !== undefined && item.valueUsd !== null
+      && Math.abs(hosp + phys - item.valueUsd) < 0.005 && Math.abs(unit - item.valueUsd) < 0.005;
+    const composition = composed
+      ? `$${round2(unit).toFixed(2)} = $${round2(hosp!).toFixed(2)} hospital facility fee`
+        + `${parsed?.apc ? ` (OPPS APC ${parsed.apc})` : ''} + $${round2(phys!).toFixed(2)} `
+        + `${categoryKey(item) === 'er' ? 'emergency physician' : 'physician'} fee`
+        + `${parsed ? ` (${parsed.systemName} ${parsed.code})` : ''}. `
+        + 'Two published rates, added; the addition is ours. '
+      : '';
     const chargeUrn = push({
       resourceType: 'ChargeItem',
       id: uuid(),
@@ -359,7 +541,7 @@ export function toFhirBundle(
       ...(kind === 'Encounter' ? { context: { reference: clinicalUrn } } : { service: [{ reference: clinicalUrn }] }),
       quantity: { value: times },
       priceOverride: { value: round2(unit * times), currency: 'USD' } as FhirMoney,
-      overrideReason: overrideReason(item, unit, times, override?.note ?? ''),
+      overrideReason: composition + overrideReason(item, unit, times, override?.note ?? ''),
       ...(source ? { definitionUri: [source.url] } : {}),
       ...(kind === 'Encounter' && note ? { note } : {}),
     });
@@ -427,6 +609,8 @@ export function toFhirBundle(
       sources: bySource.size,
       clinicalLinesWithNoFigure,
       chargeItemsWithoutASourceFile,
+      burdenObservations,
+      paidObservations,
     },
   };
 }

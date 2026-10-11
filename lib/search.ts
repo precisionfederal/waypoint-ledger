@@ -52,3 +52,22 @@ export function search(query: string, table: PriceItem[], limit = 8): Hit[] {
   }
   return hits.sort((a, b) => b.score - a.score || a.item.label.localeCompare(b.item.label)).slice(0, limit);
 }
+
+/* 🔴 THE CHOICES OFFERED UNDER A LINE ARE THE ONES IT COULD BE (round 2, c1).
+   "they put electrodes on my legs" offered one choice, a wrist splint
+   fitting at $79, because "they put … on my" overlapped the splint's own
+   synonym. Words of an electrodiagnostic test (electrodes, needles in the
+   muscle, shocked nerves, EMG, conduction) offer the EMG and the conduction
+   rows, which the person picks by how many nerves; anything else offers only
+   a match on a word of care, never a match made of joining verbs. */
+const ELECTRO = /\b(?:electrodes?|needles?|emg|emgs|electromyogram|electromyography|nerves?|shock|shocks|shocked|zap|zapped|conduction|ncs|ncv)\b/i;
+const VERB_ONLY = new Set(['they', 'put', 'did', 'done', 'gave', 'got', 'took', 'made', 'had', 'went', 'saw', 'sent', 'ran', 'told', 'said', 'legs', 'leg', 'arms', 'arm', 'hand', 'hands', 'foot', 'feet']);
+export function alternativesFor(raw: string, table: PriceItem[], limit = 5): PriceItem[] {
+  if (ELECTRO.test(raw)) {
+    const rows = table.filter((t) => t.id === 'cms-test-emg' || t.id.startsWith('cms-test-ncs-'));
+    if (rows.length) return rows.slice(0, Math.max(limit, rows.length));
+  }
+  const care = norm(raw).split(' ').filter((w) => w.length >= 3 && !VERB_ONLY.has(w)).join(' ');
+  if (!care) return [];
+  return search(care, table, limit).map((h) => h.item);
+}

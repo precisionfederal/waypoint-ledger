@@ -1,0 +1,93 @@
+/* /ledger before it has a line (PAGES2, polish, 2026-09-30). The card used to
+   sit at the top of a screen of blank space above the footer. The stage takes
+   the height the viewport leaves under the page heading and centres the card
+   in it; the three steps are drawn in HTML with inline SVG (1.5 px strokes,
+   currentColor). Tokens only, so light and dark both hold. Nothing here is
+   reached by the ledger with lines. */
+.stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: max(26rem, calc(100svh - 19rem));
+  padding: var(--sp-4) 0;
+}
+.card {
+  width: 100%;
+  text-align: center;
+  padding: clamp(1.5rem, 4vw, 2.75rem) clamp(1.1rem, 4vw, 3rem);
+}
+/* Re-merge (2026-10-01): VISUAL's empty-ledger spot above the heading; the
+   480x435 attributes hold its box, so the card does not move when it loads. */
+.art { display: block; width: min(12rem, 55%); height: auto; margin: 0 auto var(--sp-3); }
+.h { margin: 0 0 var(--sp-2); }
+.lede { margin: 0 auto; max-width: 52ch; color: var(--ink-2); font-size: 1.0625rem; line-height: 1.55; }
+
+.steps {
+  list-style: none;
+  margin: var(--sp-6) 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--sp-4);
+  counter-reset: none;
+  text-align: left;
+}
+.step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  padding: 1.15rem 1.25rem 1.25rem;
+  border: 1px solid var(--line-2);
+  border-radius: var(--r-lg);
+  background: var(--surface-2);
+  min-width: 0;
+}
+.ic {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.45rem;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+}
+.ic svg { display: block; }
+.n {
+  position: absolute;
+  top: 1rem;
+  right: 1.15rem;
+  font-family: var(--font-m);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.t { font-size: 1.0625rem; font-weight: 700; color: var(--ink); line-height: 1.35; }
+.d { font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+.alt { margin: var(--sp-4) 0 0; font-size: 0.9375rem; color: var(--ink-3); }
+.alt a { display: inline-flex; align-items: center; min-height: 44px; }
+
+@media (max-width: 820px) {
+  .steps { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); margin-top: var(--sp-5); }
+  .stage { min-height: 0; padding: var(--sp-2) 0 0; }
+  .step { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.85rem; row-gap: 0.15rem; align-content: start; padding: 0.9rem 1rem; }
+  .ic { grid-row: 1 / span 2; margin: 0; }
+  .t { padding-right: 1.4rem; }
+  .d { grid-column: 2; }
+  .n { top: 0.9rem; right: 1rem; }
+}
+@media (max-width: 480px) {
+  .actions { flex-direction: column; align-items: stretch; }
+  .actions > * { justify-content: center; }
+}

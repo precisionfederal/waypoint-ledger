@@ -1,0 +1,5 @@
+/* access2-4: the stepper's "One fewer" at 1 is aria-disabled, not disabled, so
+   keyboard focus stays on it. It looks exactly as the disabled button did
+   (app/core.css: opacity .4, no hover colour). */
+:global(.core-step) button.step[aria-disabled='true'] { opacity: .4; cursor: default; }
+:global(.core-step) button.step[aria-disabled='true']:hover { border-color: var(--line); color: var(--ink-2); }
