@@ -1294,3 +1294,15 @@ textarea:focus,input:focus,select:focus{border-color:var(--accent);box-shadow:0 
   section.page:has(.ledger) p.sub{margin-bottom:.5rem}
 }
 /* <<< PHONE LEDGER, FIRST LINE */
+
+/* >>> PROOF STRIP UNDER THE HERO (judge panel 15 Oct B-5, components/ProofStrip.tsx) */
+.proof-strip{list-style:none;margin:var(--sp-4) 0 0;padding:0;display:flex;flex-wrap:wrap;gap:.5rem 1.5rem;font-size:.95rem;min-height:1.5rem}
+.proof-strip li{margin:0;padding:0}
+.proof-strip a{color:var(--ink-2);text-decoration:underline;text-underline-offset:.2em}
+.proof-strip a:hover{color:inherit}
+@media (max-width:720px){.proof-strip{flex-direction:column;gap:.4rem;font-size:.9rem}}
+/* <<< PROOF STRIP */
+/* The walkthrough link beside the hero points (QA sweep 15 Oct): the proof strip's link style. */
+.hero-watch{margin:var(--sp-3) 0 0;font-size:.95rem}
+.hero-watch a{color:var(--ink-2);text-decoration:underline;text-underline-offset:.2em}
+.hero-watch a:hover{color:inherit}

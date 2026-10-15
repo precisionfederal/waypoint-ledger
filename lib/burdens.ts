@@ -4,13 +4,18 @@
    /survey asks people to rank five burdens: money, time, missed work, unpaid
    care, and care gone without. Until now the ledger priced exactly one of them.
 
-   This module prices two more — missed work and unpaid care — from two BLS
-   rows that are already in the verified table, and counts two that no federal
-   file prices at all. Four rules govern every line here:
+   This module prices three more (missed work, unpaid care, and the hours a
+   person spends on the phone and on paperwork) from two BLS rows that are
+   already in the verified table, and counts two that no federal file prices
+   at all. A trip stays a count; when the person types their own miles and
+   hours per trip, the card shows the arithmetic on those numbers, at the GSA
+   mileage rate and the BLS all-occupations median wage, labelled as theirs.
+   Four rules govern every line here:
 
    1. NO NEW NUMBER. Every dollar comes from `data/prices.json`
-      (`bls2026q2-median-weekly-earnings`, `bls2025-caregiver-replacement-wages`)
-      or from a figure the person typed about their own pay.
+      (`bls2026q2-median-weekly-earnings`, `bls2025-caregiver-replacement-wages`,
+      `gsa2026-pov-mileage-rate`) or from a figure the person typed about their
+      own pay, miles or hours.
    2. THE ARITHMETIC IS PRINTED. The BLS earnings row says it in its own words:
       BLS publishes weekly and never daily, so a daily figure "is arithmetic
       and must be shown as arithmetic, never cited as a government statistic."
@@ -32,12 +37,16 @@ import { MAX_WORKDAYS } from './workdays-said';
 
 export const WORKDAY_ROW_ID = 'bls2026q2-median-weekly-earnings';
 export const CARE_ROW_ID = 'bls2025-caregiver-replacement-wages';
+/** The federal per-mile reimbursement rate: an INPUT row, never a medical price. */
+export const MILEAGE_ROW_ID = 'gsa2026-pov-mileage-rate';
+/** The all-occupations median hourly wage, published on the caregiving row. */
+export const TYPICAL_WAGE_KEY = 'all_occupations_median_hourly_usd';
 export const BURDENS_KEY = 'waypoint-ledger.burdens.v1';
 
 /** The gap-report category a dismissal count is sent as (see cf/functions/api/gap.js). */
 export const DISMISSED_CATEGORY = 'dismissed';
 
-export type BurdenKind = 'workdays' | 'care-hours' | 'trips' | 'dismissed';
+export type BurdenKind = 'workdays' | 'care-hours' | 'admin-hours' | 'trips' | 'dismissed';
 export type CareMethodId = 'home-health-aide' | 'nursing-assistant' | 'registered-nurse' | 'opportunity-cost';
 export type PayBasisId = 'median' | 'men' | 'women' | 'own';
 
@@ -58,12 +67,22 @@ export function money(n: number, showCents = true): string {
 const clamp = (n: number, max: number): number =>
   !Number.isFinite(n) || n <= 0 ? 0 : Math.min(Math.floor(n), max);
 
-export const MAX = { workdays: MAX_WORKDAYS, careHours: 20000, trips: 3650, dismissed: 500 } as const;
+export const MAX = { workdays: MAX_WORKDAYS, careHours: 20000, adminHours: 5000, trips: 3650, milesPerTrip: 1000, hoursPerTrip: 48, dismissed: 500 } as const;
+
+/** A person-typed amount (miles, hours) to one decimal place; 0 means left blank. */
+const tenth = (n: number, max: number): number =>
+  !Number.isFinite(n) || n <= 0 ? 0 : Math.min(Math.round(n * 10) / 10, max);
 
 export interface BurdenCounts {
   workdays: number;
   careHours: number;
+  /** Hours on the phone and paperwork: insurers, offices, records, referrals, prior authorizations. */
+  adminHours: number;
   trips: number;
+  /** The person's own round-trip miles per trip. 0 = left blank. Never leaves the device. */
+  milesPerTrip: number;
+  /** The person's own hours per trip, travel and waiting. 0 = left blank. Never leaves the device. */
+  hoursPerTrip: number;
   dismissed: number;
   careMethod: CareMethodId;
   payBasis: PayBasisId;
@@ -72,7 +91,7 @@ export interface BurdenCounts {
 }
 
 export const EMPTY_BURDENS: BurdenCounts = {
-  workdays: 0, careHours: 0, trips: 0, dismissed: 0,
+  workdays: 0, careHours: 0, adminHours: 0, trips: 0, milesPerTrip: 0, hoursPerTrip: 0, dismissed: 0,
   careMethod: 'home-health-aide', payBasis: 'median', ownWeeklyPayUsd: null,
 };
 
@@ -86,6 +105,9 @@ export interface BurdenSource {
 
 export interface BurdenAlternative { id: string; label: string; valueUsd: number; note: string; arithmetic: string | null }
 
+/** A line of arithmetic on the person's own numbers (trips): shown apart, never added to anything. */
+export interface BurdenOwnLine { id: 'miles' | 'trip-hours'; label: string; valueUsd: number; arithmetic: string }
+
 export interface BurdenCard {
   kind: BurdenKind;
   /** The heading on the card. */
@@ -96,7 +118,7 @@ export interface BurdenCard {
   count: number;
   /** null means no published federal figure prices this. It stays blank; it is never filled. */
   valueUsd: number | null;
-  tag: 'DERIVED' | 'COUNT ONLY';
+  tag: 'DERIVED' | 'COUNT ONLY' | 'YOUR NUMBERS';
   /** The multiplication, shown on the face of the card. */
   arithmetic: string | null;
   /** What method produced the figure, in one sentence. */
@@ -108,6 +130,8 @@ export interface BurdenCard {
   alternatives: BurdenAlternative[];
   /** Present only when nothing prices this burden. */
   noFigureReason: string | null;
+  /** Arithmetic on the person's own numbers (trips only). Each line stands alone; none is added to another. */
+  ownLines: BurdenOwnLine[];
 }
 
 /* ------------------------------------------------------------------ pay */
@@ -167,6 +191,7 @@ export function priceWorkdays(daysIn: number, basis: PayBasisId = 'median', ownW
         arithmetic: days === 0 ? null : `${money(o.weeklyUsd as number, false)} ÷ 5 × ${days} = ${money(cents((o.weeklyUsd as number) / 5 * days))}`,
       })) : [],
     noFigureReason: weekly === null ? 'No weekly earnings figure is loaded, so this line stays blank.' : null,
+    ownLines: [],
   };
 }
 
@@ -210,13 +235,73 @@ export function priceCareHours(hoursIn: number, method: CareMethodId = 'home-hea
       arithmetic: hours === 0 ? null : `${money(m.hourlyUsd as number)} × ${hours} = ${money(cents((m.hourlyUsd as number) * hours))}`,
     })),
     noFigureReason: rate === null ? 'No hourly figure is loaded for that method, so this line stays blank.' : null,
+    ownLines: [],
+  };
+}
+
+/* -------------------------------------------- the phone and the paperwork */
+
+/** The all-occupations median hourly wage, read from the caregiving row. */
+export function typicalHourlyWage(): number | null { return alt(CARE_ROW_ID, TYPICAL_WAGE_KEY); }
+
+function typicalWageSource(): BurdenSource {
+  const row = rowOf(CARE_ROW_ID);
+  return {
+    priceId: CARE_ROW_ID, title: row?.sourceTitle ?? null, url: row?.sourceUrl ?? null, year: row?.year ?? null,
+    describes: 'The median hourly wage across all occupations in the same BLS survey: half of U.S. workers in it earn more, half less. It is a wage, not a figure about you.',
+  };
+}
+
+export function priceAdminHours(hoursIn: number): BurdenCard {
+  const hours = clamp(hoursIn, MAX.adminHours);
+  const rate = typicalHourlyWage();
+  const value = rate === null || hours === 0 ? null : cents(rate * hours);
+  return {
+    kind: 'admin-hours',
+    title: 'Hours on the phone and paperwork',
+    question: 'Calling insurers and offices, chasing records, referrals and prior authorizations: roughly how many hours did it take?',
+    unit: hours === 1 ? 'hour' : 'hours',
+    count: hours,
+    valueUsd: value,
+    tag: 'DERIVED',
+    arithmetic: rate === null || hours === 0 ? null
+      : `${hours} ${hours === 1 ? 'hour' : 'hours'} × ${money(rate)} an hour (BLS all-occupations median) = ${money(value ?? 0)}`,
+    method: 'The value of that time at the typical U.S. wage, not money anyone paid. It is the hours you entered times the published BLS median hourly wage for all occupations.',
+    limit: 'BLS publishes the wage and has never published a value for time spent on calls and forms. So this is arithmetic over one federal input and your own count, shown as arithmetic, never a federal statistic. If you earn more or less than the median, or were not working, the time was worth a different amount to you.',
+    source: typicalWageSource(),
+    alternatives: [],
+    noFigureReason: rate === null ? 'No hourly wage figure is loaded, so this line stays blank.' : null,
+    ownLines: [],
   };
 }
 
 /* ------------------------------------------------ counted, never priced */
 
-export function countTrips(tripsIn: number): BurdenCard {
+export function countTrips(tripsIn: number, milesIn = 0, hoursIn = 0): BurdenCard {
   const trips = clamp(tripsIn, MAX.trips);
+  const miles = tenth(milesIn, MAX.milesPerTrip);
+  const hours = tenth(hoursIn, MAX.hoursPerTrip);
+  const noFigureReason = 'No published federal figure prices a trip to care, so this column stays blank rather than get filled with an estimate. The table does carry the federal mileage rate (GSA, $0.76 a mile from 1 July 2026), which reimburses federal travellers for a mile driven on official business. It is an input you can apply to your own miles, it is not a medical price, and nothing here adds it for you.';
+  const mileRow = rowOf(MILEAGE_ROW_ID);
+  const perMile = mileRow?.valueUsd ?? null;
+  const wage = typicalHourlyWage();
+  const tw = trips === 1 ? 'trip' : 'trips';
+  const lines: BurdenOwnLine[] = [];
+  if (trips > 0 && miles > 0 && perMile !== null) {
+    const v = cents(trips * miles * perMile);
+    lines.push({ id: 'miles', label: 'Your miles, at the federal mileage rate', valueUsd: v,
+      arithmetic: `${trips} ${tw} × ${miles} ${miles === 1 ? 'mile' : 'miles'} × ${money(perMile)} a mile (GSA rate) = ${money(v)}` });
+  }
+  if (trips > 0 && hours > 0 && wage !== null) {
+    const v = cents(trips * hours * wage);
+    lines.push({ id: 'trip-hours', label: 'Your hours, at the typical U.S. wage', valueUsd: v,
+      arithmetic: `${trips} ${tw} × ${hours} ${hours === 1 ? 'hour' : 'hours'} × ${money(wage)} an hour (BLS all-occupations median) = ${money(v)}` });
+  }
+  const own = lines.length > 0;
+  const src = (id: string): BurdenSource => {
+    const r = rowOf(id);
+    return { priceId: id, title: r?.sourceTitle ?? null, url: r?.sourceUrl ?? null, year: r?.year ?? null, describes: r?.population ?? null };
+  };
   return {
     kind: 'trips',
     title: 'Trips you made',
@@ -224,13 +309,18 @@ export function countTrips(tripsIn: number): BurdenCard {
     unit: trips === 1 ? 'trip' : 'trips',
     count: trips,
     valueUsd: null,
-    tag: 'COUNT ONLY',
-    arithmetic: null,
-    method: 'Counted, not priced.',
-    limit: 'Miles, parking, fuel, a bus fare and a day of someone else driving are all real, and they differ so much by person that a single national figure would describe almost nobody.',
-    source: { priceId: null, title: null, url: null, year: null, describes: null },
+    tag: own ? 'YOUR NUMBERS' : 'COUNT ONLY',
+    arithmetic: own ? lines.map((l) => l.arithmetic).join(' · ') : null,
+    method: own ? 'Your miles and hours, not a federal figure.' : 'Counted, not priced.',
+    limit: own
+      ? 'The mileage rate is what the government pays its own travellers, not what a mile cost you, and the wage values your time; it is not money paid. Parking, fares and tolls are in neither line.'
+      : 'Miles, parking, fuel, a bus fare and a day of someone else driving are all real, and they differ so much by person that a single national figure would describe almost nobody.',
+    source: lines[0]?.id === 'miles' ? src(MILEAGE_ROW_ID) : own ? typicalWageSource() : { priceId: null, title: null, url: null, year: null, describes: null },
     alternatives: [],
-    noFigureReason: 'No published federal figure prices a trip to care, so this column stays blank rather than get filled with an estimate. The table does carry the federal mileage rate (GSA, $0.76 a mile from 1 July 2026), which reimburses federal travellers for a mile driven on official business. It is an input you can apply to your own miles, it is not a medical price, and nothing here adds it for you.',
+    noFigureReason: own
+      ? `No federal figure prices a trip, so this is arithmetic on the numbers you typed. ${lines.length === 2 ? 'Neither line is a medical price or added to anything.' : 'It is not a medical price and is added to nothing.'}`
+      : noFigureReason,
+    ownLines: lines,
   };
 }
 
@@ -250,24 +340,26 @@ export function countDismissed(timesIn: number): BurdenCard {
     source: { priceId: null, title: null, url: null, year: null, describes: null },
     alternatives: [],
     noFigureReason: 'No dataset records being dismissed. MEPS, HCUP and CMS files record care that was delivered and billed.',
+    ownLines: [],
   };
 }
 
 /* ------------------------------------------------------------ the cards */
 
-/** The four cards, in order. Deliberately no total: they are never added. */
+/** The five cards, in order. Deliberately no total: they are never added. */
 export function burdenCards(c: BurdenCounts): BurdenCard[] {
   return [
     priceWorkdays(c.workdays, c.payBasis, c.ownWeeklyPayUsd),
     priceCareHours(c.careHours, c.careMethod),
-    countTrips(c.trips),
+    priceAdminHours(c.adminHours),
+    countTrips(c.trips, c.milesPerTrip, c.hoursPerTrip),
     countDismissed(c.dismissed),
   ];
 }
 
-/** How many of the four the person actually filled in. Used for the heading, never for money. */
+/** How many of the five the person actually filled in. Used for the heading, never for money. */
 export function burdensEntered(c: BurdenCounts): number {
-  return [c.workdays, c.careHours, c.trips, c.dismissed].filter((n) => n > 0).length;
+  return [c.workdays, c.careHours, c.adminHours, c.trips, c.dismissed].filter((n) => n > 0).length;
 }
 
 /* ------------------------------------------- persistence, on this device */
@@ -282,7 +374,11 @@ export function normalizeBurdens(raw: unknown): BurdenCounts {
   return {
     workdays: clamp(num(r.workdays) ?? 0, MAX.workdays),
     careHours: clamp(num(r.careHours) ?? 0, MAX.careHours),
+    /* Saved before these existed: a missing field is 0, which is blank. */
+    adminHours: clamp(num(r.adminHours) ?? 0, MAX.adminHours),
     trips: clamp(num(r.trips) ?? 0, MAX.trips),
+    milesPerTrip: tenth(num(r.milesPerTrip) ?? 0, MAX.milesPerTrip),
+    hoursPerTrip: tenth(num(r.hoursPerTrip) ?? 0, MAX.hoursPerTrip),
     dismissed: clamp(num(r.dismissed) ?? 0, MAX.dismissed),
     careMethod: CARE_IDS.includes(r.careMethod as CareMethodId) ? (r.careMethod as CareMethodId) : 'home-health-aide',
     payBasis: PAY_IDS.includes(r.payBasis as PayBasisId) ? (r.payBasis as PayBasisId) : 'median',
@@ -304,7 +400,7 @@ export const BURDENS_EVENT = 'waypoint-ledger:burdens';
 export function saveBurdens(c: BurdenCounts): void {
   if (typeof localStorage === 'undefined') return;
   try {
-    if (burdensEntered(c) === 0 && c.ownWeeklyPayUsd === null) localStorage.removeItem(BURDENS_KEY);
+    if (burdensEntered(c) === 0 && c.ownWeeklyPayUsd === null && !c.milesPerTrip && !c.hoursPerTrip) localStorage.removeItem(BURDENS_KEY);
     else localStorage.setItem(BURDENS_KEY, JSON.stringify(c));
   } catch { /* a browser with storage disabled still works, it just forgets */ }
   try { window.dispatchEvent(new Event(BURDENS_EVENT)); } catch { /* no window: nothing listens */ }

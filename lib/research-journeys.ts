@@ -208,7 +208,7 @@ export const RESEARCH_JOURNEYS: ResearchJourney[] = [
     id: 'sickle-cell', condition: 'Sickle cell disease', title: 'A year of pain crises',
     steps: [
       { said: 'went to the ER twice for a pain crisis', findings: ['nasem-scd-ssa-2025-f2', 'nasem-scd-2020-f1'] },
-      { said: 'stayed in the hospital five days', findings: ['nasem-scd-ssa-2025-f1'] },
+      { said: 'stayed in the hospital for five days', findings: ['nasem-scd-ssa-2025-f1'] },
       { said: 'saw my hematologist', findings: ['hhs-scd-2020-f4'] },
       { said: 'blood work', findings: ['hhs-scd-2020-f5'] },
     ],

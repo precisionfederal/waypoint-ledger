@@ -338,6 +338,8 @@ select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(
 .ledger-table tr.grp th{background:var(--surface-2);font-family:var(--font-d);font-size:.85rem;font-weight:700;color:var(--brand-ink);text-align:left;padding:.65rem 1rem}
 .ledger-table tr.grp th::before{content:'';display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:var(--accent);margin-right:.55rem;vertical-align:middle}
 .ledger-table td.r{white-space:nowrap;font-variant-numeric:tabular-nums}
+/* A sub-note under a number (the yearly-cap note on an import) wraps, so one long sentence never widens the whole table. */
+.ledger-table td.r .li-sub{white-space:normal;min-width:10rem;max-width:16rem;margin-left:auto}
 .ledger-table tr.is-unpriced td{color:var(--ink-3)}
 .li-name{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--brand-3);cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--brand-3) 35%,transparent);text-underline-offset:.2em}
 .li-name:hover{text-decoration-color:var(--brand-3)}

@@ -45,3 +45,30 @@ export function sheetWho(stratum: string | null | undefined, relation?: string |
   if (r) return { title: `What my ${r}’s diagnostic search has cost`, who: `your ${r}`, whose: `your ${r}’s`, forChild: false };
   return { title: 'What my diagnostic search has cost', who: 'you', whose: 'your', forChild: false };
 }
+
+/* judge panel 15 Oct #2.8: "9 lines are a reference price · 1 line is a describes you".
+   Each verdict reads as its own sentence: a noun takes "is a", a verb takes no
+   article and agrees with the count. `who` is the sheet's own who ("you", "the
+   child", "your father"). Pure, so tests/sheet-polish-1015.test.ts pins every case. */
+export function tallyPhrase(verdict: string, n: number, who: string): string {
+  const one = n === 1;
+  switch (verdict) {
+    case 'DESCRIBES YOU': return `${n} ${one ? 'line describes' : 'lines describe'} ${who}`;
+    case 'REFERENCE PRICE': return `${n} ${one ? 'line is a' : 'lines are a'} reference price`;
+    case 'BILLED AGAINST THIS': return `${n} ${one ? 'line is' : 'lines are'} what an uninsured person is billed against`;
+    case 'NOT DESCRIBED': return `${n} ${one ? 'line does' : 'lines do'} not describe ${who}`;
+    default: return `${n} ${one ? 'line is' : 'lines are'} ${verdict.toLowerCase()}`;
+  }
+}
+
+/* judge panel 15 Oct #2.8: an unpriced stop on the journey strip read only "No
+   federal figure". It now carries her own words, as the table row does, cut at a
+   word to stay one short label; hidden when she hid her words. */
+const STOP_WORDS_MAX = 40;
+export function stopWords(quoted: string, hideWords: boolean, fallback: string): string {
+  const t = quoted.replace(/^(?:and|then|so|but)\s+/i, '').trim();
+  if (hideWords || !t) return fallback;
+  if (t.length <= STOP_WORDS_MAX) return `“${t}”`;
+  const cut = t.slice(0, STOP_WORDS_MAX + 1).replace(/\s+\S*$/, '').replace(/[,;:]$/, '');
+  return `“${cut || t.slice(0, STOP_WORDS_MAX)}…”`;
+}

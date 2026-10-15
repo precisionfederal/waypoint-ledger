@@ -27,12 +27,13 @@
      · `bar`  — the legacy card shape, kept for any surface still asking for it.
    ========================================================================== */
 
-import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import Link from '@/components/IntentLink';
 import { useStore } from '@/lib/store';
 import { COVERAGE_LABEL, COVERAGE_OPTIONS, STATES, localityOf, soleLocality, type Coverage } from '@/lib/fit';
 import { PATIENT_OPTIONS, coverageOptionsFor } from '@/lib/patient';
 import type { StateDetection } from '@/lib/state-detect';
+import { lookupZip, parseZip, type ZipAnswer, type ZipSource } from '@/lib/zip-locality';
 import s from './ContextBar.module.css';
 import ConditionPicker from './ConditionPicker';
 
@@ -50,6 +51,18 @@ export interface ContextBarProps {
   detected?: StateDetection | null;
 }
 
+/* 🔴 A STATE IS NOT WHERE CMS PRICES YOU; A ZIP IS.
+   CMS prices California in 27 localities and Texas in 8, and nobody knows which
+   one is theirs. Everybody knows their ZIP. lib/zip-locality.ts reads CMS's own
+   ZIP-to-carrier-locality file (fetched from this site only when a ZIP is
+   typed) and returns the exact locality, or says the ZIP is not in the file, or
+   says CMS splits it and needs the ZIP+4. The ZIP is kept here, in this
+   browser, beside the context (`waypoint-ledger.zip.v1`), and sent with nothing. */
+const ZIP_KEY = 'waypoint-ledger.zip.v1';
+interface KeptZip { zip: string; plus4?: string; key: string; picked?: boolean; updated?: string }
+type ZipView = (ZipAnswer & { source?: ZipSource; picked?: boolean }) | { kind: 'error' };
+const zipLabel = (zip: string, plus4?: string) => (plus4 ? `${zip}-${plus4}` : zip);
+
 export default function ContextBar({ variant = 'bar', detected = null }: ContextBarProps) {
   const st = useStore();
   const { coverage, locality } = st.ctx;
@@ -64,6 +77,25 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
   const fromStory = useRef<string | null>(null);
   const theyPicked = useRef(false);
   const [narrowedTo, setNarrowedTo] = useState<string | null>(null);
+
+  const [zipText, setZipText] = useState('');
+  const [zipView, setZipView] = useState<ZipView | null>(null);
+  const [kept, setKept] = useState<KeptZip | null>(null);
+  const zipSeq = useRef(0);
+  useEffect(() => {
+    if (!st.hydrated) return;
+    try {
+      const raw = localStorage.getItem(ZIP_KEY);
+      const k = raw ? (JSON.parse(raw) as KeptZip) : null;
+      if (k && typeof k.zip === 'string' && typeof k.key === 'string') { setKept(k); setZipText(zipLabel(k.zip, k.plus4)); }
+    } catch { /* nothing kept */ }
+  }, [st.hydrated]);
+  function keep(k: KeptZip | null) {
+    setKept(k);
+    try { if (k) localStorage.setItem(ZIP_KEY, JSON.stringify(k)); else localStorage.removeItem(ZIP_KEY); } catch { /* in memory only */ }
+  }
+  /** A select they touched by hand outranks a ZIP typed earlier. */
+  function dropZip() { zipSeq.current++; setZipText(''); setZipView(null); keep(null); }
 
   useEffect(() => {
     if (!st.hydrated || theyPicked.current || !readState) return;
@@ -81,6 +113,44 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
        the person picks, because guessing a locality is guessing a price. */
     if (!locality) setNarrowedTo(readState.code);
   }, [st.hydrated, readState, locality, setLocality]);
+
+  /* The ZIP is shown only while the locality is still the one it resolved to. */
+  const zipShown = kept && loc && kept.key === loc.key ? kept : null;
+
+  function typeZip(value: string) {
+    setZipText(value);
+    const seq = ++zipSeq.current;
+    const parsed = parseZip(value);
+    if (!parsed) {
+      setZipView(value.replace(/\D/g, '').length >= 5 || /[^\d\s-]/.test(value) ? { kind: 'malformed' } : null);
+      return;
+    }
+    lookupZip(value).then((a) => {
+      if (seq !== zipSeq.current) return;
+      setZipView(a);
+      if (a.kind === 'found') {
+        theyPicked.current = true;
+        setNarrowedTo(localityOf(a.locality)?.state ?? null);
+        setLocality(a.locality);
+        keep({ zip: a.zip, plus4: a.plus4, key: a.locality, updated: a.source?.updated });
+      } else if (a.kind === 'split') {
+        theyPicked.current = true;
+        keep(null);
+        const first = localityOf(a.localities[0]);
+        setNarrowedTo(first?.state ?? null);
+        if (locality && !a.localities.includes(locality)) setLocality(undefined);
+      }
+    }).catch(() => { if (seq === zipSeq.current) setZipView({ kind: 'error' }); });
+  }
+
+  /** CMS splits this ZIP; they said which side they are on. */
+  function pickSplit(zip: string, key: string, source?: ZipSource) {
+    theyPicked.current = true;
+    setNarrowedTo(localityOf(key)?.state ?? null);
+    setLocality(key);
+    keep({ zip, key, picked: true, updated: source?.updated });
+    setZipView({ kind: 'found', zip, locality: key, byPlus4: false, picked: true, source });
+  }
 
   const stateCode = loc?.state ?? narrowedTo ?? '';
   const group = useMemo(() => STATES.find((g) => g.code === stateCode) ?? null, [stateCode]);
@@ -113,6 +183,7 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
 
   function pickState(code: string) {
     theyPicked.current = true;
+    dropZip();
     setNarrowedTo(code || null);
     if (!code) { setLocality(undefined); return; }
     const sole = soleLocality(code);
@@ -140,7 +211,7 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
      Houston amount is on the page the figures are NOT national. With no
      coverage answered the honest label for the basis is the schedule itself. */
   const summary = answered
-    ? `${coverage ? COVERAGE_LABEL[coverage] : loc ? 'Medicare reference' : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}`
+    ? `${coverage ? COVERAGE_LABEL[coverage] : loc ? 'Medicare reference' : 'National figures'}${loc ? ` · ${loc.displayName}` : ' · national figures'}${zipShown ? ` · ZIP ${zipLabel(zipShown.zip, zipShown.plus4)}` : ''}`
     : variant === 'ask' ? 'Medicare reference figures, national' : 'Medicare reference · national';
 
   /* The question a two-place word asks, put in one line rather than guessed.
@@ -250,6 +321,20 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
         <div className={s.group}>
           <p className={s.lbl}>{ask ? 'Where do you live?' : 'Where you live'}</p>
           <div className={s.selects}>
+            <label className={`${s.field} ${s.zipField}`}>
+              <span className="sr-only">ZIP code</span>
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="postal-code"
+                maxLength={10}
+                placeholder="ZIP code"
+                aria-label="ZIP code"
+                aria-describedby="ctx-zip-out"
+                value={zipText}
+                onChange={(e) => typeZip(e.target.value)}
+              />
+            </label>
             <label className={s.field}>
               <span className="sr-only">State</span>
               <select value={stateCode} onChange={(e) => pickState(e.target.value)} aria-label="State">
@@ -260,14 +345,15 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
             {group && group.localities.length > 1 && (
               <label className={s.field}>
                 <span className="sr-only">Medicare locality within {group.name}</span>
-                <select value={locality ?? ''} onChange={(e) => st.setLocality(e.target.value || undefined)} aria-label={`Medicare locality within ${group.name}`}>
+                <select value={locality ?? ''} onChange={(e) => { theyPicked.current = true; dropZip(); st.setLocality(e.target.value || undefined); }} aria-label={`Medicare locality within ${group.name}`}>
                   {group.localities.map((l) => <option key={l.key} value={l.key}>{l.displayName}</option>)}
                 </select>
               </label>
             )}
           </div>
-          {group && group.localities.length > 1 && (
-            <p className={s.hint}>CMS prices {group.name} in {group.localities.length} localities. Pick yours.</p>
+          <ZipOut view={zipView} text={zipText} kept={zipShown} onPick={pickSplit} />
+          {group && group.localities.length > 1 && !zipShown && zipView?.kind !== 'split' && (
+            <p className={s.hint}>CMS prices {group.name} in {group.localities.length} localities. Type your ZIP and it finds yours, or pick it.</p>
           )}
           {readIt && (
             <p className={s.hint}>
@@ -304,4 +390,63 @@ export default function ContextBar({ variant = 'bar', detected = null }: Context
       )}
     </section>
   );
+}
+
+/** What the ZIP said, in one line, with CMS's file named on its face. */
+function ZipOut({ view, text, kept, onPick }: {
+  view: ZipView | null; text: string; kept: KeptZip | null;
+  onPick: (zip: string, key: string, source?: ZipSource) => void;
+}) {
+  const cite = (src?: ZipSource) => (
+    <>
+      {' '}(
+      {src?.page
+        ? <a href={src.page} target="_blank" rel="noopener noreferrer">CMS ZIP-to-locality file</a>
+        : 'CMS ZIP-to-locality file'}
+      {src?.updated ? `, updated ${src.updated}` : ''})
+    </>
+  );
+  let body: ReactNode = null;
+  if (view?.kind === 'found') {
+    const l = localityOf(view.locality);
+    body = (
+      <>
+        <strong>{view.byPlus4 ? 'ZIP+4' : 'ZIP'} {zipLabel(view.zip, view.plus4)}</strong> · Medicare locality: <strong>{l?.displayName ?? view.locality}</strong>
+        {view.picked ? ', your pick of the localities CMS lists for this ZIP' : ''}
+        {cite(view.source)}
+      </>
+    );
+  } else if (!view && kept && parseZip(text)) {
+    const l = localityOf(kept.key);
+    body = (
+      <>
+        <strong>ZIP {zipLabel(kept.zip, kept.plus4)}</strong> · Medicare locality: <strong>{l?.displayName ?? kept.key}</strong>
+        {kept.picked ? ', your pick of the localities CMS lists for this ZIP' : ''} (CMS ZIP-to-locality file{kept.updated ? `, updated ${kept.updated}` : ''})
+      </>
+    );
+  } else if (view?.kind === 'unknown') {
+    body = <>ZIP {view.zip} is not in the CMS ZIP-to-locality file, so nothing changed. Pick your state instead.</>;
+  } else if (view?.kind === 'split') {
+    body = (
+      <>
+        {view.plus4Unlisted
+          ? <>{zipLabel(view.zip, view.plus4)} is not on CMS&rsquo;s ZIP+4 list. </>
+          : <>CMS prices ZIP {view.zip} in {view.localities.length} localities and tells them apart by ZIP+4. Add the 4 digits after the dash, or </>}
+        pick yours:
+        {view.localities.map((k) => (
+          <Fragment key={k}>
+            {' '}
+            <button type="button" className={s.zipPick} onClick={() => onPick(view.zip, k, view.source)}>
+              {localityOf(k)?.displayName ?? k}
+            </button>
+          </Fragment>
+        ))}
+      </>
+    );
+  } else if (view?.kind === 'malformed') {
+    body = <>A ZIP is 5 digits, like 50010, or 9 with the dash, like 50010-1234.</>;
+  } else if (view?.kind === 'error') {
+    body = <>The ZIP file did not load just now. Pick your state instead.</>;
+  }
+  return <p className={`${s.hint} ${s.zipOut}`} id="ctx-zip-out" role="status" aria-live="polite">{body}</p>;
 }

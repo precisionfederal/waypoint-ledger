@@ -14,7 +14,7 @@ export default function LedgerPage() {
         <p className="eyebrow">Step 2 of 3</p>
         {/* JUDGE-3 #9: the inner-page hero role, the --hero-h1 token PageHero uses (44 px at 1440, 28 px at 390) */}
         <h1 style={{ fontSize: 'var(--hero-h1)' }}>What it cost, line by line</h1>
-        <p className="sub">Published federal figures for this pattern of care. Not a bill, and not a claim.</p>
+        <p className="sub">Medicare's published prices for the care you listed. This is not your bill.</p>
         {/* The Medicare import. It renders nothing, not even on first paint, and
             downloads nothing more, unless GET /api/bluebutton/status says the site
             is configured (components/MedicareImport.tsx). It sits

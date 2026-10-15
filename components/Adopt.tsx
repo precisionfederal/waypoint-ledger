@@ -204,9 +204,9 @@ export default function Adopt() {
           { icon: <TI.cloud />, title: '1 Cloudflare account', text: 'One D1 database and one KV namespace run the full stack.', href: '#take-it', go: 'How to run it' },
         ]} />
 
-        {/* Each chip links to the page or file that proves it. Blue Button is named here
-            only as written and switched off: its import stays off until CMS issues us
-            credentials (GET /api/bluebutton/status: configured false, sandbox). */}
+        {/* Each chip links to the page or file that proves it. Blue Button is connected
+            to the CMS sandbox since 13 Oct 2026 (GET /api/bluebutton/status: configured
+            true, sandbox); real Medicare records wait on CMS production approval. */}
         <Chips title="Interoperability standards, and where each one stands today" groups={[
           { state: 'live', label: 'Standards it speaks today', chips: [
             { name: 'HL7 FHIR R4', note: 'Bundle export', href: '/api/fhir/example' },
@@ -216,8 +216,8 @@ export default function Adopt() {
             { name: 'ICD-10-CM', note: `on ${CONDITION_CODED} conditions`, href: '/conditions' },
             { name: 'DCAT-US v1.1', note: 'open-data catalog', href: '/data.json' },
           ] },
-          { state: 'off', label: 'Written, switched off', chips: [
-            { name: 'Blue Button 2.0', note: 'sandbox only, off until CMS issues credentials', href: '/api/bluebutton/status' },
+          { state: 'live', label: 'Connected to the CMS sandbox', chips: [
+            { name: 'Blue Button 2.0', note: 'sign-in with CMS synthetic beneficiaries', href: '/api/bluebutton/status' },
           ] },
           { state: 'none', label: 'Next on the roadmap', chips: [
             { name: 'TEFCA', href: '#standards' },
@@ -413,9 +413,10 @@ export default function Adopt() {
               </tr>
               <tr>
                 <th scope="row"><a href="https://bluebutton.cms.gov/" target="_blank" rel="noopener noreferrer">Blue Button 2.0</a></th>
-                <td data-label="Today"><strong>Written, switched off</strong></td>
-                <td data-label="What that means here" className={s.wide}>Blue Button lets a person with Medicare share their Part A, B and D claims with an app. Our import is written against the CMS sandbox and stays off until CMS issues us credentials. <a href="/api/bluebutton/status">/api/bluebutton/status</a> says so.</td>
-                <td data-label="Next step" className={`${s.wide} ${ad.next}`}>Sandbox import built and tested on CMS's synthetic claims; switched on once Precision Federal accepts the CMS terms.</td>
+                <td data-label="Today"><strong>Connected to the CMS sandbox</strong> · synthetic beneficiaries</td>
+                <td data-label="What that means here" className={s.wide}>Blue Button lets a person with Medicare share their Part A, B and D claims with an app. Our import signs in through CMS&rsquo;s own Blue Button sandbox and consent screen, reads a synthetic beneficiary&rsquo;s claims and maps them into ledger lines priced from our table: synthetic data, no real person&rsquo;s claims. Real Medicare records need CMS production approval; <a href="/api/bluebutton/status">/api/bluebutton/status</a> says which environment is connected.
+                  <span style={{ display: 'block', marginTop: '.6rem' }}><a className="btn ghost small" style={{ whiteSpace: 'normal' }} href="/ledger?try=cms-synthetic">Try it with a CMS synthetic Medicare beneficiary</a></span></td>
+                <td data-label="Next step" className={`${s.wide} ${ad.next}`}>Apply to CMS for production access, so a person can bring in their own Medicare record.</td>
               </tr>
               <tr>
                 <th scope="row"><a href="https://www.cms.gov/initiatives/health-technology-ecosystem/overview/interoperability-framework" target="_blank" rel="noopener noreferrer">CMS Interoperability Framework</a></th>

@@ -122,6 +122,9 @@ const cents = (n: number): number => Math.round(n * 100) / 100;
 export interface SplitLine {
   key: string;
   label: string;
+  /** the price-table row id and its service code (lib/plan-estimate.ts tells a visit from a test by them) */
+  itemId: string;
+  code?: string;
   /** the count that may be priced (once-a-year codes capped, as on the ledger) */
   times: number;
   rule: PartBRule;
@@ -184,7 +187,7 @@ export function medicareSplit(entries: readonly JourneyEntry[], ctx: Ctx = {}): 
     const fig = scheduleFigureOf(it, ctx);
     if (fig === null) continue;
     const n = clampTimes(it, e.times).times;
-    lines.push({ key: e.key, label: it.label, times: n, rule, approvedUsd: cents(fig * n) });
+    lines.push({ key: e.key, label: it.label, itemId: it.id, code: it.code, times: n, rule, approvedUsd: cents(fig * n) });
   }
   if (!lines.length) return null;
   const approvedUsd = cents(lines.reduce((a, l) => a + l.approvedUsd, 0));
@@ -320,7 +323,7 @@ export function totalDollarYear(lines: readonly PricedLine[], fits: ReadonlyMap<
   if (byYear.size === 1) {
     const [[y, v]] = [...byYear.entries()];
     if (v.charge && !v.medicare) return `${y} dollars: average billed charges on ${y} Medicare claims, not adjusted to ${PART_B.year}`;
-    if (v.medicare && !v.charge) return `${y} Medicare dollars: each visit and test at the ${y} published rate, whenever it happened`;
+    if (v.medicare && !v.charge) return `Every visit and test priced at Medicare's ${y} rate, even if it happened years ago`;
     return `${y} dollars, each line at its file’s ${y} figure`;
   }
   const parts = [...byYear.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([y, v]) => `${y} (${v.n} ${v.n === 1 ? 'line' : 'lines'})`);

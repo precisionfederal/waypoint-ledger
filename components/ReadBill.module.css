@@ -1,0 +1,69 @@
+/* "Read my bill" on /journey (components/ReadBillMount.tsx, components/ReadBill.tsx).
+   Shared tokens only, so the dark theme and any redesign of globals.css carry over.
+   Type never goes under 15px; every control is at least 44px tall. */
+.card { border-color: var(--accent-soft); }
+.head { display: flex; gap: var(--sp-4); align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.head > div { flex: 1 1 22rem; min-width: 0; }
+.h { font-family: var(--font-d); font-size: 1.15rem; line-height: 1.3; margin: 0 0 var(--sp-2); color: var(--ink); }
+.lede { font-size: 1rem; line-height: 1.5; color: var(--ink-2); margin: 0; max-width: 70ch; }
+.lede strong { color: var(--accent-ink); font-weight: 600; }
+
+.panel { margin-top: var(--sp-4); display: grid; gap: var(--sp-3); min-width: 0; }
+.promise { margin: 0; padding: var(--sp-2) var(--sp-3); border-radius: var(--r-md); background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; font-size: 1rem; }
+.lbl { font-weight: 600; font-size: 1rem; color: var(--ink); }
+.text {
+  width: 100%; box-sizing: border-box; min-height: 8rem; resize: vertical;
+  font-family: var(--font-m); font-size: 0.9375rem; line-height: 1.45;
+  padding: var(--sp-3); border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); color: var(--ink);
+}
+.text:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.drop {
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3);
+  padding: var(--sp-3); border: 2px dashed var(--line); border-radius: var(--r-md); background: var(--surface-2);
+}
+.over { border-color: var(--accent); background: var(--accent-soft); }
+.file { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.fileBtn {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 var(--sp-4);
+  border: 1px solid var(--line); border-radius: var(--r-pill); background: var(--surface);
+  color: var(--ink); font-weight: 600; font-size: 0.9375rem; cursor: pointer;
+}
+.fileBtn:hover { border-color: var(--accent); }
+.file:focus-visible + .fileBtn { box-shadow: var(--ring); }
+.dropHint { color: var(--ink-2); font-size: 0.9375rem; }
+
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-3) var(--sp-4); }
+.actions :global(.link-btn) { min-height: 44px; }
+.live:empty { display: none; }
+.note { margin: 0; font-size: 0.9375rem; line-height: 1.5; color: var(--ink-2); max-width: 72ch; }
+.msg { margin: 0; padding: var(--sp-3); border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--line); font-size: 1rem; line-height: 1.5; color: var(--ink); }
+.result { display: grid; gap: var(--sp-2); }
+.summary { margin: 0; font-size: 1.05rem; font-weight: 600; color: var(--ink); }
+
+.list { border: 0; padding: 0; margin: 0; min-width: 0; }
+.legend { font-weight: 600; font-size: 1rem; color: var(--ink); padding: 0; margin-bottom: var(--sp-2); }
+.rows { list-style: none; margin: 0; padding: 0; border: 1px solid var(--line-2); border-radius: var(--r-md); overflow: hidden; }
+.row { display: flex; gap: var(--sp-3); align-items: flex-start; padding: var(--sp-3); border-top: 1px solid var(--line-2); background: var(--surface); }
+.row:first-child { border-top: 0; }
+.check { flex: none; width: 22px; height: 22px; margin: 0.1rem 0 0; accent-color: var(--accent); cursor: pointer; }
+.check:disabled { cursor: not-allowed; }
+.rowBody { flex: 1; min-width: 0; display: grid; gap: var(--sp-1); }
+.rowLabel { font-size: 1rem; font-weight: 600; color: var(--ink); cursor: pointer; overflow-wrap: anywhere; }
+.code { font-family: var(--font-m); font-weight: 600; font-size: 0.9375rem; color: var(--accent-ink); }
+.select {
+  max-width: 100%; min-height: 44px; font-size: 0.9375rem; padding: 0 var(--sp-3);
+  border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); color: var(--ink);
+}
+.meta { margin: 0; display: flex; flex-direction: column; gap: 0.15rem; font-size: 0.9375rem; line-height: 1.45; color: var(--ink-2); overflow-wrap: anywhere; }
+
+.miss { padding: var(--sp-3); border-radius: var(--r-md); border: 1px solid var(--line); background: var(--surface-2); }
+.missH { margin: 0 0 var(--sp-2); font-weight: 600; font-size: 1rem; color: var(--ink); }
+.miss ul { margin: 0 0 var(--sp-2); padding-left: 1.2rem; font-size: 0.9375rem; color: var(--ink-2); overflow-wrap: anywhere; }
+.done { margin: 0; font-size: 1rem; color: var(--good-ink); font-weight: 600; }
+.done a { color: var(--accent-ink); }
+
+@media (max-width: 480px) {
+  .head :global(.btn) { width: 100%; justify-content: center; }
+}

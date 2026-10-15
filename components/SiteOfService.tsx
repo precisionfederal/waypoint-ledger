@@ -2,6 +2,7 @@
 
 import { TABLE, rulesFor } from '@/lib/table';
 import { usd } from '@/lib/pricing';
+import { coverageForReader } from '@/lib/coverage-words';
 
 /**
  * 🔴 THE ACTIONABLE FINDING.
@@ -144,8 +145,8 @@ export default function SiteOfService() {
 
         <details className="sos-caveat">
           <summary>Where every figure here comes from, and who it does not describe</summary>
-          <p><strong>{office.label}</strong>: {office.coverage}</p>
-          <p><strong>{hospitalFee.label}</strong>: {hospitalFee.coverage}</p>
+          <p><strong>{office.label}</strong>: {coverageForReader(office.coverage)}</p>
+          <p><strong>{hospitalFee.label}</strong>: {coverageForReader(hospitalFee.coverage)}</p>
           <p>
             <strong>The hospital-setting physician payment.</strong>{' '}
             {String(rulesFor(OFFICE_ID).alternates?._facility_setting_note ?? '')}

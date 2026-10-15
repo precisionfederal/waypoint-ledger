@@ -49,6 +49,7 @@ describe('flow3-20: a child\'s map and sheet say "the child"', () => {
     const sheet = readFileSync(new URL('../app/sheet/page.tsx', import.meta.url), 'utf8');
     expect(sheet).toContain('fitOf(e.item, ctx, forChild)');
     expect(sheet).toContain('Does the published figure describe {who}:');
-    expect(sheet).toContain('verdictWords(v, forChild)');
+    // Judge panel 15 Oct B-9: the tally is said through the sheet's own who ('the child' for a child).
+    expect(sheet).toContain('tallyPhrase(v, n, who)');
   });
 });

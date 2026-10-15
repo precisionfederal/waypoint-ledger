@@ -27,6 +27,11 @@ import { PageHero } from '@/components/trust/PageHero';
 import { CONTEXT, SMALL_CELL_MIN, SEX_POLICY, SEX_POLICY_URL, SEX_ASK_ORIGIN } from '@/lib/survey';
 import './method.css';
 import { shareCard } from '@/lib/og';
+import { coverageForReader } from '@/lib/coverage-words';
+import READER_SCORE from '@/data/reader-score.json';
+import { READER_EVAL_URL, readerScoreLine, type ReaderScore } from '@/lib/reader-score';
+import { hospitalSourceRows, hospitalSourceSummary } from '@/lib/private-rate-sources';
+import { PRIVATE_RATE_NOT_FEDERAL, PRIVATE_RATE_RULE, PRIVATE_RATE_RULE_URL } from '@/lib/private-rates';
 
 export const dynamic = 'force-static';
 
@@ -315,7 +320,7 @@ export default async function MethodPage() {
         : null,
       population: rows.length ? plain(mostCommon(rows.map((r) => r.population)) ?? '') || null : null,
       doesNotDescribe: (() => {
-        const t = mostCommon(rows.map((r) => sameQuote(r.coverage_statement.match(DOES_NOT)?.[1] ?? null)));
+        const t = mostCommon(rows.map((r) => sameQuote(coverageForReader(r.coverage_statement).match(DOES_NOT)?.[1] ?? null)));
         return t ? plain(t) : null;
       })(),
     };
@@ -341,7 +346,7 @@ export default async function MethodPage() {
     year: egHit.year,
     basis: basisName(egHit.basis),
     population: egHit.population,
-    doesNotDescribe: (() => { const t = egHit.coverage_statement.match(DOES_NOT)?.[1]; return t ? plain(t) : null; })(),
+    doesNotDescribe: (() => { const t = coverageForReader(egHit.coverage_statement).match(DOES_NOT)?.[1]; return t ? plain(t) : null; })(),
     sourceTitle: egHit.source_title ?? egSource?.title ?? '',
     sourceUrl: egHit.source_url ?? egSource?.url ?? '',
     sha: egSource?.sha256,
@@ -355,10 +360,15 @@ export default async function MethodPage() {
   const localityCount = states?.localities.length ?? 0;
   const localityRows = states ? Object.keys(states.items).length : 0;
 
+  /* judge panel 15 Oct B-10: the hospital files behind the negotiated ranges, computed from
+     data/private-rates-client.json and data/private-rates-lines.json (lib/private-rate-sources). */
+  const hospitals = hospitalSourceRows();
+  const hospitalSum = hospitalSourceSummary(hospitals);
   const TOC: TocItem[] = [
     ...(audit ? [{ id: 'audit', text: 'The audit' },
                  { id: 'classes', text: 'How each class of figure is made' },
                  { id: 'sources', text: 'The files, and what they hash to' }] : []),
+    ...(hospitals.length ? [{ id: 'hospital-rates', text: 'Hospital negotiated rates' }] : []),
     ...(states && iowa && iowa99213 ? [{ id: 'locality', text: 'Where you live' }] : []),
     ...(conds ? [{ id: 'conditions', text: 'Which condition, and its code' },
                  { id: 'ai', text: 'How the AI reads a story' },
@@ -418,6 +428,16 @@ export default async function MethodPage() {
               </li>
             ))}
           </ul>
+        )}
+        {/* judge panel 15 Oct B-6: the reader's score beside the audit counts, from the files that
+            record it (data/reader-score.json, written at build by scripts/gen-reader-score.mjs). */}
+        {(READER_SCORE as ReaderScore).sentences > 0 && (
+          <p className="mx-reader" data-testid="reader-score">
+            <span className="mx-glance-ic"><Glyph g={G.check} size={20} /></span>
+            <span><strong>{readerScoreLine(READER_SCORE as ReaderScore)}.</strong>{' '}
+              The reader only fills a phrase the rules left blank, with a row the table holds, and never sees a figure.{' '}
+              <a href={READER_EVAL_URL} rel="noopener">How it was scored, on GitHub</a></span>
+          </p>
         )}
       </div>
 
@@ -569,6 +589,45 @@ export default async function MethodPage() {
               <SourceCards cards={sourceCards} maxRows={maxSourceRows} />
             </Sec>
           </>
+        )}
+
+        {hospitals.length > 0 && (
+          <Sec id="hospital-rates" icon={G.file} title="Hospital negotiated rates"
+            lead={<>{hospitalSum.linesWithRange} ledger lines show a range of the rates hospitals negotiated with
+              private plans, printed in each hospital&rsquo;s own file under the federal hospital price transparency
+              rule (<a href={PRIVATE_RATE_RULE_URL} rel="noopener">{PRIVATE_RATE_RULE}</a>): {hospitalSum.hospitals} hospitals
+              in {hospitalSum.states.length} states ({hospitalSum.states.join(', ')}), {hospitalSum.services} service
+              codes. {PRIVATE_RATE_NOT_FEDERAL.replace('your total', 'a total')}</>}>
+            <div className="mx-tablecard" data-testid="hospital-rate-files">
+              <table className="mx-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Hospital and its file</th>
+                    <th scope="col">State</th>
+                    <th scope="col">Dated by the hospital</th>
+                    <th scope="col">Read</th>
+                    <th scope="col" className="r">Services priced</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {hospitals.map((h) => (
+                    <tr key={h.id}>
+                      <td className="mx-td-name">{h.name}<br /><span className="mx-small">{h.system} &middot; <a href={h.fileUrl} rel="noopener">the hospital&rsquo;s file</a></span></td>
+                      <td data-label="State">{h.state ?? 'not stated'}</td>
+                      <td data-label="Dated by the hospital">{h.fileDated}</td>
+                      <td data-label="Read">{h.readOn}</td>
+                      <td className="r" data-label="Services priced">{h.services}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {hospitalSum.notRead.length > 0 && (
+              <Fold summary={<>Files we could not read ({hospitalSum.notRead.length})</>}>
+                <ul>{hospitalSum.notRead.map((n) => <li key={n.system}><strong>{n.system}.</strong> {n.why}</li>)}</ul>
+              </Fold>
+            )}
+          </Sec>
         )}
 
         {states && iowa && iowa99213 && (
@@ -966,7 +1025,7 @@ export default async function MethodPage() {
           <ul className="mx-notbuilt">
             <li><Glyph g={G.clock} /><p><strong>Time.</strong> A line has no date, and there is no view of your ledgers across months.</p></li>
             <li><Glyph g={G.plus} /><p><strong>A second invisible illness with a year-ahead figure.</strong> {condPriced.length} of the {condRows.length} conditions here carry a published year-ahead figure.{condGovNames.length > 0 && <> The figures for {andList(condGovNames)} are federal publications;</>} long COVID&rsquo;s is a peer-reviewed analysis of a federal survey, not a federal file. Lyme disease is listed with its ICD-10-CM code.</p></li>
-            <li><Glyph g={G.lock} /><p><strong>Your Medicare claims, brought in.</strong> The Blue Button 2.0 import is written against the CMS sandbox and stays off until CMS issues us credentials.</p></li>
+            <li><Glyph g={G.lock} /><p><strong>Your Medicare claims, brought in.</strong> The Blue Button 2.0 import is connected to the CMS sandbox, where it reads synthetic beneficiaries&rsquo; claims; real Medicare records wait on CMS production approval. You can watch it work on CMS&rsquo;s synthetic example: <Link href="/ledger?try=cms-synthetic">try it on the ledger</Link>.</p></li>
             <li><Glyph g={G.send} /><p><strong>Corrections sent to the agency.</strong> Every &ldquo;Wrong&rdquo; is grouped by the agency that published the figure, ready to send. None has been sent yet.</p></li>
             <li><Glyph g={G.paper} /><p><strong>Disability paperwork as a burden.</strong> Applications and appeals are not yet counted on their own.</p></li>
           </ul>

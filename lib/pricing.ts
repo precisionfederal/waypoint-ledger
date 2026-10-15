@@ -14,6 +14,7 @@
 import type {
   JourneyEntry, LedgerTotals, PriceBasis, PricedLine, PriceItem,
 } from './types';
+import { rulesFor } from './table';
 
 /**
  * `figureUsd` is the one hook for a DIFFERENT PUBLISHED FIGURE for the same unit
@@ -63,9 +64,15 @@ export function totals(lines: PricedLine[]): LedgerTotals {
   let pricedCount = 0;
   let unpricedCount = 0;
   const bases = new Set<PriceBasis>();
+  const beside: PricedLine[] = [];
 
   for (const l of lines) {
     if (!l.priced) { unpricedCount++; continue; }
+    /* 🔴 judge panel 15 Oct #2.1: the yearly prescriptions survey row ($54, 2018
+       dollars, out of pocket) was added to a stack of 2026 Medicare allowed
+       amounts. A row the table marks summable:false never enters the total, the
+       priced count or the bases; it is returned beside it, for the page to show. */
+    if (l.entry.item && rulesFor(l.entry.item.id).summable === false) { beside.push(l); continue; }
     pricedCount++;
     if (l.entry.item) bases.add(l.entry.item.basis);
     if (l.outOfPocketUsd !== null) { outOfPocketUsd += l.outOfPocketUsd; outOfPocketReported = true; }
@@ -79,7 +86,31 @@ export function totals(lines: PricedLine[]): LedgerTotals {
     pricedCount,
     unpricedCount,
     basesUsed: [...bases],
+    beside,
   };
+}
+
+export interface BesideFigure { id: string; label: string; usd: number; year: string; lines: number }
+
+/** The non-summable figures a total leaves out, one per row, for "beside the
+ *  total, not in it". Each is the sum of its own lines as the table prints them. */
+export function besideFigures(beside: readonly PricedLine[]): BesideFigure[] {
+  const m = new Map<string, BesideFigure>();
+  for (const l of beside) {
+    const it = l.entry.item;
+    if (!it || l.totalUsd === null) continue;
+    const f = m.get(it.id);
+    if (f) { f.usd += l.totalUsd; f.lines++; }
+    else m.set(it.id, { id: it.id, label: it.label, usd: l.totalUsd, year: it.year, lines: 1 });
+  }
+  return [...m.values()];
+}
+
+/** One sentence for the page, or null when nothing sits beside the total. */
+export function besideSentence(beside: readonly PricedLine[]): string | null {
+  const f = besideFigures(beside);
+  if (!f.length) return null;
+  return `Shown beside the total, not in it: ${f.map((x) => `${x.label}, ${usd(x.usd, true)} (${x.year} dollars)`).join('; ')}`;
 }
 
 /**

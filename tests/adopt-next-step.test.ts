@@ -18,7 +18,7 @@ describe('/adopt Standards: Next step column', () => {
     expect(cells.length).toBe(6);
   });
   it('fills the Blue Button cell with today\'s true state, word for word', () => {
-    expect(cells[2].trim()).toBe("Sandbox import built and tested on CMS's synthetic claims; switched on once Precision Federal accepts the CMS terms.");
+    expect(cells[2].trim()).toBe('Apply to CMS for production access, so a person can bring in their own Medicare record.');
   });
   it('states steps only: no date, no schedule, no funding', () => {
     for (const c of cells) {
@@ -30,5 +30,19 @@ describe('/adopt Standards: Next step column', () => {
   it('quotes the HL7 validator result exactly as /developers records it', () => {
     expect(cells[0]).toContain(`${FHIR_VALIDATION.errors} errors, ${FHIR_VALIDATION.warnings} warnings`);
     expect(cells[0]).toContain('/developers#agency-reuse');
+  });
+});
+
+/* QA 2026-10-15: at 1440 px the Today pill sits in the 13rem first grid column, and the
+   shared trust pill rule (white-space:nowrap) pushed "Three candidate elements named" and
+   "Connected to the CMS sandbox" across the "What that means here" column. The adopt grid
+   must let the Today cell and its pill wrap, with a selector more specific than the
+   shared `.std td:nth-of-type(1) strong` rule. */
+describe('/adopt Standards: the Today pill wraps inside its column', () => {
+  const css = readFileSync(join(__dirname, '..', 'components', 'adopt.module.css'), 'utf8');
+  const wide = css.slice(css.indexOf('@media (min-width:641px)'), css.indexOf('@media (max-width:640px)'));
+  it('sets white-space:normal on the Today cell and its pill in the grid layout', () => {
+    expect(wide).toMatch(/\.stdNext tbody td:nth-child\(2\),\.stdNext tbody td:nth-child\(2\) strong\{white-space:normal\}/);
+    expect(wide).toMatch(/\.stdNext tbody td:nth-child\(2\) strong\{max-width:100%\}/);
   });
 });

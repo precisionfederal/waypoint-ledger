@@ -36,6 +36,10 @@
   .stdNext tr>:nth-child(3){grid-area:c}
   .stdNext tr>:nth-child(4){grid-area:d}
   .stdNext tbody th[scope="row"]{white-space:normal}
+  /* QA 2026-10-15: the Today pill sits in the 13rem first column; nowrap pushed
+     "Three candidate elements named" and "Connected to the CMS sandbox" over the next column. */
+  .stdNext tbody td:nth-child(2),.stdNext tbody td:nth-child(2) strong{white-space:normal}
+  .stdNext tbody td:nth-child(2) strong{max-width:100%}
   .stdNext tbody td.next{background:var(--surface-2);border-left:2px solid var(--accent)}
 }
 @media (max-width:640px){

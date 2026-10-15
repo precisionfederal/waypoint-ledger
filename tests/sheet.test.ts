@@ -103,11 +103,11 @@ describe('the sheet carries the whole burden', () => {
   });
 
   it('prints every burden the ledger holds, with its arithmetic and its source', () => {
-    const cards = burdenCards({ ...EMPTY_BURDENS, workdays: 40, careHours: 200, trips: 30, dismissed: 4 });
-    expect(cards).toHaveLength(4);
+    const cards = burdenCards({ ...EMPTY_BURDENS, workdays: 40, careHours: 200, adminHours: 12, trips: 30, dismissed: 4 });
+    expect(cards).toHaveLength(5);
     for (const c of cards) expect(c.count).toBeGreaterThan(0);
     const priced = cards.filter((c) => c.valueUsd !== null);
-    expect(priced.length).toBe(2);
+    expect(priced.length).toBe(3);
     for (const c of priced) { expect(c.arithmetic).toBeTruthy(); expect(c.source.title).toBeTruthy(); }
     const counted = cards.filter((c) => c.valueUsd === null);
     for (const c of counted) expect(c.noFigureReason).toBeTruthy();

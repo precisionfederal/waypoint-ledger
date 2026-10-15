@@ -24,6 +24,7 @@ import Link from '@/components/IntentLink';
 import { reasonOf, useStore } from '@/lib/store';
 import { notReadAsCare } from '@/lib/mapper';
 import { basisWarning, priceJourney, totals, usd } from '@/lib/pricing';
+import { rulesFor } from '@/lib/table';
 import { agencyOf, blankCaption, everyLineUndescribed, fitOf, noFigureCopy, totalLabels } from '@/lib/fit';
 import type { Ctx, Fit } from '@/lib/fit';
 import { SHARED_NO_FIGURE, TIME_SEARCHING, gapFieldsOf, gapLabel, monthsPhrase } from '@/lib/sheet';
@@ -118,7 +119,10 @@ export function buildJourneyModel(lines: readonly PricedLine[], forgone?: Forgon
       continue;
     }
     if (!e.item && notReadAsCare({ raw: e.raw, item: e.item, gapCategory: g.gapCategory, months: g.months, reason: reasonOf(e) })) continue;
-    if (l.priced && l.totalUsd !== null) running += l.totalUsd;
+    /* judge panel 15 Oct #2.1: a summable:false figure keeps its own amount on its
+       stop and never joins the running total, as on the ledger (lib/pricing totals). */
+    const beside = !!e.item && rulesFor(e.item.id).summable === false;
+    if (l.priced && l.totalUsd !== null && !beside) running += l.totalUsd;
     const raw = (e.raw || '').trim();
     const shared = !e.item && (raw === SHARED_NO_FIGURE || raw === '');
     const ownWords = !e.item && !shared;
@@ -149,7 +153,7 @@ export function buildJourneyModel(lines: readonly PricedLine[], forgone?: Forgon
     stops,
     offPath,
     totalUsd: round2(t.totalUsd),
-    pricedCount: stops.filter((x) => x.lineUsd !== null).length,
+    pricedCount: t.pricedCount,
     blankCount: stops.filter((x) => x.lineUsd === null).length,
     searchMonths,
   };

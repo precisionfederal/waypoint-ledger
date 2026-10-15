@@ -153,10 +153,10 @@ describe('🔴 the four are never added — to the medical total or to each othe
     expect(adders).toEqual([]);
   });
 
-  it('returns four separate cards, each carrying its own source', () => {
-    const cards = burdenCards({ ...EMPTY_BURDENS, workdays: 12, careHours: 40, trips: 9, dismissed: 3 });
-    expect(cards.map((c) => c.kind)).toEqual(['workdays', 'care-hours', 'trips', 'dismissed']);
-    expect(cards.filter((c) => c.valueUsd !== null)).toHaveLength(2);
+  it('returns five separate cards, each carrying its own source', () => {
+    const cards = burdenCards({ ...EMPTY_BURDENS, workdays: 12, careHours: 40, adminHours: 6, trips: 9, dismissed: 3 });
+    expect(cards.map((c) => c.kind)).toEqual(['workdays', 'care-hours', 'admin-hours', 'trips', 'dismissed']);
+    expect(cards.filter((c) => c.valueUsd !== null)).toHaveLength(3);
     expect(new Set(cards.map((c) => c.source.priceId))).toEqual(new Set([WORKDAY_ROW_ID, CARE_ROW_ID, null]));
   });
 
@@ -184,7 +184,7 @@ describe('counts are clamped, and junk never becomes a figure', () => {
     expect(normalizeBurdens(null)).toEqual(EMPTY_BURDENS);
     expect(normalizeBurdens({ workdays: '12', careMethod: 'nonsense', payBasis: 'nonsense' })).toEqual(EMPTY_BURDENS);
     expect(normalizeBurdens({ workdays: 12, careHours: 40.7, trips: -3, dismissed: 2, careMethod: 'registered-nurse', payBasis: 'women', ownWeeklyPayUsd: 1234.567 }))
-      .toEqual({ workdays: 12, careHours: 40, trips: 0, dismissed: 2, careMethod: 'registered-nurse', payBasis: 'women', ownWeeklyPayUsd: 1234.57 });
+      .toEqual({ workdays: 12, careHours: 40, adminHours: 0, trips: 0, milesPerTrip: 0, hoursPerTrip: 0, dismissed: 2, careMethod: 'registered-nurse', payBasis: 'women', ownWeeklyPayUsd: 1234.57 });
   });
 
   it('keeps its own storage key, apart from the journey', () => {

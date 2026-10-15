@@ -13,6 +13,16 @@ import { Icon } from '@/components/Icons';
 import { agencyOf, agencyTally } from '@/lib/fit';
 import { SOURCE_COMPOSITION } from '@/lib/source-composition';
 import ThemedImg from '@/components/ThemedImg';
+import ProofStrip from '@/components/ProofStrip';
+import type SpeakInputT from '@/components/SpeakInput';
+/* FINAL-1011 listen: Speak and the .txt file load after the page wakes, in their
+   own chunk, so the first screen's code does not grow (tests/quality-budgets);
+   the row's 44 px is held while they load, so nothing under the box moves. */
+function LazySpeak(p: React.ComponentProps<typeof SpeakInputT>) {
+  const [C, setC] = useState<typeof SpeakInputT | null>(null);
+  useEffect(() => { let on = true; void import('@/components/SpeakInput').then((m) => { if (on) setC(() => m.default); }); return () => { on = false; }; }, []);
+  return C ? <C {...p} /> : <div style={{ minHeight: 44, marginBottom: '.5rem' }} aria-hidden="true" />;
+}
 
 /* Who published the rows this tool prices from, counted off the table itself.
    Bodies, not badges — and the number beside each is the real count of rows in
@@ -76,10 +86,14 @@ export default function Home() {
               <li><Icon.Check /> Free, with no account</li>
               <li><Icon.Check /> Every figure cited to the published file it came from</li>
             </ul>
+            {/* The walkthrough was linked from nowhere (QA sweep 15 Oct). A plain link: no embed, no autoplay. */}
+            <p className="hero-watch"><Link href="/walkthrough">Watch the walkthrough, with captions</Link></p>
             <ThemedImg className="hero-art-img" light="/img/hero-path.webp" dark="/img/hero-path-dark.webp" alt="" width={600} height={263} loading="eager" />
           </div>
           <HeroBuilder />
         </div>
+        {/* judge panel 15 Oct B-5: lived experience and rigor before the first click, each count read live (components/ProofStrip). */}
+        <div className="wrap"><ProofStrip /></div>
       </section>
 
       <section className="gap-pitch">
@@ -91,6 +105,7 @@ export default function Home() {
             <div className="row wrap-sm">
               <Link className="btn primary" href="/gap">Count what never happened <Icon.Arrow /></Link>
               <Link className="btn ghost" href="/survey">Rank the five burdens</Link>
+              <Link className="btn ghost" href="/lived-experience">What patients told researchers</Link>
             </div>
           </div>
           {/* 🔴 R6 sense F7. "No row in any federal file" is false and a reviewer
@@ -271,7 +286,7 @@ function HeroBuilder() {
   const n = st.entries.length;
   const nLines = `${n} ${n === 1 ? 'line' : 'lines'}`;
   function showExample() {
-    if (n && !confirm(`Replace your ${nLines} with an example? Your lines will be gone.`)) return;
+    if (n && !st.example && !confirm(`Replace your ${nLines} with an example? Your lines will be gone.`)) return;
     st.loadExample();
     window.location.href = '/ledger';
   }
@@ -282,13 +297,19 @@ function HeroBuilder() {
         <p className="core-have" role="note">
           {/* patient2-12: the ghost button "Open my ledger (N lines)" (46f413bb7a)
               and the header's Ledger link are the door; the banner only says it. */}
-          You have {mine} {mine === 1 ? 'line' : 'lines'} on your ledger. What you add here joins {mine === 1 ? 'it' : 'them'}.
+          {/* judge panel 15 Oct #2.2: an example on the ledger is replaced by what is typed here, never joined. */}
+          {st.example
+            ? <>The example we wrote is on your ledger. What you type here replaces it.</>
+            : <>You have {mine} {mine === 1 ? 'line' : 'lines'} on your ledger. What you add here joins {mine === 1 ? 'it' : 'them'}.</>}
         </p>
       )}
       <div className="hl-card">
         <label htmlFor="hero-story" className="lbl">Tell it the way you remember it</label>
         <textarea id="hero-story" ref={ref} rows={3} value={story} onChange={(e) => setStory(e.target.value)}
           placeholder={`e.g. ${EXAMPLE}`} />
+        {/* FINAL-1011 listen: "upload a document instead of typing" (patient advocate, Beta).
+            Speak or a .txt file fills this same box, so the same reader runs. */}
+        <LazySpeak value={story} onChange={setStory} target={ref} />
         {preview.segments.length > 0 ? (
           <>
             {/* The citation line is the empty state's promise. Once the chips are
@@ -338,7 +359,7 @@ function HeroBuilder() {
               {/* patient-1: with lines already stored, the ghost is the way back to
                   them; the example (which replaces the ledger) is not offered. */}
               {st.hydrated && n ? (
-                <Link className="btn ghost" href="/ledger">Open my ledger ({nLines})</Link>
+                <Link className="btn ghost" href="/ledger">{st.example ? 'Open the example' : `Open my ledger (${nLines})`}</Link>
               ) : (
                 <button className="btn ghost" type="button" onClick={showExample}>See it done with an example</button>
               )}

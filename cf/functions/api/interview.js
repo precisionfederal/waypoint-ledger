@@ -9,7 +9,7 @@
    System of record: D1 `interviews`.
    ========================================================================== */
 import { json, bad, readJson, oneOf, channelOf, count, isDryRun, dryOk } from './_http.js';
-import { panelCode } from './_panel.js';
+import { panelCode, isPanelChannel } from './_panel.js';
 import { cachedAggregate, writeProbe } from './_counters.js';
 import { all, encrypt } from './_db.js';
 import { appendChained } from './_hash.js';
@@ -56,6 +56,9 @@ export function validateInterview(b) {
     if (a) { answers[id] = a; filled++; }
   }
   if (filled < 3) return { error: 'Answer at least three questions. Skip any you like.' };
+  if (isPanelChannel(channelOf(b.channel)) && (b.consent === 'quote-by-name' || b.followUp === true)) {
+    return { error: 'This study collects no names or email addresses. Choose another option.' };
+  }
   const name = b.consent === 'quote-by-name' && typeof b.name === 'string' ? b.name.trim().slice(0, 80) : undefined;
   if (b.consent === 'quote-by-name' && !name) return { error: 'To be quoted by name, add the name you want used.' };
   const followUp = b.followUp === true;

@@ -473,9 +473,50 @@ export function importSummary(r: ImportResult): string {
   const parts = [
     `${r.claimCount} Medicare claim${r.claimCount === 1 ? '' : 's'}`,
     `${r.lineCount} billed line${r.lineCount === 1 ? '' : 's'}`,
-    `${r.matched.length} matched a published federal price row`,
+    `${r.matched.length} matched a row in this table${r.matched.some((g) => g.item.valueUsd === null) ? ` (${r.matched.filter((g) => g.item.valueUsd !== null).length} of them carry a published figure)` : ''}`,
     `${r.unmatched.length} code${r.unmatched.length === 1 ? '' : 's'} had no row in this table`,
   ];
   if (r.linesWithoutCode) parts.push(`${r.linesWithoutCode} line${r.linesWithoutCode === 1 ? '' : 's'} carried no procedure code`);
   return `${parts.join(', ')}.`;
+}
+
+/* --------------------------------------------------------------------------
+   THE PUBLIC EXAMPLE: CMS'S OWN SYNTHETIC BENEFICIARY, THROUGH THE SAME PATH.
+
+   Until CMS issues our sandbox credentials nobody can sign in, so a reader
+   could not see the import work. CMS publishes one page of claims for a
+   synthetic beneficiary (Patient/-10000010254647) as the ExplanationOfBenefit
+   example in the Blue Button 2.0 API's own OpenAPI specification. That page
+   is our test fixture, unedited (data/test-fixtures/bluebutton/SOURCE.json).
+
+   data/bluebutton-cms-synthetic-lines.json is extractLines() run on it: the
+   exact answer GET /api/bluebutton/claims would hand the browser for that
+   person. tests/bluebutton.test.ts re-derives it from the fixture and fails
+   on any difference. The browser maps it with resultFromPayload(), the one
+   function the live import also uses. It never calls CMS, and nothing about
+   it is stored: the lines are shown, never added to anyone's ledger.
+   -------------------------------------------------------------------------- */
+
+/** On every line the example produces. */
+export const SYNTHETIC_LINE_LABEL = 'CMS synthetic beneficiary, not a real person';
+/** The button, on the ledger and on /adopt. */
+export const SYNTHETIC_TRY = 'Try it with a CMS synthetic Medicare beneficiary';
+/** Where the example comes from. Read 2026-10-11: the spec's example is still
+ *  identical to the fixture, and the API documentation says the sandbox
+ *  "provides access to synthetic Medicare enrollee data". */
+export const SYNTHETIC_SOURCE = {
+  publishedBy: 'Centers for Medicare & Medicaid Services',
+  example: 'V2FhirExplanationOfBenefitExample',
+  specUrl: 'https://s3.amazonaws.com/bb-impl-content-cms-gov/static/openapi.yaml',
+  docsUrl: 'https://sandbox.bluebutton.cms.gov/docs/openapi',
+  aboutUrl: 'https://bluebutton.cms.gov/api-documentation/',
+} as const;
+
+/** What GET /api/bluebutton/claims returns, and what the example is shaped as. */
+export interface ClaimsPayload { ok: boolean; error?: string; claimCount: number; lines: ClaimLine[]; truncated: boolean; note: string | null }
+
+/** The one step both imports share: the Worker's lines, mapped in the browser
+ *  against the price table it already ships with. */
+export function resultFromPayload(p: ClaimsPayload, table: readonly PriceItem[]): ImportResult {
+  return mapLines(p.lines || [], table, p.claimCount);
 }

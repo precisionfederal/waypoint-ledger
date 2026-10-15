@@ -95,7 +95,7 @@ const calendarDay = (ymd: string) => (/^\d{4}-\d{2}-\d{2}$/.test(ymd)
    so a label naming a real group would put that group on a public register as a
    recruitment source it never agreed to be (round 3, a patient advocate). Every
    slug other than these two is printed exactly as it arrived, and says so. */
-const CHANNEL_LABEL: Record<string, string> = { direct: 'Direct link', advocate: 'Patient advocate link', 'paid-panel': 'Paid research panel' };
+const CHANNEL_LABEL: Record<string, string> = { direct: 'Direct link', advocate: 'Patient advocate link', 'paid-panel': 'Paid research panel', 'paid-panel-2': 'Paid research panel (second)' };
 const channelLabel = (slug: string) => CHANNEL_LABEL[slug] ?? `Link labelled “${slug}”`;
 
 /** How many rows of the price table each body published — the denominator for a correction. */
@@ -329,7 +329,7 @@ export default function Register({ sample = false }: { sample?: boolean } = {}) 
         {totalSent === 0 ? <FirstAnswer /> : (
         <div className="reg-grid">
           <Stat sample={sample} icon="rank" n={loaded ? sv!.n : null} label={sv && sv.n === 1 ? 'survey answer' : 'survey answers'}
-            sub={!loaded ? (failed ? 'unread' : undefined) : sv!.n > 0 ? `${svSenders ? `from ${svSenders} ${svSenders === 1 ? 'sender' : 'senders'}, every answer ranked · ` : ''}first ${day(sv!.firstAt)} · latest ${day(sv!.lastAt)}` : 'no rankings yet'}
+            sub={!loaded ? (failed ? 'unread' : undefined) : sv!.n > 0 ? `${paidPanel(sv) ? `${paidPanel(sv)} through a paid research panel of U.S. adults with a long-term health condition · ` : ''}${svSenders ? `from ${svSenders} ${svSenders === 1 ? 'sender' : 'senders'}, every answer ranked · ` : ''}first ${day(sv!.firstAt)} · latest ${day(sv!.lastAt)}` : 'no rankings yet'}
             marked={ours('survey')}
             invite={{ href: '/survey', words: 'No rankings yet. Be the first, in two minutes' }} />
           <Stat sample={sample} icon="talk" n={loaded ? iv!.n : null} label={iv && iv.n === 1 ? 'written interview' : 'written interviews'}
@@ -509,7 +509,7 @@ export default function Register({ sample = false }: { sample?: boolean } = {}) 
 
         {/* ---------------- interviews ---------------- */}
         <Fold id="interviews" title={<>{tag}Written interviews</>}
-          summary={iv ? sigN(`${iv.n} so far${changes.length ? ` · ${changes.length} published ${changes.length === 1 ? 'change' : 'changes'}` : ''}`) : sigN('')}>
+          summary={iv ? sigN(`${iv.n} so far`) : sigN('')}>
           <Steps label="What happens to a written interview" steps={[
             { icon: <StatIcon kind="talk" />, title: 'A written interview', text: 'Held privately, never served.' },
             { icon: TI.eye(), title: 'What changes because of it is published here', text: <>As &ldquo;someone said this, so we changed that&rdquo;.</> },
@@ -1157,6 +1157,13 @@ function StateCoverage({ counts, withheld, n }: { counts?: Record<string, number
    change log, in the first screen of the live register, with the way down to the
    whole log. Rendered only when a published entry exists: an empty log never
    leaves an empty box up here (it is said once, in the log itself). */
+/** A quoted entry reads "said:"; our own summary of what someone told us says so. */
+const saidLabel = (c: Change) => (/^["“]/.test(c.said.trim()) ? 'said:' : 'told us (our summary):');
+
+/** judge4 #11: the paid panel is said on the face of the survey tile, not only in a fold. */
+const paidPanel = (sv: { channels?: Record<string, number> } | null | undefined): number =>
+  Object.entries(sv?.channels ?? {}).filter(([k]) => k.startsWith('paid-panel')).reduce((t, [, v]) => t + v, 0);
+
 function ChangedBecauseOfYou({ latest, total, sample = false }: { latest: Change; total: number; sample?: boolean }) {
   return (
     <section className={`card ${styles.changed}`} aria-labelledby="changed-h">
@@ -1168,7 +1175,7 @@ function ChangedBecauseOfYou({ latest, total, sample = false }: { latest: Change
         </p>
         <a className={styles.changedLink} href="#changes">{total === 1 ? 'The change log in full →' : `All ${total} published changes →`}</a>
       </div>
-      <p className={styles.changedLine}><b>{latest.who} said:</b> {latest.said}</p>
+      <p className={styles.changedLine}><b>{latest.who} {saidLabel(latest)}</b> {latest.said}</p>
       <p className={styles.changedLine}><b>So we changed:</b> {latest.changed}</p>
     </section>
   );
@@ -1183,7 +1190,7 @@ function ChangeLog({ changes, loaded, failed, onRetry, busy }: { changes: Change
   return (
     <>
       <p className="micro">{changes.length} published {changes.length === 1 ? 'change' : 'changes'}, newest first.</p>
-      <ul className="changes">{changes.map((c, i) => <li key={c.id ?? i}><span className="ch-date">{calendarDay(c.date)}</span><p><b>{c.who} said:</b> {c.said}</p><p><b>So we changed:</b> {c.changed}</p></li>)}</ul>
+      <ul className="changes">{changes.map((c, i) => <li key={c.id ?? i}><span className="ch-date">{calendarDay(c.date)}</span><p><b>{c.who} {saidLabel(c)}</b> {c.said}</p><p><b>So we changed:</b> {c.changed}</p></li>)}</ul>
     </>
   );
 }

@@ -1,0 +1,7 @@
+.h1 { font-family: var(--font-d); font-size: clamp(1.75rem, 4vw, 2.5rem); line-height: 1.15; margin: 0 0 var(--sp-2); }
+.lead { color: var(--ink-2); font-size: 1.05rem; margin: 0 0 var(--sp-4); max-width: 46rem; }
+.video { display: block; width: 100%; max-width: 64rem; height: auto; aspect-ratio: 16 / 9; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md, 12px); }
+.cta { margin: var(--sp-4) 0 var(--sp-6); }
+.h2 { font-family: var(--font-d); font-size: 1.25rem; margin: 0 0 var(--sp-3); }
+.transcript { max-width: 46rem; font-size: 1rem; line-height: 1.6; }
+.transcript p { margin: 0 0 var(--sp-3); }

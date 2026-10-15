@@ -7,7 +7,7 @@ import { ITEMS, STORY_MAX, UNPRICEABLE, clearStoryDraft, readStoryDraft, saveSto
 import { alternativesFor, search } from '@/lib/search';
 import { StartOverButton } from './LineControls';
 import { CATEGORIES, categoryKey } from '@/lib/categories';
-import { JOURNEY_TOTAL_BASIS, priceJourney, totals, usd } from '@/lib/pricing';
+import { JOURNEY_TOTAL_BASIS, besideSentence, priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION } from '@/lib/table';
 import type { PriceItem, PricedLine } from '@/lib/types';
 import ShareCard, { type ShareCardData } from './ShareCard';
@@ -19,6 +19,7 @@ import { searchLength } from '@/lib/search-length';
 import { siteOfServiceFinding } from '@/lib/site-of-service';
 import { Icon } from './Icons';
 import { LivePreviewChips, addLabel, useLivePreview } from './LivePreview';
+import ReadBillMount from './ReadBillMount';
 export { LivePreviewChips, addLabel, previewTotals, sharedRead, useLivePreview, type LivePreview } from './LivePreview';
 
 const EXAMPLE = 'saw my regular doctor three times, then a cardiologist, an echo and a Holter, then the ER once when my heart was racing';
@@ -199,6 +200,8 @@ export default function JourneyBuilder() {
           </form>
         </section>
 
+        <ReadBillMount />
+
         {/* 🔴 ASKED UNDER THE BOX, NOT IN FRONT OF IT.
             The three questions that decide whether a federal figure describes
             this person are still asked before the number — but as one line that
@@ -345,6 +348,7 @@ export default function JourneyBuilder() {
               <p className="lbl">Running total</p>
               <p className="big-num">{usd(sum.totalUsd)}</p>
               <p className="micro">{sum.pricedCount} priced {sum.pricedCount === 1 ? 'line' : 'lines'}{sum.unpricedCount ? ` · ${sum.unpricedCount} unpriced` : ''} · {JOURNEY_TOTAL_BASIS}</p>
+              {sum.beside.length > 0 && <p className="micro" data-testid="total-beside">{besideSentence(sum.beside)}.</p>}
               {preview.previewTotal > 0 && (
                 <p className="lp-ghost">+ {usd(preview.previewTotal)} from the sentence you are typing, not added yet</p>
               )}
@@ -407,8 +411,10 @@ function focusPrimary(): void {
 export function shareCardData(lines: PricedLine[], _lineCount: number, namedUnpriced: number): Omit<ShareCardData, 'url' | 'tableVersion'> {
   const sum = totals(lines);
   const byCat = new Map<string, number>();
+  const side = new Set(sum.beside);
   for (const l of lines) {
-    if (!l.priced || !l.entry.item) continue;
+    /* judge panel 15 Oct #2.1: the card's bars hold only what its total holds. */
+    if (!l.priced || !l.entry.item || side.has(l)) continue;
     const k = categoryKey(l.entry.item);
     byCat.set(k, (byCat.get(k) ?? 0) + (l.totalUsd ?? 0));
   }

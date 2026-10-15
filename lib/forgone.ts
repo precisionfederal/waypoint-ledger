@@ -25,13 +25,13 @@
    ========================================================================== */
 
 import gapData from '@/data/invisible-events.json';
-/** The site's small-cell line (lib/survey-def.js SMALL_CELL_MIN), held here so the ledger and
- *  /adopt/kit do not carry the whole survey definition; a test pins the two together. */
-export const RANK_MIN_ANSWERS = 11;
+import type { SurveyAggregateLike } from './forgone-rank';
+/* The survey sentence lives in ./forgone-rank so the home proof strip reads it without
+   the counter rows (judge panel 15 Oct B-5); it is re-exported here unchanged. */
+export { RANK_MIN_ANSWERS, FORGONE_BURDEN, forgoneRank, forgoneRankSentence } from './forgone-rank';
+export type { SurveyAggregateLike, ForgoneRank } from './forgone-rank';
 
 export const FORGONE_KEY = 'waypoint-ledger.forgone.v1';
-/** The survey burden id this block answers to (lib/survey-def.js BURDENS). */
-export const FORGONE_BURDEN = 'forgone';
 /** The two gap-counter categories that are care a person went without. Same ids /gap and /api/gap use. */
 export const FORGONE_CATEGORIES = ['care-not-sought', 'care-denied'] as const;
 export type ForgoneCategory = (typeof FORGONE_CATEGORIES)[number];
@@ -75,53 +75,11 @@ export function forgoneGapBody(c: ForgoneCounts, tableVersion: string): { counts
   return Object.keys(counts).length ? { counts, tableVersion } : null;
 }
 
-/** The survey aggregate, as much of it as this block reads. */
-export interface SurveyAggregateLike {
-  n?: number;
-  submissions?: number;
-  senderBasis?: string;
-  ranking?: { burden: string; rankedFirstBy: number }[];
-}
-
-/** What the live aggregate says about this burden. Counts are answers, never people. */
-export interface ForgoneRank {
-  /** answers that ranked care gone without first */
-  first: number;
-  /** answers in the aggregate */
-  answers: number;
-  /** true only when no other burden was ranked first by more answers */
-  top: boolean;
-}
-
-/** "X of Y survey answers ranked it heaviest", from the live aggregate. Null when it cannot be said truthfully, or below the small-cell line (RANK_MIN_ANSWERS). */
-export function forgoneRank(agg: SurveyAggregateLike | null | undefined): ForgoneRank | null {
-  if (!agg || !Array.isArray(agg.ranking)) return null;
-  const answers = Number.isFinite(agg.submissions) ? Number(agg.submissions) : Number(agg.n);
-  if (!Number.isFinite(answers) || answers <= 0) return null;
-  /* Below the site's own small-cell line the sentence is not said. A handful of
-     answers, some of them the team testing the form, is not a finding to put
-     beside a person's ledger; /register/live still shows every count with its
-     channel. */
-  if (answers < RANK_MIN_ANSWERS) return null;
-  const row = agg.ranking.find((r) => r.burden === FORGONE_BURDEN);
-  if (!row || !Number.isFinite(row.rankedFirstBy)) return null;
-  const first = Math.min(row.rankedFirstBy, answers);
-  const others = agg.ranking.filter((r) => r.burden !== FORGONE_BURDEN).map((r) => (Number.isFinite(r.rankedFirstBy) ? r.rankedFirstBy : 0));
-  return { first, answers, top: first > 0 && others.every((n) => n <= first) };
-}
-
 /** Whether the survey can be read at all: an aggregate that says zero answers. */
 export function surveyIsEmpty(agg: SurveyAggregateLike | null | undefined): boolean {
   if (!agg || typeof agg !== 'object') return false;
   const answers = Number.isFinite(agg.submissions) ? Number(agg.submissions) : Number(agg.n);
   return Number.isFinite(answers) && answers <= 0;
-}
-
-export function forgoneRankSentence(r: ForgoneRank): string {
-  const noun = r.answers === 1 ? 'survey answer' : 'survey answers';
-  return r.top
-    ? `${r.first} of ${r.answers} ${noun} ranked it heaviest of the five burdens.`
-    : `${r.first} of ${r.answers} ${noun} ranked it first of the five burdens.`;
 }
 
 export function loadForgone(): ForgoneCounts {

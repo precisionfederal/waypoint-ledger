@@ -105,6 +105,19 @@ describe('it sits at the centre of the ledger', () => {
     expect(band).toBeLessThan(table);
     expect(table).toBeLessThan(fold);
   });
+  /* JUDGE-PANEL-R2 2.2 / S-1: at 390 px it rendered after the table (y about
+     4,806 px) while desktop had it under the total. The test above read only the
+     first occurrence, so the phone copy slipped past it. One element, on every
+     width, before "Who carries this cost" and the lines. */
+  it('renders once, on every width: never gated on phone, before WhoPays and the table', () => {
+    expect(ledger.match(/<CareGoneWithout\b/g)).toHaveLength(1);
+    expect(ledger).not.toMatch(/phone\s*&&\s*<CareGoneWithout/);
+    const band = ledger.indexOf('<CareGoneWithout />');
+    expect(ledger.slice(band - 40, band)).not.toMatch(/phone/);
+    expect(band).toBeGreaterThan(ledger.indexOf('<TotalReveal'));
+    expect(band).toBeLessThan(ledger.indexOf('<WhoPays'));
+    expect(band).toBeLessThan(ledger.indexOf('<section className="card table-card" id="lines">'));
+  });
 });
 
 describe('it is compact (round 2 decision) and truthful at 0 and at 4 answers', () => {

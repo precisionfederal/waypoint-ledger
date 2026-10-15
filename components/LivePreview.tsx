@@ -8,6 +8,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { ITEMS } from '@/lib/store';
 import { parseJourney, parseJourneyWithModel, readOnPurpose, unpricedByName, type ParsedSegment } from '@/lib/mapper';
 import { usd } from '@/lib/pricing';
+import { rulesFor } from '@/lib/table';
 import { monthsPhrase } from '@/lib/sheet';
 import { saidQuote } from '@/lib/said-quote';
 
@@ -108,6 +109,9 @@ export function previewTotals(segments: ParsedSegment[]): { matched: number; pre
   for (const s of segments) {
     if (!s.result.item) continue;
     matched++;
+    /* A yearly survey figure (prescriptions) sits beside the total, never in it,
+       here as on the ledger: it is a different unit and basis. */
+    if (rulesFor(s.result.item.id).summable === false) continue;
     previewTotal += (s.result.item.valueUsd ?? 0) * s.times;
   }
   return { matched, previewTotal };

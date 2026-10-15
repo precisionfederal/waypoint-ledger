@@ -23,6 +23,7 @@ import type { PriceItem } from './types';
 import { placeOnlyPhrase } from './state-detect';
 import { DIAGNOSED_REASON, DIAGNOSIS_REASON, isDiagnosisLine } from './diagnosis-line';
 import { COMMON_WORDS } from './common-words';
+import { TABLE as FULL_TABLE } from './table';
 
 /** How sure the match is. Reported to the person; never used to invent a figure. */
 export type MatchConfidence = 'high' | 'medium' | 'low' | 'none';
@@ -1665,7 +1666,7 @@ function conductionBeside(raw: string, table: PriceItem[]): ParsedSegment | null
  *  They are read, not blank: no visit swallows them, and the AI reader is never
  *  asked to fill them (lib/map-model.ts candidatesOf). */
 export function unpricedByName(reason: string | null | undefined): boolean {
-  return !!reason && (reason === INVASIVE_CPET_REASON || reason === PUSH_THROUGH_REASON || reason === NCS_COUNT_REASON || reason === NCS_RANGE_REASON || reason === BARE_SCAN_REASON || reason === BARE_ULTRASOUND_REASON || reason === CONTRAST_GAP_REASON || reason === MONITOR_GAP_REASON);
+  return !!reason && (reason === INVASIVE_CPET_REASON || reason === UNCARRIED_TREATMENT_REASON || reason === PUSH_THROUGH_REASON || reason === NCS_COUNT_REASON || reason === NCS_RANGE_REASON || reason === BARE_SCAN_REASON || reason === BARE_ULTRASOUND_REASON || reason === CONTRAST_GAP_REASON || reason === MONITOR_GAP_REASON);
 }
 function conductionResult(raw: string, table: PriceItem[], carried: { gapCategory: GapCategory | null; months: number | null }): MapResult | null {
   if (!namesConduction(raw) || NEEDLE_EMG_WORDS.test(normalize(raw))) return null;
@@ -1879,6 +1880,10 @@ const FLOOR = 42;
    none is sent to the AI reader (a model asked to fill "I take magnesium"
    would find the magnesium test again).
    -------------------------------------------------------------------------- */
+const RX_ROW = 'meps2018-retail-rx-out-of-pocket';
+/** Given in a vein, a drip or a shot: not a retail prescription, so not the pharmacy figure. */
+const NOT_RETAIL_RX = / (?:iv|i v|intravenous|infusions?|drips?|injections?|injected|shots?)(?= )/;
+const RX_CLASS = / (?:antidepressants?|ssris?|snris?|antibiotics?|antivirals?|antibiotic|painkillers?|pain (?:meds|medications?|medicines?|killers?|relievers?)|opioids?|steroids?|prednisone|anti ?anxiety (?:meds|medications?)|anti ?inflammator(?:y|ies)(?: (?:meds|medications?|drugs?))?|muscle relaxants?|sleeping pills?|sleep (?:meds|medications?)|birth control|blood pressure (?:meds|medications?|pills?)|antihistamines?|inhalers?|insulin|mood stabili[sz]ers?|antipsychotics?|beta blockers?|anticonvulsants?|migraine (?:meds|medications?)|(?:a |the |my |her |his )?prescriptions?|prescribed (?:meds|medications?|drugs?|pills?|me (?:meds|medications?|pills?))|meds) /;
 const SUPPLEMENT_CUE = / (?:supplements?|supplementing|vitamins|multivitamins?|pills?|capsules?|tablets?|gummies|softgels?|over the counter|otc|\d+ ?(?:mg|mcg|iu)) /;
 const TAKE_CUE = / (?:take|takes|taking|took|started on|start on|on|bought|buy|buying|using|use) /;
 const TEST_CUE = / (?:level|levels|test|tests|tested|testing|blood|lab|labs|panel|checked|check|drawn|draw|measured|came back|result|results|low|high|deficient|deficiency) /;
@@ -2319,6 +2324,10 @@ function mapUtteranceRules(said: string, table: PriceItem[]): MapResult {
      from the standard CPET row, and no single published federal figure covers
      the whole procedure. Named, never priced, never the ordinary CPET. */
   if (INVASIVE_CPET.test(flat(raw))) return { item: null, score: 0, matchedOn: null, confidence: 'none', reason: INVASIVE_CPET_REASON, ...carried };
+  /* 10/13 interview (postpartum depression): "I was hospitalized and had ECT"
+     read as no care. ECT and TMS are real treatments with fee schedule codes
+     this table does not carry yet: named, never priced, never dropped. */
+  if (UNCARRIED_TREATMENT.test(flat(raw))) return { item: null, score: 0, matchedOn: null, confidence: 'none', reason: UNCARRIED_TREATMENT_REASON, ...carried };
 
   /* FINAL-1011 (main): "told to push through" is advice, not an IV push. The
      fuzzy match read it as cms-proc-iv-push; a push through a line, a vein or an
@@ -2345,6 +2354,17 @@ function mapUtteranceRules(said: string, table: PriceItem[]): MapResult {
     if (loose.item && loose.score >= FLOOR && isScanRow(loose.item.id)) {
       return { item: null, score: 0, matchedOn: null, confidence: 'none', reason: CONTRAST_GAP_REASON, ...carried };
     }
+  }
+  /* 10/13 interview (postpartum depression): "an antidepressant" read as no care,
+     so five years of medication left nothing on the ledger. A named drug class
+     that matched no row takes the one published prescriptions figure, which
+     says on its face that it is a yearly median and never joins the sum. */
+  if ((bestScore < FLOOR || !best) && !gap && RX_CLASS.test(flat(raw)) && !NOT_RETAIL_RX.test(flat(raw))) {
+    /* judge4 #6: the live ledger maps against SELECTABLE (summable rows only), which
+       leaves this yearly survey row out; it is read from the full table, and the
+       ledger shows it under Survey figures, beside the total, never in it. */
+    const rx = table.find((x) => x.id === RX_ROW) ?? FULL_TABLE.find((x) => x.id === RX_ROW);
+    if (rx) return { item: rx, score: FLOOR, matchedOn: 'prescriptions', confidence: 'medium', reason: null, ...carried };
   }
   if (bestScore < FLOOR || !best) {
     // A dismissal that matched no row still says why it carries no figure.
@@ -2899,6 +2919,9 @@ const IV_WORDS = / (?:iv|i v|intravenous|drip|infusion|line|vein|port|drug|medic
 export const PUSH_THROUGH_REASON =
   'advice to push through is not a unit of care, so it carries no published figure. If it left you worse off, count it under Care that made you worse.';
 const INVASIVE_CPET = / (?:icpet|i cpet|invasive (?:cpet|exercise (?:test|testing|stress test)|cardio ?pulmonary exercise (?:test|testing|stress test))|(?:cpet|cardio ?pulmonary exercise test(?:ing)?) with (?:a |an )?(?:right heart )?cath(?:eter|eterization)?)(?= )/;
+const UNCARRIED_TREATMENT = / (?:ect|e c t|electroconvulsive(?: therapy| treatments?)?|electro ?shock(?: therapy| treatments?)?|tms|transcranial magnetic stimulation)(?= )/;
+export const UNCARRIED_TREATMENT_REASON =
+  'a treatment with its own Medicare fee schedule code that this price table does not carry yet, so it stays on the ledger by name, unpriced';
 export const INVASIVE_CPET_REASON =
   'invasive exercise test: no single published federal figure for the whole procedure, and the standard exercise test row is not the same test, so this line stays unpriced';
 export const MONITOR_GAP_REASON =

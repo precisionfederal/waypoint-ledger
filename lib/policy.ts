@@ -496,10 +496,10 @@ export const LEVERS: Lever[] = [
   },
   {
     id: 'lyme-cost-of-illness',
-    title: 'The cost of Lyme disease, as HHS’s own reports asked for it',
+    title: 'The total cost of an illness, the study HHS’s own working group asked for',
     what: 'HHS’s Tick-Borne Disease Working Group asked for studies of the total cost of illness of tick-borne diseases, beginning with Lyme, and the Lyme human-centered design report made for the HHS LymeX effort recommends a cost-of-care resource.',
     today: `The two Lyme blood tests are priced from the CMS Clinical Laboratory Fee Schedule: CPT 86618 at ${usd2(LYME_SCREEN?.valueUsd)} and CPT 86617 at ${usd2(LYME_CONFIRM?.valueUsd)}, each with its file and row. ${hasLyme() ? 'Lyme is one of the conditions in section 1.' : 'Lyme is not yet a condition in this tool, and no annual Lyme figure is shown.'}`,
-    larger: 'With Lyme searches itemized line by line and enough of them, HHS could set the cost of a Lyme diagnostic search, as people lived it, beside the published per-case estimates.',
+    larger: 'With diagnostic searches itemized line by line and enough of them, starting with tick-borne illness and then any condition, HHS could set the cost of a search, as people lived it, beside the published per-case estimates.',
     sources: [
       { title: 'Tick-Borne Disease Working Group, 2018 Report to Congress, Recommendation 3.3', url: 'https://health.gov/sites/oash/files/2025-01/tbdwg-report-to-congress-2018.pdf', year: '2018',
         quote: 'Support economic studies and activities to estimate the total cost of illness associated with tick-borne diseases in the United States, beginning first with Lyme disease and including both financial and societal impacts.' },

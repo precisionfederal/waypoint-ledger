@@ -7,15 +7,16 @@
    from, and three questions worth asking. Nothing here is advice.
    ========================================================================== */
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import Link from '@/components/IntentLink';
-import { priceJourney, totals, usd } from '@/lib/pricing';
+import { besideSentence, priceJourney, totals, usd } from '@/lib/pricing';
 import { UNPRICEABLE, useStore } from '@/lib/store';
-import { COVERAGE_LABEL, agencyOf, fitOf, localityOf, totalLabels, verdictWords, type Fit } from '@/lib/fit';
+import { COVERAGE_LABEL, agencyOf, fitOf, localityOf, totalLabels, type Fit } from '@/lib/fit';
 import { BASIS_NAME } from '@/components/LineDrawer';
 import { EMPTY_BURDENS, burdenCards, loadBurdensWithWords, money, type BurdenCounts } from '@/lib/burdens';
 import { searchLength, splitFrom } from '@/lib/search-length';
-import { NO_FIGURE, fitTally, gapLabel, gapSummary, gapWhy, isCareLine, monthsPhrase, noteRowsOf } from '@/lib/sheet';
+import { NO_FIGURE, SHARED_NO_FIGURE, fitTally, gapLabel, gapSummary, gapWhy, isCareLine, monthsPhrase, noteRowsOf } from '@/lib/sheet';
+import { saidQuote } from '@/lib/said-quote';
 import type { JourneyEntry, PriceItem } from '@/lib/types';
 import HelpThatExists from '@/components/HelpThatExists';
 import { gapPhrase, hasPaid, paidArithmetic, paidRowOf, paidSummary, signedMoney } from '@/lib/paid';
@@ -25,9 +26,16 @@ import { countedGaps } from '@/components/sheet/sheet-size';
 import ThemedImg from '@/components/ThemedImg';
 import JourneyStrip, { shortUnit, type Stop } from '@/components/sheet/JourneyStrip';
 import { EXAMPLE_UNPRICED, exampleEntries } from '@/components/sheet/example';
-import { sheetWho } from '@/components/sheet/sheet-who';
+import { sheetWho, stopWords, tallyPhrase } from '@/components/sheet/sheet-who';
+import { hiddenCount, hiddenNote, shownEntries, toggled } from '@/components/sheet/redact';
+import ListenButton from '@/components/ListenButton';
+import { ledgerScript, spokenLineOf } from '@/lib/speech';
+import { TABLE_VERSION } from '@/lib/table';
 import './sheet.css';
 import './print.css';
+
+/* The ticks inside "Hide before sharing" load only when it is opened. */
+const RedactList = lazy(() => import('@/components/sheet/RedactList'));
 
 /* 🔴 THE SHEET LABELS THE FIGURE IT ACTUALLY PRINTED.
    The cell printed the fit-substituted figure against the ROW's basis and year:
@@ -49,7 +57,15 @@ export default function SheetPage() {
   const [example, setExample] = useState(false);
   const [savedAt] = useState<string>(() => new Date().toISOString());
   useEffect(() => { setExample(new URLSearchParams(window.location.search).has('example')); }, []);
-  const entries: JourneyEntry[] | null = !st.hydrated ? null : example ? exampleEntries() : st.entries;
+  const allEntries: JourneyEntry[] | null = !st.hydrated ? null : example ? exampleEntries() : st.entries;
+  /* HIDE BEFORE SHARING (components/sheet/redact.ts): lines the person hides, and
+     their own words, are left off everything the page prints. Nothing hidden by
+     default; held in this page only, never stored or sent. */
+  const [hidden, setHidden] = useState<Set<string>>(() => new Set());
+  const [hideWords, setHideWords] = useState(false);
+  const [redactOpen, setRedactOpen] = useState(false);
+  const entries: JourneyEntry[] | null = allEntries === null ? null : shownEntries(allEntries, hidden);
+  const nHidden = allEntries ? hiddenCount(allEntries, hidden) : 0;
 
   const [burdens, setBurdens] = useState<BurdenCounts>(EMPTY_BURDENS);
   useEffect(() => { setBurdens(loadBurdensWithWords()); }, []);
@@ -153,7 +169,7 @@ export default function SheetPage() {
      before the sheet or its empty state is (re-merge: CLS 0.35 at 1440 on an empty sheet). */
   if (entries === null) return <section className="step sheet-loading" aria-busy="true"><div className="wrap"><p className="sub">Loading your ledger…</p></div></section>;
 
-  if (!entries.length) {
+  if (!allEntries || !allEntries.length) {
     /* PAGES DETAIL (2026-09-30): an empty sheet was a heading and a line on a
        900 px page. It is a real empty state now: an icon, the same two lines, a
        primary button to price a journey, and a sample sheet a person can see
@@ -188,7 +204,8 @@ export default function SheetPage() {
   const stops: Stop[] = rows.map((l, i) => ({
     key: l.entry.key, n: i + 1, times: l.entry.times, priced: l.priced,
     label: l.entry.item ? shortUnit(l.entry.item.label)
-      : (l.entry as JourneyEntry & { gapCategory?: string | null }).gapCategory ? 'Counted, never priced' : 'No federal figure',
+      : (l.entry as JourneyEntry & { gapCategory?: string | null }).gapCategory ? 'Counted, never priced'
+      : l.entry.raw === SHARED_NO_FIGURE ? 'No federal figure' : stopWords(saidQuote(l.entry.raw ?? ''), hideWords, 'No federal figure'),
   }));
   const share = (n: number) => (sum.totalUsd > 0 ? Math.max(1.5, Math.min(100, (n / sum.totalUsd) * 100)) : 0);
 
@@ -198,7 +215,16 @@ export default function SheetPage() {
         <SheetRail />
 
         <div className="sheet-stage">
-        {example && (
+        <details className="sheet-redact no-print" data-testid="sheet-redact" onToggle={(e) => { if ((e.currentTarget as HTMLDetailsElement).open) setRedactOpen(true); }}>
+          <summary>Hide before sharing{nHidden > 0 || hideWords ? ` · ${[nHidden > 0 ? `${nHidden} ${nHidden === 1 ? 'line' : 'lines'} hidden` : null, hideWords ? 'your words hidden' : null].filter(Boolean).join(' · ')}` : ''}</summary>
+          {redactOpen && (
+            <Suspense fallback={<p className="rd-note">Loading your lines…</p>}>
+              <RedactList entries={allEntries} hidden={hidden} onToggle={(k) => setHidden((h) => toggled(h, k))} hideWords={hideWords} onWords={setHideWords} />
+            </Suspense>
+          )}
+        </details>
+        {/* judge panel 15 Oct #2.2: the home example on the ledger is a sample sheet too. */}
+        {(example || !!st.example) && (
           <p className="sheet-sample no-print">
             <b>Sample sheet.</b> An example journey, priced from the same published figures. <Link href="/">Describe your own</Link>
           </p>
@@ -209,18 +235,36 @@ export default function SheetPage() {
           {/* FLOW5 flow5-3: a child's sheet names the child, as the Brief does. */}
           <h1 id="sheet-h1">{sw.title}</h1>
           <p className="sheet-meta">Prepared {date} with Waypoint Ledger · every figure is published U.S. federal data, cited below</p>
+          {/* FINAL-1011 listen: the sheet read aloud from the figures printed below (lib/speech.ts ledgerScript). */}
+          <ListenButton what="this sheet" script={() => ledgerScript({
+            label: labels.primary, totalUsd: sum.totalUsd, pricedCount: sum.pricedCount, searched,
+            /* B-7 after B-1: the summable:false figure is said beside the total, as printed. */
+            beside: besideSentence(sum.beside),
+            lines: rows.filter((l) => !sum.beside.includes(l)).map((l) => {
+              const gap = (l.entry as JourneyEntry & { gapCategory?: string | null }).gapCategory;
+              return spokenLineOf(l, l.entry.item ? fits.get(l.entry.key) : undefined, { countedAs: gap ? gapLabel(gap) : null });
+            }),
+            searchingFor: counted.months > 0 ? monthsPhrase(counted.months) : null,
+            namedUnpriced: counted.named,
+            agencies: [...new Set(lines.filter((l) => l.entry.item).map((l) => agencyOf(l.entry.item!)))],
+            tableVersion: TABLE_VERSION,
+          })} />
         </header>
 
         <div className="sheet-total">
           <div className="st-main">
             <p className="total-label">{labels.primary}</p>
             <p className="total-num">{usd(sum.totalUsd)}</p>
+            {/* judge panel 15 Oct #2.1: a summable:false figure is printed beside the total, never in it. */}
+            {sum.beside.length > 0 && <p className="sheet-searched" data-testid="sheet-beside">{besideSentence(sum.beside)}.</p>}
             {searched && (() => { const [a, f, b] = splitFrom(searched); return <p className="sheet-searched">{a}{f && <span className="core-searched-from">{f}</span>}{b}</p>; })()}
           </div>
           <dl className="st-counts">
             <div><dt>Priced {sum.pricedCount === 1 ? 'line' : 'lines'}</dt><dd>{sum.pricedCount}</dd></div>
-            {noFigureLines > 0 && <div><dt>Without a federal figure</dt><dd>{noFigureLines}</dd></div>}
+            {noFigureLines > 0 && <div><dt>No published price</dt><dd>{noFigureLines}</dd></div>}
+            {nHidden > 0 && <div><dt>Hidden by you</dt><dd>{nHidden}</dd></div>}
           </dl>
+          {nHidden > 0 && <p className="st-hidden" data-testid="sheet-hidden-note">{hiddenNote(nHidden)}</p>}
           {/* nothing missing is a statement, never a zero: the ledger's own words */}
           {noFigureLines === 0 && <p className="st-all">Every visit and test carries a published federal figure</p>}
           <p className="sheet-total-note">
@@ -243,11 +287,11 @@ export default function SheetPage() {
         {tally.length > 0 && (
           <p className="sheet-fit">
             <strong>Does the published figure describe {who}:</strong>{' '}
-            {tally.map(([v, n]) => `${n} ${n === 1 ? 'line is' : 'lines are'} ${/^[aeiou]/i.test(v) ? 'an' : 'a'} ${verdictWords(v, forChild).toLowerCase()}`).join(' · ')}.{tally.length > 1 ? ' Each line says which it is, under its own figure.' : ''}
+            {tally.map(([v, n]) => tallyPhrase(v, n, who)).join(' · ')}.{tally.length > 1 ? ' Each line says which it is, under its own figure.' : ''}
           </p>
         )}
 
-        {notes.length > 0 && (
+        {notes.length > 0 && !hideWords && (
           <section className="sheet-words" aria-labelledby="sheet-words-h">
             <h2 id="sheet-words-h">In my own words</h2>
             <p className="sheet-words-note">Printed as I said it, in order. Not priced.</p>
@@ -282,7 +326,7 @@ export default function SheetPage() {
               const pMath = pr ? paidArithmetic(l.entry, (n) => usd(n, true)) : null;
               return (
                 <tr key={l.entry.key}>
-                  <td><span className="sheet-n" aria-hidden="true">{i + 1}</span>{l.entry.raw || <em>from a shared link</em>}</td>
+                  <td><span className="sheet-n" aria-hidden="true">{i + 1}</span>{hideWords ? <em>hidden by you</em> : l.entry.raw || <em>from a shared link</em>}</td>
                   <td data-label="Unit of care">{it ? <>{oneAgency ? '' : `${agencyOf(it)} · `}{it.label}{it.code ? <>{' '}<span className="sheet-code sheet-unit-code">{it.code}</span></> : null}</> : gap ? <em>{gapLabel(gap)}: counted, never priced</em> : <em>not matched to a federal figure</em>}</td>
                   <td className="num" data-label="Times">{l.entry.times}</td>
                   {/* 🔴 ONE CELL CARRIES THE FIGURE, ITS BASIS AND WHETHER IT
@@ -390,7 +434,7 @@ export default function SheetPage() {
             </p>
             {burdenList.length === 0 && (
               <p className="micro no-print">
-                Workdays, unpaid care hours, trips and dismissals are counted on <Link href="/ledger">your ledger</Link>; whatever you enter there prints here.
+                Workdays, unpaid care hours, hours on the phone and paperwork, trips and dismissals are counted on <Link href="/ledger">your ledger</Link>; whatever you enter there prints here.
               </p>
             )}
           </section>

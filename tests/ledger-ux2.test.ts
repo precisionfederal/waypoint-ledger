@@ -54,7 +54,7 @@ describe('UX-2 fix 10 — the strongest fact is not displayed as a zero', () => 
   });
 
   it('the count comes straight back the moment something IS missing', () => {
-    expect(ledger).toContain(": { lbl: 'Without a federal figure', val: String(blankLines), sub: 'shown blank, never guessed' }");
+    expect(ledger).toContain(": { lbl: 'No published price', val: String(blankLines), sub: 'left blank, not estimated' }");
   });
 });
 

@@ -1,0 +1,9 @@
+{
+  "_from": "data/test-fixtures/READER-EVAL.md and cf/functions/api/map.js, by scripts/gen-reader-score.mjs",
+  "sentences": 209,
+  "rulesF1": "88.8%",
+  "readerF1": "98.4%",
+  "wrongUnitsAdded": 0,
+  "scoredOn": "2026-09-30",
+  "model": "gpt-5.6-luna"
+}

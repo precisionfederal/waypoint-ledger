@@ -88,12 +88,18 @@ describe('never in any total', () => {
 });
 
 describe('the words', () => {
+  it('the whole ER encounter says which half of the bill its hospital range covers (judge3 #2)', () => {
+    const t = faceRangeText({ id: 'cms-ed-99284-complete' });
+    expect(t).toMatch(/^Hospitals’ posted negotiated rates, (?:doctor|hospital)’s fee only: /);
+    const v = faceRangeText({ id: 'cms-99213' });
+    if (v) expect(v).toMatch(/^Hospitals’ posted negotiated rates: /);
+  });
   it('say hospitals\' posted negotiated rates, never "near you", "your price" or "$0"', () => {
     for (const id of lines) {
       const text = faceRangeText({ id });
       const html = face(id);
       if (!text) { expect(html).toBe(''); continue; }
-      expect(text).toMatch(/^Hospitals’ posted negotiated rates: \$[\d,]+\.\d\d–\$[\d,]+\.\d\d \(\d+ hospitals\)$/);
+      expect(text).toMatch(/^Hospitals’ posted negotiated rates(?:, (?:doctor|hospital)’s fee only)?: \$[\d,]+\.\d\d–\$[\d,]+\.\d\d \(\d+ hospitals\)$/);
       for (const s of [text, html]) {
         expect(s.toLowerCase()).not.toContain('near you');
         expect(s.toLowerCase()).not.toContain('your price');

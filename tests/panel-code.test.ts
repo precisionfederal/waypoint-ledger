@@ -3,7 +3,7 @@
    successful survey or interview POST whose own channel is exactly 'paid-panel'. */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { panelCode, PANEL_CHANNEL } from '../cf/functions/api/_panel.js';
+import { panelCode, PANEL_CHANNEL, PANEL2_CHANNEL } from '../cf/functions/api/_panel.js';
 import { channelOf } from '../cf/functions/api/_http.js';
 import { normalizeChannel, SURVEY_VERSION } from '../lib/survey-def.js';
 import { onRequestPost as postSurvey } from '../cf/functions/api/survey.js';
@@ -39,6 +39,16 @@ describe('panelCode', () => {
     expect(panelCode({ PROLIFIC_COMPLETION_CODE: CODE }, PANEL_CHANNEL, 'interview')).toEqual({ completionCode: CODE });
     expect(panelCode({ PROLIFIC_COMPLETION_CODE_SURVEY: 'SURV1' }, PANEL_CHANNEL, 'interview')).toEqual({});
     expect(panelCode(env, 'advocate', 'survey')).toEqual({});
+  });
+  it('the second panel reads only its own codes, and never the first panel\'s', () => {
+    const env = { PROLIFIC_COMPLETION_CODE_SURVEY: 'PRO1', PANEL2_COMPLETION_CODE_SURVEY: ' CON1 ', PANEL2_COMPLETION_CODE: 'CONALL' };
+    expect(panelCode(env, PANEL2_CHANNEL, 'survey')).toEqual({ completionCode: 'CON1' });
+    expect(panelCode(env, PANEL2_CHANNEL, 'interview')).toEqual({ completionCode: 'CONALL' });
+    expect(panelCode(env, PANEL_CHANNEL, 'survey')).toEqual({ completionCode: 'PRO1' });
+    expect(panelCode({ PROLIFIC_COMPLETION_CODE: CODE }, PANEL2_CHANNEL, 'survey')).toEqual({});
+    expect(panelCode({ PANEL2_COMPLETION_CODE: 'X' }, 'constructor', 'survey')).toEqual({});
+    expect(normalizeChannel('paid-panel-2')).toBe(PANEL2_CHANNEL);
+    expect(channelOf(PANEL2_CHANNEL)).toBe(PANEL2_CHANNEL);
   });
   it('the channel arrives normalised: the link label becomes the exact slug the server keeps', () => {
     expect(normalizeChannel('Paid Panel')).toBe(PANEL_CHANNEL);
@@ -78,4 +88,21 @@ describe('POST /api/survey and /api/interview carry the code only for a paid-pan
       expect(j.completionCode).toBe('OWN42');
     });
   }
+});
+
+describe('a paid-panel interview collects no name and no email', () => {
+  for (const ch of ['paid-panel', 'paid-panel-2']) {
+    it(`${ch}: quote-by-name and the follow-up email are refused`, async () => {
+      const byName = await (await postInterview({ request: post({ ...interview(ch), consent: 'quote-by-name', name: 'A Person' }), env: fakeEnv() } as never)).json();
+      expect(byName.ok).not.toBe(true);
+      const follow = await (await postInterview({ request: post({ ...interview(ch), followUp: true, email: 'a@b.co' }), env: fakeEnv() } as never)).json();
+      expect(follow.ok).not.toBe(true);
+      const ok = await (await postInterview({ request: post({ ...interview(ch), consent: 'quote-anonymously' }), env: fakeEnv() } as never)).json();
+      expect(ok.ok).toBe(true);
+    });
+  }
+  it('other channels keep both options', async () => {
+    const j = await (await postInterview({ request: post({ ...interview('advocate'), consent: 'quote-by-name', name: 'A Person', followUp: true, email: 'a@b.co' }), env: fakeEnv() } as never)).json();
+    expect(j.ok).toBe(true);
+  });
 });

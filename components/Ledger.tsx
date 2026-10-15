@@ -6,7 +6,7 @@ import FinePrint from '@/components/FinePrint';
 import { ITEMS, UNPRICEABLE, reasonOf, useStore } from '@/lib/store';
 import { NO_MATCH_REASON, PLAIN_WORDS_REASON, SAY_IT_REASON, notReadAsCare, unpricedByName } from '@/lib/mapper';
 import { isDiagnosisLine } from '@/lib/diagnosis-line';
-import { basisWarning, priceJourney, totals, usd } from '@/lib/pricing';
+import { basisWarning, besideFigures, besideSentence, priceJourney, totals, usd } from '@/lib/pricing';
 import { TABLE_VERSION, checkCombination, bundlingNote } from '@/lib/table';
 import { CATEGORIES, categoryKey, categoryOf } from '@/lib/categories';
 import type { PriceItem, PricedLine } from '@/lib/types';
@@ -47,6 +47,8 @@ import ls from './Ledger.module.css';
 import { ledgerJson } from '@/lib/ledger-export';
 import le from './LedgerEmpty.module.css';
 import ThemedImg from './ThemedImg';
+import ListenButton from './ListenButton';
+import { ledgerScript, spokenLineOf } from '@/lib/speech';
 
 const LE_SV = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.5, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const };
 
@@ -122,10 +124,11 @@ export default function Ledger() {
      5,688 px down. Read once on mount, from the local hint (no request). */
   const [signedIn, setSignedIn] = useState(false);
   useEffect(() => { setSignedIn(signedInHint()); }, []);
-  /* patient-14: on a phone her own lines come before the survey band. Chosen
-     in script, not by CSS order, so the reading and tab order match what is
-     seen. The ledger renders only after hydration, so there is no server
-     markup to disagree with. */
+  /* Phone width, read in script, not by CSS order, so the reading and tab
+     order match what is seen (WhoPays goes compact). The ledger renders only
+     after hydration, so there is no server markup to disagree with. Care you
+     went without no longer moves on a phone (JUDGE-PANEL-R2 S-1, which
+     replaces patient-14): it sits under the total on every width. */
   const [phone, setPhone] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia?.('(max-width: 720px)');
@@ -245,7 +248,16 @@ export default function Ledger() {
   // Provenance and the fit paragraph live behind the mark: a line is six things, everything else is a click.
   const [openWhy, setOpenWhy] = useState<Set<string>>(new Set());
   const toggleWhy = (k: string) => setOpenWhy((p) => { const n = new Set(p); if (n.has(k)) n.delete(k); else n.add(k); return n; });
-  const chart = useMemo(() => groups.filter((g) => g.cat.key !== 'unmatched').map((g) => ({ label: g.cat.label, total: g.lines.reduce((a, l) => a + (l.totalUsd ?? 0), 0), n: g.lines.reduce((a, l) => a + l.entry.times, 0) })).filter((r) => r.total > 0).sort((a, b) => b.total - a.total), [groups]);
+  /* judge panel 15 Oct #2.1: a summable:false figure (the yearly prescriptions survey
+     row) gets its own bar, tagged "beside the total", so the bars never add it in. */
+  const chart = useMemo(() => {
+    const side = new Set(sum.beside);
+    const bar = (label: string, ls: PricedLine[], beside: boolean) => ({ label, beside, total: ls.reduce((a, l) => a + (l.totalUsd ?? 0), 0), n: ls.reduce((a, l) => a + l.entry.times, 0) });
+    return groups.filter((g) => g.cat.key !== 'unmatched')
+      .flatMap((g) => [bar(g.cat.label, g.lines.filter((l) => !side.has(l)), false), bar(g.cat.label, g.lines.filter((l) => side.has(l)), true)])
+      .filter((r) => r.total > 0).sort((a, b) => Number(a.beside) - Number(b.beside) || b.total - a.total);
+  }, [groups, sum.beside]);
+  const beside = useMemo(() => besideSentence(sum.beside), [sum.beside]);
   const max = Math.max(1, ...chart.map((c) => c.total));
   const wrong = Object.values(st.flags).filter((v) => v === 'wrong').length;
   /* 🔴 THE YEAR-AHEAD FIGURE IS THE ONE THIS PERSON CHOSE, AND ONLY WHEN IT CAN
@@ -336,7 +348,7 @@ export default function Ledger() {
     io.observe(totalEl);
     return () => io.disconnect();
   }, [totalEl]);
-  const burdensEntered = burdens.workdays > 0 || burdens.careHours > 0 || burdens.trips > 0 || burdens.dismissed > 0;
+  const burdensEntered = burdens.workdays > 0 || burdens.careHours > 0 || burdens.adminHours > 0 || burdens.trips > 0 || burdens.dismissed > 0;
 
   /* Three stat cards beside the total, in the order that argues: time first. */
   const stats: { lbl: string; val: string; sub: ReactNode; line?: true; phoneDup?: true }[] = [];
@@ -358,7 +370,7 @@ export default function Ledger() {
   stats.push(
     blankLines === 0
       ? { lbl: 'carries a published federal figure', val: 'Every visit and test', sub: null, line: true }
-      : { lbl: 'Without a federal figure', val: String(blankLines), sub: 'shown blank, never guessed' },
+      : { lbl: 'No published price', val: String(blankLines), sub: 'left blank, not estimated' },
   );
   if (wrong > 0) stats.push({ lbl: 'Corrections you sent', val: String(wrong), sub: <Link href="/register/live">see the running count</Link> });
 
@@ -485,6 +497,7 @@ export default function Ledger() {
         label: labels.primary, totalUsd: sum.totalUsd,
         ...(labels.secondary ? { secondLabel: labels.secondary, secondTotalUsd: otherSum.totalUsd } : {}),
         pricedLines: sum.pricedCount, unpricedLines: sum.unpricedCount, linesWithNoFigureForYou: notDescribed,
+        ...(sum.beside.length ? { besideTheTotal: besideFigures(sum.beside).map((f) => ({ id: f.id, label: f.label, usd: f.usd, dollarYear: f.year, lines: f.lines })), besideTheTotalIs: 'figures the table marks non-summable: shown beside the total, never added to it' } : {}),
       },
       lines: lines.map((l) => {
         const f = fits.get(l.entry.key);
@@ -541,6 +554,7 @@ export default function Ledger() {
       if (feeSchedule) L.push(`THE RATE IS PUBLISHED BY THE STATE: ${feeSchedule.program}, ${feeSchedule.url} (address checked ${feeSchedule.verifiedOn})`);
     } else {
       L.push(`${labels.primary.toUpperCase()}: ${usd(sum.totalUsd)}`);
+      if (beside) L.push(`${beside}.`);
       if (labels.secondary) L.push(`${labels.secondary.toUpperCase()}: ${usd(otherSum.totalUsd)}, shown beside it and never added.`);
     }
     if (paidSum.any) L.push(`WHAT I PAID, MY OWN FIGURES, NEVER ADDED TO THE ABOVE: ${usd(paidSum.paidUsd, true)} on ${paidSum.paidLines} ${paidSum.paidLines === 1 ? 'line' : 'lines'}${paidSum.gapUsd !== null ? ` · difference from the ${paidSum.figureName} on the ${paidSum.compared} ${paidSum.compared === 1 ? 'line' : 'lines'} that carry both: ${paidSum.gapUsd >= 0 ? '+' : '-'}${usd(Math.abs(paidSum.gapUsd), true)}` : ''}`);
@@ -649,12 +663,33 @@ export default function Ledger() {
             visits={appointments}
             searched={searched}
             tableVersion={TABLE_VERSION}
-            label="Published figures for this pattern of care"
+            label={st.example ? "Medicare's price for the example's care" : "Medicare's price for the care you listed"}
             allCited={blankLines === 0}
             sublabel={totalDollarYear(lines, fits)}
+            beside={beside}
           />
         )}
         <ContextBar variant="line" />
+        {/* FINAL-1011 listen: "I literally can't read… is there audio way" (patient advocate, Beta).
+            Read aloud from these same figures (lib/speech.ts ledgerScript), never other numbers. */}
+        {/* B-7 after B-1: the voice says the card's own label and total; a summable:false line
+            is said beside the total, as the card prints it, never as a line inside it. */}
+        <ListenButton what="this ledger" script={() => ledgerScript({
+          label: st.example ? "Medicare's price for the example's care" : "Medicare's price for the care you listed",
+          beside: suppressed ? null : beside,
+          totalUsd: suppressed ? null : sum.totalUsd,
+          basis: suppressed ? null : labels.primary,
+          pricedCount: sum.pricedCount, visits: appointments, searched,
+          second: !suppressed && twoTotals && labels.secondary ? { label: labels.secondary, totalUsd: otherSum.totalUsd } : null,
+          suppressed: suppressed && noFig ? { headline: noFig.headline, floorUsd, ceilingUsd } : null,
+          lines: groups.filter((g) => g.cat.key !== 'notcare').flatMap((g) => g.lines.filter((l) => !sum.beside.includes(l)).map((l) => spokenLineOf(l, fits.get(l.entry.key), {
+            countedAs: gapHints.get(l.entry.key)?.label ?? (g.cat.key === 'counted' ? 'the gap report' : null), diagnosis: g.cat.key === 'diagnosis',
+          }))),
+          searchingFor: gaps.months > 0 ? monthsPhrase(gaps.months) : null,
+          namedUnpriced: gaps.named,
+          agencies: agencies.map((a) => a.agency),
+          tableVersion: TABLE_VERSION,
+        })} />
         {/* judge panel #9: Medicare is not a child's insurer; say what these figures are for her.
             flow3-18: the parent's note only for a parent; one line for someone who fell ill as a child. */}
         {/* patient2-9: the parent's note is one line with More, so her first line reaches a phone's first screen. */}
@@ -719,8 +754,10 @@ export default function Ledger() {
           It sits under the total as one strip whose counters open in place, so
           the first line of the ledger is still in the first screen. No dollar
           is ever attached to care that did not happen, and nothing in it is
-          added to the total above. */}
-      {!phone && <CareGoneWithout />}
+          added to the total above. JUDGE-PANEL-R2 S-1 (15 Oct): one place on
+          every width. A phone used to get it after the table, about 4,800 px
+          down, while the change log and the filing say "under the total". */}
+      <CareGoneWithout />
 
       {/* FINAL-1011 whopays: the NIH lead's question at the Beta, "how much is cost
           to the healthcare system, how much is out of pocket, how much is
@@ -734,6 +771,8 @@ export default function Ledger() {
       <section className="card table-card" id="lines">
         {/* The composed Lyme example says so on the page, not only in its toast (FINAL-1011 lyme NEEDS). */}
         {st.example === 'lyme' && <p className="micro">An example we wrote, not anyone&rsquo;s record: a Lyme disease journey.</p>}
+        {/* judge panel 15 Oct #2.2: the home example says so too, and yields to her own words (lib/store addStory). */}
+        {st.example === 'home' && <p className="micro" data-testid="example-label">An example we wrote, not anyone&rsquo;s record. Type your own and it replaces this.</p>}
         {/* The instruction that used to run under the page heading, moved to the
             thing it is about. It is the whole argument of the product. Its fine
             print sits beside it rather than alone at the foot (desktop F21). */}
@@ -886,8 +925,6 @@ export default function Ledger() {
         </div>
       </section>
 
-      {phone && <CareGoneWithout />}
-
       <PaidCard s={paidSum} onEdit={() => setPaidOpen(true)} />
       <PaidDialog open={paidOpen !== null} focusKey={typeof paidOpen === 'string' ? paidOpen : null} entries={st.entries} gapKeys={new Set(gapHints.keys())}
         onClose={() => setPaidOpen(null)} onSave={(rows) => { for (const r of rows) st.setPaid(r.key, r.usd, r.each); setPaidOpen(null); }} />
@@ -921,8 +958,8 @@ export default function Ledger() {
           </div>
           <div className="bars" role="list" aria-labelledby="where-the-cost-sits">
             {chart.map((c) => (
-              <div key={c.label} className="bar-row" role="listitem">
-                <span className="bar-l">{c.label}<small>{c.n} {c.n === 1 ? 'time' : 'times'}</small></span>
+              <div key={`${c.label}${c.beside ? ' beside' : ''}`} className="bar-row" role="listitem">
+                <span className="bar-l">{c.label}<small>{c.n} {c.n === 1 ? 'time' : 'times'}{c.beside ? ' · beside the total, not in it' : ''}</small></span>
                 <span className="bar-track" aria-hidden="true"><span className="bar-fill" style={{ width: `${(c.total / max) * 100}%` }} /></span>
                 <span className="bar-v">{usd(c.total, true)}</span>
               </div>

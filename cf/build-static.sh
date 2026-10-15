@@ -5,7 +5,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 OUT_NAME="${OUT_NAME:-out}"
 STAGE="$ROOT/cf/.stage-$OUT_NAME"
-( cd "$ROOT" && node scripts/gen-dictionary.mjs 2>/dev/null && node scripts/gen-price-table.mjs 2>/dev/null && node scripts/gen-locality-table.mjs 2>/dev/null && node scripts/gen-conditions-count.mjs )
+( cd "$ROOT" && node scripts/gen-dictionary.mjs 2>/dev/null && node scripts/gen-price-table.mjs 2>/dev/null && node scripts/gen-locality-table.mjs 2>/dev/null && node scripts/gen-conditions-count.mjs && node scripts/gen-audit-count.mjs && node scripts/gen-reader-score.mjs )
 # The /privacy field table is generated from cf/migrations/*.sql, the write-path
 # validators, the integrity projection and the CSV header. NEVER silence this one:
 # a column with no plain-English line in data/column-glossary.json must fail the build,

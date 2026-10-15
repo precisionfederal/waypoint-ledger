@@ -453,7 +453,7 @@ function fitAsSaid(item: PriceItem, ctx: Ctx): Fit {
             + (pr
               ? `Hospitals must post the rates they negotiated, under the federal price transparency rule (45 CFR 180), and ${hosp} hospitals' files list commercial rates for this service; they are shown beside this figure as hospital-published rates, never added to your total. `
               : '')
-            + 'This is the federal reference figure for the same service, not your bill. Private plans normally pay more than Medicare, '
+            + 'This is the federal reference figure for the same service, not your bill. Private plans often pay more than Medicare, though some hospitals post negotiated rates below it, '
             + 'and the average charge below is what the same service is billed at before any plan negotiates it down.');
         }
       case 'medicaid':

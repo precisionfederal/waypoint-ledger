@@ -17,6 +17,7 @@ import {
   NO_FIGURE_GROUP,
 } from '../lib/paid';
 import { priceJourney, totals, usd } from '../lib/pricing';
+import { coverageForReader } from '../lib/coverage-words';
 import { decodeShare, encodeShare, savedRowsOf, sharePayload, splitSaved } from '../lib/store';
 import { validateJourney } from '../lib/price-api';
 import { TABLE, SELECTABLE, TABLE_VERSION } from '../lib/table';
@@ -168,7 +169,14 @@ describe('with no paid amount the ledger and the sheet are exactly round 4', () 
     const now = renderWith(Ledger, fakeStore(demoEntries()));
     expect(now.split(FOOT_LINK).length).toBe(2);
     // FINAL-1011 face: the hospital range under each row's figure is new, and the only other addition.
-    expect(now.replace(FOOT_LINK, '').replace(/<button type="button" class="[^"]*" data-private-face="[^"]*"[^>]*>.*?<\/button>/g, '')).toBe(before);
+    // Judge panel 15 Oct B-4: the site-of-service card prints its coverage statements through
+    // lib/coverage-words (Medicaid usually pays less than Medicare), the one other change.
+    // The trips card's own-numbers half is lazy (fallback null): it renders only once another test in
+    // this worker has loaded the chunk, so the comparison drops it either way.
+    const settled = now
+      .replace(/<fieldset style="border:0;padding:0;margin:.2rem 0 0;display:grid;gap:.45rem"><legend class="lbl"[^>]*>Add your own numbers \(optional\)<\/legend>.*?<\/fieldset>/, '')
+      .replace(/<ul aria-live="polite" style="list-style:none;padding:0;margin:.2rem 0 .45rem;display:grid;gap:.5rem"><\/ul>/g, '');
+    expect(settled.replace(FOOT_LINK, '').replace(/<button type="button" class="[^"]*" data-private-face="[^"]*"[^>]*>.*?<\/button>/g, '')).toBe(coverageForReader(before));
   });
 
   it('no paid column, card, strip or form is rendered', () => {
@@ -179,7 +187,8 @@ describe('with no paid amount the ledger and the sheet are exactly round 4', () 
 
   it('the sheet markup is byte-for-byte the same', () => {
     const now = renderWith(Sheet, fakeStore(demoEntries())).replace(/Prepared [A-Z][a-z]+ \d{1,2}, \d{4}/, 'Prepared DATE');
-    expect(now).toBe(sheetBefore);
+    // Judge panel 15 Oct B-9: the unpriced stop on the journey strip carries her own words.
+    expect(now).toBe(sheetBefore.replace('<span class="sj-label">No federal figure</span>', '<span class="sj-label">\u201cshocked the nerves\u201d</span>'));
   });
 });
 
@@ -200,7 +209,7 @@ describe('with a paid amount the ledger and the sheet show it beside the federal
   });
 
   it('the federal total is the same string with or without it', () => {
-    const hero = (h: string) => /Published figures for this pattern of care[\s\S]{0,600}?\$[\d,]+(\.\d\d)?/.exec(h)?.[0];
+    const hero = (h: string) => /Medicare(?:'|&#x27;)s price for the care you listed[\s\S]{0,600}?\$[\d,]+(\.\d\d)?/.exec(h)?.[0];
     expect(hero(html)).toBeTruthy();
     expect(hero(html)).toBe(hero(none));
   });

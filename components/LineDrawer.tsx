@@ -15,6 +15,7 @@ import Dialog from './Dialog';
 import PrivateRange from './PrivateRange';
 import cs from './ContextBar.module.css';
 import ds from './LineDrawer.module.css';
+import { coverageForReader } from '@/lib/coverage-words';
 
 /* ==========================================================================
    THE SOURCE DRAWER, IN SEVEN BLOCKS.
@@ -207,7 +208,8 @@ export default function LineDrawer({ item, ctx = {}, onClose, forChild = false }
     return () => { document.body.classList.remove('no-scroll'); };
   }, [item]);
   if (!item) return null;
-  const cov = splitCoverage(item.coverage);
+  /* judge panel 15 Oct #2.4: Medicaid usually pays less than Medicare, not more (lib/coverage-words). */
+  const cov = splitCoverage(coverageForReader(item.coverage));
   const fit = fitOf(item, ctx, forChild);
   const why = splitWhy(fit.why);
   const loc = localityOf(ctx.locality);

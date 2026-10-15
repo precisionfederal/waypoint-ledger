@@ -113,6 +113,9 @@ export default function InterviewForm() {
   const [followUp, setFollowUp] = useState(false);
   const [email, setEmail] = useState('');
   const [channel, setChannel] = useState('direct');
+  /* A paid research panel forbids collecting names or contact details: no "quote me by name", no follow-up email. */
+  const panel = channel === 'paid-panel' || channel === 'paid-panel-2';
+  useEffect(() => { if (panel) { setFollowUp(false); setConsent((c) => (c === 'quote-by-name' ? '' : c)); } }, [panel, consent, followUp]);
   const [state, setState] = useState<'idle' | 'sending' | 'sent'>('idle');
   const [err, setErr] = useState<string | null>(null);
   /* Present only for a paid research-panel answer with the code configured server-side. */
@@ -329,16 +332,16 @@ export default function InterviewForm() {
           <div className="choice-grid">
             <label className={`choice ${consent === 'notes' ? 'on' : ''}`}><input type="radio" name="consent" checked={consent === 'notes'} onChange={() => setConsent('notes')} /><span>Learn from it, never quote it</span></label>
             <label className={`choice ${consent === 'quote-anonymously' ? 'on' : ''}`}><input type="radio" name="consent" checked={consent === 'quote-anonymously'} onChange={() => setConsent('quote-anonymously')} /><span>Quote me, without my name</span></label>
-            <label className={`choice ${consent === 'quote-by-name' ? 'on' : ''}`}><input type="radio" name="consent" checked={consent === 'quote-by-name'} onChange={() => setConsent('quote-by-name')} /><span>Quote me by name</span></label>
+            {!panel && <label className={`choice ${consent === 'quote-by-name' ? 'on' : ''}`}><input type="radio" name="consent" checked={consent === 'quote-by-name'} onChange={() => setConsent('quote-by-name')} /><span>Quote me by name</span></label>}
           </div>
-          {consent === 'quote-by-name' && (
+          {!panel && consent === 'quote-by-name' && (
             <label className="field"><span>The name to use</span><input type="text" maxLength={80} value={name} onChange={(e) => setName(e.target.value)} /></label>
           )}
-          <label className="check">
+          {!panel && <label className="check">
             <input type="checkbox" checked={followUp} onChange={(e) => setFollowUp(e.target.checked)} />
             <span>Tell me when there is a new version to look at</span>
-          </label>
-          {followUp && (
+          </label>}
+          {!panel && followUp && (
             <label className="field"><span>Email for that one message, and nothing else</span><input type="email" inputMode="email" autoComplete="email" maxLength={120} value={email} onChange={(e) => setEmail(e.target.value)} /></label>
           )}
         </fieldset>

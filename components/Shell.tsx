@@ -53,6 +53,7 @@ const MORE: MoreGroup[] = [
       { href: '/sheet', label: 'Appointment sheet' },
       { href: '/survey', label: 'Rank the burdens' },
       { href: '/lived-experience', label: 'What patients told researchers', footerOnly: true },
+      { href: '/walkthrough', label: 'Watch the walkthrough, with captions', footerOnly: true },
       { href: '/interview', label: 'Written interview' },
       { href: '/account', label: 'Save across devices' },
     ],
@@ -75,6 +76,7 @@ const MORE: MoreGroup[] = [
     links: [
       { href: '/privacy', label: 'Privacy' },
       { href: '/integrity', label: 'The integrity record' },
+      { href: '/who-shaped-this', label: 'Who shaped this', footerOnly: true },
       { href: '/accessibility', label: 'Accessibility' },
     ],
   },

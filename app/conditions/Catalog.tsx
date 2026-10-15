@@ -379,8 +379,6 @@ export default function Catalog({ entries, schemaHref, qualifier }:
           <span><strong>{without.length}</strong> priceable, no verified burden figure yet</span>
         </p>
 
-        {withPanel.map((e) => <ValidationPanel key={e.condition.id} entry={e} />)}
-
         <ConditionFilter total={entries.length} />
 
         <h2 className={s.h2} id="with-figure">
@@ -393,6 +391,9 @@ export default function Catalog({ entries, schemaHref, qualifier }:
         <div className={s.grid} data-cond-group="">
           {withFigure.map((e) => <Entry key={e.condition.id} e={e} />)}
         </div>
+
+        {/* judge3 #5: the catalog leads; the one published-figure check sits under it. */}
+        {withPanel.map((e) => <ValidationPanel key={e.condition.id} entry={e} />)}
 
         <Fold id="no-figure" title={`Priceable, no verified federal burden figure yet (${without.length})`}
           summary={`Each with its ICD-10-CM code and what the tool prices${examplesWithout.length ? `; ${examplesWithout.length} with an example sentence` : ''}`}>

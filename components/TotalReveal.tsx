@@ -60,6 +60,9 @@ export interface TotalRevealProps {
    *  "Every visit and test carries a published federal figure" folds into the (i)
    *  (core.css .core-allcited-fp), so her first line reaches the first screen. */
   allCited?: boolean;
+  /** judge panel 15 Oct #2.1: the summable:false figures the total leaves out, in one
+   *  sentence (lib/pricing besideSentence), printed under the number; null when none. */
+  beside?: string | null;
 }
 
 const EASE = (t: number) => 1 - Math.pow(1 - t, 3);
@@ -81,6 +84,7 @@ export default function TotalReveal({
   yearAhead = null,
   searched = null,
   allCited = false,
+  beside = null,
 }: TotalRevealProps) {
   /* 🔴 NO FLASH OF THE ANSWER BEFORE THE COUNT (desktop F05). Starting from the
      final figure painted "$1,304", then dropped to about $0 and counted up. The
@@ -130,9 +134,10 @@ export default function TotalReveal({
       {/* judge panel #6: the length of the search sits beside the money, in her words' numbers. */}
       {searched && (() => { const [a, f, b] = splitFrom(searched); return <p className="core-searched">{a}{f && <span className="core-searched-from">{f}</span>}{b}</p>; })()}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {label}: {usd(totalUsd)} across {pricedCount} priced {pricedCount === 1 ? 'line' : 'lines'}.
+        {label}: {usd(totalUsd)} across {pricedCount} priced {pricedCount === 1 ? 'line' : 'lines'}.{beside ? ` ${beside}.` : ''}
       </p>
       {sublabel && <p className="reveal-sub">{sublabel}</p>}
+      {beside && <p className="reveal-sub" data-testid="total-beside">{beside}.</p>}
       <div className="fp-row">
         <p className="micro" style={{ margin: 0 }}>{pricedCount} priced {pricedCount === 1 ? 'line' : 'lines'}{typeof visits === 'number' && visits > 0 ? ` · ${visits} ${visits === 1 ? 'visit or test' : 'visits and tests'}` : ''}</p>
         <FinePrint label="About these figures">

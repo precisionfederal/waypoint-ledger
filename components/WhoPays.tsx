@@ -14,15 +14,25 @@
    assumption it rests on, on its face.
    ========================================================================== */
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, lazy, useEffect, useId, useMemo, useState } from 'react';
 import { usd } from '@/lib/pricing';
-import { COVERAGE_LABEL, type Ctx } from '@/lib/fit';
+import { COVERAGE_LABEL, localityOf, type Ctx } from '@/lib/fit';
 import { burdenCards, type BurdenCounts } from '@/lib/burdens';
 import { loadForgone } from '@/lib/forgone';
 import type { GapSummary } from '@/lib/sheet';
 import type { PricedLine } from '@/lib/types';
 import { PART_B, RATE_PCT, RULE_TEXT, invisibleCounts, whoPays, type ForgoneLike } from '@/lib/whopays';
+import { loadPlan, savePlan, type PlanKind } from '@/lib/plan-store';
 import s from './WhoPays.module.css';
+
+/* The form and the arithmetic load only when a person picks their own plan or Medicaid. */
+const YourPlan = lazy(() => import('./YourPlan'));
+
+const PLAN_KINDS: { key: PlanKind; label: string }[] = [
+  { key: 'medicare', label: 'Original Medicare' },
+  { key: 'private', label: 'My employer or marketplace plan' },
+  { key: 'medicaid', label: 'Medicaid' },
+];
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const day = (iso: string) => { const [y, m, d] = iso.split('-').map(Number); return `${d} ${MONTHS[m - 1]} ${y}`; };
@@ -48,6 +58,17 @@ export default function WhoPays({ lines, ctx, gaps, burdens, compact = false }: 
     dismissed: burdens.dismissed, trips: burdens.trips,
   }), [gaps, burdens, forgone]);
   const wages = useMemo(() => burdenCards(burdens).filter((c) => c.valueUsd !== null && c.count > 0), [burdens]);
+  /* Whose terms the share is worked out under. Original Medicare until the person
+     picks another; a saved choice (this device only) or their coverage above picks it after mount. */
+  const [kind, setKind] = useState<PlanKind>('medicare');
+  useEffect(() => {
+    const saved = loadPlan();
+    if (saved.kind !== 'medicare') setKind(saved.kind);
+    else if (ctx.coverage === 'employer' || ctx.coverage === 'marketplace') setKind('private');
+    else if (ctx.coverage === 'medicaid') setKind('medicaid');
+  }, [ctx.coverage]);
+  const pick = (k: PlanKind) => { setKind(k); savePlan({ kind: k, terms: loadPlan().terms }); };
+  const pid = useId();
 
   const m = w.medicare;
   const p = w.private;
@@ -65,12 +86,31 @@ export default function WhoPays({ lines, ctx, gaps, burdens, compact = false }: 
             : <>Shown as a reference for someone with Original Medicare. Choose your coverage above and this says whether it describes you.</>}
         </p>
       )}
+      {m && (
+        <fieldset className={s.pick} data-testid="whopays-plan-pick">
+          <legend className={s.pickLg}>Work out your share with</legend>
+          <div className={s.pills}>
+            {PLAN_KINDS.map((o) => (
+              <label key={o.key} className={s.pill} htmlFor={`${pid}-${o.key}`}>
+                <input id={`${pid}-${o.key}`} type="radio" name={`${pid}-plan`} value={o.key} checked={kind === o.key} onChange={() => pick(o.key)} />
+                <span>{o.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+      )}
+      {m && kind !== 'medicare' && (
+        <Suspense fallback={<p className={s.small}>Loading your plan&rsquo;s form…</p>}>
+          <YourPlan kind={kind} split={m} stateCode={localityOf(ctx.locality)?.state ?? null} />
+        </Suspense>
+      )}
       <div className={s.grid}>
         {m && (
           <div className={s.tile} data-testid="whopays-program">
             <p className={s.lbl}>The Medicare program pays</p>
             <p className={s.num}>{usd(m.programUsd, true)}</p>
             <p className={s.basis}>{rules} · of {usd(m.approvedUsd, true)} Medicare-approved on {m.lines.length} {m.lines.length === 1 ? 'line' : 'lines'}</p>
+            <p className={s.why} data-testid="whopays-why-low"><b>Why this may look low:</b> Medicare&rsquo;s approved amount is a rate the government sets. Private plans and hospital charges are usually higher. Where the table carries the billed charge, it is in each line&rsquo;s drawer.</p>
           </div>
         )}
         {m && (
@@ -78,7 +118,7 @@ export default function WhoPays({ lines, ctx, gaps, burdens, compact = false }: 
             <p className={s.lbl}>Your share if you had Original Medicare (Part B) and had not met the {PART_B.year} deductible</p>
             <p className={s.num}>{usd(m.personUsd, true)}</p>
             <p className={s.basis}>
-              {rules} · {usd(m.deductibleAppliedUsd, true)} deductible{m.deductibleAppliedUsd < m.deductibleUsd ? ` (of ${usd(m.deductibleUsd)})` : ''} + {RATE_PCT} of the remaining {usd(remaining, true)} = {usd(m.coinsuranceUsd, true)}
+              {rules} · {usd(m.deductibleAppliedUsd, true)} deductible{m.deductibleAppliedUsd < m.deductibleUsd ? ` (of ${usd(m.deductibleUsd)})` : ''}{remaining > 0 ? <> + {usd(m.coinsuranceUsd, true)} coinsurance ({RATE_PCT} of the remaining {usd(remaining, true)}) = {usd(m.deductibleAppliedUsd + m.coinsuranceUsd, true)}</> : ', all of it under the deductible'}
               {m.noShareUsd > 0 ? ` · ${usd(m.noShareUsd, true)} of lab tests and yearly screenings carry no share` : ''}
             </p>
           </div>
@@ -120,7 +160,7 @@ export default function WhoPays({ lines, ctx, gaps, burdens, compact = false }: 
               </tbody>
             </table>
             <p className={s.small}>
-              {usd(m.subjectUsd, true)} is under the deductible-then-{RATE_PCT} rule. The {usd(m.deductibleUsd)} deductible is met once across those lines: {usd(m.deductibleAppliedUsd, true)}. Then {RATE_PCT} × {usd(remaining, true)} = {usd(m.coinsuranceUsd, true)}. Your share: {usd(m.deductibleAppliedUsd, true)} + {usd(m.coinsuranceUsd, true)} = <b>{usd(m.personUsd, true)}</b>. The program: {usd(m.approvedUsd, true)} − {usd(m.personUsd, true)} = <b>{usd(m.programUsd, true)}</b>.
+              {usd(m.subjectUsd, true)} is under the deductible-then-{RATE_PCT} rule. The {usd(m.deductibleUsd)} deductible is met once across those lines: {usd(m.deductibleAppliedUsd, true)}. {remaining > 0 ? <>Then {RATE_PCT} × {usd(remaining, true)} = {usd(m.coinsuranceUsd, true)}. </> : `Nothing is left over the deductible, so no ${RATE_PCT} share applies. `}Your share: {usd(m.deductibleAppliedUsd, true)} + {usd(m.coinsuranceUsd, true)} = <b>{usd(m.personUsd, true)}</b>. The program: {usd(m.approvedUsd, true)} − {usd(m.personUsd, true)} = <b>{usd(m.programUsd, true)}</b>.
             </p>
             <ul className={s.src}>
               <li>“{PART_B.deductibleSource.quote}.” <a href={PART_B.deductibleSource.url} target="_blank" rel="noopener noreferrer">CMS fact sheet</a></li>

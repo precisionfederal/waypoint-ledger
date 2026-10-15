@@ -43,8 +43,8 @@
         "open data",
         "provenance"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "describedBy": "https://waypointledger.org/data/price-dictionary.csv",
       "describedByType": "text/csv",
       "references": [
@@ -118,7 +118,7 @@
       "landingPage": "https://waypointledger.org/adopt",
       "identifier": "https://waypointledger.org/data/locality-prices.csv",
       "title": "Medicare allowed amounts for 52 services in all 109 CMS payment localities",
-      "description": "5668 figures: 52 CPT/HCPCS codes priced for each of the 109 Medicare payment localities across 53 states and territories. Every figure is CMS's own formula, (work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009, applied to CMS's own published relative value units and geographic practice cost indices, which are printed on the same row together with the SHA-256 of each source file. The generator is also the audit: it recomputed all 5668 figures on 2026-10-11 and found 0 mismatches, and exits non-zero on one cent of drift. For a person who is not on Medicare this is a published reference price, not a bill; for a person on Medicaid it does not describe what their state pays at all.",
+      "description": "5668 figures: 52 CPT/HCPCS codes priced for each of the 109 Medicare payment localities across 53 states and territories. Every figure is CMS's own formula, (work_rvu * pw_gpci + pe_nonfacility_rvu * pe_gpci + mp_rvu * mp_gpci) * 33.4009, applied to CMS's own published relative value units and geographic practice cost indices, which are printed on the same row together with the SHA-256 of each source file. The generator is also the audit: it recomputed all 5668 figures on 2026-10-15 and found 0 mismatches, and exits non-zero on one cent of drift. For a person who is not on Medicare this is a published reference price, not a bill; for a person on Medicaid it does not describe what their state pays at all.",
       "keyword": [
         "medicare",
         "physician fee schedule",
@@ -131,8 +131,8 @@
         "open data",
         "reproducible"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "describedBy": "https://waypointledger.org/data/locality-dictionary.csv",
       "describedByType": "text/csv",
       "isPartOf": "https://waypointledger.org/data/price-table.csv",
@@ -202,8 +202,8 @@
         "health care costs",
         "open data"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "describedBy": "https://waypointledger.org/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -259,8 +259,8 @@
         "public feedback",
         "open data"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "describedBy": "https://waypointledger.org/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -317,8 +317,8 @@
         "invisible illness",
         "open data"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "describedBy": "https://waypointledger.org/data/dictionary.csv",
       "describedByType": "text/csv",
       "distribution": [
@@ -373,8 +373,8 @@
         "survey instrument",
         "open data"
       ],
-      "modified": "2026-10-11",
-      "issued": "2026-10-11",
+      "modified": "2026-10-15",
+      "issued": "2026-10-15",
       "distribution": [
         {
           "@type": "dcat:Distribution",

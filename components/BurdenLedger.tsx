@@ -1,17 +1,19 @@
 'use client';
 
 /* ==========================================================================
-   THE FOUR BURDENS, BESIDE THE MONEY — never inside it
+   THE FIVE BURDENS, BESIDE THE MONEY — never inside it
 
    /survey asks people to rank five burdens and the ledger above prices one.
-   This block prices two more from BLS rows already in the table, counts two
-   that no federal file prices, and keeps all four apart: no card is added to
-   the medical total, and no card is added to another. The arithmetic is on
+   This block prices three more from BLS rows already in the table (missed
+   work, unpaid care, the hours on the phone and paperwork), counts two that
+   no federal file prices (trips, dismissals), and keeps all five apart: no
+   card is added to the medical total, and no card is added to another. A
+   trip gets arithmetic only on the miles and hours the person types. The arithmetic is on
    the face of every card, because a figure a person cannot check is a figure
    they have to take on trust.
    ========================================================================== */
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import Link from '@/components/IntentLink';
 import { TABLE_VERSION } from '@/lib/table';
 import { useStore } from '@/lib/store';
@@ -21,6 +23,11 @@ import {
   type BurdenCard, type BurdenCounts, type CareMethodId, type PayBasisId,
 } from '@/lib/burdens';
 import { Icon } from './Icons';
+
+/* The trips inputs and the lines on her own numbers load in their own chunk,
+   so the /ledger route stays inside its size budget. */
+const TripInputs = lazy(() => import('./BurdenTrips'));
+const OwnLines = lazy(() => import('./BurdenTrips').then((m) => ({ default: m.OwnLines })));
 
 const mono = { fontFamily: 'var(--font-m)', fontSize: '.86rem' } as const;
 /** A phone target, not a cursor target. */
@@ -47,6 +54,8 @@ export default function BurdenLedger() {
   const [c, setC] = useState<BurdenCounts>(EMPTY_BURDENS);
   const [ready, setReady] = useState(false);
   const [ownPayText, setOwnPayText] = useState('');
+  const [milesText, setMilesText] = useState('');
+  const [tripHoursText, setTripHoursText] = useState('');
   /* What the person's own sentences said about missed work (lib/burdens.ts). */
   const [said, setSaid] = useState<{ raw: string; days: number; note: string }[]>([]);
   const [sendState, setSendState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
@@ -58,6 +67,8 @@ export default function BurdenLedger() {
     setC(loaded);
     setSaid(readWorkdaysSaid());
     setOwnPayText(loaded.ownWeeklyPayUsd === null ? '' : String(loaded.ownWeeklyPayUsd));
+    setMilesText(loaded.milesPerTrip ? String(loaded.milesPerTrip) : '');
+    setTripHoursText(loaded.hoursPerTrip ? String(loaded.hoursPerTrip) : '');
     setReady(true);
   }, []);
   useEffect(() => { if (ready) saveBurdens(c); }, [c, ready]);
@@ -76,7 +87,7 @@ export default function BurdenLedger() {
   const entered = burdensEntered(c);
 
   function set<K extends keyof BurdenCounts>(k: K, v: BurdenCounts[K]) { setC((p) => ({ ...p, [k]: v })); }
-  function bump(k: 'workdays' | 'careHours' | 'trips' | 'dismissed', delta: number, max: number) {
+  function bump(k: CountKey, delta: number, max: number) {
     setC((p) => ({ ...p, [k]: Math.max(0, Math.min(max, (p[k] || 0) + delta)) }));
     if (k === 'dismissed') { setSendState('idle'); setSendMsg(null); }
   }
@@ -110,7 +121,7 @@ export default function BurdenLedger() {
       <h2 id="burdens-h">The costs the claims files never see</h2>
       <p className="micro" style={{ maxWidth: '48rem', fontSize: '1rem' }}>
         Ranked by the people who carried them at <Link href="/survey">/survey</Link>. We price them apart and never weight them.
-        The money is the ledger above. These are the other four: two have a published federal figure behind them, and two do not, so they stay blank.
+        The money is the ledger above. These are the other five: three are valued from a published federal wage, with the arithmetic on the card, and two have no federal figure, so they stay blank. Add your own miles and hours to the trips and the card does the arithmetic on your numbers.
       </p>
 
       <div className="acts" style={{ gridTemplateColumns: 'repeat(auto-fit,minmax(16rem,1fr))', marginTop: 'var(--sp-4, 1.5rem)' }}>
@@ -144,6 +155,10 @@ export default function BurdenLedger() {
               set('ownWeeklyPayUsd', Number.isFinite(n) && n > 0 ? cents(n) : null);
             }} />}
             {card.kind === 'care-hours' && <CareMethodPicker value={c.careMethod} onPick={(id) => set('careMethod', id)} />}
+            {card.kind === 'trips' && <Suspense fallback={null}><TripInputs
+              milesText={milesText} hoursText={tripHoursText}
+              onMiles={(text) => { const n = ownAmount(text, MAX.milesPerTrip); setMilesText(parseFloat(text) > n ? String(n) : text); set('milesPerTrip', n); }}
+              onHours={(text) => { const n = ownAmount(text, MAX.hoursPerTrip); setTripHoursText(parseFloat(text) > n ? String(n) : text); set('hoursPerTrip', n); }} /></Suspense>}
 
             <Figure card={card} />
 
@@ -168,7 +183,7 @@ export default function BurdenLedger() {
       <p className="micro" style={{ marginTop: 'var(--sp-3, 1rem)', maxWidth: '52rem' }}>
         {entered === 0
           ? 'Nothing is filled in until you enter a count or name one in your own words. Then the arithmetic appears with the federal row it came from.'
-          : entered === 4 ? 'All four filled in. ' : `${entered} of the four filled in. `}
+          : entered === cards.length ? 'All five filled in. ' : `${entered} of the five filled in. `}
         These figures are never added to the itemized total above, and never added to each other: a missed workday and an hour of
         someone else&rsquo;s time are different quantities, and adding them would be the weighting we say we do not do.
         {/* flow3-12: no storage key in front of a patient. The one thing that can
@@ -192,13 +207,21 @@ export default function BurdenLedger() {
 
 /* ------------------------------------------------------------- the parts */
 
+type CountKey = 'workdays' | 'careHours' | 'adminHours' | 'trips' | 'dismissed';
+
+/** A miles or hours box the person typed: one decimal place, 0 when blank or junk. */
+function ownAmount(text: string, max: number): number {
+  const n = parseFloat(text);
+  return Number.isFinite(n) && n > 0 ? Math.min(Math.round(n * 10) / 10, max) : 0;
+}
+
 function Counter({ card, onBump, onSet }: {
   card: BurdenCard;
-  onBump: (k: 'workdays' | 'careHours' | 'trips' | 'dismissed', d: number, max: number) => void;
+  onBump: (k: CountKey, d: number, max: number) => void;
   onSet: (fn: (p: BurdenCounts) => BurdenCounts) => void;
 }) {
-  const key = ({ workdays: 'workdays', 'care-hours': 'careHours', trips: 'trips', dismissed: 'dismissed' } as const)[card.kind];
-  const max = ({ workdays: MAX.workdays, careHours: MAX.careHours, trips: MAX.trips, dismissed: MAX.dismissed } as const)[key];
+  const key = ({ workdays: 'workdays', 'care-hours': 'careHours', 'admin-hours': 'adminHours', trips: 'trips', dismissed: 'dismissed' } as const)[card.kind];
+  const max = ({ workdays: MAX.workdays, careHours: MAX.careHours, adminHours: MAX.adminHours, trips: MAX.trips, dismissed: MAX.dismissed } as const)[key];
   const step = card.kind === 'care-hours' ? 5 : 1;
   const id = `burden-${card.kind}`;
   return (
@@ -222,12 +245,15 @@ function Counter({ card, onBump, onSet }: {
 function Figure({ card }: { card: BurdenCard }) {
   const [open, setOpen] = useState(false);
   const has = card.valueUsd !== null;
+  const own = card.ownLines.length > 0;
   return (
     <div>
-      {has ? (
+      {own ? (
+        <Suspense fallback={null}><OwnLines lines={card.ownLines} /></Suspense>
+      ) : has ? (
         <>
           <p className="mid-num" style={{ margin: '.2rem 0 .1rem' }} aria-live="polite">{money(card.valueUsd as number)}</p>
-          <p style={{ ...mono, margin: '0 0 .45rem', color: 'var(--ink-2)' }}>{card.arithmetic}</p>
+          <p style={{ ...mono, margin: '0 0 .45rem', color: 'var(--ink-2)', overflowWrap: 'anywhere' }}>{card.arithmetic}</p>
         </>
       ) : (
         <p style={{ margin: '.2rem 0 .45rem' }}>
@@ -238,7 +264,7 @@ function Figure({ card }: { card: BurdenCard }) {
       <p className="micro" style={{ margin: 0 }}>{card.noFigureReason ?? card.method}</p>
 
       <button className="link-btn" type="button" aria-expanded={open} onClick={() => setOpen(!open)} style={{ marginTop: '.35rem' }}>
-        {open ? 'Hide the source and the limits' : has ? 'Where this figure comes from' : 'Why this stays blank'}
+        {open ? 'Hide the source and the limits' : has || own ? 'Where this figure comes from' : 'Why this stays blank'}
       </button>
 
       {open && (

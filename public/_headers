@@ -24,3 +24,7 @@
 # whose glyphs change must get a new file name.
 /fonts/*
   Cache-Control: public, max-age=2592000
+
+# The walkthrough's captions: a browser only loads a <track> served as text/vtt.
+/video/*.vtt
+  Content-Type: text/vtt; charset=utf-8

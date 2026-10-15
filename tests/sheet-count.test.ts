@@ -14,16 +14,16 @@ import { EXAMPLE_UNPRICED, exampleEntries, exampleLines } from '../components/sh
 import { exampleLedger } from '../lib/store';
 import type { JourneyEntry } from '../lib/types';
 
-/** The ledger's count: the numeral beside "Without a federal figure", or 0 when it says every line is cited. */
+/** The ledger's count: the numeral beside "No published price", or 0 when it says every line is cited. */
 const ledgerCount = (h: string): number => {
-  const m = /figV[^>]*>(\d+)<\/span><span[^>]*>Without a federal figure</.exec(h);
+  const m = /figV[^>]*>(\d+)<\/span><span[^>]*>No published price</.exec(h);
   if (m) return Number(m[1]);
   expect(h).toContain('Every visit and test');
   return 0;
 };
 /** The sheet's count: the same label in its summary band, or 0 when it says every line carries a figure. */
 const sheetCount = (h: string): number => {
-  const m = /<dt>Without a federal figure<\/dt><dd>(\d+)<\/dd>/.exec(h);
+  const m = /<dt>No published price<\/dt><dd>(\d+)<\/dd>/.exec(h);
   if (m) return Number(m[1]);
   expect(h).toContain('Every visit and test carries a published federal figure');
   return 0;

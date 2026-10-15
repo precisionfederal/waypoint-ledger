@@ -139,6 +139,8 @@ export interface LedgerTotals {
   unpricedCount: number;
   /** Bases actually present, so the UI can warn when they are not addable. */
   basesUsed: PriceBasis[];
+  /** Priced lines on a row the table marks summable:false: shown beside the total, never in it. */
+  beside: PricedLine[];
 }
 
 /** A user's verdict on a published federal figure. This is the payload that

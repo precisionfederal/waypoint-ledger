@@ -23,8 +23,10 @@ import {
   SANDBOX, SERVICE_CODE_SYSTEMS, normalizeCode, codeIndex, pickRow,
   extractLines, claimCount, nextPageUrl, mapClaims, mapLines, importSummary,
   refusalOf, CMS_ATTRIBUTION, ENVIRONMENT_LABEL,
+  resultFromPayload, SYNTHETIC_LINE_LABEL, SYNTHETIC_TRY, SYNTHETIC_SOURCE,
   type EobBundle, type ClaimLine,
 } from '../lib/bluebutton';
+import { syntheticPayload } from '../lib/bluebutton-synthetic';
 import { TABLE } from '../lib/table';
 import { priceJourney, totals, clampTimes } from '../lib/pricing';
 
@@ -217,7 +219,8 @@ describe('what the CMS sample actually maps to — derived from the table, never
 
   it('summarises itself without an adjective or a dollar sign, and its numbers agree with the map', () => {
     const s = importSummary(r);
-    expect(s).toBe(`10 Medicare claims, 63 billed lines, ${r.matched.length} matched a published federal price row, `
+    const priced = r.matched.filter((g) => g.item.valueUsd !== null).length;
+    expect(s).toBe(`10 Medicare claims, 63 billed lines, ${r.matched.length} matched a row in this table${priced < r.matched.length ? ` (${priced} of them carry a published figure)` : ''}, `
       + `${r.unmatched.length} code${r.unmatched.length === 1 ? '' : 's'} had no row in this table, 31 lines carried no procedure code.`);
     expect(s).not.toContain('$');
   });
@@ -428,8 +431,12 @@ describe('the Medicare import: on the ledger, hidden until configured', () => {
   const rel = (f: string) => f.slice(ROOT.length + 1).split('\\').join('/');
 
   /* The places allowed to name it: the mount, and two descriptions that say it is off. */
-  const NAMES_IT_AS_OFF = ['app/method/page.tsx', 'components/Adopt.tsx'];
-  const OFF = /stays off until CMS issues us credentials/;
+  // 14 Oct 2026: the /walkthrough transcript voices the video's Blue Button line, which says sandbox and production approval.
+  // Judge panel 15 Oct B-5: the home proof strip says 'Connected to the CMS sandbox', only while /api/bluebutton/status says configured.
+  const NAMES_IT_AS_OFF = ['app/method/page.tsx', 'app/walkthrough/page.tsx', 'components/Adopt.tsx', 'components/ProofStrip.tsx'];
+  // 13 Oct 2026: sandbox credentials issued and the live sign-in verified end to end
+  // (BBUser00001: 52 claims, 137 billed lines). Both descriptions now say sandbox, not production.
+  const OFF = /CMS (?:production approval|sandbox)/;
 
   it('is mounted on the ledger page, through its gate, and nowhere else', () => {
     const gate = files.filter((f) => /<MedicareImport\b/.test(readFileSync(f, 'utf8'))).map(rel);
@@ -438,6 +445,9 @@ describe('the Medicare import: on the ledger, hidden until configured', () => {
     expect(panel).toEqual(['components/MedicareImport.tsx']);
     // The panel's code is its own chunk, loaded only when configured.
     expect(readFileSync(join(ROOT, 'components/MedicareImport.tsx'), 'utf8')).toMatch(/lazy\(\(\) => import\('\.\/ImportClaims'\)\)/);
+    // The CMS example loads the same chunk, and only when someone asks for it.
+    expect(readFileSync(join(ROOT, 'components/MedicareImport.tsx'), 'utf8'))
+      .toMatch(/lazy\(\(\) => import\('\.\/ImportClaims'\)\.then\(\(m\) => \(\{ default: m\.SyntheticImport \}\)\)\)/);
   });
 
   it('only the mount and the two descriptions name Blue Button, and both descriptions say it is off', () => {
@@ -466,11 +476,15 @@ describe('the Medicare import: on the ledger, hidden until configured', () => {
     }
   });
 
-  it('🔴 the mount paints nothing before the status answers (no shift, no words)', async () => {
+  it('🔴 before the status answers, the mount paints only the CMS example\'s one line, never the live import', async () => {
     const { default: MedicareImport } = await import('../components/MedicareImport');
     const { default: ImportClaims } = await import('../components/ImportClaims');
     const { StoreProvider } = await import('../lib/store');
-    expect(renderToStaticMarkup(createElement(MedicareImport))).toBe('');
+    const first = renderToStaticMarkup(createElement(MedicareImport));
+    expect(first).toContain('data-testid="bb-try"');
+    expect(first).toContain(SYNTHETIC_TRY);
+    expect(first).not.toContain('Bring in your Medicare record');
+    expect(first).not.toContain('Sign in at Medicare');
     expect(renderToStaticMarkup(createElement(StoreProvider, null, createElement(ImportClaims)))).toBe('');
     expect(renderToStaticMarkup(createElement(StoreProvider, null,
       createElement(ImportClaims, { initialStatus: unconfigured })))).toBe('');
@@ -628,5 +642,113 @@ describe('the callback and status carry CMS\'s reason, never a stranger\'s', () 
     expect(j.configured).toBe(false);
     expect(j.refusal).toBeNull();
     expect(res.headers.get('set-cookie')).toBeNull();
+  });
+});
+
+/* --------------------------------------------------------------------------
+   FINAL-1011 proof #1: the CMS example a reader can press.
+
+   The ten synthetic claims CMS publishes with the API, shown to anyone, through
+   the live import's own mapping call, priced from the table, every line
+   labelled, nothing fetched, nothing stored, nothing added to a ledger.
+   -------------------------------------------------------------------------- */
+describe('the CMS synthetic example: a button anyone can press', () => {
+  const linesFile = JSON.parse(readFileSync(join(ROOT, 'data/bluebutton-cms-synthetic-lines.json'), 'utf8'));
+
+  it('🔴 its lines are exactly what the Worker would extract from the CMS fixture, nothing added or edited', () => {
+    expect(linesFile.fixture_sha256).toBe(source.fixture_sha256);
+    expect(linesFile.claimCount).toBe(claimCount(bundle));
+    expect(linesFile.lines).toEqual(JSON.parse(JSON.stringify(extractLines(bundle))));
+    // And the example says where it came from, in CMS's own example name.
+    expect(source.example_key).toContain(SYNTHETIC_SOURCE.example);
+    expect(source.spec_url).toBe(SYNTHETIC_SOURCE.specUrl);
+    expect(source.spec_served_by).toBe(SYNTHETIC_SOURCE.docsUrl);
+  });
+
+  it('the button path is the live path: resultFromPayload() on the example equals mapping the CMS bundle', () => {
+    const viaButton = resultFromPayload(syntheticPayload(), TABLE);
+    expect(viaButton).toEqual(mapClaims(bundle, TABLE));
+    // The live import's load() calls the same function on the Worker's answer.
+    const src = readFileSync(join(ROOT, 'components/ImportClaims.tsx'), 'utf8');
+    expect(src).toContain('setResult(resultFromPayload(j, TABLE));');
+    expect(src).toContain('resultFromPayload(syntheticPayload(), TABLE)');
+  });
+
+  it('yields at least one ledger line priced from the published table, and the sum is those lines', () => {
+    const r = resultFromPayload(syntheticPayload(), TABLE);
+    const lines = priceJourney(r.entries);
+    const t = totals(lines);
+    expect(t.pricedCount).toBeGreaterThanOrEqual(1);
+    for (const l of lines.filter((x) => x.priced)) expect(l.entry.item!.sourceUrl).toMatch(/^https:\/\/[^/]*\.gov\//);
+  });
+
+  it('🔴 says plainly: synthetic data published by CMS, sandbox only, no real person, on every line', async () => {
+    const { SyntheticImportView } = await import('../components/ImportClaims');
+    const r = resultFromPayload(syntheticPayload(), TABLE);
+    const html = renderToStaticMarkup(createElement(SyntheticImportView, { result: r }));
+    expect(html).toContain('Synthetic data published by CMS.');
+    expect(html).toContain('No real person’s claims.');
+    expect(html).toContain('connects to CMS’s sandbox of synthetic beneficiaries; real Medicare records need CMS production approval');
+    expect(html).toContain('did not contact CMS, and nothing here is stored or added to your ledger');
+    expect(html.split(SYNTHETIC_LINE_LABEL).length - 1).toBeGreaterThanOrEqual(r.matched.length + 1);
+    expect((html.match(/data-testid="bb-synthetic-line"/g) || []).length).toBe(r.matched.length);
+    expect(html).toContain(SYNTHETIC_SOURCE.docsUrl);
+    expect(html).toContain(CMS_ATTRIBUTION.replace('&', '&amp;'));
+    expect(html).toContain(importSummary(r));
+    expect(html).not.toMatch(/to my ledger|Sign in at Medicare/);
+    expect(html).not.toContain('—');
+  });
+
+  it('🔴 writes nothing to storage and calls nothing on the network, CMS or otherwise', async () => {
+    const calls: string[] = [];
+    const g = globalThis as Record<string, unknown>;
+    const saved = { fetch: g.fetch, localStorage: g.localStorage, sessionStorage: g.sessionStorage, XMLHttpRequest: g.XMLHttpRequest };
+    const spyStore = (name: string) => ({
+      getItem: () => { calls.push(`${name}.getItem`); return null; },
+      setItem: () => { calls.push(`${name}.setItem`); },
+      removeItem: () => { calls.push(`${name}.removeItem`); },
+      clear: () => { calls.push(`${name}.clear`); },
+    });
+    g.fetch = (() => { calls.push('fetch'); return Promise.reject(new Error('no network')); }) as unknown;
+    g.localStorage = spyStore('localStorage');
+    g.sessionStorage = spyStore('sessionStorage');
+    g.XMLHttpRequest = function XHR() { calls.push('XMLHttpRequest'); } as unknown;
+    try {
+      const { SyntheticImport } = await import('../components/ImportClaims');
+      const r = resultFromPayload(syntheticPayload(), TABLE);
+      priceJourney(r.entries);
+      const html = renderToStaticMarkup(createElement(SyntheticImport));
+      expect(html).toContain(SYNTHETIC_LINE_LABEL);
+    } finally {
+      Object.assign(g, saved);
+    }
+    expect(calls).toEqual([]);
+    // And in the code itself: the example's half of the panel and its data module
+    // have no fetch, no storage and no store.
+    const src = readFileSync(join(ROOT, 'components/ImportClaims.tsx'), 'utf8');
+    const example = src.slice(src.indexOf('THE CMS EXAMPLE.'), src.indexOf('/** `initialStatus` is the answer'));
+    expect(example.length).toBeGreaterThan(1000);
+    const data = readFileSync(join(ROOT, 'lib/bluebutton-synthetic.ts'), 'utf8');
+    for (const code of [example, data]) {
+      expect(code).not.toMatch(/fetch\(|localStorage|sessionStorage|indexedDB|useStore|addItem|sendBeacon|XMLHttpRequest/);
+    }
+    expect(data).not.toMatch(/https?:\/\//);
+  });
+
+  it('the ledger button and the /adopt link open the same example', async () => {
+    const mount = readFileSync(join(ROOT, 'components/MedicareImport.tsx'), 'utf8');
+    expect(mount).toContain(`const TRY_LABEL = '${SYNTHETIC_TRY}';`);
+    const { TRY_PARAM, TRY_VALUE } = await import('../components/MedicareImport');
+    const adopt = readFileSync(join(ROOT, 'components/Adopt.tsx'), 'utf8');
+    expect(adopt).toContain(`href="/ledger?${TRY_PARAM}=${TRY_VALUE}">${SYNTHETIC_TRY}</a>`);
+  });
+
+  it('/adopt says the exact truth in the Blue Button cell', () => {
+    const adopt = readFileSync(join(ROOT, 'components/Adopt.tsx'), 'utf8');
+    const row = adopt.slice(adopt.indexOf('href="https://bluebutton.cms.gov/"'), adopt.indexOf('CMS Interoperability Framework</a></th>'));
+    expect(row).toContain('<td data-label="Today"><strong>Connected to the CMS sandbox</strong> · synthetic beneficiaries</td>');
+    expect(row).toContain('synthetic data, no real person&rsquo;s claims');
+    expect(row).toContain('Real Medicare records need CMS production approval');
+    expect(row).not.toContain('Written, switched off');
   });
 });

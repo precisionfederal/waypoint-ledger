@@ -92,9 +92,16 @@ function HospitalRows({ r }: { r: ShownRange }) {
    data/private-rates-lines.json, so the row needs no rates file). A reference,
    never added to any total; nothing renders below MIN_HOSPITALS hospitals. Pressing
    it opens the line's drawer at this section, unfolded. */
+/* judge3 #2: a whole-encounter Medicare figure (the ER visit, doctor and hospital
+   together) sits beside rates that cover one half of the bill. The face says
+   which half, so a lower range never reads as private plans paying less. */
+export function faceScope(itemId: string, group: string): string {
+  if (!itemId.endsWith('-complete')) return '';
+  return group === 'facility' ? ', hospital’s fee only' : group === 'professional' ? ', doctor’s fee only' : '';
+}
 export function faceRangeText(item: { id: string }): string | null {
   const r = faceRange(item);
-  return r ? `Hospitals’ posted negotiated rates: ${money(r.low)}–${money(r.high)} (${plural(r.hospitals, 'hospital')})` : null;
+  return r ? `Hospitals’ posted negotiated rates${faceScope(item.id, r.group)}: ${money(r.low)}–${money(r.high)} (${plural(r.hospitals, 'hospital')})` : null;
 }
 
 /** After the line's drawer opens, unfold its hospital-rates section and bring it into view. */
@@ -113,9 +120,9 @@ export function PrivateRangeFace({ item, onOpen }: { item: { id: string; label: 
   if (!r) return null;
   return (
     <button type="button" className={ps.face} data-private-face={item.id}
-      aria-label={`Hospitals’ posted negotiated rates for ${item.label}: ${money(r.low)} to ${money(r.high)} at ${plural(r.hospitals, 'hospital')}. A reference from hospital price transparency files, not added to any total. Opens the line’s hospital rates.`}
+      aria-label={`Hospitals’ posted negotiated rates${faceScope(item.id, r.group)} for ${item.label}: ${money(r.low)} to ${money(r.high)} at ${plural(r.hospitals, 'hospital')}. A reference from hospital price transparency files, not added to any total. Opens the line’s hospital rates.`}
       onClick={() => { onOpen(); requestAnimationFrame(() => revealPrivateRange()); }}>
-      <span className={ps.faceKind}>Hospitals’ posted negotiated rates</span>
+      <span className={ps.faceKind}>Hospitals’ posted negotiated rates{faceScope(item.id, r.group)}</span>
       <span className={ps.faceFig}><span className={ps.faceAmt}>{money(r.low)}&ndash;{money(r.high)}</span> ({plural(r.hospitals, 'hospital')})</span>
     </button>
   );
@@ -154,11 +161,16 @@ export default function PrivateRange({ item, ctx = {} }: { item: PriceItem | nul
       <details className={ps.more}>
         <summary>
           <span className={ps.sumText} id={titleId}>
-            Hospital rates: {money(first.spread.low)}&ndash;{money(first.spread.high)}, {plural(first.spread.hospitals, 'hospital')}
+            Hospital rates{faceScope(item.id, first.group)}: {money(first.spread.low)}&ndash;{money(first.spread.high)}, {plural(first.spread.hospitals, 'hospital')}
           </span>
           <RangeBar r={first} medicare={marker} />
           <span className={ps.chev} aria-hidden="true" />
         </summary>
+        {faceScope(item.id, first.group) && (
+          <p className="micro" style={{ margin: ".4rem 0" }}>
+            These posted rates cover {first.group === 'facility' ? 'the hospital’s fee' : 'the doctor’s fee'} only; Medicare&rsquo;s figure on this line is the whole encounter, so the two are not compared.
+          </p>
+        )}
         <div className={ps.fold}>
           <p className={ps.small}>{PRIVATE_RATE_LABEL_LONG}. {PRIVATE_RATE_NOT_FEDERAL}</p>
           {view.shown.map((r) => {

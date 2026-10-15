@@ -109,7 +109,7 @@ export interface JourneyGapHint extends GapHint { key: string; raw: string; time
 export interface SavedEntry { raw: string; itemId: string | null; times: number; gapCategory?: string | null; months?: number | null; reason?: string | null; paid?: number; paidEach?: true }
 /* `paid` at the top level is the round-4 shape (price id -> amount), read once
    and moved onto the line it belongs to. */
-interface Saved { v: 2; savedAt: string; entries: SavedEntry[]; unpriced: string[]; flags: Record<string, 'right' | 'wrong'>; paid?: Record<string, number> }
+interface Saved { v: 2; savedAt: string; entries: SavedEntry[]; unpriced: string[]; flags: Record<string, 'right' | 'wrong'>; paid?: Record<string, number>; example?: LedgerExampleId }
 
 /** A toast may carry one action ("Undo"); it then stays up long enough to reach (10 s). */
 export type ToastAction = { label: string; run: () => void };
@@ -156,8 +156,8 @@ interface Store {
   remap: (key: string, itemId: string | null) => void;
   reset: () => void;
   loadExample: () => void;
-  /** The composed example on the ledger (?example=lyme), so a page can label it "an example we wrote"; null for a person's own lines. */
-  example: ComposedExampleId | null;
+  /** The example on the ledger ('home' from "See it done with an example", or ?example=lyme), so a page can label it "an example we wrote"; null for a person's own lines. */
+  example: LedgerExampleId | null;
   correct: (item: PriceItem, verdict: 'right' | 'wrong', believedValueUsd?: number | null, note?: string, lineKey?: string) => Promise<boolean>;
   clearFlag: (id: string) => void;
   shareUrl: () => string;
@@ -208,8 +208,8 @@ function rowsOfSaved(st: Saved): JourneyEntry[] {
 
 /** What a saved copy says, without the moment it was written: two tabs that
  *  hold the same ledger write the same body, so neither writes it back. */
-function savedBody(st: Pick<Saved, 'entries' | 'unpriced' | 'flags'> | null): string {
-  return st ? JSON.stringify([st.entries ?? [], st.unpriced ?? [], st.flags ?? {}]) : '';
+function savedBody(st: Pick<Saved, 'entries' | 'unpriced' | 'flags' | 'example'> | null): string {
+  return st ? JSON.stringify([st.entries ?? [], st.unpriced ?? [], st.flags ?? {}, st.example ?? null]) : '';
 }
 
 /** patient2-4: keep the keys of lines that did not change, so an open Wrong box
@@ -408,6 +408,14 @@ export const COMPOSED_EXAMPLES = {
   },
 } as const;
 export type ComposedExampleId = keyof typeof COMPOSED_EXAMPLES;
+/* judge panel 15 Oct #2.2: the home example ("See it done with an example") is an
+   example too, labelled on the ledger, and the first words a person types replace it. */
+export type LedgerExampleId = ComposedExampleId | 'home';
+export const isExampleId = (v: unknown): v is LedgerExampleId => v === 'home' || (typeof v === 'string' && Object.prototype.hasOwnProperty.call(COMPOSED_EXAMPLES, v));
+/** What a typed story is added to: the person's own lines, or nothing while an example shows. */
+export function storyBase(example: LedgerExampleId | null, entries: JourneyEntry[]): JourneyEntry[] {
+  return example === null ? entries : [];
+}
 
 /** The composed example a URL asks for (?example=lyme), or null. Anything else is ignored. */
 export function composedExampleIn(search: string): ComposedExampleId | null {
@@ -466,7 +474,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, [keepPatient]);
   const [hydrated, setHydrated] = useState(false);
   /** Which composed example is on the ledger, so a page can say so on its face; null for a person's own lines. */
-  const [example, setExample] = useState<ComposedExampleId | null>(null);
+  const [example, setExample] = useState<LedgerExampleId | null>(null);
+  /* Read by the add actions, so the first story typed over an example replaces it. */
+  const exampleRef = useRef<LedgerExampleId | null>(null);
+  useEffect(() => { exampleRef.current = example; }, [example]);
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [saving, setSaving] = useState(false);
   const [pending, setPending] = useState<{ entries: JourneyEntry[]; unpriced: string[] } | null>(null);
@@ -488,9 +499,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         const raw = ev.key === null ? localStorage.getItem(KEY) : ev.newValue;
         const st = raw ? (JSON.parse(raw) as Saved) : null;
         lastWritten.current = savedBody(st);
-        if (!st) { setEntries([]); setUnpriced([]); setFlags({}); return; }
+        if (!st) { setEntries([]); setUnpriced([]); setFlags({}); setExample(null); return; }
         setEntries(keepKeys(entriesRef.current, rowsOfSaved(st)));
-        setUnpriced(st.unpriced ?? []); setFlags(st.flags ?? {});
+        setUnpriced(st.unpriced ?? []); setFlags(st.flags ?? {}); setExample(isExampleId(st.example) ? st.example : null);
       } catch { /* a copy this tab cannot read is left alone */ }
     };
     window.addEventListener('storage', onStorage);
@@ -595,6 +606,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           lastWritten.current = savedBody(st);
           setEntries(rowsOfSaved(st));
           setUnpriced(st.unpriced ?? []); setFlags(st.flags ?? {});
+          /* The example's label outlives the full-page load "See it done with an example" makes. */
+          if (isExampleId(st.example)) { exampleRef.current = st.example; setExample(st.example); }
         } else {
           const old = localStorage.getItem(LEGACY);
           if (old) {
@@ -667,7 +680,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      const s: Saved = { v: 2, savedAt: new Date().toISOString(), entries: entries.map((e) => ({ raw: e.raw, itemId: e.item?.id ?? null, times: e.times, gapCategory: e.gapCategory ?? null, months: e.months ?? null, ...(!e.item && reasonOf(e) ? { reason: reasonOf(e) } : {}), ...paidFieldsOut(e) })), unpriced: unpricedHits, flags };
+      const s: Saved = { v: 2, savedAt: new Date().toISOString(), entries: entries.map((e) => ({ raw: e.raw, itemId: e.item?.id ?? null, times: e.times, gapCategory: e.gapCategory ?? null, months: e.months ?? null, ...(!e.item && reasonOf(e) ? { reason: reasonOf(e) } : {}), ...paidFieldsOut(e) })), unpriced: unpricedHits, flags, ...(example ? { example } : {}) };
       const keep = entries.length || unpricedHits.length;
       const body = keep ? savedBody(s) : '';
       /* patient2-4: a copy that only repeats what another tab just wrote is not
@@ -676,9 +689,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       lastWritten.current = body;
       if (keep) localStorage.setItem(KEY, JSON.stringify(s)); else localStorage.removeItem(KEY);
     } catch { /* ignore */ }
-  }, [entries, unpricedHits, flags, hydrated]);
+  }, [entries, unpricedHits, flags, example, hydrated]);
+
+  /* judge panel 15 Oct #2.2: a typed story over an example starts from an empty
+     ledger. The example's lines, its named cost and its thumbs go; nothing of the
+     person's own is touched, because while an example shows there is none. */
+  const clearExampleFor = useCallback((): JourneyEntry[] => {
+    const base = storyBase(exampleRef.current, entriesRef.current);
+    if (exampleRef.current === null) return base;
+    exampleRef.current = null;
+    setExample(null); setEntries([]); setUnpriced([]); setFlags({});
+    entriesRef.current = base;
+    toast('The example was cleared; these are your lines.', 'info');
+    return base;
+  }, [toast]);
 
   const addStory = useCallback((story: string) => {
+    const base = clearExampleFor();
     noteStory(story);
     const segs = parseJourney(story.trim(), ITEMS);
     const add: JourneyEntry[] = []; let matched = 0, unpriced = 0; const annual: string[] = [];
@@ -690,18 +717,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       add.push({ key: uid(), raw: s.raw, item: s.result.item, times: cap.times, gapCategory: s.result.gapCategory, months: s.result.months, ...(!s.result.item && s.result.reason ? { reason: s.result.reason } : {}) } as JourneyEntry);
       if (s.result.item) matched++;
     }
-    const m = mergeEntries(entriesRef.current, add);
+    const m = mergeEntries(base, add);
     entriesRef.current = m.entries;
     setEntries(m.entries);
     for (const n of annual) toast(n, 'info');
     const joined = mergeToast(m.merged);
     if (joined) toast(joined, 'info');
     return { added: add.length, matched, unpriced, merged: m.merged.length };
-  }, [toast, noteStory]);
+  }, [toast, noteStory, clearExampleFor]);
 
   /** Add what the live preview already read — the AI reader's fills included — so the chip
    *  a person saw is the line she gets. Absorbed fragments never become lines. */
   const addSegments = useCallback((segs: ParsedSegment[], story?: string) => {
+    const base = clearExampleFor();
     noteStory(story ?? segs.map((s) => s.raw).join('. '));
     const add: JourneyEntry[] = []; let matched = 0, unpriced = 0; const annual: string[] = [];
     for (const s of segs) {
@@ -713,14 +741,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       add.push({ key: uid(), raw: s.raw, item: s.result.item, times: cap.times, gapCategory: s.result.gapCategory, months: s.result.months, source: s.source ?? 'rules', modelWhy: s.modelWhy ?? null, ...(!s.result.item && s.result.reason ? { reason: s.result.reason } : {}) } as JourneyEntry);
       if (s.result.item) matched++;
     }
-    const m = mergeEntries(entriesRef.current, add);
+    const m = mergeEntries(base, add);
     entriesRef.current = m.entries;
     setEntries(m.entries);
     for (const n of annual) toast(n, 'info');
     const joined = mergeToast(m.merged);
     if (joined) toast(joined, 'info');
     return { added: add.length, matched, unpriced, merged: m.merged.length };
-  }, [toast, noteStory]);
+  }, [toast, noteStory, clearExampleFor]);
 
   const applyRead = useCallback((segs: ParsedSegment[]) => {
     const r = applyLateRead(entriesRef.current, segs);
@@ -736,6 +764,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
 
   const addOne = useCallback((text: string) => {
     const t = text.trim(); if (!t) return;
+    clearExampleFor();
     const un = unpriceableHit(t);
     if (un) { setUnpriced((p) => (p.includes(un.id) ? p : [...p, un.id])); noteWork(t, un.id); toast(`“${t}” is a real cost we will not price. ${un.whyUnpriced.split('.')[0]}.`, 'warn'); return; }
     const { text: clean, times } = extractCount(t);
@@ -744,16 +773,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     if (cap.capped && m.item) toast(perYearNote(m.item, times), 'info');
     setEntries((p) => [...p, { key: uid(), raw: t, item: m.item, times: cap.times, gapCategory: m.gapCategory, months: m.months }]);
     toast(m.item ? `Matched to ${m.item.label}.` : `No federal figure matches “${t}”. Kept on your journey, unpriced.`, m.item ? 'ok' : 'warn');
-  }, [toast]);
+  }, [toast, clearExampleFor]);
 
   const addItem = useCallback((it: PriceItem, raw?: string) => {
+    clearExampleFor();
     setEntries((p) => {
       const existing = p.find((e) => e.item?.id === it.id && !raw);
       if (existing) return p.map((e) => (e.key === existing.key ? { ...e, times: clampPerYear(it, e.times + 1).times } : e));
       return [...p, { key: uid(), raw: raw ?? (it.synonyms[0] || it.label), item: it, times: 1 }];
     });
     toast(`${it.label} added.`, 'ok');
-  }, [toast]);
+  }, [toast, clearExampleFor]);
 
   const setTimes = useCallback((key: string, times: number) => {
     setEntries((p) => p.map((e) => {
@@ -784,7 +814,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     entriesRef.current = ex;
     setEntries(ex);
     setUnpriced(['lost-work']);
-    setExample(null);
+    exampleRef.current = 'home';
+    setExample('home');
   }, []);
 
   const correct = useCallback(async (item: PriceItem, verdict: 'right' | 'wrong', believedValueUsd: number | null = null, note?: string, lineKey?: string) => {
@@ -897,4 +928,9 @@ export function useStore(): Store {
   const s = useContext(Ctx);
   if (!s) throw new Error('useStore outside StoreProvider');
   return s;
+}
+
+/** The store when a provider is above, else null: for a mount that also renders alone (tests, static markup). */
+export function useStoreMaybe(): Store | null {
+  return useContext(Ctx);
 }

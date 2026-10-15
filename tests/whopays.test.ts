@@ -207,7 +207,7 @@ describe('the dollar year on the total and on every non-2026 figure', () => {
   it('the Medicare total says "2026 Medicare dollars" and the interval', () => {
     const fits = fitsFor({});
     const lines = priceJourney(entries, (e) => fits.get(e.key)?.figureUsd ?? null);
-    expect(totalDollarYear(lines, fits)).toBe('2026 Medicare dollars: each visit and test at the 2026 published rate, whenever it happened');
+    expect(totalDollarYear(lines, fits)).toBe("Every visit and test priced at Medicare's 2026 rate, even if it happened years ago");
   });
 
   it('the uninsured charge stack says 2024 dollars, and each charge figure carries its year', () => {
@@ -228,9 +228,9 @@ describe('the dollar year on the total and on every non-2026 figure', () => {
 
   it('the ledger prints the dollar year under the total and mounts the panel under the total', () => {
     const h = renderWith(Ledger, fakeStore(entries));
-    expect(h).toContain('2026 Medicare dollars: each visit and test at the 2026 published rate, whenever it happened');
+    expect(h).toContain("Every visit and test priced at Medicare&#x27;s 2026 rate, even if it happened years ago");
     expect(h).toContain('Who carries this cost');
-    expect(h.indexOf('Who carries this cost')).toBeGreaterThan(h.indexOf('2026 Medicare dollars'));
+    expect(h.indexOf('Who carries this cost')).toBeGreaterThan(h.indexOf('Every visit and test priced at Medicare'));
     const u = renderWith(Ledger, fakeStore(entries, { ctx: { coverage: 'uninsured' } }));
     expect(u).toContain('2024 dollars: average billed charges');
     expect(u).toMatch(/core-year"> 2024 dollars/);
